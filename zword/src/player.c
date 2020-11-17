@@ -1,10 +1,9 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window/Keyboard.h>
 
-#include "player.h"
-#include "coordinates.h"
 #include "util.h"
 #include "physics.h"
 #include "image.h"

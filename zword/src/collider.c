@@ -1,12 +1,12 @@
 #include <stdbool.h>
+#include <math.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Graphics.h>
 
-#include "collider.h"
-#include "util.h"
 #include "component.h"
 #include "camera.h"
+#include "util.h"
 
 
 sfVector2f overlap_circle_circle(Component* component, int i, int j) {
@@ -38,7 +38,7 @@ float axis_half_width(sfVector2f half_width, sfVector2f half_height, sfVector2f 
 float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f axis) {
     sfVector2f r21 = { r1.x - r2.x, r1.y - r2.y };
     float r = dot(r21, axis);
-    float o = w1 + w2 - abs(r);
+    float o = w1 + w2 - fabs(r);
     if (o > 0.0) {
         if (fabs(r) < 0.001) {
             return o;

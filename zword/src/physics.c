@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "physics.h"
+#include "component.h"
 
 
 void update(Component* component, float deltaTime) {

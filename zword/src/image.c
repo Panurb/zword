@@ -5,7 +5,7 @@
 
 #include "camera.h"
 #include "util.h"
-#include "image.h"
+#include "component.h"
 
 
 sfSprite* load_sprite(char filename[20], sfVector2f scale) {
