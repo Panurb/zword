@@ -5,13 +5,19 @@
 #include <SFML/Window/Keyboard.h>
 
 #include "util.h"
-#include "physics.h"
-#include "image.h"
-#include "collider.h"
+#include "component.h"
+
+
+void shoot(Component* component) {
+    int i = component->entities;
+    component->entities++;
+
+
+}
 
 
 void input(Component* component, sfVector2f mouse) {
-    for (int i = 0; i <= component->entities; i++) {
+    for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
         sfVector2f v = { 0, 0 };
@@ -35,58 +41,30 @@ void input(Component* component, sfVector2f mouse) {
         float n = norm(v);
 
         if (n > 0) {
-            component->physics[i]->acceleration.x += v.x * component->player[i]->speed / n;
-            component->physics[i]->acceleration.y += v.y * component->player[i]->speed / n;
+            component->physics[i]->acceleration.x += v.x * component->player[i]->acceleration / n;
+            component->physics[i]->acceleration.y += v.y * component->player[i]->acceleration / n;
         }
 
         mouse.x -= component->coordinate[i]->position.x;
         mouse.y -= component->coordinate[i]->position.y;
 
         component->coordinate[i]->angle = atan2(mouse.y, mouse.x);
+
+        if (sfMouse_isButtonPressed(sfMouseLeft)) {
+            shoot(component);
+        }
     }
 }
 
 
-void create_player(Component* component) {
+void create_player(Component* component, float x, float y) {
     int i = component->entities;
     component->entities++;
 
-    CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
-    sfVector2f pos = { 0, 0 };
-    coord->position = pos;
-    coord->angle = 0.0;
-    component->coordinate[i] = coord;
-
-    ImageComponent* image = malloc(sizeof(ImageComponent));
-    sfVector2f scale = { 1, 1 };
-    sfSprite* sprite = load_sprite("player", scale);
-    image->scale = scale;
-    image->sprite = sprite;
-    component->image[i] = image;
-
-    PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
-    sfVector2f vel = { 0, 0 };
-    sfVector2f acc = { 0, 0 };
-    phys->velocity = vel;
-    phys->acceleration = acc;
-    phys->angular_velocity = 0.0;
-    phys->friction = 0.01;
-    phys->bounce = 0.5;
-    component->physics[i] = phys;
-
-    //CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
-    //col->radius = 0.5;
-    //col->shape = sfCircleShape_create();
-    //component->circle_collider[i] = col;
-
-    RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
-    col->width = 1.0;
-    col->height = 1.0;
-    col->shape = sfRectangleShape_create();
-    component->rectangle_collider[i] = col;
-
-    PlayerComponent* player = malloc(sizeof(PlayerComponent));
-    player->health = 100;
-    player->speed = 0.02;
-    component->player[i] = player;
+    component->coordinate[i] = CoordinateComponent_create(0.0, 0.0, 0.0);
+    component->image[i] = ImageComponent_create("player", 1.0);
+    component->physics[i] = PhysicsComponent_create(0.01, 0.5);
+    component->circle_collider[i] = CircleColliderComponent_create(0.5);
+    //component->rectangle_collider[i] = RectangleColliderComponent_create(1.0, 1.0);
+    component->player[i] = PlayerComponent_create();
 }

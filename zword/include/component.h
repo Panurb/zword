@@ -11,12 +11,14 @@ typedef struct {
     float angle;
 } CoordinateComponent;
 
+CoordinateComponent* CoordinateComponent_create(float x, float y, float angle);
 
 typedef struct {
     sfVector2f scale;
     sfSprite* sprite;
 } ImageComponent;
 
+ImageComponent* ImageComponent_create(char filename[20], float scale);
 
 typedef struct {
     sfVector2f velocity;
@@ -26,12 +28,14 @@ typedef struct {
     float bounce;
 } PhysicsComponent;
 
+PhysicsComponent* PhysicsComponent_create(float friction, float bounce);
 
 typedef struct {
     float radius;
     sfCircleShape* shape;
 } CircleColliderComponent;
 
+CircleColliderComponent* CircleColliderComponent_create(float radius);
 
 typedef struct {
     float width;
@@ -39,12 +43,15 @@ typedef struct {
     sfRectangleShape* shape;
 } RectangleColliderComponent;
 
+RectangleColliderComponent* RectangleColliderComponent_create(float width, float height);
 
 typedef struct {
     int health;
-    float speed;
+    float max_speed;
+    float acceleration;
 } PlayerComponent;
 
+PlayerComponent* PlayerComponent_create();
 
 typedef struct {
     int entities;

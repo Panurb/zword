@@ -3,4 +3,4 @@
 #include "component.h"
 
 
-void create_wall(Component* component);
+void create_wall(Component* component, float x, float y, float width, float height, float angle);

@@ -8,7 +8,7 @@
 #include "component.h"
 
 
-sfSprite* load_sprite(char filename[20], sfVector2f scale) {
+sfSprite* load_sprite(char filename[20]) {
     char path[100];
     snprintf(path, 100, "%s%s%s", "data/images/", filename, ".png");
 

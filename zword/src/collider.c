@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 
@@ -11,32 +12,18 @@
 #include "util.h"
 
 
-sfVector2f overlap_circle_circle(Component* component, int i, int j) {
-    sfVector2f overlap = { 0, 0 };
+sfVector2f half_width(Component* component, int i) {
+    return polar_to_cartesian(0.5 * component->rectangle_collider[i]->width, component->coordinate[i]->angle);
+}
 
-    sfVector2f a = component->coordinate[i]->position;
-    sfVector2f b = component->coordinate[j]->position;
-
-    float d = dist(a, b);
-    float r = component->circle_collider[i]->radius + component->circle_collider[j]->radius;
-
-    if (d < r) {
-        if (d < 0.001) {
-            overlap.y = r;
-        }
-        else {
-            overlap.x = (a.x - b.x) * (r - d) / d;
-            overlap.y = (a.y - b.y) * (r - d) / d;
-        }
-    }
-
-    return overlap;
+sfVector2f half_height(Component* component, int i) {
+    return polar_to_cartesian(0.5 * component->rectangle_collider[i]->height, component->coordinate[i]->angle + 0.5 * M_PI);
 }
 
 float axis_half_width(Component* component, int i, sfVector2f axis) {
-    sfVector2f half_width = polar_to_cartesian(0.5 * component->rectangle_collider[i]->width, component->coordinate[i]->angle);
-    sfVector2f half_height = polar_to_cartesian(0.5 * component->rectangle_collider[i]->height, component->coordinate[i]->angle + 0.5 * M_PI);
-    return fabs(dot(half_width, axis)) + fabs(dot(half_height, axis));
+    sfVector2f hw = half_width(component, i);
+    sfVector2f hh = half_height(component, i);
+    return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
 }
 
 float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f axis) {
@@ -44,10 +31,9 @@ float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f 
     float r = dot(r21, axis);
     float o = w1 + w2 - fabs(r);
     if (o > 0.0) {
-        if (fabs(r) < 0.001) {
+        if (fabs(r) < 1e-6) {
             return o;
-        }
-        else {
+        } else {
             return copysignf(o, r);
         }
     }
@@ -55,29 +41,43 @@ float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f 
     return 0.0;
 }
 
+sfVector2f overlap_circle_circle(Component* component, int i, int j) {
+    sfVector2f a = component->coordinate[i]->position;
+    sfVector2f b = component->coordinate[j]->position;
+
+    float d = dist(a, b);
+    float r = component->circle_collider[i]->radius + component->circle_collider[j]->radius;
+
+    if (d > r) {
+        return (sfVector2f) { 0.0, 0.0 };
+    }
+
+    if (d < 1e-6) {
+        return (sfVector2f) { 0.0, r };
+    }
+
+    return (sfVector2f) { (a.x - b.x) * (r - d) / d, (a.y - b.y) * (r - d) / d };
+}
+
 sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
+    bool near_corner = true;
+
+    float overlaps[2] = { 0.0, 0.0 };
+    sfVector2f axes[2];
+    axes[0] = polar_to_cartesian(1.0, component->coordinate[i]->angle);
+    axes[1] = perp(axes[0]);
+
     sfVector2f a = component->coordinate[i]->position;
     sfVector2f b = component->coordinate[j]->position;
     float radius = component->circle_collider[j]->radius;
 
-    bool near_corner = true;
-
-    float angle = component->coordinate[i]->angle;
-    sfVector2f half_width = polar_to_cartesian(0.5 * component->rectangle_collider[i]->width, angle);
-    sfVector2f half_height = polar_to_cartesian(0.5 * component->rectangle_collider[i]->height, angle + 0.5 * M_PI);
-
-    sfVector2f axes[2];
-    float overlaps[2];
-
-    axes[0] = polar_to_cartesian(1.0, angle);
-    axes[1] = polar_to_cartesian(1.0, angle + 0.5 * M_PI);
-
     for (int k = 0; k < 2; k++) {
         overlaps[k] = axis_overlap(axis_half_width(component, i, axes[k]), a, radius, b, axes[k]);
 
-        if (fabs(overlaps[k]) < 0.001) {
+        if (fabs(overlaps[k]) < 1e-6) {
             return (sfVector2f) { 0.0, 0.0 };
         }
+
         if (fabs(overlaps[k]) >= radius) {
             near_corner = false;
         }
@@ -88,9 +88,11 @@ sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
         return (sfVector2f) { overlaps[k] * axes[k].x, overlaps[k] * axes[k].y };
     }
 
-    sfVector2f corner;
-    corner.x = a.x - copysignf(half_width.x, overlaps[0]) - copysignf(half_height.x, overlaps[1]);
-    corner.y = a.y - copysignf(half_width.y, overlaps[0]) - copysignf(half_height.y, overlaps[1]);
+    sfVector2f hw = half_width(component, i);
+    sfVector2f hh = half_height(component, i);
+
+    sfVector2f corner = { a.x - hw.x * copysignf(1.0, overlaps[0]) - hh.x * copysignf(1.0, overlaps[1]),
+                          a.y - hw.y * copysignf(1.0, overlaps[0]) - hh.y * copysignf(1.0, overlaps[1]) };
 
     sfVector2f axis = { corner.x - b.x, corner.y - b.y };
     axis = normalized(axis);
@@ -112,21 +114,20 @@ sfVector2f overlap_circle_rectangle(Component* component, int i, int j) {
 }
 
 sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
-    sfVector2f pos_i = component->coordinate[i]->position;
-    sfVector2f pos_j = component->coordinate[j]->position;
+    sfVector2f hw_i = polar_to_cartesian(1.0, component->coordinate[i]->angle);
+    sfVector2f hw_j = polar_to_cartesian(1.0, component->coordinate[j]->angle);
 
-    float angle_i = component->coordinate[i]->angle;
-    float angle_j = component->coordinate[i]->angle;
-
-    sfVector2f axes[4] = {polar_to_cartesian(1.0, angle_i), polar_to_cartesian(1.0, angle_i + 0.5 * M_PI), 
-                          polar_to_cartesian(1.0, angle_j), polar_to_cartesian(1.0, angle_j + 0.5 * M_PI)};
     float overlaps[4];
+    sfVector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
+
+    sfVector2f a = component->coordinate[i]->position;
+    sfVector2f b = component->coordinate[j]->position;
 
     for (int k = 0; k < 4; k++) {
-        overlaps[k] = axis_overlap(axis_half_width(component, i, axes[k]), pos_i,
-                                   axis_half_width(component, j, axes[k]), pos_j, axes[k]);
+        overlaps[k] = axis_overlap(axis_half_width(component, i, axes[k]), a,
+                                   axis_half_width(component, j, axes[k]), b, axes[k]);
 
-        if (fabs(overlaps[k]) < 0.001) {
+        if (fabs(overlaps[k]) < 1e-6) {
             return (sfVector2f) { 0.0, 0.0 };
         }
     }
@@ -181,22 +182,21 @@ void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
             pos.x -= component->circle_collider[i]->radius;
             pos.y += component->circle_collider[i]->radius;
             sfCircleShape_setPosition(component->circle_collider[i]->shape, world_to_screen(pos, camera));
-            sfCircleShape_setFillColor(component->circle_collider[i]->shape, sfColor_fromRGB(0, 255, 255));
+            sfCircleShape_setFillColor(component->circle_collider[i]->shape, sfColor_fromRGB(255, 0, 255));
             sfCircleShape_setRadius(component->circle_collider[i]->shape, component->circle_collider[i]->radius * camera->zoom);
             sfRenderWindow_drawCircleShape(window, component->circle_collider[i]->shape, NULL);
         } else if (component->rectangle_collider[i]) {
             RectangleColliderComponent* col = component->rectangle_collider[i];
 
+            sfRectangleShape_setOrigin(col->shape, (sfVector2f) { 0.5 * col->width * camera->zoom, 0.5 * col->height * camera->zoom });
+
             sfVector2f pos = component->coordinate[i]->position;
-            pos.x -= 0.5 * col->width;
-            pos.y += 0.5 * col->height;
             sfRectangleShape_setPosition(col->shape, world_to_screen(pos, camera));
 
             sfRectangleShape_setFillColor(col->shape, sfColor_fromRGB(0, 255, 255));
             sfVector2f size = { col->width * camera->zoom, col->height * camera->zoom };
             sfRectangleShape_setSize(col->shape, size);
 
-            sfRectangleShape_setOrigin(col->shape, (sfVector2f) { 0.5 * col->width * camera->zoom, 0.5 * col->height * camera->zoom });
             sfRectangleShape_setRotation(col->shape, -to_degrees(component->coordinate[i]->angle));
 
             sfRenderWindow_drawRectangleShape(window, col->shape, NULL);

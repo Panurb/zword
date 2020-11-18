@@ -1,0 +1,52 @@
+#include "component.h"
+#include "image.h"
+
+
+CoordinateComponent* CoordinateComponent_create(float x, float y, float angle) {
+    CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
+    coord->position = (sfVector2f) { x, y };
+    coord->angle = angle;
+    return coord;
+}
+
+
+ImageComponent* ImageComponent_create(char filename[20], float scale) {
+    ImageComponent* image = malloc(sizeof(ImageComponent));
+    image->scale = (sfVector2f) { scale, scale };
+    image->sprite = load_sprite(filename);
+    return image;
+}
+
+
+PhysicsComponent* PhysicsComponent_create(float friction, float bounce) {
+    PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
+    phys->velocity = (sfVector2f) { 0, 0 };
+    phys->acceleration = (sfVector2f) { 0, 0 };
+    phys->angular_velocity = 0.0;
+    phys->friction = friction;
+    phys->bounce = bounce;
+    return phys;
+}
+
+CircleColliderComponent* CircleColliderComponent_create(float radius) {
+    CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
+    col->radius = radius;
+    col->shape = sfCircleShape_create();
+    return col;
+}
+
+RectangleColliderComponent* RectangleColliderComponent_create(float width, float height) {
+    RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
+    col->width = width;
+    col->height = height;
+    col->shape = sfRectangleShape_create();
+    return col;
+}
+
+PlayerComponent* PlayerComponent_create() {
+    PlayerComponent* player = malloc(sizeof(PlayerComponent));
+    player->health = 100;
+    player->max_speed = 0.5;
+    player->acceleration = 1.0;
+    return player;
+}

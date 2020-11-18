@@ -49,3 +49,15 @@ int abs_argmin(float* a, int n) {
 
     return i;
 }
+
+float mean(float* array, int size) {
+    float tot = 0.0;
+    for (int i = 0; i < size; i++) {
+        tot += array[i];
+    }
+    return tot / size;
+}
+
+sfVector2f perp(sfVector2f v) {
+    return (sfVector2f) { -v.y, v.x };
+}

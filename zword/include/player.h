@@ -5,4 +5,4 @@
 
 void input(Component* component, sfVector2f mouse);
 
-void create_player(Component* component);
+void create_player(Component* component, float x, float y);
