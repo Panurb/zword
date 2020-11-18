@@ -9,6 +9,10 @@ float norm(sfVector2f v) {
     return sqrtf(v.x * v.x + v.y * v.y);
 }
 
+float norm2(sfVector2f v) {
+    return v.x * v.x + v.y * v.y;
+}
+
 float dist(sfVector2f a, sfVector2f b) {
     float x = a.x - b.x;
     float y = a.y - b.y;
@@ -32,4 +36,16 @@ float dot(sfVector2f a, sfVector2f b) {
 sfVector2f polar_to_cartesian(float length, float angle) {
     sfVector2f v = { length * cosf(angle), length * sinf(angle) };
     return v;
+}
+
+int abs_argmin(float* a, int n) {
+    int i = 0;
+
+    for (int j = 1; j < n; j++) {
+        if (fabs(a[j]) < fabs(a[i])) {
+            i = j;
+        }
+    }
+
+    return i;
 }

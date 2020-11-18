@@ -71,13 +71,19 @@ void create_player(Component* component) {
     phys->acceleration = acc;
     phys->angular_velocity = 0.0;
     phys->friction = 0.01;
+    phys->bounce = 0.5;
     component->physics[i] = phys;
 
-    CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
-    col->position = pos;
-    col->radius = 0.5;
-    col->shape = sfCircleShape_create();
-    component->circle_collider[i] = col;
+    //CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
+    //col->radius = 0.5;
+    //col->shape = sfCircleShape_create();
+    //component->circle_collider[i] = col;
+
+    RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
+    col->width = 1.0;
+    col->height = 1.0;
+    col->shape = sfRectangleShape_create();
+    component->rectangle_collider[i] = col;
 
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->health = 100;

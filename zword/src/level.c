@@ -21,9 +21,9 @@ void create_wall(Component* component) {
     image->sprite = sprite;
     component->image[i] = image;
 
-    CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
-    col->position = pos;
-    col->radius = 1.0;
-    col->shape = sfCircleShape_create();
-    component->circle_collider[i] = col;
+    RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
+    col->width = 1.0;
+    col->height = 3.0;
+    col->shape = sfRectangleShape_create();
+    component->rectangle_collider[i] = col;
 }

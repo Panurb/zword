@@ -355,6 +355,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-.exe
+*.exe
+CMakeSettings.json
 
 bin/
+build/

@@ -23,20 +23,20 @@ typedef struct {
     sfVector2f acceleration;
     float angular_velocity;
     float friction;
+    float bounce;
 } PhysicsComponent;
 
 
 typedef struct {
-    sfVector2f position;
     float radius;
     sfCircleShape* shape;
 } CircleColliderComponent;
 
 
 typedef struct {
-    sfVector2f position;
     float width;
     float height;
+    sfRectangleShape* shape;
 } RectangleColliderComponent;
 
 
