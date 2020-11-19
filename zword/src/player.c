@@ -9,11 +9,20 @@
 #include "component.h"
 
 
-void shoot(Component* component) {
-    int i = component->entities;
+void shoot(Component* component, int i) {
+    int j = component->entities;
     component->entities++;
 
-    printf("Bang!");
+    float angle = component->coordinate[i]->angle;
+    sfVector2f r = polar_to_cartesian(0.6, angle);
+
+    sfVector2f pos = sum(component->coordinate[i]->position, r);
+
+    component->coordinate[j] = CoordinateComponent_create(pos.x, pos.y, 0.0);
+    component->circle_collider[j] = CircleColliderComponent_create(0.1);
+    component->physics[j] = PhysicsComponent_create(1.0, 0.0, 0.5);
+
+    component->physics[j]->velocity = mult(10.0, r);
 }
 
 
@@ -51,9 +60,12 @@ void input(Component* component, sfVector2f mouse) {
 
         component->coordinate[i]->angle = atan2(mouse.y, mouse.x);
 
-        //if (sfMouse_isButtonPressed(sfMouseLeft)) {
-        //    shoot(component);
-        //}
+        if (component->player[i]->cooldown < 0.0 && sfMouse_isButtonPressed(sfMouseLeft)) {
+            shoot(component, i);
+            component->player[i]->cooldown = 0.5;
+        }
+
+        component->player[i]->cooldown -= 1.0 / 60.0;
     }
 }
 
@@ -64,8 +76,7 @@ void create_player(Component* component, float x, float y) {
 
     component->coordinate[i] = CoordinateComponent_create(x, y, 0.0);
     component->image[i] = ImageComponent_create("player", 1.0);
-    component->physics[i] = PhysicsComponent_create(0.0, 1.0);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
-    //component->rectangle_collider[i] = RectangleColliderComponent_create(1.0, 1.0);
     component->player[i] = PlayerComponent_create();
 }

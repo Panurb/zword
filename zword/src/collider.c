@@ -91,8 +91,8 @@ sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
     sfVector2f hw = half_width(component, i);
     sfVector2f hh = half_height(component, i);
 
-    sfVector2f corner = { a.x - hw.x * copysignf(1.0, overlaps[0]) - hh.x * copysignf(1.0, overlaps[1]),
-                          a.y - hw.y * copysignf(1.0, overlaps[0]) - hh.y * copysignf(1.0, overlaps[1]) };
+    sfVector2f corner = { a.x - hw.x * sign(overlaps[0]) - hh.x * sign(overlaps[1]),
+                          a.y - hw.y * sign(overlaps[0]) - hh.y * sign(overlaps[1]) };
 
     sfVector2f axis = { corner.x - b.x, corner.y - b.y };
     axis = normalized(axis);
@@ -168,26 +168,21 @@ void collide(Component* component) {
 
             if (ol.x == 0 && ol.y == 0) continue;
 
-            physics->collision.overlap.x += ol.x;
-            physics->collision.overlap.y += ol.y;
-
+            float m = 1.0;
             sfVector2f other_vel = { 0.0, 0.0 };
             if (component->physics[j]) {
+                m = component->physics[j]->mass / (physics->mass + component->physics[j]->mass);
                 other_vel.x = component->physics[j]->velocity.x;
                 other_vel.y = component->physics[j]->velocity.y;
             }
 
-            sfVector2f rel_vel;
-            rel_vel.x = physics->velocity.x - other_vel.x;
-            rel_vel.y = physics->velocity.y - other_vel.y;
+            sfVector2f dv = diff(physics->velocity, other_vel);
+            sfVector2f n = normalized(ol);
+            sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, n), n));
 
-            float v = dot(rel_vel, ol);
-            float n = norm2(ol);
+            physics->collision.velocity = sum(physics->collision.velocity, new_vel);
 
-            if (n > 0) {
-                physics->collision.velocity.x = -2 * v * ol.x / n;
-                physics->collision.velocity.y = -2 * v * ol.y / n;
-            }
+            physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
         }
     }
 }

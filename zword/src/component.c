@@ -18,13 +18,15 @@ ImageComponent* ImageComponent_create(char filename[20], float scale) {
 }
 
 
-PhysicsComponent* PhysicsComponent_create(float friction, float bounce) {
+PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = (sfVector2f) { 0, 0 };
     phys->acceleration = (sfVector2f) { 0, 0 };
     phys->collision.overlap = (sfVector2f) { 0, 0 };
     phys->collision.velocity = (sfVector2f) { 0.0, 0.0} ;
     phys->angular_velocity = 0.0;
+    phys->angular_acceleration = 0.0;
+    phys->mass = mass;
     phys->friction = friction;
     phys->bounce = bounce;
     return phys;
@@ -50,5 +52,31 @@ PlayerComponent* PlayerComponent_create() {
     player->health = 100;
     player->max_speed = 0.5;
     player->acceleration = 1.0;
+    player->cooldown = 0.0;
     return player;
+}
+
+void destroy_entity(Component* component, int i) {
+    if (component->coordinate[i]) {
+        free(component->coordinate[i]);
+    }
+    if (component->image[i]) {
+        free(component->image[i]);
+    }
+    if (component->physics[i]) {
+        free(component->physics[i]);
+    }
+    if (component->circle_collider[i]) {
+        free(component->circle_collider[i]);
+    }
+    if (component->rectangle_collider[i]) {
+        free(component->rectangle_collider[i]);
+    }
+    if (component->player[i]) {
+        free(component->player[i]);
+    }
+
+    if (i == component->entities - 1) {
+        component->entities--;
+    }
 }

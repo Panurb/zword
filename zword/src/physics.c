@@ -6,41 +6,34 @@
 #include "util.h"
 
 
-void update(Component* component, float deltaTime) {
+void update(Component* component, float delta_time) {
     for (int i = 0; i <= component->entities; i++) {
         PhysicsComponent* physics = component->physics[i];
 
         if (!physics) continue;
 
-        component->coordinate[i]->position.x += physics->collision.overlap.x;
-        component->coordinate[i]->position.y += physics->collision.overlap.y;
+        CoordinateComponent* coord = component->coordinate[i];
 
-        physics->velocity.x += physics->collision.velocity.x;
-        physics->velocity.y += physics->collision.velocity.y;
+        coord->position = sum(coord->position, physics->collision.overlap);
 
         if (fabs(physics->collision.velocity.x) > 1e-6) {
-            physics->velocity.x *= 0.5;
-            physics->velocity.y *= 0.5;
+            physics->velocity = physics->collision.velocity;
 
-            physics->velocity.x *= physics->bounce;
-            physics->velocity.y *= physics->bounce;
+
+            sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
+            sfVector2f v_t = diff(physics->velocity, v_n);
+            physics->velocity = sum(mult(physics->bounce, v_n), mult((1.0 - physics->friction), v_t));
         }
 
-        physics->collision.overlap.x = 0.0;
-        physics->collision.overlap.y = 0.0;
-        physics->collision.velocity.x = 0.0;
-        physics->collision.velocity.y = 0.0;
+        physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
+        physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
 
-        physics->acceleration.x -= copysignf(physics->friction, physics->velocity.x);
-        physics->acceleration.y -= copysignf(physics->friction, physics->velocity.y);
+        physics->acceleration = diff(physics->acceleration, mult(physics->friction, normalized(physics->velocity)));
 
-        physics->velocity.x += physics->acceleration.x * deltaTime;
-        physics->velocity.y += physics->acceleration.y * deltaTime;
+        physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
 
-        component->coordinate[i]->position.x += physics->velocity.x * deltaTime;
-        component->coordinate[i]->position.y += physics->velocity.y * deltaTime;
+        coord->position = sum(coord->position, mult(delta_time, physics->velocity));
 
-        physics->acceleration.x = 0.0;
-        physics->acceleration.y = 0.0;
+        physics->acceleration = (sfVector2f) { 0.0, 0.0 };
     }
 }

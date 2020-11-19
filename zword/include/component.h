@@ -3,7 +3,7 @@
 #include <SFML/Graphics.h>
 
 
-#define MAX_ENTITIES 100
+#define MAX_ENTITIES 1000
 
 
 typedef struct {
@@ -28,11 +28,13 @@ typedef struct {
         sfVector2f velocity;
     } collision;
     float angular_velocity;
+    float angular_acceleration;
+    float mass;
     float friction;
     float bounce;
 } PhysicsComponent;
 
-PhysicsComponent* PhysicsComponent_create(float friction, float bounce);
+PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce);
 
 typedef struct {
     float radius;
@@ -53,6 +55,7 @@ typedef struct {
     int health;
     float max_speed;
     float acceleration;
+    float cooldown;
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -66,3 +69,5 @@ typedef struct {
     RectangleColliderComponent* rectangle_collider[MAX_ENTITIES];
     PlayerComponent* player[MAX_ENTITIES];
 } Component;
+
+void destroy_entity(Component* component, int i);

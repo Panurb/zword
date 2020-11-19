@@ -64,3 +64,24 @@ float mean(float* array, int size) {
 sfVector2f perp(sfVector2f v) {
     return (sfVector2f) { -v.y, v.x };
 }
+
+float sign(float x) {
+    return copysignf(1.0, x);
+}
+
+sfVector2f sum(sfVector2f v, sfVector2f u) {
+    return (sfVector2f) { v.x + u.x, v.y + u.y };
+}
+
+sfVector2f diff(sfVector2f v, sfVector2f u) {
+    return (sfVector2f) { v.x - u.x, v.y - u.y };
+}
+
+sfVector2f mult(float c, sfVector2f v) {
+    return (sfVector2f) { c * v.x, c * v.y };
+}
+
+sfVector2f proj(sfVector2f a, sfVector2f b) {
+    sfVector2f b_norm = normalized(b);
+    return mult(dot(a, b_norm), b_norm);
+}

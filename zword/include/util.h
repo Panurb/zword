@@ -22,3 +22,13 @@ int abs_argmin(float* a, int n);
 float mean(float* array, int size);
 
 sfVector2f perp(sfVector2f v);
+
+float sign(float x);
+
+sfVector2f sum(sfVector2f v, sfVector2f u);
+
+sfVector2f diff(sfVector2f v, sfVector2f u);
+
+sfVector2f mult(float c, sfVector2f v);
+
+sfVector2f proj(sfVector2f a, sfVector2f b);

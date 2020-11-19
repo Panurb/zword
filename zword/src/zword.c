@@ -17,7 +17,7 @@
 
 
 // remove from here
-#define MAX_ENTITIES 100
+#define MAX_ENTITIES 1000
 
 
 int main() {
@@ -27,13 +27,16 @@ int main() {
         return 1;
     }
 
+    bool focus = true;
+
     //sfWindow_setVerticalSyncEnabled(window, true);
     //sfWindow_setFramerateLimit(window, 60);
 
     sfClock* clock = sfClock_create();
     sfEvent event;
 
-    float frame_times[10] = { 0.0 };
+    float frame_times[1000] = { 0.0 };
+    float frame_avg = 0.0;
 
     float delta_time = 1.0 / 60.0;
     float elapsed_time = 0.0;
@@ -63,39 +66,44 @@ int main() {
     sfVector2f cam_pos = { 0, 0 };
     Camera camera = { cam_pos, 128.0, mode.width, mode.height };
 
-    create_wall(component, 3.0, 0.0, 0.5, 6.0, 0.0);
-    create_wall(component, -3.0, 0.0, 0.5, 6.0, 0.0);
-    create_wall(component, 0.0, -3.0, 6.0, 0.5, 0.0);
-    create_wall(component, 0.0, 3.0, 6.0, 0.5, 0.0);
-
-    create_prop(component, 0.0, 0.0, 1.0, 1.0, 0.4);
-    create_prop(component, 0.0, 1.0, 1.0, 1.0, 0.4);
-    create_prop(component, 0.0, -1.0, 1.0, 1.0, 0.4);
-
-    create_player(component, 2.0, 0.0);
+    create_level(component);
 
     int i = 0;
     while (sfRenderWindow_isOpen(window))
     {
         while (sfRenderWindow_pollEvent(window, &event))
         {
+            if (event.type == sfEvtLostFocus) {
+                focus = false;
+            }
+
+            if (event.type == sfEvtGainedFocus) {
+                focus = true;
+                sfClock_restart(clock);
+            }
+
             if (event.type == sfEvtClosed) {
                 sfRenderWindow_close(window);
             }
         }
 
-        sfVector2f mouse = screen_to_world(sfMouse_getPosition(window), &camera);
-        input(component, mouse);
+        if (focus) {
+            sfVector2f mouse = screen_to_world(sfMouse_getPosition(window), &camera);
+            input(component, mouse);
 
-        frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
-        elapsed_time += frame_times[i];
-        i = (i + 1) % 10;
+            frame_avg -= frame_times[i] / 1000.0;
+            frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
+            frame_avg += frame_times[i] / 1000.0;
 
-        while (elapsed_time > delta_time) {
-            elapsed_time -= delta_time;
+            elapsed_time += frame_times[i];
+            i = (i + 1) % 1000;
 
-            update(component, delta_time);
-            collide(component);
+            while (elapsed_time > delta_time) {
+                elapsed_time -= delta_time;
+
+                update(component, delta_time);
+                collide(component);
+            }
         }
 
         sfRenderWindow_clear(window, sfBlack);
@@ -103,15 +111,17 @@ int main() {
         //draw(component, window, &camera);
         debug_draw(component, window, &camera);
 
-        float fps = 1.0 / mean(frame_times, 10);
-
-        char buffer[10];
-        snprintf(buffer, 20, "%f", fps);
+        char buffer[20];
+        snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);
         sfText_setString(text, buffer);
 
         sfRenderWindow_drawText(window, text, NULL);
 
         sfRenderWindow_display(window);
+    }
+
+    for (int i = 0; i < component->entities; i++) {
+        destroy_entity(component, i);
     }
 
     sfRenderWindow_destroy(window);
