@@ -22,6 +22,8 @@ PhysicsComponent* PhysicsComponent_create(float friction, float bounce) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = (sfVector2f) { 0, 0 };
     phys->acceleration = (sfVector2f) { 0, 0 };
+    phys->collision.overlap = (sfVector2f) { 0, 0 };
+    phys->collision.velocity = (sfVector2f) { 0.0, 0.0} ;
     phys->angular_velocity = 0.0;
     phys->friction = friction;
     phys->bounce = bounce;

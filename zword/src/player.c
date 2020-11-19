@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window/Keyboard.h>
@@ -12,7 +13,7 @@ void shoot(Component* component) {
     int i = component->entities;
     component->entities++;
 
-
+    printf("Bang!");
 }
 
 
@@ -50,9 +51,9 @@ void input(Component* component, sfVector2f mouse) {
 
         component->coordinate[i]->angle = atan2(mouse.y, mouse.x);
 
-        if (sfMouse_isButtonPressed(sfMouseLeft)) {
-            shoot(component);
-        }
+        //if (sfMouse_isButtonPressed(sfMouseLeft)) {
+        //    shoot(component);
+        //}
     }
 }
 
@@ -61,9 +62,9 @@ void create_player(Component* component, float x, float y) {
     int i = component->entities;
     component->entities++;
 
-    component->coordinate[i] = CoordinateComponent_create(0.0, 0.0, 0.0);
+    component->coordinate[i] = CoordinateComponent_create(x, y, 0.0);
     component->image[i] = ImageComponent_create("player", 1.0);
-    component->physics[i] = PhysicsComponent_create(0.01, 0.5);
+    component->physics[i] = PhysicsComponent_create(0.0, 1.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     //component->rectangle_collider[i] = RectangleColliderComponent_create(1.0, 1.0);
     component->player[i] = PlayerComponent_create();

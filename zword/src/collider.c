@@ -137,46 +137,63 @@ sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
     return (sfVector2f) { overlaps[k] * axes[k].x, overlaps[k] * axes[k].y };
 }
 
-void collide(Component* component) {
-    for (int i = 0; i <= component->entities; i++) {
-        if (!component->physics[i]) continue;
+sfVector2f overlap(Component* component, int i, int j) {
+    sfVector2f ol = { 0, 0 };
+    if (component->circle_collider[i]) {
+        if (component->circle_collider[j]) {
+            ol = overlap_circle_circle(component, i, j);
+        } else if (component->rectangle_collider[j]) {
+            ol = overlap_circle_rectangle(component, i, j);
+        }
+    } else if (component->rectangle_collider[i]) {
+        if (component->circle_collider[j]) {
+            ol = overlap_rectangle_circle(component, i, j);
+        } else if (component->rectangle_collider[j]) {
+            ol = overlap_rectangle_rectangle(component, i, j);
+        }
+    }
 
-        for (int j = 0; j <= component->entities; j++) {
+    return ol;
+}
+
+void collide(Component* component) {
+    for (int i = 0; i < component->entities; i++) {
+        PhysicsComponent* physics = component->physics[i];
+        if (!physics) continue;
+
+        for (int j = 0; j < component->entities; j++) {
             if (i == j) continue;
 
-            sfVector2f overlap = { 0, 0 };
-            if (component->circle_collider[i]) {
-                if (component->circle_collider[j]) {
-                    overlap = overlap_circle_circle(component, i, j);
-                } else if (component->rectangle_collider[j]) {
-                    overlap = overlap_circle_rectangle(component, i, j);
-                }
-            } else if (component->rectangle_collider[i]) {
-                if (component->circle_collider[j]) {
-                    overlap = overlap_rectangle_circle(component, i, j);
-                } else if (component->rectangle_collider[j]) {
-                    overlap = overlap_rectangle_rectangle(component, i, j);
-                }
+            sfVector2f ol = overlap(component, i, j);
+
+            if (ol.x == 0 && ol.y == 0) continue;
+
+            physics->collision.overlap.x += ol.x;
+            physics->collision.overlap.y += ol.y;
+
+            sfVector2f other_vel = { 0.0, 0.0 };
+            if (component->physics[j]) {
+                other_vel.x = component->physics[j]->velocity.x;
+                other_vel.y = component->physics[j]->velocity.y;
             }
 
-            if (overlap.x == 0 && overlap.y == 0) continue;
+            sfVector2f rel_vel;
+            rel_vel.x = physics->velocity.x - other_vel.x;
+            rel_vel.y = physics->velocity.y - other_vel.y;
 
-            component->coordinate[i]->position.x += overlap.x;
-            component->coordinate[i]->position.y += overlap.y;
+            float v = dot(rel_vel, ol);
+            float n = norm2(ol);
 
-            float v = dot(component->physics[i]->velocity, overlap);
-            float n = norm2(overlap);
-            component->physics[i]->velocity.x -= 2 * v * overlap.x / n;
-            component->physics[i]->velocity.y -= 2 * v * overlap.y / n;
-
-            component->physics[i]->velocity.x *= component->physics[i]->bounce;
-            component->physics[i]->velocity.y *= component->physics[i]->bounce;
+            if (n > 0) {
+                physics->collision.velocity.x = -2 * v * ol.x / n;
+                physics->collision.velocity.y = -2 * v * ol.y / n;
+            }
         }
     }
 }
 
 void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i <= component->entities; i++) {
+    for (int i = 0; i < component->entities; i++) {
         if (component->circle_collider[i]) {
             sfVector2f pos = component->coordinate[i]->position;
             pos.x -= component->circle_collider[i]->radius;

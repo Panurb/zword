@@ -67,7 +67,11 @@ int main() {
     create_wall(component, -3.0, 0.0, 0.5, 6.0, 0.0);
     create_wall(component, 0.0, -3.0, 6.0, 0.5, 0.0);
     create_wall(component, 0.0, 3.0, 6.0, 0.5, 0.0);
-    create_wall(component, 0.0, 0.0, 2.0, 1.0, 0.4);
+
+    create_prop(component, 0.0, 0.0, 1.0, 1.0, 0.4);
+    create_prop(component, 0.0, 1.0, 1.0, 1.0, 0.4);
+    create_prop(component, 0.0, -1.0, 1.0, 1.0, 0.4);
+
     create_player(component, 2.0, 0.0);
 
     int i = 0;
@@ -75,8 +79,9 @@ int main() {
     {
         while (sfRenderWindow_pollEvent(window, &event))
         {
-            if (event.type == sfEvtClosed)
+            if (event.type == sfEvtClosed) {
                 sfRenderWindow_close(window);
+            }
         }
 
         sfVector2f mouse = screen_to_world(sfMouse_getPosition(window), &camera);
@@ -95,7 +100,7 @@ int main() {
 
         sfRenderWindow_clear(window, sfBlack);
 
-        draw(component, window, &camera);
+        //draw(component, window, &camera);
         debug_draw(component, window, &camera);
 
         float fps = 1.0 / mean(frame_times, 10);

@@ -3,30 +3,44 @@
 #include <math.h>
 
 #include "component.h"
+#include "util.h"
 
 
 void update(Component* component, float deltaTime) {
     for (int i = 0; i <= component->entities; i++) {
-        if (!component->physics[i]) continue;
+        PhysicsComponent* physics = component->physics[i];
 
-        component->physics[i]->acceleration.x -= copysignf(component->physics[i]->friction, component->physics[i]->velocity.x);
-        component->physics[i]->acceleration.y -= copysignf(component->physics[i]->friction, component->physics[i]->velocity.y);
+        if (!physics) continue;
 
-        component->physics[i]->velocity.x += component->physics[i]->acceleration.x * deltaTime;
-        component->physics[i]->velocity.y += component->physics[i]->acceleration.y * deltaTime;
+        component->coordinate[i]->position.x += physics->collision.overlap.x;
+        component->coordinate[i]->position.y += physics->collision.overlap.y;
 
-        component->coordinate[i]->position.x += component->physics[i]->velocity.x * deltaTime;
-        component->coordinate[i]->position.y += component->physics[i]->velocity.y * deltaTime;
+        physics->velocity.x += physics->collision.velocity.x;
+        physics->velocity.y += physics->collision.velocity.y;
 
-        //if (fabs(component->physics[i]->velocity.x) < 0.01) {
-         //   component->physics[i]->velocity.x = 0.0;
-        //}
+        if (fabs(physics->collision.velocity.x) > 1e-6) {
+            physics->velocity.x *= 0.5;
+            physics->velocity.y *= 0.5;
 
-        //if (fabs(component->physics[i]->velocity.y) < 0.01) {
-         //   component->physics[i]->velocity.y = 0.0;
-        //}
+            physics->velocity.x *= physics->bounce;
+            physics->velocity.y *= physics->bounce;
+        }
 
-        component->physics[i]->acceleration.x = 0.0;
-        component->physics[i]->acceleration.y = 0.0;
+        physics->collision.overlap.x = 0.0;
+        physics->collision.overlap.y = 0.0;
+        physics->collision.velocity.x = 0.0;
+        physics->collision.velocity.y = 0.0;
+
+        physics->acceleration.x -= copysignf(physics->friction, physics->velocity.x);
+        physics->acceleration.y -= copysignf(physics->friction, physics->velocity.y);
+
+        physics->velocity.x += physics->acceleration.x * deltaTime;
+        physics->velocity.y += physics->acceleration.y * deltaTime;
+
+        component->coordinate[i]->position.x += physics->velocity.x * deltaTime;
+        component->coordinate[i]->position.y += physics->velocity.y * deltaTime;
+
+        physics->acceleration.x = 0.0;
+        physics->acceleration.y = 0.0;
     }
 }

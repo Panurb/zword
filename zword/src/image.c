@@ -25,7 +25,7 @@ sfSprite* load_sprite(char filename[20]) {
 }
 
 void draw(Component* component, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i <= component->entities; i++) {
+    for (int i = 0; i < component->entities; i++) {
         if (!component->image[i]) continue;
 
         sfSprite_setPosition(component->image[i]->sprite, world_to_screen(component->coordinate[i]->position, camera));

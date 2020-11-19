@@ -23,6 +23,10 @@ ImageComponent* ImageComponent_create(char filename[20], float scale);
 typedef struct {
     sfVector2f velocity;
     sfVector2f acceleration;
+    struct {
+        sfVector2f overlap;
+        sfVector2f velocity;
+    } collision;
     float angular_velocity;
     float friction;
     float bounce;
