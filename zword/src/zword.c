@@ -88,9 +88,6 @@ int main() {
         }
 
         if (focus) {
-            sfVector2f mouse = screen_to_world(sfMouse_getPosition(window), &camera);
-            input(component, mouse);
-
             frame_avg -= frame_times[i] / 1000.0;
             frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
             frame_avg += frame_times[i] / 1000.0;
@@ -100,6 +97,8 @@ int main() {
 
             while (elapsed_time > delta_time) {
                 elapsed_time -= delta_time;
+
+                input(component, window, &camera);
 
                 update(component, delta_time);
                 collide(component);

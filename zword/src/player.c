@@ -7,6 +7,7 @@
 
 #include "util.h"
 #include "component.h"
+#include "camera.h"
 
 
 void shoot(Component* component, int i) {
@@ -22,11 +23,11 @@ void shoot(Component* component, int i) {
     component->circle_collider[j] = CircleColliderComponent_create(0.1);
     component->physics[j] = PhysicsComponent_create(1.0, 0.0, 0.5);
 
-    component->physics[j]->velocity = mult(10.0, r);
+    component->physics[j]->velocity = mult(20.0, r);
 }
 
 
-void input(Component* component, sfVector2f mouse) {
+void input(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
@@ -48,24 +49,23 @@ void input(Component* component, sfVector2f mouse) {
             v.y -= 1;
         }
 
-        float n = norm(v);
+        CoordinateComponent* coord = component->coordinate[i];
+        PhysicsComponent* phys = component->physics[i];
+        PlayerComponent* player = component->player[i];
 
-        if (n > 0) {
-            component->physics[i]->acceleration.x += v.x * component->player[i]->acceleration / n;
-            component->physics[i]->acceleration.y += v.y * component->player[i]->acceleration / n;
-        }
+        phys->acceleration = sum(phys->acceleration, mult(player->acceleration, normalized(v)));
 
-        mouse.x -= component->coordinate[i]->position.x;
-        mouse.y -= component->coordinate[i]->position.y;
+        sfVector2f mouse = screen_to_world(sfMouse_getPosition(window), camera);
+        sfVector2f rel_mouse = diff(mouse, coord->position);
 
-        component->coordinate[i]->angle = atan2(mouse.y, mouse.x);
+        coord->angle = atan2(rel_mouse.y, rel_mouse.x);
 
-        if (component->player[i]->cooldown < 0.0 && sfMouse_isButtonPressed(sfMouseLeft)) {
+        if (player->cooldown < 0.0 && sfMouse_isButtonPressed(sfMouseLeft)) {
             shoot(component, i);
-            component->player[i]->cooldown = 0.5;
+            player->cooldown = 0.25;
         }
 
-        component->player[i]->cooldown -= 1.0 / 60.0;
+        player->cooldown -= 1.0 / 60.0;
     }
 }
 

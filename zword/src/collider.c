@@ -27,8 +27,7 @@ float axis_half_width(Component* component, int i, sfVector2f axis) {
 }
 
 float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f axis) {
-    sfVector2f r21 = { r1.x - r2.x, r1.y - r2.y };
-    float r = dot(r21, axis);
+    float r = dot(diff(r1, r2), axis);
     float o = w1 + w2 - fabs(r);
     if (o > 0.0) {
         if (fabs(r) < 1e-6) {
@@ -56,7 +55,7 @@ sfVector2f overlap_circle_circle(Component* component, int i, int j) {
         return (sfVector2f) { 0.0, r };
     }
 
-    return (sfVector2f) { (a.x - b.x) * (r - d) / d, (a.y - b.y) * (r - d) / d };
+    return mult(r / d - 1, diff(a, b));
 }
 
 sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
@@ -85,32 +84,27 @@ sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
 
     int k = abs_argmin(overlaps, 2);
     if (!near_corner) {
-        return (sfVector2f) { overlaps[k] * axes[k].x, overlaps[k] * axes[k].y };
+        return mult(overlaps[k], axes[k]);
     }
 
     sfVector2f hw = half_width(component, i);
     sfVector2f hh = half_height(component, i);
 
-    sfVector2f corner = { a.x - hw.x * sign(overlaps[0]) - hh.x * sign(overlaps[1]),
-                          a.y - hw.y * sign(overlaps[0]) - hh.y * sign(overlaps[1]) };
+    sfVector2f corner = diff(a, sum(mult(sign(overlaps[0]), hw), mult(sign(overlaps[1]), hh)));
 
-    sfVector2f axis = { corner.x - b.x, corner.y - b.y };
-    axis = normalized(axis);
+    sfVector2f axis = normalized(diff(corner, b));
 
     float overlap = axis_overlap(axis_half_width(component, i, axis), a, radius, b, axis);
 
     if (0.0 < fabs(overlap) && fabs(overlap) < fabs(overlaps[k])) {
-        return (sfVector2f) { overlap * axis.x, overlap * axis.y };
+        return mult(overlap, axis);
     }
 
     return (sfVector2f) { 0.0, 0.0 };
 }
 
 sfVector2f overlap_circle_rectangle(Component* component, int i, int j) {
-    sfVector2f overlap = overlap_rectangle_circle(component, j, i);
-    overlap.x *= -1;
-    overlap.y *= -1;
-    return overlap;
+    return mult(-1.0, overlap_rectangle_circle(component, j, i));
 }
 
 sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
@@ -134,7 +128,7 @@ sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
 
     int k = abs_argmin(overlaps, 4);
 
-    return (sfVector2f) { overlaps[k] * axes[k].x, overlaps[k] * axes[k].y };
+    return mult(overlaps[k], axes[k]);
 }
 
 sfVector2f overlap(Component* component, int i, int j) {
@@ -166,14 +160,13 @@ void collide(Component* component) {
 
             sfVector2f ol = overlap(component, i, j);
 
-            if (ol.x == 0 && ol.y == 0) continue;
+            if (ol.x == 0.0 && ol.y == 0.0) continue;
 
             float m = 1.0;
             sfVector2f other_vel = { 0.0, 0.0 };
             if (component->physics[j]) {
                 m = component->physics[j]->mass / (physics->mass + component->physics[j]->mass);
-                other_vel.x = component->physics[j]->velocity.x;
-                other_vel.y = component->physics[j]->velocity.y;
+                other_vel = component->physics[j]->velocity;
             }
 
             sfVector2f dv = diff(physics->velocity, other_vel);
@@ -190,13 +183,16 @@ void collide(Component* component) {
 void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         if (component->circle_collider[i]) {
+            CircleColliderComponent* col = component->circle_collider[i];
+
+            sfCircleShape_setOrigin(col->shape, (sfVector2f) { col->radius * camera->zoom, col->radius * camera->zoom });
+
             sfVector2f pos = component->coordinate[i]->position;
-            pos.x -= component->circle_collider[i]->radius;
-            pos.y += component->circle_collider[i]->radius;
-            sfCircleShape_setPosition(component->circle_collider[i]->shape, world_to_screen(pos, camera));
-            sfCircleShape_setFillColor(component->circle_collider[i]->shape, sfColor_fromRGB(255, 0, 255));
-            sfCircleShape_setRadius(component->circle_collider[i]->shape, component->circle_collider[i]->radius * camera->zoom);
-            sfRenderWindow_drawCircleShape(window, component->circle_collider[i]->shape, NULL);
+            sfCircleShape_setPosition(col->shape, world_to_screen(pos, camera));
+
+            sfCircleShape_setRadius(col->shape, col->radius * camera->zoom);
+
+            sfRenderWindow_drawCircleShape(window, col->shape, NULL);
         } else if (component->rectangle_collider[i]) {
             RectangleColliderComponent* col = component->rectangle_collider[i];
 
@@ -205,7 +201,6 @@ void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
             sfVector2f pos = component->coordinate[i]->position;
             sfRectangleShape_setPosition(col->shape, world_to_screen(pos, camera));
 
-            sfRectangleShape_setFillColor(col->shape, sfColor_fromRGB(0, 255, 255));
             sfVector2f size = { col->width * camera->zoom, col->height * camera->zoom };
             sfRectangleShape_setSize(col->shape, size);
 

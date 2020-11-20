@@ -24,8 +24,7 @@ sfVector2f normalized(sfVector2f v) {
     if (fabs(n) < 1e-6) {
         return v;
     }
-    sfVector2f vn = { v.x / n, v.y / n };
-    return vn;
+    return (sfVector2f) { v.x / n, v.y / n };
 }
 
 double to_degrees(double radians) {

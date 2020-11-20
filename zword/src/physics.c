@@ -16,13 +16,12 @@ void update(Component* component, float delta_time) {
 
         coord->position = sum(coord->position, physics->collision.overlap);
 
-        if (fabs(physics->collision.velocity.x) > 1e-6) {
+        if (fabs(physics->collision.velocity.x) != 0.0) {
             physics->velocity = physics->collision.velocity;
-
 
             sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
             sfVector2f v_t = diff(physics->velocity, v_n);
-            physics->velocity = sum(mult(physics->bounce, v_n), mult((1.0 - physics->friction), v_t));
+            physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0 - physics->friction, v_t));
         }
 
         physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
