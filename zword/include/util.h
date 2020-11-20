@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdlib.h>
+
 #include <SFML/System/Vector2.h>
 
 
@@ -32,3 +34,8 @@ sfVector2f diff(sfVector2f v, sfVector2f u);
 sfVector2f mult(float c, sfVector2f v);
 
 sfVector2f proj(sfVector2f a, sfVector2f b);
+
+static inline float float_rand(float min, float max) {
+    float scale = rand() / (float) RAND_MAX;
+    return min + scale * (max - min);
+}

@@ -1,6 +1,6 @@
-#pragma once
-
 #include <math.h>
+
+#include <SFML/System/Vector2.h>
 
 #include "component.h"
 #include "util.h"
@@ -27,7 +27,7 @@ void update(Component* component, float delta_time) {
         physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
         physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
 
-        physics->acceleration = diff(physics->acceleration, mult(physics->friction, normalized(physics->velocity)));
+        physics->acceleration = diff(physics->acceleration, mult(physics->drag, normalized(physics->velocity)));
 
         physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
 

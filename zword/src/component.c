@@ -1,10 +1,13 @@
+#include <SFML/Graphics.h>
+#include <SFML/System/Vector2.h>
+
 #include "component.h"
 #include "image.h"
 
 
-CoordinateComponent* CoordinateComponent_create(float x, float y, float angle) {
+CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle) {
     CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
-    coord->position = (sfVector2f) { x, y };
+    coord->position = pos;
     coord->angle = angle;
     return coord;
 }
@@ -18,7 +21,7 @@ ImageComponent* ImageComponent_create(char filename[20], float scale) {
 }
 
 
-PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce) {
+PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = (sfVector2f) { 0, 0 };
     phys->acceleration = (sfVector2f) { 0, 0 };
@@ -29,6 +32,7 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     phys->mass = mass;
     phys->friction = friction;
     phys->bounce = bounce;
+    phys->drag = drag;
     return phys;
 }
 

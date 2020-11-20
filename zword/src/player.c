@@ -19,15 +19,15 @@ void shoot(Component* component, int i) {
 
     sfVector2f pos = sum(component->coordinate[i]->position, r);
 
-    component->coordinate[j] = CoordinateComponent_create(pos.x, pos.y, 0.0);
+    component->coordinate[j] = CoordinateComponent_create(pos, 0.0);
     component->circle_collider[j] = CircleColliderComponent_create(0.1);
-    component->physics[j] = PhysicsComponent_create(1.0, 0.0, 0.5);
+    component->physics[j] = PhysicsComponent_create(1.0, 0.0, 0.5, 0.5);
 
     component->physics[j]->velocity = mult(20.0, r);
 }
 
 
-void input(Component* component, sfRenderWindow* window, Camera* camera) {
+void input(Component* component, sfRenderWindow* window, Camera* camera, float delta_time) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
@@ -55,7 +55,7 @@ void input(Component* component, sfRenderWindow* window, Camera* camera) {
 
         phys->acceleration = sum(phys->acceleration, mult(player->acceleration, normalized(v)));
 
-        sfVector2f mouse = screen_to_world(sfMouse_getPosition(window), camera);
+        sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
         sfVector2f rel_mouse = diff(mouse, coord->position);
 
         coord->angle = atan2(rel_mouse.y, rel_mouse.x);
@@ -65,18 +65,20 @@ void input(Component* component, sfRenderWindow* window, Camera* camera) {
             player->cooldown = 0.25;
         }
 
-        player->cooldown -= 1.0 / 60.0;
+        player->cooldown -= delta_time;
+
+        camera->position = sum(camera->position, mult(10.0 * delta_time, diff(coord->position, camera->position)));
     }
 }
 
 
-void create_player(Component* component, float x, float y) {
+void create_player(Component* component, sfVector2f pos) {
     int i = component->entities;
     component->entities++;
 
-    component->coordinate[i] = CoordinateComponent_create(x, y, 0.0);
+    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
     component->image[i] = ImageComponent_create("player", 1.0);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 2.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
 }

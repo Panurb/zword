@@ -63,8 +63,7 @@ int main() {
         component->player[i] = NULL;
     }
     
-    sfVector2f cam_pos = { 0, 0 };
-    Camera camera = { cam_pos, 128.0, mode.width, mode.height };
+    Camera* camera = Camera_create(mode);
 
     create_level(component);
 
@@ -98,7 +97,7 @@ int main() {
             while (elapsed_time > delta_time) {
                 elapsed_time -= delta_time;
 
-                input(component, window, &camera);
+                input(component, window, camera, delta_time);
 
                 update(component, delta_time);
                 collide(component);
@@ -107,8 +106,10 @@ int main() {
 
         sfRenderWindow_clear(window, sfBlack);
 
-        //draw(component, window, &camera);
-        debug_draw(component, window, &camera);
+        draw_grid(window, camera);
+
+        //draw(component, window, camera);
+        debug_draw(component, window, camera);
 
         char buffer[20];
         snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);

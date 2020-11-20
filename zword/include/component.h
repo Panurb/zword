@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.h>
 
-
 #define MAX_ENTITIES 1000
 
 
@@ -11,7 +10,7 @@ typedef struct {
     float angle;
 } CoordinateComponent;
 
-CoordinateComponent* CoordinateComponent_create(float x, float y, float angle);
+CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle);
 
 typedef struct {
     sfVector2f scale;
@@ -32,9 +31,10 @@ typedef struct {
     float mass;
     float friction;
     float bounce;
+    float drag;
 } PhysicsComponent;
 
-PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce);
+PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag);
 
 typedef struct {
     float radius;
