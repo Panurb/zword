@@ -7,6 +7,7 @@
 #include <SFML/System/Vector2.h>
 #include <SFML/Graphics.h>
 
+#include "collider.h"
 #include "component.h"
 #include "camera.h"
 #include "util.h"
@@ -150,32 +151,112 @@ sfVector2f overlap(Component* component, int i, int j) {
     return ol;
 }
 
-void collide(Component* component) {
+
+void update_grid(Component* component, CollisionGrid collision_grid, int i) {
+    CoordinateComponent* coord = component->coordinate[i];
+
+    int x = floor(coord->position.x + 32);
+    int y = floor(coord->position.y + 32);
+
+    int w;
+    int h;
+    if (component->rectangle_collider[i]) {
+        w = ceil(axis_half_width(component, i, (sfVector2f) { 1.0, 0.0 }));
+        h = ceil(axis_half_width(component, i, (sfVector2f) { 0.0, 1.0 }));
+    } else if (component->circle_collider[i]) {
+        w = ceil(component->circle_collider[i]->radius);
+        h = w;
+    }
+    
+    for (int j = x - w; j <= x + w; j++) {
+        for (int k = y - h; k <= y + h; k++) {
+            for (int l = 0; l < 10; l++) {
+                if (collision_grid[j][k][l] == -1) {
+                    collision_grid[j][k][l] = i;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+void clear_grid(Component* component, CollisionGrid collision_grid, int i) {
+    CoordinateComponent* coord = component->coordinate[i];
+
+    int x = floor(coord->position.x + 32);
+    int y = floor(coord->position.y + 32);
+
+    int w;
+    int h;
+    if (component->rectangle_collider[i]) {
+        w = ceil(axis_half_width(component, i, (sfVector2f) { 1.0, 0.0 }));
+        h = ceil(axis_half_width(component, i, (sfVector2f) { 0.0, 1.0 }));
+    } else if (component->circle_collider[i]) {
+        w = ceil(component->circle_collider[i]->radius);
+        h = w;
+    }
+    
+    for (int j = x - w; j <= x + w; j++) {
+        for (int k = y - h; k <= y + h; k++) {
+            for (int l = 0; l < 10; l++) {
+                if (collision_grid[j][k][l] == i) {
+                    collision_grid[j][k][l] = -1;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+void collide(Component* component, CollisionGrid collision_grid) {
     for (int i = 0; i < component->entities; i++) {
         PhysicsComponent* physics = component->physics[i];
         if (!physics) continue;
 
-        for (int j = 0; j < component->entities; j++) {
-            if (i == j) continue;
+        CoordinateComponent* coord = component->coordinate[i];
 
-            sfVector2f ol = overlap(component, i, j);
+        int x = floor(coord->position.x + 32);
+        int y = floor(coord->position.y + 32);
 
-            if (ol.x == 0.0 && ol.y == 0.0) continue;
+        int w;
+        int h;
+        if (component->rectangle_collider[i]) {
+            w = ceil(axis_half_width(component, i, (sfVector2f) { 1.0, 0.0 }));
+            h = ceil(axis_half_width(component, i, (sfVector2f) { 0.0, 1.0 }));
+        } else if (component->circle_collider[i]) {
+            w = ceil(component->circle_collider[i]->radius);
+            h = w;
+        }
+        
+        for (int jj = x - w; jj <= x + w; jj++) {
+            for (int k = y - h; k <= y + h; k++) {
+                for (int l = 0; l < 10; l++) {
+                    int j = collision_grid[jj][k][l];
 
-            float m = 1.0;
-            sfVector2f other_vel = { 0.0, 0.0 };
-            if (component->physics[j]) {
-                m = component->physics[j]->mass / (physics->mass + component->physics[j]->mass);
-                other_vel = component->physics[j]->velocity;
+                    if (i == j) continue;
+
+                    sfVector2f ol = overlap(component, i, j);
+
+                    if (ol.x == 0.0 && ol.y == 0.0) continue;
+
+                    float m = 1.0;
+                    sfVector2f other_vel = { 0.0, 0.0 };
+                    if (component->physics[j]) {
+                        m = component->physics[j]->mass / (physics->mass + component->physics[j]->mass);
+                        other_vel = component->physics[j]->velocity;
+                    }
+
+                    sfVector2f dv = diff(physics->velocity, other_vel);
+                    sfVector2f n = normalized(ol);
+                    sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, n), n));
+
+                    physics->collision.velocity = sum(physics->collision.velocity, new_vel);
+
+                    physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
+                }
             }
-
-            sfVector2f dv = diff(physics->velocity, other_vel);
-            sfVector2f n = normalized(ol);
-            sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, n), n));
-
-            physics->collision.velocity = sum(physics->collision.velocity, new_vel);
-
-            physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
         }
     }
 }

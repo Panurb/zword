@@ -65,7 +65,13 @@ int main() {
     
     Camera* camera = Camera_create(mode);
 
+    CollisionGrid collision_grid = { -1 };
+
     create_level(component);
+
+    for (int i = 0; i < component->entities; i++) {
+        update_grid(component, collision_grid, i);
+    }
 
     int i = 0;
     while (sfRenderWindow_isOpen(window))
@@ -99,8 +105,8 @@ int main() {
 
                 input(component, window, camera, delta_time);
 
-                update(component, delta_time);
-                collide(component);
+                update(component, delta_time, collision_grid);
+                collide(component, collision_grid);
             }
         }
 
