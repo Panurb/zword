@@ -6,12 +6,19 @@
 #include "camera.h"
 
 
-typedef int CollisionGrid[64][64][10];
+typedef struct{
+    int array[64][64][10];
+    int width;
+    int height;
+    int size;
+} ColliderGrid;
 
-void update_grid(Component* component, CollisionGrid collision_grid, int i);
+ColliderGrid* ColliderGrid_create();
 
-void clear_grid(Component* component, CollisionGrid collision_grid, int i);
+void update_grid(Component* component, ColliderGrid* collision_grid, int i);
 
-void collide(Component* component, CollisionGrid collision_grid);
+void clear_grid(Component* component, ColliderGrid* collision_grid, int i);
+
+void collide(Component* component, ColliderGrid* collision_grid);
 
 void debug_draw(Component* component, sfRenderWindow* window, Camera* camera);

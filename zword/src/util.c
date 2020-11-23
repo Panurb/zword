@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <stdlib.h>
 
 #include <SFML/System/Vector2.h>
 
@@ -83,4 +84,27 @@ sfVector2f mult(float c, sfVector2f v) {
 sfVector2f proj(sfVector2f a, sfVector2f b) {
     sfVector2f b_norm = normalized(b);
     return mult(dot(a, b_norm), b_norm);
+}
+
+float float_rand(float min, float max) {
+    float scale = rand() / (float) RAND_MAX;
+    return min + scale * (max - min);
+}
+
+int find(int value, int* array, int size) {
+    for (int i; i < size; i++) {
+        if (array[i] == value) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
 }

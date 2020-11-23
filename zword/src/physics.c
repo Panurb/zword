@@ -7,7 +7,7 @@
 #include "collider.h"
 
 
-void update(Component* component, float delta_time, CollisionGrid collision_grid) {
+void update(Component* component, float delta_time, ColliderGrid* collision_grid) {
     for (int i = 0; i < component->entities; i++) {
         PhysicsComponent* physics = component->physics[i];
 
@@ -15,14 +15,7 @@ void update(Component* component, float delta_time, CollisionGrid collision_grid
 
         CoordinateComponent* coord = component->coordinate[i];
 
-        int x = floor(coord->position.x + 32);
-        int y = floor(coord->position.y + 32);
-
-        clear_grid(component, collision_grid, i);
-
-        coord->position = sum(coord->position, physics->collision.overlap);
-
-        if (fabs(physics->collision.velocity.x) != 0.0) {
+        if (physics->collision.velocity.x != 0.0 || physics->collision.velocity.y != 0.0) {
             physics->velocity = physics->collision.velocity;
 
             sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
@@ -30,17 +23,28 @@ void update(Component* component, float delta_time, CollisionGrid collision_grid
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0 - physics->friction, v_t));
         }
 
-        physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
-        physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
-
         physics->acceleration = diff(physics->acceleration, mult(physics->drag, normalized(physics->velocity)));
 
         physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
 
-        coord->position = sum(coord->position, mult(delta_time, physics->velocity));
+        if (norm(physics->velocity) < 1e-3) {
+            physics->velocity = (sfVector2f) { 0.0, 0.0 };
+        }
 
-        update_grid(component, collision_grid, i);
+        sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
 
+        if (delta_pos.x != 0.0 || delta_pos.y != 0.0) {
+            clear_grid(component, collision_grid, i);
+        }
+
+        coord->position = sum(coord->position, delta_pos);
+
+        if (delta_pos.x != 0.0 || delta_pos.y != 0.0) {
+            update_grid(component, collision_grid, i);
+        }
+
+        physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
+        physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
         physics->acceleration = (sfVector2f) { 0.0, 0.0 };
     }
 }

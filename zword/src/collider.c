@@ -13,19 +13,40 @@
 #include "util.h"
 
 
+ColliderGrid* ColliderGrid_create() {
+    ColliderGrid* grid = malloc(sizeof(ColliderGrid));
+    grid->width = 64;
+    grid->height = 64;
+    grid->size = 10;
+
+    for (int i = 0; i < grid->width; i++) {
+        for (int j = 0; j < grid->height; j++) {
+            for (int k = 0; k < grid->size; k++) {
+                grid->array[i][j][k] = -1;
+            }
+        }
+    }
+
+    return grid;
+}
+
+
 sfVector2f half_width(Component* component, int i) {
     return polar_to_cartesian(0.5 * component->rectangle_collider[i]->width, component->coordinate[i]->angle);
 }
 
+
 sfVector2f half_height(Component* component, int i) {
     return polar_to_cartesian(0.5 * component->rectangle_collider[i]->height, component->coordinate[i]->angle + 0.5 * M_PI);
 }
+
 
 float axis_half_width(Component* component, int i, sfVector2f axis) {
     sfVector2f hw = half_width(component, i);
     sfVector2f hh = half_height(component, i);
     return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
 }
+
 
 float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f axis) {
     float r = dot(diff(r1, r2), axis);
@@ -152,11 +173,19 @@ sfVector2f overlap(Component* component, int i, int j) {
 }
 
 
-void update_grid(Component* component, CollisionGrid collision_grid, int i) {
-    CoordinateComponent* coord = component->coordinate[i];
+typedef struct {
+    int left;
+    int right;
+    int top;
+    int bottom;
+} Bounds;
 
-    int x = floor(coord->position.x + 32);
-    int y = floor(coord->position.y + 32);
+
+Bounds get_bounds(Component* component, ColliderGrid* grid, int i) {
+    CoordinateComponent* coord = component->coordinate[i];
+    
+    int x = floor(coord->position.x + 0.5 * grid->width);
+    int y = floor(coord->position.y + 0.5 * grid->height);
 
     int w;
     int h;
@@ -167,12 +196,25 @@ void update_grid(Component* component, CollisionGrid collision_grid, int i) {
         w = ceil(component->circle_collider[i]->radius);
         h = w;
     }
-    
-    for (int j = x - w; j <= x + w; j++) {
-        for (int k = y - h; k <= y + h; k++) {
-            for (int l = 0; l < 10; l++) {
-                if (collision_grid[j][k][l] == -1) {
-                    collision_grid[j][k][l] = i;
+
+    Bounds bounds;
+    bounds.left = max(0, x - w);
+    bounds.right = min(grid->width - 1, x + w);
+    bounds.bottom = max(0, y - h);
+    bounds.top = min(grid->height - 1, y + h);
+
+    return bounds;
+}
+
+
+void update_grid(Component* component, ColliderGrid* grid, int i) {
+    Bounds bounds = get_bounds(component, grid, i);
+
+    for (int j = bounds.left; j <= bounds.right; j++) {
+        for (int k = bounds.bottom; k <= bounds.top; k++) {
+            for (int l = 0; l < grid->size; l++) {
+                if (grid->array[j][k][l] == -1) {
+                    grid->array[j][k][l] = i;
                     break;
                 }
             }
@@ -181,27 +223,14 @@ void update_grid(Component* component, CollisionGrid collision_grid, int i) {
 }
 
 
-void clear_grid(Component* component, CollisionGrid collision_grid, int i) {
-    CoordinateComponent* coord = component->coordinate[i];
-
-    int x = floor(coord->position.x + 32);
-    int y = floor(coord->position.y + 32);
-
-    int w;
-    int h;
-    if (component->rectangle_collider[i]) {
-        w = ceil(axis_half_width(component, i, (sfVector2f) { 1.0, 0.0 }));
-        h = ceil(axis_half_width(component, i, (sfVector2f) { 0.0, 1.0 }));
-    } else if (component->circle_collider[i]) {
-        w = ceil(component->circle_collider[i]->radius);
-        h = w;
-    }
+void clear_grid(Component* component, ColliderGrid* grid, int i) {
+    Bounds bounds = get_bounds(component, grid, i);
     
-    for (int j = x - w; j <= x + w; j++) {
-        for (int k = y - h; k <= y + h; k++) {
-            for (int l = 0; l < 10; l++) {
-                if (collision_grid[j][k][l] == i) {
-                    collision_grid[j][k][l] = -1;
+    for (int j = bounds.left; j <= bounds.right; j++) {
+        for (int k = bounds.bottom; k <= bounds.top; k++) {
+            for (int l = 0; l < grid->size; l++) {
+                if (grid->array[j][k][l] == i) {
+                    grid->array[j][k][l] = -1;
                     break;
                 }
             }
@@ -210,59 +239,105 @@ void clear_grid(Component* component, CollisionGrid collision_grid, int i) {
 }
 
 
-void collide(Component* component, CollisionGrid collision_grid) {
+void get_neighbors(Component* component, ColliderGrid* grid, int i, int* array, int size) {
+    Bounds bounds = get_bounds(component, grid, i);
+
+    for (int j = 0; j < size; j++) {
+        array[j] = -1;
+    }
+
+    for (int j = bounds.left; j <= bounds.right; j++) {
+        for (int k = bounds.bottom; k <= bounds.top; k++) {
+            for (int l = 0; l < grid->size; l++) {
+                int n = grid->array[j][k][l];
+
+                if (n == -1 || n == i) continue;
+
+                for (int m = 0; m < size; m++) {
+                    if (array[m] == n) break;
+
+                    if (array[m] == -1) {
+                        array[m] = n;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void raycast(Component* Component, ColliderGrid* grid, sfVector2f start, sfVector2f direction) {
+    // TODO
+}
+
+
+void collide(Component* component, ColliderGrid* grid) {
     for (int i = 0; i < component->entities; i++) {
         PhysicsComponent* physics = component->physics[i];
         if (!physics) continue;
 
-        CoordinateComponent* coord = component->coordinate[i];
+        int neighbors[20];
+        get_neighbors(component, grid, i, neighbors, 20);
 
-        int x = floor(coord->position.x + 32);
-        int y = floor(coord->position.y + 32);
+        for (int j = 0; j < 20; j++) {
+            int k = neighbors[j];
 
-        int w;
-        int h;
-        if (component->rectangle_collider[i]) {
-            w = ceil(axis_half_width(component, i, (sfVector2f) { 1.0, 0.0 }));
-            h = ceil(axis_half_width(component, i, (sfVector2f) { 0.0, 1.0 }));
-        } else if (component->circle_collider[i]) {
-            w = ceil(component->circle_collider[i]->radius);
-            h = w;
-        }
-        
-        for (int jj = x - w; jj <= x + w; jj++) {
-            for (int k = y - h; k <= y + h; k++) {
-                for (int l = 0; l < 10; l++) {
-                    int j = collision_grid[jj][k][l];
+            if (k == -1) break;
 
-                    if (i == j) continue;
+            sfVector2f ol = overlap(component, i, k);
 
-                    sfVector2f ol = overlap(component, i, j);
+            if (ol.x == 0.0 && ol.y == 0.0) continue;
 
-                    if (ol.x == 0.0 && ol.y == 0.0) continue;
-
-                    float m = 1.0;
-                    sfVector2f other_vel = { 0.0, 0.0 };
-                    if (component->physics[j]) {
-                        m = component->physics[j]->mass / (physics->mass + component->physics[j]->mass);
-                        other_vel = component->physics[j]->velocity;
-                    }
-
-                    sfVector2f dv = diff(physics->velocity, other_vel);
-                    sfVector2f n = normalized(ol);
-                    sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, n), n));
-
-                    physics->collision.velocity = sum(physics->collision.velocity, new_vel);
-
-                    physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
-                }
+            float m = 1.0;
+            sfVector2f other_vel = { 0.0, 0.0 };
+            if (component->physics[k]) {
+                m = component->physics[k]->mass / (physics->mass + component->physics[k]->mass);
+                other_vel = component->physics[k]->velocity;
             }
+
+            sfVector2f dv = diff(physics->velocity, other_vel);
+            sfVector2f n = normalized(ol);
+            sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, n), n));
+
+            physics->collision.velocity = sum(physics->collision.velocity, new_vel);
+
+            physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
         }
     }
 }
 
+
 void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
+        /*
+        Bounds bounds = get_bounds(component, grid, i);
+        for (int j = bounds.left; j <= bounds.right; j++) {
+            for (int k = bounds.bottom; k <= bounds.top; k++) {
+                for (int l = 0; l < 10; l++) {
+                    sfRectangleShape* shape = sfRectangleShape_create();
+                    sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * camera->zoom, 0.5 * camera->zoom });
+
+                    sfVector2f pos = { j - 31.3, k - 31.3 };
+                    sfRectangleShape_setPosition(shape, world_to_screen(pos, camera));
+
+                    sfVector2f size = { camera->zoom, camera->zoom };
+                    sfRectangleShape_setSize(shape, size);
+
+                    sfRectangleShape_setOutlineColor(shape, sfWhite);
+                    sfRectangleShape_setOutlineThickness(shape, 0.1 * camera->zoom);
+                    sfRectangleShape_setFillColor(shape, sfTransparent);
+
+                    sfRenderWindow_drawRectangleShape(window, shape, NULL);
+
+                    sfRectangleShape_destroy(shape);
+                }
+            }
+        }
+        */
+
+        CoordinateComponent* coord = component->coordinate[i];
+
         if (component->circle_collider[i]) {
             CircleColliderComponent* col = component->circle_collider[i];
 

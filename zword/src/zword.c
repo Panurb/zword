@@ -65,12 +65,12 @@ int main() {
     
     Camera* camera = Camera_create(mode);
 
-    CollisionGrid collision_grid = { -1 };
+    ColliderGrid* grid = ColliderGrid_create();
 
     create_level(component);
 
     for (int i = 0; i < component->entities; i++) {
-        update_grid(component, collision_grid, i);
+        update_grid(component, grid, i);
     }
 
     int i = 0;
@@ -105,8 +105,8 @@ int main() {
 
                 input(component, window, camera, delta_time);
 
-                update(component, delta_time, collision_grid);
-                collide(component, collision_grid);
+                update(component, delta_time, grid);
+                collide(component, grid);
             }
         }
 
