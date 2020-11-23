@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window.h>
@@ -39,14 +40,16 @@ sfVector2f screen_to_world(sfVector2i a, Camera* cam) {
 }
 
 
-void draw_line(sfRenderWindow* window, sfRectangleShape* line, sfVector2f start, sfVector2f end) {
+void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, sfVector2f start, sfVector2f end) {
     sfVector2f r = diff(end, start);
 
-    sfRectangleShape_setPosition(line, start);
-    
-    sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end), 1.0 });
+    sfRectangleShape_setPosition(line, world_to_screen(start, camera));
 
-    sfRectangleShape_setRotation(line, to_degrees(atan2(r.y, r.x)));
+    sfRectangleShape_setFillColor(line, sfColor_fromRGB(50, 50, 50));
+    
+    sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * camera->zoom, 0.02 * camera->zoom });
+
+    sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));
 
     sfRenderWindow_drawRectangleShape(window, line, NULL);
 }
@@ -54,20 +57,20 @@ void draw_line(sfRenderWindow* window, sfRectangleShape* line, sfVector2f start,
 
 void draw_grid(sfRenderWindow* window, Camera* camera) {
     int nx = ceil(camera->width / camera->zoom);
-    for (int i = 0; i < nx; i++) {
-        float offset = -camera->zoom * (fmod(camera->position.x, 1.0) - 1.0);
-        sfVector2f start = { i * camera->zoom + offset, 0.0 };
-        sfVector2f end = { i * camera->zoom + offset, camera->height };
+    float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);
+    for (int i = 0; i <= nx; i++) {
+        sfVector2f start = { x + i, camera->position.y + 0.5 * camera->height / camera->zoom };
+        sfVector2f end = { x + i, camera->position.y - 0.5 * camera->height / camera->zoom };
 
-        draw_line(window, camera->grid[i], start, end);
+        draw_line(window, camera, camera->grid[i], start, end);
     }
 
-    int ny = ceil(camera->height / camera->zoom) + 1;
-    for (int i = nx; i < nx + ny; i++) {
-        float offset = camera->zoom * (fmod(camera->position.y, 1.0));
-        sfVector2f start = { 0.0, (i - nx) * camera->zoom + offset };
-        sfVector2f end = { camera->width, (i - nx) * camera->zoom + offset };
+    int ny = ceil(camera->height / camera->zoom);    
+    float y = floor(camera->position.y - 0.5 * camera->height / camera->zoom);
+    for (int i = nx; i <= nx + ny; i++) {
+        sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + (i - nx) };
+        sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + (i - nx) };
 
-        draw_line(window, camera->grid[i], start, end);
+        draw_line(window, camera, camera->grid[i], start, end);
     }
 }

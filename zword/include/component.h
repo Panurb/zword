@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include <SFML/Graphics.h>
 
 #define MAX_ENTITIES 1000
@@ -37,6 +39,7 @@ typedef struct {
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag);
 
 typedef struct {
+    bool enabled;
     float radius;
     sfCircleShape* shape;
 } CircleColliderComponent;

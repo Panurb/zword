@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include <SFML/Graphics.h>
 #include <SFML/System/Vector2.h>
 
@@ -38,6 +40,7 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
 
 CircleColliderComponent* CircleColliderComponent_create(float radius) {
     CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
+    col->enabled = true;
     col->radius = radius;
     col->shape = sfCircleShape_create();
     sfCircleShape_setFillColor(col->shape, sfColor_fromRGB(255, 0, 255));

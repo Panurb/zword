@@ -70,6 +70,10 @@ int main() {
     create_level(component);
 
     for (int i = 0; i < component->entities; i++) {
+        if (component->circle_collider[i] && !component->circle_collider[i]->enabled) {
+            continue;
+        }
+
         update_grid(component, grid, i);
     }
 
@@ -103,7 +107,7 @@ int main() {
             while (elapsed_time > delta_time) {
                 elapsed_time -= delta_time;
 
-                input(component, window, camera, delta_time);
+                input(component, window, grid, camera, delta_time);
 
                 update(component, delta_time, grid);
                 collide(component, grid);
@@ -115,7 +119,8 @@ int main() {
         draw_grid(window, camera);
 
         //draw(component, window, camera);
-        debug_draw(component, window, camera);
+        player_debug_draw(component, grid, window, camera);
+        debug_draw(component, grid, window, camera);
 
         char buffer[20];
         snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);

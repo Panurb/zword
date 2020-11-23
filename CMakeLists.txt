@@ -18,19 +18,27 @@ set(SOURCES
     zword/src/zword.c
 )
 
-add_executable(zword_exe ${SOURCES})
+add_executable(zword ${SOURCES})
 
-target_link_libraries(zword_exe ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-audio.a)
-target_link_libraries(zword_exe ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-graphics.a)
-target_link_libraries(zword_exe ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-network.a)
-target_link_libraries(zword_exe ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-system.a)
-target_link_libraries(zword_exe ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-window.a)
+target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-audio.a)
+target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-graphics.a)
+target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-network.a)
+target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-system.a)
+target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-window.a)
 
-install(TARGETS zword_exe 
-    DESTINATION ${CMAKE_SOURCE_DIR}/bin)
+install(TARGETS zword
+    DESTINATION ${CMAKE_SOURCE_DIR}/build)
+	
+set(DLLS
+	CSFML/bin/csfml-audio-2.dll
+	CSFML/bin/csfml-graphics-2.dll
+	CSFML/bin/csfml-network-2.dll
+	CSFML/bin/csfml-system-2.dll
+	CSFML/bin/csfml-window-2.dll
+)
 
-install(DIRECTORY CSFML/bin
-    DESTINATION ${CMAKE_SOURCE_DIR})
+install(FILES ${DLLS}
+    DESTINATION ${CMAKE_SOURCE_DIR}/build)
 
 install(DIRECTORY zword/data
-    DESTINATION ${CMAKE_SOURCE_DIR}/bin)
+    DESTINATION ${CMAKE_SOURCE_DIR}/build)

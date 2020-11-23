@@ -11,6 +11,8 @@ typedef struct{
     int width;
     int height;
     int size;
+    float tile_width;
+    float tile_height;
 } ColliderGrid;
 
 ColliderGrid* ColliderGrid_create();
@@ -21,4 +23,6 @@ void clear_grid(Component* component, ColliderGrid* collision_grid, int i);
 
 void collide(Component* component, ColliderGrid* collision_grid);
 
-void debug_draw(Component* component, sfRenderWindow* window, Camera* camera);
+void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera);
+
+sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, int i, sfRenderWindow* window, Camera* camera);

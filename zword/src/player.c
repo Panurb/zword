@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window/Keyboard.h>
@@ -8,6 +9,7 @@
 #include "util.h"
 #include "component.h"
 #include "camera.h"
+#include "collider.h"
 
 
 void shoot(Component* component, int i) {
@@ -27,7 +29,7 @@ void shoot(Component* component, int i) {
 }
 
 
-void input(Component* component, sfRenderWindow* window, Camera* camera, float delta_time) {
+void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Camera* camera, float delta_time) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
@@ -72,6 +74,35 @@ void input(Component* component, sfRenderWindow* window, Camera* camera, float d
 }
 
 
+void player_debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+    for (int i = 0; i < component->entities; i++) {
+        if (!component->player[i]) continue;
+
+        CoordinateComponent* coord = component->coordinate[i];
+
+        float angle = coord->angle;
+        sfVector2f velocity = polar_to_cartesian(0.6, angle);
+
+        sfVector2f start = sum(coord->position, velocity);
+
+        sfVector2f end = raycast(component, grid, start, velocity, i + 1, window, camera);
+        sfVector2f r = diff(end, start);
+        angle = atan2(r.y, r.x);
+
+        sfRectangleShape* line = sfRectangleShape_create();
+
+        sfRectangleShape_setFillColor(line, sfMagenta);
+        sfRectangleShape_setPosition(line, world_to_screen(start, camera));
+        sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * camera->zoom, 0.1 * camera->zoom });
+        sfRectangleShape_setRotation(line, to_degrees(-angle));
+
+        sfRenderWindow_drawRectangleShape(window, line, NULL);
+
+        sfRectangleShape_destroy(line);
+    }
+}
+
+
 void create_player(Component* component, sfVector2f pos) {
     int i = component->entities;
     component->entities++;
@@ -81,4 +112,11 @@ void create_player(Component* component, sfVector2f pos) {
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 2.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
+
+    i = component->entities;
+    component->entities++;
+
+    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
+    component->circle_collider[i] = CircleColliderComponent_create(0.25);
+    component->circle_collider[i]->enabled = false;
 }

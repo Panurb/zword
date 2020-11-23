@@ -40,3 +40,5 @@ int find(int value, int* array, int size);
 int min(int a, int b);
 
 int max(int a, int b);
+
+float mod(float x, float y);

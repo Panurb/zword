@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Graphics.h>
@@ -18,6 +19,8 @@ ColliderGrid* ColliderGrid_create() {
     grid->width = 64;
     grid->height = 64;
     grid->size = 10;
+    grid->tile_width = 1.0;
+    grid->tile_height = 1.0;
 
     for (int i = 0; i < grid->width; i++) {
         for (int j = 0; j < grid->height; j++) {
@@ -154,7 +157,7 @@ sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
 }
 
 sfVector2f overlap(Component* component, int i, int j) {
-    sfVector2f ol = { 0, 0 };
+    sfVector2f ol = { 0.0, 0.0 };
     if (component->circle_collider[i]) {
         if (component->circle_collider[j]) {
             ol = overlap_circle_circle(component, i, j);
@@ -267,8 +270,85 @@ void get_neighbors(Component* component, ColliderGrid* grid, int i, int* array, 
 }
 
 
-void raycast(Component* Component, ColliderGrid* grid, sfVector2f start, sfVector2f direction) {
-    // TODO
+sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, int i, sfRenderWindow* window, Camera* camera) {
+    //http://www.cs.yorku.ca/~amana/research/grid.pdf
+
+    int x = floor(start.x / grid->tile_width + 0.5 * grid->width);
+    int y = floor(start.y / grid->tile_height + 0.5 * grid->height);
+
+    int step_x = sign(velocity.x);
+    int step_y = sign(velocity.y);
+
+    float offset_x = mod(step_x * start.x, grid->tile_width);
+    float offset_y = mod(step_y * start.y, grid->tile_height);
+
+    float t_max_x = (grid->tile_width - offset_x) / fabs(velocity.x);
+    float t_max_y = (grid->tile_height - offset_y) / fabs(velocity.y);
+
+    float t_delta_x = grid->tile_width / fabs(velocity.x);
+    float t_delta_y = grid->tile_height / fabs(velocity.y);
+
+    CoordinateComponent* coord = component->coordinate[i];
+
+    float time = 0.0;
+    while (1) {
+        /*
+        sfRectangleShape* shape = sfRectangleShape_create();
+        sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * camera->zoom, 0.5 * camera->zoom });
+
+        sfVector2f pos = { x - 0.5 * grid->width + 0.5 * grid->tile_width, 
+                           y - 0.5 * grid->height + 0.5 * grid->tile_height };
+        sfRectangleShape_setPosition(shape, world_to_screen(pos, camera));
+
+        sfVector2f size = { camera->zoom, camera->zoom };
+        sfRectangleShape_setSize(shape, size);
+
+        sfRectangleShape_setOutlineColor(shape, sfWhite);
+        sfRectangleShape_setOutlineThickness(shape, 0.05 * camera->zoom);
+        sfRectangleShape_setFillColor(shape, sfTransparent);
+
+        sfRenderWindow_drawRectangleShape(window, shape, NULL);
+
+        sfRectangleShape_destroy(shape);
+        */
+
+        if (t_max_x < t_max_y) {
+            time = t_max_x;
+
+            t_max_x += t_delta_x;
+            x += step_x;
+        } else {
+            time = t_max_y;
+
+            t_max_y += t_delta_y;
+            y += step_y;
+        }
+
+        if (x < 0 || x > grid->width - 1) {
+            break;
+        }
+
+        if (y < 0 || y > grid->height - 1) {
+            break;
+        }
+
+        for (int j = 0; j < grid->size; j++) {
+            if (grid->array[x][y][j] != -1 && grid->array[x][y][j] != i - 1) {
+                float t = time;
+                while (t < min(t_max_x, t_max_y)) {
+                    coord->position = sum(start, mult(t, velocity));
+                    sfVector2f ol = overlap(component, i, grid->array[x][y][j]);
+                    if (ol.x != 0.0 || ol.y != 0.0) {
+                        return sum(coord->position, ol);
+                    }
+
+                    t += 0.01;
+                }
+            }
+        }
+    }
+
+    return sum(start, mult(time, velocity));
 }
 
 
@@ -308,7 +388,7 @@ void collide(Component* component, ColliderGrid* grid) {
 }
 
 
-void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
+void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         /*
         Bounds bounds = get_bounds(component, grid, i);

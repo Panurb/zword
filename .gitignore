@@ -358,5 +358,4 @@ _deps
 *.exe
 CMakeSettings.json
 
-bin/
 build/
