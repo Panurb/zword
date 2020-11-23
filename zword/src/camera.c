@@ -40,14 +40,14 @@ sfVector2f screen_to_world(sfVector2i a, Camera* cam) {
 }
 
 
-void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, sfVector2f start, sfVector2f end) {
+void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, sfVector2f start, sfVector2f end, float width, sfColor color) {
     sfVector2f r = diff(end, start);
 
     sfRectangleShape_setPosition(line, world_to_screen(start, camera));
 
-    sfRectangleShape_setFillColor(line, sfColor_fromRGB(50, 50, 50));
+    sfRectangleShape_setFillColor(line, color);
     
-    sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * camera->zoom, 0.02 * camera->zoom });
+    sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * camera->zoom, width * camera->zoom });
 
     sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));
 
@@ -62,7 +62,7 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f start = { x + i, camera->position.y + 0.5 * camera->height / camera->zoom };
         sfVector2f end = { x + i, camera->position.y - 0.5 * camera->height / camera->zoom };
 
-        draw_line(window, camera, camera->grid[i], start, end);
+        draw_line(window, camera, camera->grid[i], start, end, 0.02, sfColor_fromRGB(50, 50, 50));
     }
 
     int ny = ceil(camera->height / camera->zoom);    
@@ -71,6 +71,6 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + (i - nx) };
         sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + (i - nx) };
 
-        draw_line(window, camera, camera->grid[i], start, end);
+        draw_line(window, camera, camera->grid[i], start, end, 0.02, sfColor_fromRGB(50, 50, 50));
     }
 }

@@ -337,13 +337,15 @@ sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, s
                 float t = time;
                 while (t < min(t_max_x, t_max_y)) {
                     coord->position = sum(start, mult(t, velocity));
-                    sfVector2f ol = overlap(component, i, grid->array[x][y][j]);
-                    if (ol.x != 0.0 || ol.y != 0.0) {
-                        return sum(coord->position, ol);
+                    for (int k = j; k < grid->size; k++) {
+                        sfVector2f ol = overlap(component, i, grid->array[x][y][k]);
+                        if (ol.x != 0.0 || ol.y != 0.0) {
+                            return coord->position;
+                        }
                     }
-
                     t += 0.01;
                 }
+                break;
             }
         }
     }
@@ -420,6 +422,8 @@ void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window
 
         if (component->circle_collider[i]) {
             CircleColliderComponent* col = component->circle_collider[i];
+
+            if (!col->enabled) continue;
 
             sfCircleShape_setOrigin(col->shape, (sfVector2f) { col->radius * camera->zoom, col->radius * camera->zoom });
 

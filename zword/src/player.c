@@ -81,24 +81,30 @@ void player_debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow*
         CoordinateComponent* coord = component->coordinate[i];
 
         float angle = coord->angle;
-        sfVector2f velocity = polar_to_cartesian(0.6, angle);
 
-        sfVector2f start = sum(coord->position, velocity);
+        sfVector2f velocity = polar_to_cartesian(0.6, angle - 0.5);
 
-        sfVector2f end = raycast(component, grid, start, velocity, i + 1, window, camera);
-        sfVector2f r = diff(end, start);
-        angle = atan2(r.y, r.x);
+        sfVector2f points[4];
+        points[0] = sum(coord->position, velocity);
+        points[1] = raycast(component, grid, points[0], velocity, i + 1, window, camera);
 
-        sfRectangleShape* line = sfRectangleShape_create();
+        for (int j = 1; j < 9; j++) {
+            velocity = polar_to_cartesian(0.6, angle - 0.5 + j * 0.1);
+            points[3] = sum(coord->position, velocity);
+            points[2] = raycast(component, grid, points[3], velocity, i + 1, window, camera);
 
-        sfRectangleShape_setFillColor(line, sfMagenta);
-        sfRectangleShape_setPosition(line, world_to_screen(start, camera));
-        sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * camera->zoom, 0.1 * camera->zoom });
-        sfRectangleShape_setRotation(line, to_degrees(-angle));
+            sfConvexShape* shape = sfConvexShape_create();
+            sfConvexShape_setPointCount(shape, 4);
+            for (int k = 0; k < 4; k++) {
+                sfConvexShape_setPoint(shape, k, world_to_screen(points[k], camera));
+            }
 
-        sfRenderWindow_drawRectangleShape(window, line, NULL);
+            sfRenderWindow_drawConvexShape(window, shape, NULL);
+            sfConvexShape_destroy(shape);
 
-        sfRectangleShape_destroy(line);
+            points[0] = points[3];
+            points[1] = points[2];
+        }
     }
 }
 
