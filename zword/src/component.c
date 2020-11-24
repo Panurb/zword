@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include <SFML/Graphics.h>
 #include <SFML/System/Vector2.h>
@@ -35,6 +36,7 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     phys->friction = friction;
     phys->bounce = bounce;
     phys->drag = drag;
+    phys->max_speed = 20.0;
     return phys;
 }
 
@@ -43,7 +45,7 @@ CircleColliderComponent* CircleColliderComponent_create(float radius) {
     CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
     col->radius = radius;
     col->shape = sfCircleShape_create();
-    sfCircleShape_setFillColor(col->shape, sfColor_fromRGB(255, 0, 255));
+    sfCircleShape_setFillColor(col->shape, sfColor_fromRGB(150, 0, 150));
     return col;
 }
 
@@ -53,7 +55,7 @@ RectangleColliderComponent* RectangleColliderComponent_create(float width, float
     col->width = width;
     col->height = height;
     col->shape = sfRectangleShape_create();
-    sfRectangleShape_setFillColor(col->shape, sfColor_fromRGB(0, 255, 255));
+    sfRectangleShape_setFillColor(col->shape, sfColor_fromRGB(50, 50, 50));
     return col;
 }
 
@@ -62,7 +64,7 @@ PlayerComponent* PlayerComponent_create() {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->health = 100;
     player->max_speed = 0.5;
-    player->acceleration = 5.0;
+    player->acceleration = 20.0;
     player->cooldown = 0.0;
     return player;
 }

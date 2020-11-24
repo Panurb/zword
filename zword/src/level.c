@@ -29,6 +29,15 @@ void create_prop(Component* component, sfVector2f pos) {
 }
 
 
+void create_pointlight(Component* component, sfVector2f pos) {
+    int i = component->entities;
+    component->entities++;
+
+    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
+    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 81, 0.2);
+}
+
+
 void create_house(Component* component, float x, float y) {
     float angle = float_rand(0.0, 2 * M_PI);
 
@@ -37,12 +46,12 @@ void create_house(Component* component, float x, float y) {
 
     sfVector2f pos = { x, y };
 
-    create_wall(component, sum(pos, w), 0.5, 6.0, angle);
-    create_wall(component, diff(pos, w), 0.5, 6.0, angle);
-    create_wall(component, diff(pos, h), 6.0, 0.5, angle + M_PI);
+    create_wall(component, sum(pos, w), 0.5, 5.5, angle);
+    create_wall(component, diff(pos, w), 0.5, 5.5, angle);
+    create_wall(component, diff(pos, h), 6.5, 0.5, angle + M_PI);
 
-    create_wall(component, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.0, 0.5, angle + M_PI);
-    create_wall(component, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.0, 0.5, angle + M_PI);
+    create_wall(component, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, 0.5, angle + M_PI);
+    create_wall(component, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, 0.5, angle + M_PI);
 
     create_prop(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
     create_prop(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));

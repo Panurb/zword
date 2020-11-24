@@ -10,6 +10,7 @@ set(SOURCES
     zword/src/camera.c
     zword/src/collider.c
     zword/src/component.c
+    zword/src/grid.c
     zword/src/image.c
     zword/src/level.c
     zword/src/light.c

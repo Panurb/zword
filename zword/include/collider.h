@@ -4,22 +4,14 @@
 
 #include "component.h"
 #include "camera.h"
+#include "grid.h"
 
 
-typedef struct{
-    int array[64][64][10];
-    int width;
-    int height;
-    int size;
-    float tile_width;
-    float tile_height;
-} ColliderGrid;
+sfVector2f half_width(Component* component, int i);
 
-ColliderGrid* ColliderGrid_create();
+sfVector2f half_height(Component* component, int i);
 
-void update_grid(Component* component, ColliderGrid* collision_grid, int i);
-
-void clear_grid(Component* component, ColliderGrid* collision_grid, int i);
+float axis_half_width(Component* component, int i, sfVector2f axis);
 
 void collide(Component* component, ColliderGrid* collision_grid);
 

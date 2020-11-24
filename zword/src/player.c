@@ -35,7 +35,7 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
-        sfVector2f v = { 0, 0 };
+        sfVector2f v = { 0.0, 0.0 };
 
         if (sfKeyboard_isKeyPressed(sfKeyA)) {
             v.x -= 1;
@@ -82,8 +82,9 @@ void create_player(Component* component, sfVector2f pos) {
 
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
     component->image[i] = ImageComponent_create("player", 1.0);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 2.0);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0);
+    component->physics[i]->max_speed = 5.0;
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
-    component->light[i] = LightComponent_create(10.0, 1.0, 41, 0.2);
+    component->light[i] = LightComponent_create(10.0, 1.0, 81, 0.2);
 }

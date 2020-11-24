@@ -5,6 +5,7 @@
 #include "component.h"
 #include "util.h"
 #include "collider.h"
+#include "grid.h"
 
 
 void update(Component* component, float delta_time, ColliderGrid* collision_grid) {
@@ -27,8 +28,11 @@ void update(Component* component, float delta_time, ColliderGrid* collision_grid
 
         physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
 
-        if (norm(physics->velocity) < 1e-3) {
+        float v = norm(physics->velocity);
+        if (v < 1e-3) {
             physics->velocity = (sfVector2f) { 0.0, 0.0 };
+        } else if (v > physics->max_speed) {
+            physics->velocity = mult(physics->max_speed / v, physics->velocity);
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));

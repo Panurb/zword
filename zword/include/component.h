@@ -34,6 +34,7 @@ typedef struct {
     float friction;
     float bounce;
     float drag;
+    float max_speed;
 } PhysicsComponent;
 
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag);

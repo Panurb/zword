@@ -15,6 +15,7 @@
 #include "util.h"
 #include "image.h"
 #include "light.h"
+#include "grid.h"
 
 
 // remove from here
