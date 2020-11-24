@@ -23,9 +23,20 @@ void create_prop(Component* component, sfVector2f pos) {
     component->entities++;
 
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
-    //component->rectangle_collider[i] = RectangleColliderComponent_create(width, height);
-    component->circle_collider[i] = CircleColliderComponent_create(0.5);
+    component->rectangle_collider[i] = RectangleColliderComponent_create(1.0, 1.0);
     component->physics[i] = PhysicsComponent_create(1.0, 0.5, 0.5, 2.0);
+}
+
+
+void create_enemy(Component* component, sfVector2f pos) {
+    int i = component->entities;
+    component->entities++;
+
+    component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
+    component->circle_collider[i] = CircleColliderComponent_create(0.5);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 5.0);
+    component->physics[i]->max_speed = 2.0;
+    component->enemy[i] = EnemyComponent_create();
 }
 
 
@@ -53,9 +64,9 @@ void create_house(Component* component, float x, float y) {
     create_wall(component, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, 0.5, angle + M_PI);
     create_wall(component, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, 0.5, angle + M_PI);
 
-    create_prop(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
-    create_prop(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
-    create_prop(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
+    create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
+    create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
+    create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
 }
 
 

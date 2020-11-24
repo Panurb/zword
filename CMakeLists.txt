@@ -10,10 +10,12 @@ set(SOURCES
     zword/src/camera.c
     zword/src/collider.c
     zword/src/component.c
+    zword/src/enemy.c
     zword/src/grid.c
     zword/src/image.c
     zword/src/level.c
     zword/src/light.c
+    zword/src/particle.c
     zword/src/physics.c
     zword/src/player.c
     zword/src/util.c

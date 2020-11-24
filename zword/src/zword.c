@@ -16,6 +16,7 @@
 #include "image.h"
 #include "light.h"
 #include "grid.h"
+#include "enemy.h"
 
 
 // remove from here
@@ -109,6 +110,8 @@ int main() {
                 elapsed_time -= delta_time;
 
                 input(component, window, grid, camera, delta_time);
+
+                update_enemy(component, grid);
 
                 update(component, delta_time, grid);
                 collide(component, grid);

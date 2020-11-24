@@ -1,5 +1,8 @@
+#define _USE_MATH_DEFINES
+
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include <SFML/Graphics.h>
 #include <SFML/System/Vector2.h>
@@ -63,7 +66,6 @@ RectangleColliderComponent* RectangleColliderComponent_create(float width, float
 PlayerComponent* PlayerComponent_create() {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->health = 100;
-    player->max_speed = 0.5;
     player->acceleration = 20.0;
     player->cooldown = 0.0;
     return player;
@@ -80,24 +82,60 @@ LightComponent* LightComponent_create(float range, float angle, int rays, float 
 }
 
 
+EnemyComponent* EnemyComponent_create() {
+    EnemyComponent* enemy = malloc(sizeof(EnemyComponent));
+    enemy->health = 100;
+    enemy->acceleration = 15.0;
+    enemy->target = -1;
+    return enemy;
+}
+
+
+ParticleComponent* ParticleComponent_create() {
+    ParticleComponent* particle = malloc(sizeof(ParticleComponent));
+    particle->loop = true;
+    particle->angle = 2 * M_PI;
+    particle->particles = 20;
+    for (int i = 0; i < 100; i++) {
+        particle->position[i] = (sfVector2f) { 0.0, 0.0 };
+        particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
+    }
+    return particle;
+}
+
+
 void destroy_entity(Component* component, int i) {
     if (component->coordinate[i]) {
         free(component->coordinate[i]);
+        component->coordinate[i] = NULL;
     }
     if (component->image[i]) {
         free(component->image[i]);
+        component->image[i] = NULL;
     }
     if (component->physics[i]) {
         free(component->physics[i]);
+        component->physics[i] = NULL;
     }
     if (component->circle_collider[i]) {
         free(component->circle_collider[i]);
+        component->circle_collider[i] = NULL;
     }
     if (component->rectangle_collider[i]) {
         free(component->rectangle_collider[i]);
+        component->rectangle_collider[i] = NULL;
     }
     if (component->player[i]) {
         free(component->player[i]);
+        component->player[i] = NULL;
+    }
+    if (component->light[i]) {
+        free(component->light[i]);
+        component->light[i] = NULL;
+    }
+    if (component->enemy[i]) {
+        free(component->enemy[i]);
+        component->enemy[i] = NULL;
     }
 
     if (i == component->entities - 1) {

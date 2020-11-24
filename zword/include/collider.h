@@ -16,5 +16,3 @@ float axis_half_width(Component* component, int i, sfVector2f axis);
 void collide(Component* component, ColliderGrid* collision_grid);
 
 void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera);
-
-sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range);

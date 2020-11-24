@@ -56,7 +56,6 @@ RectangleColliderComponent* RectangleColliderComponent_create(float width, float
 
 typedef struct {
     int health;
-    float max_speed;
     float acceleration;
     float cooldown;
 } PlayerComponent;
@@ -73,6 +72,24 @@ typedef struct {
 LightComponent* LightComponent_create(float range, float angle, int rays, float brightness);
 
 typedef struct {
+    int health;
+    float acceleration;
+    int target;
+} EnemyComponent;
+
+EnemyComponent* EnemyComponent_create();
+
+typedef struct {
+    bool loop;
+    float angle;
+    int particles;
+    sfVector2f position[100];
+    sfVector2f velocity[100];
+} ParticleComponent;
+
+ParticleComponent* ParticleComponent_create();
+
+typedef struct {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     ImageComponent* image[MAX_ENTITIES];
@@ -81,6 +98,7 @@ typedef struct {
     RectangleColliderComponent* rectangle_collider[MAX_ENTITIES];
     PlayerComponent* player[MAX_ENTITIES];
     LightComponent* light[MAX_ENTITIES];
+    EnemyComponent* enemy[MAX_ENTITIES];
 } Component;
 
 void destroy_entity(Component* component, int i);

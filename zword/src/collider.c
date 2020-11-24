@@ -26,9 +26,13 @@ sfVector2f half_height(Component* component, int i) {
 
 
 float axis_half_width(Component* component, int i, sfVector2f axis) {
-    sfVector2f hw = half_width(component, i);
-    sfVector2f hh = half_height(component, i);
-    return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
+    if (component->rectangle_collider[i]) {
+        sfVector2f hw = half_width(component, i);
+        sfVector2f hh = half_height(component, i);
+        return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
+    } else if (component->circle_collider[i]) {
+        return component->circle_collider[i]->radius;
+    }
 }
 
 
