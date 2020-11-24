@@ -38,14 +38,15 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     return phys;
 }
 
+
 CircleColliderComponent* CircleColliderComponent_create(float radius) {
     CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
-    col->enabled = true;
     col->radius = radius;
     col->shape = sfCircleShape_create();
     sfCircleShape_setFillColor(col->shape, sfColor_fromRGB(255, 0, 255));
     return col;
 }
+
 
 RectangleColliderComponent* RectangleColliderComponent_create(float width, float height) {
     RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
@@ -56,6 +57,7 @@ RectangleColliderComponent* RectangleColliderComponent_create(float width, float
     return col;
 }
 
+
 PlayerComponent* PlayerComponent_create() {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->health = 100;
@@ -64,6 +66,17 @@ PlayerComponent* PlayerComponent_create() {
     player->cooldown = 0.0;
     return player;
 }
+
+
+LightComponent* LightComponent_create(float range, float angle, int rays, float brightness) {
+    LightComponent* light = malloc(sizeof(LightComponent));
+    light->range = range;
+    light->angle = angle;
+    light->rays = rays;
+    light->brightness = brightness;
+    return light;
+}
+
 
 void destroy_entity(Component* component, int i) {
     if (component->coordinate[i]) {

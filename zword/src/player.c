@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -74,41 +76,6 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
 }
 
 
-void player_debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->player[i]) continue;
-
-        CoordinateComponent* coord = component->coordinate[i];
-
-        float angle = coord->angle;
-
-        sfVector2f velocity = polar_to_cartesian(0.6, angle - 0.5);
-
-        sfVector2f points[4];
-        points[0] = sum(coord->position, velocity);
-        points[1] = raycast(component, grid, points[0], velocity, i + 1, window, camera);
-
-        for (int j = 1; j < 9; j++) {
-            velocity = polar_to_cartesian(0.6, angle - 0.5 + j * 0.1);
-            points[3] = sum(coord->position, velocity);
-            points[2] = raycast(component, grid, points[3], velocity, i + 1, window, camera);
-
-            sfConvexShape* shape = sfConvexShape_create();
-            sfConvexShape_setPointCount(shape, 4);
-            for (int k = 0; k < 4; k++) {
-                sfConvexShape_setPoint(shape, k, world_to_screen(points[k], camera));
-            }
-
-            sfRenderWindow_drawConvexShape(window, shape, NULL);
-            sfConvexShape_destroy(shape);
-
-            points[0] = points[3];
-            points[1] = points[2];
-        }
-    }
-}
-
-
 void create_player(Component* component, sfVector2f pos) {
     int i = component->entities;
     component->entities++;
@@ -118,11 +85,5 @@ void create_player(Component* component, sfVector2f pos) {
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 2.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
-
-    i = component->entities;
-    component->entities++;
-
-    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->circle_collider[i] = CircleColliderComponent_create(0.25);
-    component->circle_collider[i]->enabled = false;
+    component->light[i] = LightComponent_create(10.0, 1.0, 41, 0.2);
 }

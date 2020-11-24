@@ -14,6 +14,7 @@
 #include "physics.h"
 #include "util.h"
 #include "image.h"
+#include "light.h"
 
 
 // remove from here
@@ -22,7 +23,10 @@
 
 int main() {
     sfVideoMode mode = { 1280, 720, 32 };
-    sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfResize | sfClose, NULL);
+    sfContext* context = sfContext_create();
+    sfContextSettings settings = sfContext_getSettings(context);
+    settings.antialiasingLevel = 8;
+    sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
     if (!window) {
         return 1;
     }
@@ -70,10 +74,6 @@ int main() {
     create_level(component);
 
     for (int i = 0; i < component->entities; i++) {
-        if (component->circle_collider[i] && !component->circle_collider[i]->enabled) {
-            continue;
-        }
-
         update_grid(component, grid, i);
     }
 
@@ -119,8 +119,9 @@ int main() {
         draw_grid(window, camera);
 
         //draw(component, window, camera);
-        player_debug_draw(component, grid, window, camera);
         debug_draw(component, grid, window, camera);
+
+        draw_light(component, grid, window, camera);
 
         char buffer[20];
         snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);

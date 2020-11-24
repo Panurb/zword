@@ -270,8 +270,10 @@ void get_neighbors(Component* component, ColliderGrid* grid, int i, int* array, 
 }
 
 
-sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, int i, sfRenderWindow* window, Camera* camera) {
+sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range) {
     //http://www.cs.yorku.ca/~amana/research/grid.pdf
+
+    velocity = normalized(velocity);
 
     int x = floor(start.x / grid->tile_width + 0.5 * grid->width);
     int y = floor(start.y / grid->tile_height + 0.5 * grid->height);
@@ -287,41 +289,20 @@ sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, s
 
     float t_delta_x = grid->tile_width / fabs(velocity.x);
     float t_delta_y = grid->tile_height / fabs(velocity.y);
-
-    CoordinateComponent* coord = component->coordinate[i];
-
-    float time = 0.0;
+    
+    float t_min = range;
+    sfVector2f point = sum(start, mult(range, velocity));
     while (1) {
-        /*
-        sfRectangleShape* shape = sfRectangleShape_create();
-        sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * camera->zoom, 0.5 * camera->zoom });
-
-        sfVector2f pos = { x - 0.5 * grid->width + 0.5 * grid->tile_width, 
-                           y - 0.5 * grid->height + 0.5 * grid->tile_height };
-        sfRectangleShape_setPosition(shape, world_to_screen(pos, camera));
-
-        sfVector2f size = { camera->zoom, camera->zoom };
-        sfRectangleShape_setSize(shape, size);
-
-        sfRectangleShape_setOutlineColor(shape, sfWhite);
-        sfRectangleShape_setOutlineThickness(shape, 0.05 * camera->zoom);
-        sfRectangleShape_setFillColor(shape, sfTransparent);
-
-        sfRenderWindow_drawRectangleShape(window, shape, NULL);
-
-        sfRectangleShape_destroy(shape);
-        */
-
         if (t_max_x < t_max_y) {
-            time = t_max_x;
-
             t_max_x += t_delta_x;
             x += step_x;
         } else {
-            time = t_max_y;
-
             t_max_y += t_delta_y;
             y += step_y;
+        }
+
+        if (min(t_max_x, t_max_y) > range) {
+            break;
         }
 
         if (x < 0 || x > grid->width - 1) {
@@ -332,25 +313,51 @@ sfVector2f raycast(Component* component, ColliderGrid* grid, sfVector2f start, s
             break;
         }
 
-        for (int j = 0; j < grid->size; j++) {
-            if (grid->array[x][y][j] != -1 && grid->array[x][y][j] != i - 1) {
-                float t = time;
-                while (t < min(t_max_x, t_max_y)) {
-                    coord->position = sum(start, mult(t, velocity));
-                    for (int k = j; k < grid->size; k++) {
-                        sfVector2f ol = overlap(component, i, grid->array[x][y][k]);
-                        if (ol.x != 0.0 || ol.y != 0.0) {
-                            return coord->position;
-                        }
+        for (int jj = 0; jj < grid->size; jj++) {
+            int j = grid->array[x][y][jj];
+            if (j == -1)  continue;
+
+            CoordinateComponent* coord = component->coordinate[j];
+            if (component->rectangle_collider[j]) {
+                //https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
+
+                sfVector2f hw = half_width(component, j);
+                sfVector2f hh = half_height(component, j);
+                sfVector2f corners[4];
+                corners[0] = sum(coord->position, sum(hw, hh));
+                corners[1] = sum(coord->position, diff(hw, hh));
+                corners[2] = diff(coord->position, sum(hw, hh));
+                corners[3] = diff(coord->position, diff(hw, hh));
+
+                for (int k = 0; k < 4; k++) {
+                    sfVector2f dir = diff(corners[(k + 1) % 4], corners[k]);
+                    float t = cross(diff(corners[k], start), dir) / cross(velocity, dir);
+                    float u = cross(diff(start, corners[k]), velocity) / cross(dir, velocity);
+
+                    if (t >= 0.0 && t < t_min && u >= 0.0 && u <= 1.0) {
+                        point = sum(start, mult(t, velocity));
+                        t_min = t;
                     }
-                    t += 0.01;
                 }
-                break;
+            } else if (component->circle_collider[j]) {
+                //https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
+
+                float radius = component->circle_collider[j]->radius;
+                sfVector2f oc = diff(start, coord->position);
+                float delta = powf(dot(velocity, oc), 2) - norm2(oc) + powf(radius, 2);
+                float t = -dot(velocity, oc) - sqrtf(delta);
+
+                if (delta >= 0.0 && t >= 0.0) {
+                    if (t < t_min) {
+                        point = sum(start, mult(t, velocity));
+                        t_min = t;
+                    }
+                }
             }
         }
     }
 
-    return sum(start, mult(time, velocity));
+    return point;
 }
 
 
@@ -422,8 +429,6 @@ void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window
 
         if (component->circle_collider[i]) {
             CircleColliderComponent* col = component->circle_collider[i];
-
-            if (!col->enabled) continue;
 
             sfCircleShape_setOrigin(col->shape, (sfVector2f) { col->radius * camera->zoom, col->radius * camera->zoom });
 

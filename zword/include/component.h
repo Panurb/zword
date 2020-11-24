@@ -39,7 +39,6 @@ typedef struct {
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag);
 
 typedef struct {
-    bool enabled;
     float radius;
     sfCircleShape* shape;
 } CircleColliderComponent;
@@ -64,6 +63,15 @@ typedef struct {
 PlayerComponent* PlayerComponent_create();
 
 typedef struct {
+    float range;
+    float angle;
+    int rays;
+    float brightness;
+} LightComponent;
+
+LightComponent* LightComponent_create(float range, float angle, int rays, float brightness);
+
+typedef struct {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     ImageComponent* image[MAX_ENTITIES];
@@ -71,6 +79,7 @@ typedef struct {
     CircleColliderComponent* circle_collider[MAX_ENTITIES];
     RectangleColliderComponent* rectangle_collider[MAX_ENTITIES];
     PlayerComponent* player[MAX_ENTITIES];
+    LightComponent* light[MAX_ENTITIES];
 } Component;
 
 void destroy_entity(Component* component, int i);

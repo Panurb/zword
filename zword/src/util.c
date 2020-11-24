@@ -112,3 +112,7 @@ int max(int a, int b) {
 float mod(float x, float y) {
     return fmod(fmod(x, y) + y, y);
 }
+
+float cross(sfVector2f v, sfVector2f u) {
+    return v.x * u.y - v.y * u.x;
+}

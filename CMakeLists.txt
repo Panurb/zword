@@ -12,6 +12,7 @@ set(SOURCES
     zword/src/component.c
     zword/src/image.c
     zword/src/level.c
+    zword/src/light.c
     zword/src/physics.c
     zword/src/player.c
     zword/src/util.c
