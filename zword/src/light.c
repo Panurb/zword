@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <math.h>
 
 #include <SFML/Graphics.h>
@@ -122,35 +124,37 @@ void draw_light(Component* component, ColliderGrid* grid, sfRenderWindow* window
         LightComponent* light = component->light[i];
         CoordinateComponent* coord = component->coordinate[i];
 
-        float angle = coord->angle;
+        for (int k = 0; k <= light->smoothing; k++) {
+            float range = light->range - 0.2 * fabs(k - light->smoothing / 2);
 
-        sfVector2f velocity = polar_to_cartesian(1.0, angle - 0.5 * light->angle);
+            sfVector2f velocity = polar_to_cartesian(1.0, coord->angle - 0.5 * light->angle);
+            sfVector2f start = sum(coord->position, polar_to_cartesian((k - light->smoothing / 2) * 0.1, coord->angle + 0.5 * M_PI));
 
-        sfVector2f points[3];
-        points[0] = coord->position;
-        points[1] = raycast(component, grid, points[0], velocity, light->range).position;
+            sfConvexShape_setPoint(light->shape, 0, world_to_screen(start, camera));
 
-        for (int j = 1; j <= light->rays; j++) {
-            velocity = polar_to_cartesian(1.0, angle - 0.5 * light->angle + j * (light->angle / light->rays));
+            sfVector2f end = raycast(component, grid, start, velocity, range).position;
+            sfConvexShape_setPoint(light->shape, 1, world_to_screen(end, camera));
 
-            HitInfo info = raycast(component, grid, points[0], velocity, light->range);
-            points[2] = info.position;
+            for (int j = 1; j <= light->rays; j++) {
+                velocity = polar_to_cartesian(1.0, coord->angle - 0.5 * light->angle + j * (light->angle / light->rays));
 
-            float w = axis_half_width(component, info.object, velocity);
-            points[2] = sum(points[2], mult(0.25, velocity));
+                HitInfo info = raycast(component, grid, start, velocity, range);
+                sfVector2f end = info.position;
 
-            sfConvexShape* shape = sfConvexShape_create();
-            sfConvexShape_setPointCount(shape, 3);
-            for (int k = 0; k < 3; k++) {
-                sfConvexShape_setPoint(shape, k, world_to_screen(points[k], camera));
+                sfVector2f offset = mult(0.25 - 0.05 * fabs(k - light->smoothing / 2), velocity);
+
+                sfConvexShape_setPoint(light->shape, j % 2 + 1, world_to_screen(sum(end, offset), camera));
+
+                //float brightness = light->brightness * 4 / pow(light->rays, 2) * (j * (-j + light->rays));
+                float brightness = light->brightness;
+                if (light->smoothing != 0) {
+                    brightness *= 1.0 / light->smoothing;
+                }
+                sfColor color = sfColor_fromRGBA(light->color[0], light->color[1], light->color[2], brightness * 255);
+                sfConvexShape_setFillColor(light->shape, color);
+
+                sfRenderWindow_drawConvexShape(window, light->shape, NULL);
             }
-
-            float brightness = light->brightness * 4 / pow(light->rays, 2) * (-j * j + light->rays * j);
-            sfConvexShape_setFillColor(shape, sfColor_fromRGBA(255, 255, 255, brightness * 255));
-            sfRenderWindow_drawConvexShape(window, shape, NULL);
-            sfConvexShape_destroy(shape);
-
-            points[1] = points[2];
         }
     }
 }

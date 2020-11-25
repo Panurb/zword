@@ -17,6 +17,7 @@
 #include "light.h"
 #include "grid.h"
 #include "enemy.h"
+#include "particle.h"
 
 
 // remove from here
@@ -111,10 +112,12 @@ int main() {
 
                 input(component, window, grid, camera, delta_time);
 
-                update_enemy(component, grid);
+                //update_enemy(component, grid);
 
                 update(component, delta_time, grid);
                 collide(component, grid);
+
+                update_particles(component, delta_time);
             }
         }
 
@@ -124,6 +127,8 @@ int main() {
 
         //draw(component, window, camera);
         debug_draw(component, grid, window, camera);
+
+        draw_particles(component, window, camera);
 
         draw_light(component, grid, window, camera);
 

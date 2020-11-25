@@ -37,6 +37,7 @@ void create_enemy(Component* component, sfVector2f pos) {
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 5.0);
     component->physics[i]->max_speed = 2.0;
     component->enemy[i] = EnemyComponent_create();
+    component->particle[i] = ParticleComponent_create();
 }
 
 

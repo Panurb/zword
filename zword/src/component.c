@@ -9,6 +9,7 @@
 
 #include "component.h"
 #include "image.h"
+#include "util.h"
 
 
 CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle) {
@@ -77,7 +78,13 @@ LightComponent* LightComponent_create(float range, float angle, int rays, float 
     light->range = range;
     light->angle = angle;
     light->rays = rays;
+    light->color[0] = 255;
+    light->color[1] = 255;
+    light->color[2] = 255;
     light->brightness = brightness;
+    light->smoothing = 0;
+    light->shape = sfConvexShape_create();
+    sfConvexShape_setPointCount(light->shape, 3);
     return light;
 }
 
@@ -93,13 +100,19 @@ EnemyComponent* EnemyComponent_create() {
 
 ParticleComponent* ParticleComponent_create() {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
-    particle->loop = true;
+    particle->loop = false;
     particle->angle = 2 * M_PI;
-    particle->particles = 20;
-    for (int i = 0; i < 100; i++) {
+    particle->particles = 0;
+    particle->max_particles = 20;
+    particle->iterator = 0;
+    for (int i = 0; i < particle->max_particles; i++) {
         particle->position[i] = (sfVector2f) { 0.0, 0.0 };
         particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
     }
+    particle->shape = sfCircleShape_create();
+    sfCircleShape_setFillColor(particle->shape, sfColor_fromRGB(200, 0, 0));
+    particle->rate = 0.0;
+    particle->timer = 0.0;
     return particle;
 }
 
@@ -136,6 +149,10 @@ void destroy_entity(Component* component, int i) {
     if (component->enemy[i]) {
         free(component->enemy[i]);
         component->enemy[i] = NULL;
+    }
+    if (component->particle[i]) {
+        free(component->particle[i]);
+        component->particle[i] = NULL;
     }
 
     if (i == component->entities - 1) {

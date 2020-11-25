@@ -66,7 +66,10 @@ typedef struct {
     float range;
     float angle;
     int rays;
+    int color[3];
     float brightness;
+    int smoothing;
+    sfConvexShape* shape;
 } LightComponent;
 
 LightComponent* LightComponent_create(float range, float angle, int rays, float brightness);
@@ -83,8 +86,13 @@ typedef struct {
     bool loop;
     float angle;
     int particles;
-    sfVector2f position[100];
-    sfVector2f velocity[100];
+    int max_particles;
+    int iterator;
+    sfVector2f position[20];
+    sfVector2f velocity[20];
+    sfCircleShape* shape;
+    float rate;
+    float timer;
 } ParticleComponent;
 
 ParticleComponent* ParticleComponent_create();
@@ -99,6 +107,7 @@ typedef struct {
     PlayerComponent* player[MAX_ENTITIES];
     LightComponent* light[MAX_ENTITIES];
     EnemyComponent* enemy[MAX_ENTITIES];
+    ParticleComponent* particle[MAX_ENTITIES];
 } Component;
 
 void destroy_entity(Component* component, int i);

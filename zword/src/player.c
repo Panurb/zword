@@ -26,6 +26,7 @@ void shoot(Component* component, ColliderGrid* grid, int i) {
     if (component->enemy[info.object]) {
         component->enemy[info.object]->health -= 40;
         component->physics[info.object]->velocity = polar_to_cartesian(2.0, angle);
+        component->particle[info.object]->rate = 20.0;
 
         if (component->enemy[info.object]->health <= 0) {
             destroy_entity(component, info.object);
@@ -101,4 +102,5 @@ void create_player(Component* component, sfVector2f pos) {
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
     component->light[i] = LightComponent_create(10.0, 1.0, 501, 0.2);
+    //component->particle[i] = ParticleComponent_create();
 }
