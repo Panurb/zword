@@ -7,3 +7,5 @@
 void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Camera* camera, float delta_time);
 
 void create_player(Component* component, sfVector2f pos);
+
+void draw_player(Component* component, sfRenderWindow* window, Camera* camera);

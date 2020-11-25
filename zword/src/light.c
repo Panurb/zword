@@ -117,12 +117,16 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
 }
 
 
-void draw_light(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+void draw_light(Component* component, ColliderGrid* grid, sfRenderTexture* texture, Camera* camera) {
+    sfRenderTexture_clear(texture, sfColor_fromRGB(50, 50, 50));
+
     for (int i = 0; i < component->entities; i++) {
         if (!component->light[i]) continue;
 
         LightComponent* light = component->light[i];
         CoordinateComponent* coord = component->coordinate[i];
+
+        sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
 
         for (int k = 0; k <= light->smoothing; k++) {
             float range = light->range - 0.2 * fabs(k - light->smoothing / 2);
@@ -130,10 +134,10 @@ void draw_light(Component* component, ColliderGrid* grid, sfRenderWindow* window
             sfVector2f velocity = polar_to_cartesian(1.0, coord->angle - 0.5 * light->angle);
             sfVector2f start = sum(coord->position, polar_to_cartesian((k - light->smoothing / 2) * 0.1, coord->angle + 0.5 * M_PI));
 
-            sfConvexShape_setPoint(light->shape, 0, world_to_screen(start, camera));
+            sfConvexShape_setPoint(light->shape, 0, world_to_texture(start, camera));
 
             sfVector2f end = raycast(component, grid, start, velocity, range).position;
-            sfConvexShape_setPoint(light->shape, 1, world_to_screen(end, camera));
+            sfConvexShape_setPoint(light->shape, 1, world_to_texture(end, camera));
 
             for (int j = 1; j <= light->rays; j++) {
                 velocity = polar_to_cartesian(1.0, coord->angle - 0.5 * light->angle + j * (light->angle / light->rays));
@@ -143,17 +147,17 @@ void draw_light(Component* component, ColliderGrid* grid, sfRenderWindow* window
 
                 sfVector2f offset = mult(0.25 - 0.05 * fabs(k - light->smoothing / 2), velocity);
 
-                sfConvexShape_setPoint(light->shape, j % 2 + 1, world_to_screen(sum(end, offset), camera));
+                sfConvexShape_setPoint(light->shape, j % 2 + 1, world_to_texture(sum(end, offset), camera));
 
                 //float brightness = light->brightness * 4 / pow(light->rays, 2) * (j * (-j + light->rays));
                 float brightness = light->brightness;
                 if (light->smoothing != 0) {
                     brightness *= 1.0 / light->smoothing;
                 }
-                sfColor color = sfColor_fromRGBA(light->color[0], light->color[1], light->color[2], brightness * 255);
+                sfColor color = sfColor_fromRGBA(light->color[0], light->color[1], light->color[2], 255);
                 sfConvexShape_setFillColor(light->shape, color);
 
-                sfRenderWindow_drawConvexShape(window, light->shape, NULL);
+                sfRenderTexture_drawConvexShape(texture, light->shape, &state);
             }
         }
     }

@@ -69,6 +69,9 @@ PlayerComponent* PlayerComponent_create() {
     player->health = 100;
     player->acceleration = 20.0;
     player->cooldown = 0.0;
+    player->fire_rate = 5.0;
+    player->recoil = 0.0;
+    player->recoil_reduction = 0.5;
     return player;
 }
 
@@ -98,20 +101,23 @@ EnemyComponent* EnemyComponent_create() {
 }
 
 
-ParticleComponent* ParticleComponent_create() {
+ParticleComponent* ParticleComponent_create(float angle, float size, float rate, sfColor color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
+    particle->enabled = false;
     particle->loop = false;
-    particle->angle = 2 * M_PI;
+    particle->angle = angle;
     particle->particles = 0;
-    particle->max_particles = 20;
+    particle->max_particles = 100;
     particle->iterator = 0;
+    particle->max_size = size;
     for (int i = 0; i < particle->max_particles; i++) {
         particle->position[i] = (sfVector2f) { 0.0, 0.0 };
         particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
+        particle->size[i] = particle->max_size;
     }
     particle->shape = sfCircleShape_create();
-    sfCircleShape_setFillColor(particle->shape, sfColor_fromRGB(200, 0, 0));
-    particle->rate = 0.0;
+    sfCircleShape_setFillColor(particle->shape, color);
+    particle->rate = rate;
     particle->timer = 0.0;
     return particle;
 }

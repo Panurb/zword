@@ -12,6 +12,11 @@ void update_enemy(Component* component, ColliderGrid* grid) {
         EnemyComponent* enemy = component->enemy[i];
         PhysicsComponent* phys = component->physics[i];
 
+        if (enemy->health <= 0) {
+            destroy_entity(component, i);
+            break;
+        }
+
         if (enemy->target == -1) {
             for (int j = 0; j < component->entities; j++) {
                 if (!component->player[j]) continue;

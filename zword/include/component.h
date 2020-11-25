@@ -58,6 +58,9 @@ typedef struct {
     int health;
     float acceleration;
     float cooldown;
+    float fire_rate;
+    float recoil;
+    float recoil_reduction;
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -83,19 +86,22 @@ typedef struct {
 EnemyComponent* EnemyComponent_create();
 
 typedef struct {
+    bool enabled;
     bool loop;
     float angle;
     int particles;
     int max_particles;
     int iterator;
-    sfVector2f position[20];
-    sfVector2f velocity[20];
+    sfVector2f position[100];
+    sfVector2f velocity[100];
+    float size[100];
+    float max_size;
     sfCircleShape* shape;
     float rate;
     float timer;
 } ParticleComponent;
 
-ParticleComponent* ParticleComponent_create();
+ParticleComponent* ParticleComponent_create(float angle, float size, float rate, sfColor color);
 
 typedef struct {
     int entities;

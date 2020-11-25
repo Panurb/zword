@@ -33,6 +33,8 @@ int main() {
     if (!window) {
         return 1;
     }
+    sfRenderTexture* texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
+    sfSprite* sprite = sfSprite_create();
 
     bool focus = true;
 
@@ -112,7 +114,7 @@ int main() {
 
                 input(component, window, grid, camera, delta_time);
 
-                //update_enemy(component, grid);
+                update_enemy(component, grid);
 
                 update(component, delta_time, grid);
                 collide(component, grid);
@@ -125,12 +127,17 @@ int main() {
 
         draw_grid(window, camera);
 
-        //draw(component, window, camera);
         debug_draw(component, grid, window, camera);
+        //draw(component, window, camera);
 
         draw_particles(component, window, camera);
 
-        draw_light(component, grid, window, camera);
+        draw_light(component, grid, texture, camera);
+        sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
+        sfSprite_setTexture(sprite, sfRenderTexture_getTexture(texture), sfTrue);
+        sfRenderWindow_drawSprite(window, sprite, &state);
+
+        draw_player(component, window, camera);
 
         char buffer[20];
         snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);

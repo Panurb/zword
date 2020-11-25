@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window.h>
@@ -40,7 +41,21 @@ sfVector2f screen_to_world(sfVector2i a, Camera* cam) {
 }
 
 
+sfVector2f world_to_texture(sfVector2f a, Camera* cam) {
+    sfVector2f b;
+    b.x = (a.x - cam->position.x) * cam->zoom + 0.5 * cam->width;
+    b.y = (a.y - cam->position.y) * cam->zoom + 0.5 * cam->height;
+    return b;
+}
+
+
 void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, sfVector2f start, sfVector2f end, float width, sfColor color) {
+    bool created = false;
+    if (!line) {
+        line = sfRectangleShape_create();
+        created = true;
+    }
+
     sfVector2f r = diff(end, start);
 
     sfRectangleShape_setPosition(line, world_to_screen(start, camera));
@@ -52,6 +67,10 @@ void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, s
     sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));
 
     sfRenderWindow_drawRectangleShape(window, line, NULL);
+
+    if (created) {
+        sfRectangleShape_destroy(line);
+    }
 }
 
 
