@@ -46,7 +46,7 @@ void create_pointlight(Component* component, sfVector2f pos) {
     component->entities++;
 
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 81, 0.2);
+    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 501, 0.25);
 }
 
 
@@ -68,6 +68,8 @@ void create_house(Component* component, float x, float y) {
     create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
     create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
     create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
+
+    create_pointlight(component, pos);
 }
 
 
@@ -77,4 +79,13 @@ void create_level(Component* component) {
     create_house(component, 10.0, 10.0);
 
     create_player(component, (sfVector2f) { 0.0, 0.0 });
+
+    int i = component->entities;
+    component->entities++;
+
+    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 0.0, -5.0 }, 0.0);
+    component->rectangle_collider[i] = RectangleColliderComponent_create(6.0, 3.0);
+    component->physics[i] = PhysicsComponent_create(10.0, 0.5, 0.2, 3.0);
+    component->vehicle[i] = VehicleComponent_create();
+    component->light[i] = LightComponent_create(10.0, 1.0, 51, 0.1);
 }

@@ -35,11 +35,13 @@ typedef struct {
     float bounce;
     float drag;
     float max_speed;
+    float max_angular_speed;
 } PhysicsComponent;
 
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag);
 
 typedef struct {
+    bool enabled;
     float radius;
     sfCircleShape* shape;
 } CircleColliderComponent;
@@ -61,6 +63,7 @@ typedef struct {
     float fire_rate;
     float recoil;
     float recoil_reduction;
+    int vehicle;
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -69,10 +72,11 @@ typedef struct {
     float range;
     float angle;
     int rays;
-    int color[3];
+    sfColor color;
     float brightness;
     int smoothing;
     sfConvexShape* shape;
+    sfCircleShape* shine;
 } LightComponent;
 
 LightComponent* LightComponent_create(float range, float angle, int rays, float brightness);
@@ -104,6 +108,14 @@ typedef struct {
 ParticleComponent* ParticleComponent_create(float angle, float size, float rate, sfColor color);
 
 typedef struct {
+    int driver;
+    float acceleration;
+    float max_speed;
+} VehicleComponent;
+
+VehicleComponent* VehicleComponent_create();
+
+typedef struct {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     ImageComponent* image[MAX_ENTITIES];
@@ -114,6 +126,7 @@ typedef struct {
     LightComponent* light[MAX_ENTITIES];
     EnemyComponent* enemy[MAX_ENTITIES];
     ParticleComponent* particle[MAX_ENTITIES];
+    VehicleComponent* vehicle[MAX_ENTITIES];
 } Component;
 
 void destroy_entity(Component* component, int i);

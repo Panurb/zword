@@ -59,6 +59,10 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
 
     velocity = normalized(velocity);
 
+    HitInfo info;
+    info.object = -1;
+    info.normal = perp(velocity);
+
     int x = floor(start.x / grid->tile_width + 0.5 * grid->width);
     int y = floor(start.y / grid->tile_height + 0.5 * grid->height);
 
@@ -72,7 +76,6 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
     float t_delta_y = grid->tile_height / fabs(velocity.y);
     
     float t_min = range;
-    int object = -1;
     int objects[20];
 
     for (int i = 0; i < 20; i++) {
@@ -98,7 +101,7 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
             float t = ray_intersection(component, j, start, velocity, range);
             if (t < t_min) {
                 t_min = t;
-                object = j;
+                info.object = j;
             }
         }
 
@@ -113,12 +116,34 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
         if (min(t_max_x, t_max_y) > range) break;
     }
 
-    return (HitInfo) { sum(start, mult(t_min, velocity)), object };
+    info.position = sum(start, mult(t_min, velocity));
+    if (info.object != -1) {
+        sfVector2f r = normalized(diff(info.position, component->coordinate[info.object]->position));
+        if (component->circle_collider[info.object]) {
+            info.normal = r;
+        } else if (component->rectangle_collider[info.object]) {
+            sfVector2f hw = polar_to_cartesian(1.0, component->coordinate[info.object]->angle);
+            sfVector2f hh = polar_to_cartesian(1.0, component->coordinate[info.object]->angle + 0.5 * M_PI);
+
+            float width = component->rectangle_collider[info.object]->width;
+            float height = component->rectangle_collider[info.object]->height;
+
+            float rhw = dot(r, hw);
+            float rhh = dot(r, hh);
+            if (0.5 * width - fabs(rhw) > 0.5 * height - fabs(rhh)) {
+                info.normal = mult(sign(rhh), hh);
+            } else {
+                info.normal = mult(sign(rhw), hw);
+            }
+        }
+    }
+
+    return info;
 }
 
 
-void draw_light(Component* component, ColliderGrid* grid, sfRenderTexture* texture, Camera* camera) {
-    sfRenderTexture_clear(texture, sfColor_fromRGB(50, 50, 50));
+void draw_lights(Component* component, ColliderGrid* grid, sfRenderWindow* window, sfRenderTexture* texture, Camera* camera, float ambient_light) {
+    sfRenderTexture_clear(texture, sfColor_fromRGB(255 * ambient_light, 255 * ambient_light, 255 * ambient_light));
 
     for (int i = 0; i < component->entities; i++) {
         if (!component->light[i]) continue;
@@ -154,10 +179,25 @@ void draw_light(Component* component, ColliderGrid* grid, sfRenderTexture* textu
                 if (light->smoothing != 0) {
                     brightness *= 1.0 / light->smoothing;
                 }
-                sfColor color = sfColor_fromRGBA(light->color[0], light->color[1], light->color[2], 255);
+                
+                sfColor color = light->color;
+                color.a = brightness * 255;
                 sfConvexShape_setFillColor(light->shape, color);
 
                 sfRenderTexture_drawConvexShape(texture, light->shape, &state);
+
+                sfCircleShape_setPosition(light->shine, world_to_screen(diff(end, mult(0.14, info.normal)), camera));
+
+                float vn = dot(velocity, info.normal);
+                if (vn < -0.98) {
+                    sfColor color = sfWhite;
+                    color.a = (1 - 50 * (1 + vn)) * 128;
+                    sfCircleShape_setFillColor(light->shine, color);
+                    float radius = 0.05 * (1 - 5 * (1 + vn)) * camera->zoom;
+                    sfCircleShape_setRadius(light->shine, radius);
+                    sfCircleShape_setOrigin(light->shine, (sfVector2f) { radius, radius });
+                    sfRenderWindow_drawCircleShape(window, light->shine, NULL);
+                }
             }
         }
     }

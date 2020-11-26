@@ -41,12 +41,14 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     phys->bounce = bounce;
     phys->drag = drag;
     phys->max_speed = 20.0;
+    phys->max_angular_speed = 1.0;
     return phys;
 }
 
 
 CircleColliderComponent* CircleColliderComponent_create(float radius) {
     CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
+    col->enabled = true;
     col->radius = radius;
     col->shape = sfCircleShape_create();
     sfCircleShape_setFillColor(col->shape, sfColor_fromRGB(150, 0, 150));
@@ -72,6 +74,7 @@ PlayerComponent* PlayerComponent_create() {
     player->fire_rate = 5.0;
     player->recoil = 0.0;
     player->recoil_reduction = 0.5;
+    player->vehicle = -1;
     return player;
 }
 
@@ -81,13 +84,12 @@ LightComponent* LightComponent_create(float range, float angle, int rays, float 
     light->range = range;
     light->angle = angle;
     light->rays = rays;
-    light->color[0] = 255;
-    light->color[1] = 255;
-    light->color[2] = 255;
+    light->color = sfWhite;
     light->brightness = brightness;
     light->smoothing = 0;
     light->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(light->shape, 3);
+    light->shine = sfCircleShape_create();
     return light;
 }
 
@@ -120,6 +122,15 @@ ParticleComponent* ParticleComponent_create(float angle, float size, float rate,
     particle->rate = rate;
     particle->timer = 0.0;
     return particle;
+}
+
+
+VehicleComponent* VehicleComponent_create() {
+    VehicleComponent* vehicle = malloc(sizeof(VehicleComponent));
+    vehicle->acceleration = 20.0;
+    vehicle->max_speed = 10.0;
+    vehicle->driver = -1;
+    return vehicle;
 }
 
 

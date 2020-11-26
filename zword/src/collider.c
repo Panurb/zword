@@ -143,14 +143,14 @@ sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
 
 sfVector2f overlap(Component* component, int i, int j) {
     sfVector2f ol = { 0.0, 0.0 };
-    if (component->circle_collider[i]) {
+    if (component->circle_collider[i] && component->circle_collider[i]->enabled) {
         if (component->circle_collider[j]) {
             ol = overlap_circle_circle(component, i, j);
         } else if (component->rectangle_collider[j]) {
             ol = overlap_circle_rectangle(component, i, j);
         }
     } else if (component->rectangle_collider[i]) {
-        if (component->circle_collider[j]) {
+        if (component->circle_collider[j] && component->circle_collider[j]->enabled) {
             ol = overlap_rectangle_circle(component, i, j);
         } else if (component->rectangle_collider[j]) {
             ol = overlap_rectangle_rectangle(component, i, j);

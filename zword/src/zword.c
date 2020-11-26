@@ -36,6 +36,8 @@ int main() {
     sfRenderTexture* texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
     sfSprite* sprite = sfSprite_create();
 
+    float ambient_light = 0.5;
+
     bool focus = true;
 
     //sfWindow_setVerticalSyncEnabled(window, true);
@@ -102,19 +104,12 @@ int main() {
         }
 
         if (focus) {
-            frame_avg -= frame_times[i] / 1000.0;
-            frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
-            frame_avg += frame_times[i] / 1000.0;
-
-            elapsed_time += frame_times[i];
-            i = (i + 1) % 1000;
-
             while (elapsed_time > delta_time) {
                 elapsed_time -= delta_time;
 
                 input(component, window, grid, camera, delta_time);
 
-                update_enemy(component, grid);
+                //update_enemy(component, grid);
 
                 update(component, delta_time, grid);
                 collide(component, grid);
@@ -123,7 +118,7 @@ int main() {
             }
         }
 
-        sfRenderWindow_clear(window, sfBlack);
+        sfRenderWindow_clear(window, sfColor_fromRGB(20, 20, 20));
 
         draw_grid(window, camera);
 
@@ -132,12 +127,19 @@ int main() {
 
         draw_particles(component, window, camera);
 
-        draw_light(component, grid, texture, camera);
+        draw_lights(component, grid, window, texture, camera, ambient_light);
         sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
         sfSprite_setTexture(sprite, sfRenderTexture_getTexture(texture), sfTrue);
         sfRenderWindow_drawSprite(window, sprite, &state);
 
         draw_player(component, window, camera);
+
+        frame_avg -= frame_times[i] / 1000.0;
+        frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
+        frame_avg += frame_times[i] / 1000.0;
+
+        elapsed_time += frame_times[i];
+        i = (i + 1) % 1000;
 
         char buffer[20];
         snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);

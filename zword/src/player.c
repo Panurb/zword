@@ -63,22 +63,53 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
             v.y -= 1;
         }
 
+        v = normalized(v);
+
         CoordinateComponent* coord = component->coordinate[i];
-        PhysicsComponent* phys = component->physics[i];
         PlayerComponent* player = component->player[i];
 
-        phys->acceleration = sum(phys->acceleration, mult(player->acceleration, normalized(v)));
+        if (player->vehicle == -1) {
+            PhysicsComponent* phys = component->physics[i];
 
-        sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
-        sfVector2f rel_mouse = diff(mouse, coord->position);
+            phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
 
-        coord->angle = atan2(rel_mouse.y, rel_mouse.x);
+            sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
+            sfVector2f rel_mouse = diff(mouse, coord->position);
 
-        player->cooldown -= delta_time;
-        player->recoil = fmax(0.1 * norm(phys->velocity), player->recoil - delta_time * player->recoil_reduction);
+            coord->angle = atan2(rel_mouse.y, rel_mouse.x);
 
-        if (sfMouse_isButtonPressed(sfMouseLeft)) {
-            shoot(component, grid, i, delta_time);
+            player->cooldown -= delta_time;
+            player->recoil = fmax(0.1 * norm(phys->velocity), player->recoil - delta_time * player->recoil_reduction);
+
+            if (sfMouse_isButtonPressed(sfMouseLeft)) {
+                shoot(component, grid, i, delta_time);
+            }
+
+            if (sfKeyboard_isKeyPressed(sfKeyF)) {
+                for (int j = 0; j < component->entities; j++) {
+                    if (!component->vehicle[j]) continue;
+
+                    if (dist(coord->position, component->coordinate[j]->position) < 3.0) {
+                        player->vehicle = j;
+                        component->vehicle[j]->driver = i;
+                        component->circle_collider[i]->enabled = false;
+                        component->light[i]->brightness = 0.0;
+                        break;
+                    }
+                }
+            }
+        } else {
+            VehicleComponent* vehicle = component->vehicle[player->vehicle];
+            PhysicsComponent* phys = component->physics[player->vehicle];
+
+            coord->position = component->coordinate[player->vehicle]->position;
+
+            sfVector2f at = mult(v.y, polar_to_cartesian(vehicle->acceleration, component->coordinate[player->vehicle]->angle));
+            phys->acceleration = sum(phys->acceleration, at);
+
+            phys->velocity = polar_to_cartesian(norm(phys->velocity), component->coordinate[player->vehicle]->angle);
+
+            phys->angular_acceleration -= min(1.0, 10 * norm(phys->velocity)) * vehicle->acceleration * v.x;
         }
 
         camera->position = sum(camera->position, mult(10.0 * delta_time, diff(coord->position, camera->position)));
@@ -96,8 +127,8 @@ void create_player(Component* component, sfVector2f pos) {
     component->physics[i]->max_speed = 5.0;
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
-    component->light[i] = LightComponent_create(10.0, 1.0, 101, 0.2);
-    component->particle[i] = ParticleComponent_create(1.0, 0.1, 5.0, sfColor_fromRGBA(255, 255, 0, 128));
+    component->light[i] = LightComponent_create(10.0, 1.0, 101, 0.25);
+    //component->particle[i] = ParticleComponent_create(1.0, 0.1, 5.0, sfColor_fromRGBA(255, 255, 0, 128));
 }
 
 
@@ -105,16 +136,18 @@ void draw_player(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
-        sfVector2f r = polar_to_cartesian(1.0, component->coordinate[i]->angle + 0.5 * component->player[i]->recoil);
+        if (component->player[i]->vehicle == -1) {
+            sfVector2f r = polar_to_cartesian(1.0, component->coordinate[i]->angle + 0.5 * component->player[i]->recoil);
 
-        sfVector2f start = sum(component->coordinate[i]->position, mult(0.5, r));
-        sfVector2f end = sum(component->coordinate[i]->position, mult(3.0, r));
-        draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
+            sfVector2f start = sum(component->coordinate[i]->position, mult(0.5, r));
+            sfVector2f end = sum(component->coordinate[i]->position, mult(3.0, r));
+            draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
 
-        r = polar_to_cartesian(1.0, component->coordinate[i]->angle - 0.5 * component->player[i]->recoil);
+            r = polar_to_cartesian(1.0, component->coordinate[i]->angle - 0.5 * component->player[i]->recoil);
 
-        start = sum(component->coordinate[i]->position, mult(0.5, r));
-        end = sum(component->coordinate[i]->position, mult(3.0, r));
-        draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
+            start = sum(component->coordinate[i]->position, mult(0.5, r));
+            end = sum(component->coordinate[i]->position, mult(3.0, r));
+            draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
+        }
     }
 }

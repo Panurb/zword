@@ -50,5 +50,17 @@ void update(Component* component, float delta_time, ColliderGrid* collision_grid
         physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
         physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
         physics->acceleration = (sfVector2f) { 0.0, 0.0 };
+
+        if (physics->angular_velocity != 0.0) {
+            physics->angular_acceleration -= 2.0 * sign(physics->angular_velocity) * physics->drag;
+        }
+
+        physics->angular_velocity += delta_time * physics->angular_acceleration;
+        if (fabs(physics->angular_velocity) > physics->max_angular_speed) {
+            physics->angular_velocity = physics->max_angular_speed * sign(physics->angular_velocity);
+        }
+        
+        coord->angle += delta_time * physics->angular_velocity;
+        physics->angular_acceleration = 0.0;
     }
 }
