@@ -44,3 +44,5 @@ int max(int a, int b);
 float mod(float x, float y);
 
 float cross(sfVector2f v, sfVector2f u);
+
+sfVector2f rotate(sfVector2f v, float angle);

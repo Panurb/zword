@@ -24,18 +24,10 @@ void update(Component* component, float delta_time, ColliderGrid* collision_grid
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0 - physics->friction, v_t));
         }
 
-        physics->acceleration = diff(physics->acceleration, mult(physics->drag, normalized(physics->velocity)));
-
-        physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
-
-        float v = norm(physics->velocity);
-        if (v < 1e-3) {
-            physics->velocity = (sfVector2f) { 0.0, 0.0 };
-        } else if (v > physics->max_speed) {
-            physics->velocity = mult(physics->max_speed / v, physics->velocity);
-        }
-
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
+
+        physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
+        physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
 
         if (delta_pos.x != 0.0 || delta_pos.y != 0.0) {
             clear_grid(component, collision_grid, i);
@@ -47,12 +39,23 @@ void update(Component* component, float delta_time, ColliderGrid* collision_grid
             update_grid(component, collision_grid, i);
         }
 
-        physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
-        physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
+        physics->acceleration = diff(physics->acceleration, mult(physics->drag, normalized(physics->velocity)));
+
+        physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
+
         physics->acceleration = (sfVector2f) { 0.0, 0.0 };
+        
+        float speed = norm(physics->velocity);
+        if (speed < 1e-3) {
+            physics->velocity = (sfVector2f) { 0.0, 0.0 };
+        } else if (speed > physics->max_speed) {
+            physics->velocity = mult(physics->max_speed / speed, physics->velocity);
+        }
+
+        coord->angle += delta_time * physics->angular_velocity;
 
         if (physics->angular_velocity != 0.0) {
-            physics->angular_acceleration -= 2.0 * sign(physics->angular_velocity) * physics->drag;
+            physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
         }
 
         physics->angular_velocity += delta_time * physics->angular_acceleration;
@@ -60,7 +63,6 @@ void update(Component* component, float delta_time, ColliderGrid* collision_grid
             physics->angular_velocity = physics->max_angular_speed * sign(physics->angular_velocity);
         }
         
-        coord->angle += delta_time * physics->angular_velocity;
         physics->angular_acceleration = 0.0;
     }
 }

@@ -14,7 +14,7 @@
 Camera* Camera_create(sfVideoMode mode) {
     Camera* camera = malloc(sizeof(Camera));
     camera->position = (sfVector2f) { 0.0, 0.0 };
-    camera->zoom = 50.0;
+    camera->zoom = 25.0;
     camera->width = mode.width;
     camera->height = mode.height;
     for (int i = 0; i < 50; i++) {

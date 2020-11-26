@@ -93,23 +93,36 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
                         player->vehicle = j;
                         component->vehicle[j]->driver = i;
                         component->circle_collider[i]->enabled = false;
-                        component->light[i]->brightness = 0.0;
+                        component->light[i]->enabled = false;
                         break;
                     }
                 }
             }
         } else {
             VehicleComponent* vehicle = component->vehicle[player->vehicle];
+
             PhysicsComponent* phys = component->physics[player->vehicle];
 
             coord->position = component->coordinate[player->vehicle]->position;
 
-            sfVector2f at = mult(v.y, polar_to_cartesian(vehicle->acceleration, component->coordinate[player->vehicle]->angle));
-            phys->acceleration = sum(phys->acceleration, at);
+            sfVector2f r = polar_to_cartesian(1.0, component->coordinate[player->vehicle]->angle);
+            sfVector2f at = mult(vehicle->acceleration * v.y, r);
+            phys->acceleration = sum(phys->acceleration, at);   
 
-            phys->velocity = polar_to_cartesian(norm(phys->velocity), component->coordinate[player->vehicle]->angle);
+            if (norm(phys->velocity) > 1.0) {
+                phys->angular_acceleration -= sign(v.y) * vehicle->turning * v.x;
+            }
 
-            phys->angular_acceleration -= min(1.0, 10 * norm(phys->velocity)) * vehicle->acceleration * v.x;
+            sfVector2f v_new = rotate(phys->velocity, phys->angular_velocity * delta_time);
+
+            phys->acceleration = sum(phys->acceleration, mult(1.0 / delta_time, diff(v_new, phys->velocity)));
+
+            if (sfKeyboard_isKeyPressed(sfKeyE)) {
+                player->vehicle = -1;
+                vehicle->driver = -1;
+                component->circle_collider[i]->enabled = true;
+                component->light[i]->enabled = true;
+            }
         }
 
         camera->position = sum(camera->position, mult(10.0 * delta_time, diff(coord->position, camera->position)));

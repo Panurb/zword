@@ -16,6 +16,7 @@ CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle) {
     CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
     coord->position = pos;
     coord->angle = angle;
+    coord->parent = -1;
     return coord;
 }
 
@@ -24,6 +25,7 @@ ImageComponent* ImageComponent_create(char filename[20], float scale) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
     image->scale = (sfVector2f) { scale, scale };
     image->sprite = load_sprite(filename);
+    image->shine = 0.0;
     return image;
 }
 
@@ -41,7 +43,8 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     phys->bounce = bounce;
     phys->drag = drag;
     phys->max_speed = 20.0;
-    phys->max_angular_speed = 1.0;
+    phys->angular_drag = 2 * drag;
+    phys->max_angular_speed = 2.5;
     return phys;
 }
 
@@ -81,11 +84,13 @@ PlayerComponent* PlayerComponent_create() {
 
 LightComponent* LightComponent_create(float range, float angle, int rays, float brightness) {
     LightComponent* light = malloc(sizeof(LightComponent));
+    light->enabled = true;
     light->range = range;
     light->angle = angle;
     light->rays = rays;
     light->color = sfWhite;
-    light->brightness = brightness;
+    light->brightness = 0.0;
+    light->max_brightness = brightness;
     light->smoothing = 0;
     light->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(light->shape, 3);
@@ -130,6 +135,7 @@ VehicleComponent* VehicleComponent_create() {
     vehicle->acceleration = 20.0;
     vehicle->max_speed = 10.0;
     vehicle->driver = -1;
+    vehicle->turning = 50.0;
     return vehicle;
 }
 

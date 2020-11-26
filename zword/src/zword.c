@@ -22,6 +22,7 @@
 
 // remove from here
 #define MAX_ENTITIES 1000
+#define FRAME_WINDOW 100
 
 
 int main() {
@@ -46,7 +47,7 @@ int main() {
     sfClock* clock = sfClock_create();
     sfEvent event;
 
-    float frame_times[1000] = { 0.0 };
+    float frame_times[FRAME_WINDOW] = { 0.0 };
     float frame_avg = 0.0;
 
     float delta_time = 1.0 / 60.0;
@@ -109,18 +110,20 @@ int main() {
 
                 input(component, window, grid, camera, delta_time);
 
-                //update_enemy(component, grid);
+                update_enemy(component, grid);
 
                 update(component, delta_time, grid);
                 collide(component, grid);
 
                 update_particles(component, delta_time);
+
+                update_lights(component, delta_time);
             }
         }
 
-        sfRenderWindow_clear(window, sfColor_fromRGB(20, 20, 20));
+        sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
 
-        draw_grid(window, camera);
+        //draw_grid(window, camera);
 
         debug_draw(component, grid, window, camera);
         //draw(component, window, camera);
@@ -134,12 +137,12 @@ int main() {
 
         draw_player(component, window, camera);
 
-        frame_avg -= frame_times[i] / 1000.0;
+        frame_avg -= frame_times[i] / FRAME_WINDOW;
         frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
-        frame_avg += frame_times[i] / 1000.0;
+        frame_avg += frame_times[i] / FRAME_WINDOW;
 
         elapsed_time += frame_times[i];
-        i = (i + 1) % 1000;
+        i = (i + 1) % FRAME_WINDOW;
 
         char buffer[20];
         snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);

@@ -10,6 +10,7 @@
 typedef struct {
     sfVector2f position;
     float angle;
+    int parent;
 } CoordinateComponent;
 
 CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle);
@@ -17,6 +18,7 @@ CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle);
 typedef struct {
     sfVector2f scale;
     sfSprite* sprite;
+    float shine;
 } ImageComponent;
 
 ImageComponent* ImageComponent_create(char filename[20], float scale);
@@ -35,6 +37,7 @@ typedef struct {
     float bounce;
     float drag;
     float max_speed;
+    float angular_drag;
     float max_angular_speed;
 } PhysicsComponent;
 
@@ -69,11 +72,13 @@ typedef struct {
 PlayerComponent* PlayerComponent_create();
 
 typedef struct {
+    bool enabled;
     float range;
     float angle;
     int rays;
     sfColor color;
     float brightness;
+    float max_brightness;
     int smoothing;
     sfConvexShape* shape;
     sfCircleShape* shine;
@@ -111,6 +116,7 @@ typedef struct {
     int driver;
     float acceleration;
     float max_speed;
+    float turning;
 } VehicleComponent;
 
 VehicleComponent* VehicleComponent_create();

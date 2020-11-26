@@ -116,3 +116,9 @@ float mod(float x, float y) {
 float cross(sfVector2f v, sfVector2f u) {
     return v.x * u.y - v.y * u.x;
 }
+
+sfVector2f rotate(sfVector2f v, float angle) {
+    float c = cosf(angle);
+    float s = sinf(angle);
+    return (sfVector2f) { v.x * c - v.y * s, v.x * s + v.y * c };
+}
