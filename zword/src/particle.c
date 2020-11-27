@@ -8,11 +8,12 @@
 
 
 void add_particle(Component* component, int i) {
-    CoordinateComponent* coord = component->coordinate[i];
     ParticleComponent* part = component->particle[i];
 
-    part->position[part->iterator] = coord->position;
-    part->velocity[part->iterator] = polar_to_cartesian(float_rand(2.0, 4.0), coord->angle + float_rand(-0.5 * part->angle, 0.5 * part->angle));
+    part->position[part->iterator] = get_position(component, i);
+    float r = part->speed * float_rand(0.9, 1.1);
+    float angle = float_rand(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
+    part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(component, i) + angle);
     part->size[part->iterator] = part->max_size;
     if (part->particles < part->max_particles) {
         part->particles++;

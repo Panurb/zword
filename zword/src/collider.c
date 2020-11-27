@@ -144,15 +144,15 @@ sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
 sfVector2f overlap(Component* component, int i, int j) {
     sfVector2f ol = { 0.0, 0.0 };
     if (component->circle_collider[i] && component->circle_collider[i]->enabled) {
-        if (component->circle_collider[j]) {
+        if (component->circle_collider[j] && component->circle_collider[j]->enabled) {
             ol = overlap_circle_circle(component, i, j);
-        } else if (component->rectangle_collider[j]) {
+        } else if (component->rectangle_collider[j] && component->rectangle_collider[j]->enabled) {
             ol = overlap_circle_rectangle(component, i, j);
         }
-    } else if (component->rectangle_collider[i]) {
+    } else if (component->rectangle_collider[i] && component->rectangle_collider[i]->enabled) {
         if (component->circle_collider[j] && component->circle_collider[j]->enabled) {
             ol = overlap_rectangle_circle(component, i, j);
-        } else if (component->rectangle_collider[j]) {
+        } else if (component->rectangle_collider[j] && component->rectangle_collider[j]->enabled) {
             ol = overlap_rectangle_rectangle(component, i, j);
         }
     }
@@ -233,7 +233,7 @@ void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window
 
             sfCircleShape_setOrigin(col->shape, (sfVector2f) { col->radius * camera->zoom, col->radius * camera->zoom });
 
-            sfVector2f pos = component->coordinate[i]->position;
+            sfVector2f pos = get_position(component, i);
             sfCircleShape_setPosition(col->shape, world_to_screen(pos, camera));
 
             sfCircleShape_setRadius(col->shape, col->radius * camera->zoom);
@@ -244,13 +244,13 @@ void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window
 
             sfRectangleShape_setOrigin(col->shape, (sfVector2f) { 0.5 * col->width * camera->zoom, 0.5 * col->height * camera->zoom });
 
-            sfVector2f pos = component->coordinate[i]->position;
+            sfVector2f pos = get_position(component, i);
             sfRectangleShape_setPosition(col->shape, world_to_screen(pos, camera));
 
             sfVector2f size = { col->width * camera->zoom, col->height * camera->zoom };
             sfRectangleShape_setSize(col->shape, size);
 
-            sfRectangleShape_setRotation(col->shape, -to_degrees(component->coordinate[i]->angle));
+            sfRectangleShape_setRotation(col->shape, -to_degrees(get_angle(component, i)));
 
             sfRenderWindow_drawRectangleShape(window, col->shape, NULL);
         }

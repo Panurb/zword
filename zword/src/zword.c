@@ -1,3 +1,5 @@
+#pragma warning disable CSFML_DEPRECATED
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -34,6 +36,8 @@ int main() {
     if (!window) {
         return 1;
     }
+    sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
+
     sfRenderTexture* texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
     sfSprite* sprite = sfSprite_create();
 

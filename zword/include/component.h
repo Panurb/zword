@@ -52,6 +52,7 @@ typedef struct {
 CircleColliderComponent* CircleColliderComponent_create(float radius);
 
 typedef struct {
+    bool enabled;
     float width;
     float height;
     sfRectangleShape* shape;
@@ -62,11 +63,8 @@ RectangleColliderComponent* RectangleColliderComponent_create(float width, float
 typedef struct {
     int health;
     float acceleration;
-    float cooldown;
-    float fire_rate;
-    float recoil;
-    float recoil_reduction;
     int vehicle;
+    int weapon;
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -101,6 +99,8 @@ typedef struct {
     int particles;
     int max_particles;
     int iterator;
+    float spread;
+    float speed;
     sfVector2f position[100];
     sfVector2f velocity[100];
     float size[100];
@@ -110,7 +110,7 @@ typedef struct {
     float timer;
 } ParticleComponent;
 
-ParticleComponent* ParticleComponent_create(float angle, float size, float rate, sfColor color);
+ParticleComponent* ParticleComponent_create(float angle, float spread, float size, float speed, float rate, sfColor color);
 
 typedef struct {
     int driver;
@@ -120,6 +120,16 @@ typedef struct {
 } VehicleComponent;
 
 VehicleComponent* VehicleComponent_create();
+
+typedef struct {
+    float cooldown;
+    float fire_rate;
+    float recoil;
+    float recoil_up;
+    float recoil_down;
+} WeaponComponent;
+
+WeaponComponent* WeaponComponent_create(float fire_rate, float recoil_up, float recoil_down);
 
 typedef struct {
     int entities;
@@ -133,6 +143,11 @@ typedef struct {
     EnemyComponent* enemy[MAX_ENTITIES];
     ParticleComponent* particle[MAX_ENTITIES];
     VehicleComponent* vehicle[MAX_ENTITIES];
+    WeaponComponent* weapon[MAX_ENTITIES];
 } Component;
 
 void destroy_entity(Component* component, int i);
+
+sfVector2f get_position(Component* component, int i);
+
+float get_angle(Component* component, int i);

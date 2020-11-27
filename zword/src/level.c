@@ -38,7 +38,7 @@ void create_enemy(Component* component, sfVector2f pos) {
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 5.0);
     component->physics[i]->max_speed = 2.0;
     component->enemy[i] = EnemyComponent_create();
-    component->particle[i] = ParticleComponent_create(2 * M_PI, 0.1, 10.0, sfRed);
+    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.1, 3.0, 10.0, sfRed);
 }
 
 
@@ -102,6 +102,19 @@ void create_car(Component* component, float x, float y) {
 }
 
 
+void create_weapon(Component* component, float x, float y) {
+    int i = component->entities;
+    component->entities++;
+
+    sfVector2f pos = { x, y };
+    component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
+    component->rectangle_collider[i] = RectangleColliderComponent_create(1.5, 0.25);
+    //component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0);
+    component->weapon[i] = WeaponComponent_create(5.0, 15.0, 0.75);
+    component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 100.0, 1, sfWhite);
+}
+
+
 void create_level(Component* component) {
     create_house(component, -20.0, 0.0);
     create_house(component, 20.0, 0.0);
@@ -110,4 +123,5 @@ void create_level(Component* component) {
     create_player(component, (sfVector2f) { 0.0, 0.0 });
 
     create_car(component, 0.0, -5.0);
+    create_weapon(component, 0.0, 5.0);
 }

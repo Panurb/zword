@@ -61,6 +61,7 @@ CircleColliderComponent* CircleColliderComponent_create(float radius) {
 
 RectangleColliderComponent* RectangleColliderComponent_create(float width, float height) {
     RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
+    col->enabled = true;
     col->width = width;
     col->height = height;
     col->shape = sfRectangleShape_create();
@@ -73,11 +74,8 @@ PlayerComponent* PlayerComponent_create() {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->health = 100;
     player->acceleration = 20.0;
-    player->cooldown = 0.0;
-    player->fire_rate = 5.0;
-    player->recoil = 0.0;
-    player->recoil_reduction = 0.5;
     player->vehicle = -1;
+    player->weapon = -1;
     return player;
 }
 
@@ -108,15 +106,17 @@ EnemyComponent* EnemyComponent_create() {
 }
 
 
-ParticleComponent* ParticleComponent_create(float angle, float size, float rate, sfColor color) {
+ParticleComponent* ParticleComponent_create(float angle, float spread, float size, float speed, float rate, sfColor color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
     particle->enabled = false;
     particle->loop = false;
     particle->angle = angle;
+    particle->spread = spread;
     particle->particles = 0;
     particle->max_particles = 100;
     particle->iterator = 0;
     particle->max_size = size;
+    particle->speed = speed;
     for (int i = 0; i < particle->max_particles; i++) {
         particle->position[i] = (sfVector2f) { 0.0, 0.0 };
         particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
@@ -137,6 +137,17 @@ VehicleComponent* VehicleComponent_create() {
     vehicle->driver = -1;
     vehicle->turning = 50.0;
     return vehicle;
+}
+
+
+WeaponComponent* WeaponComponent_create(float fire_rate, float recoil_up, float recoil_down) {
+    WeaponComponent* weapon = malloc(sizeof(WeaponComponent));
+    weapon->cooldown = 0.0;
+    weapon->fire_rate = fire_rate;
+    weapon->recoil = 0.0;
+    weapon->recoil_up = recoil_up;
+    weapon->recoil_down = recoil_down;
+    return weapon;
 }
 
 
@@ -177,8 +188,34 @@ void destroy_entity(Component* component, int i) {
         free(component->particle[i]);
         component->particle[i] = NULL;
     }
+    if (component->weapon[i]) {
+        free(component->weapon[i]);
+        component->weapon[i] = NULL;
+    }
 
     if (i == component->entities - 1) {
         component->entities--;
     }
+}
+
+
+sfVector2f get_position(Component* component, int i) {
+    sfVector2f position = component->coordinate[i]->position;
+
+    int parent = component->coordinate[i]->parent;
+    if (parent != -1) {
+        position = sum(component->coordinate[parent]->position, rotate(position, component->coordinate[parent]->angle));
+    }
+    return position;
+}
+
+
+float get_angle(Component* component, int i) {
+    float angle = component->coordinate[i]->angle;
+
+    int parent = component->coordinate[i]->parent;
+    if (parent != -1) {
+        angle += component->coordinate[parent]->angle;
+    }
+    return angle;
 }

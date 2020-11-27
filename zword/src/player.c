@@ -19,11 +19,13 @@
 void shoot(Component* component, ColliderGrid* grid, int i, float delta_time) {
     PlayerComponent* player = component->player[i];
 
-    if (player->cooldown <= 0.0) {
-        player->cooldown = 1.0 / player->fire_rate;
+    WeaponComponent* weapon = component->weapon[player->weapon];
 
-        float angle = component->coordinate[i]->angle + float_rand(-0.5 * player->recoil, 0.5 * player->recoil);
-        sfVector2f r = polar_to_cartesian(0.6, angle);
+    if (weapon->cooldown <= 0.0) {
+        weapon->cooldown = 1.0 / weapon->fire_rate;
+
+        float angle = float_rand(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
+        sfVector2f r = polar_to_cartesian(0.6, component->coordinate[i]->angle + angle);
 
         sfVector2f pos = sum(component->coordinate[i]->position, r);
 
@@ -31,12 +33,14 @@ void shoot(Component* component, ColliderGrid* grid, int i, float delta_time) {
 
         if (component->enemy[info.object]) {
             component->enemy[info.object]->health -= 10;
-            component->physics[info.object]->velocity = polar_to_cartesian(2.0, angle);
+            component->physics[info.object]->velocity = polar_to_cartesian(2.0, component->coordinate[i]->angle + angle);
 
             component->particle[info.object]->enabled = true;
         }
 
-        player->recoil = fmin(0.5 * M_PI, player->recoil + delta_time * 15.0);
+        weapon->recoil = fmin(0.5 * M_PI, weapon->recoil + delta_time * weapon->recoil_up);
+        component->particle[player->weapon]->angle = angle;
+        component->particle[player->weapon]->enabled = true;
     }
 }
 
@@ -78,23 +82,41 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
 
             coord->angle = atan2(rel_mouse.y, rel_mouse.x);
 
-            player->cooldown -= delta_time;
-            player->recoil = fmax(0.1 * norm(phys->velocity), player->recoil - delta_time * player->recoil_reduction);
+            if (player->weapon != -1) {
+                WeaponComponent* weapon = component->weapon[player->weapon];
+                weapon->cooldown -= delta_time;
+                weapon->recoil = fmax(0.1 * norm(phys->velocity), weapon->recoil - delta_time * weapon->recoil_down);
 
-            if (sfMouse_isButtonPressed(sfMouseLeft)) {
-                shoot(component, grid, i, delta_time);
+                if (sfMouse_isButtonPressed(sfMouseLeft)) {
+                    shoot(component, grid, i, delta_time);
+                }
+            }
+
+            if (sfMouse_isButtonPressed(sfMouseRight)) {
+                for (int j = 0; j < component->entities; j++) {
+                    if (component->weapon[j]) {
+                        if (dist(coord->position, component->coordinate[j]->position) < 1.0) {
+                            player->weapon = j;
+                            component->coordinate[j]->parent = i;
+                            component->coordinate[j]->position = (sfVector2f) { 0.0, 0.0 };
+                            component->coordinate[j]->angle = 0.0;
+                            component->rectangle_collider[j]->enabled = false;
+                            break;
+                        }
+                    }
+                }
             }
 
             if (sfKeyboard_isKeyPressed(sfKeyF)) {
                 for (int j = 0; j < component->entities; j++) {
-                    if (!component->vehicle[j]) continue;
-
-                    if (dist(coord->position, component->coordinate[j]->position) < 3.0) {
-                        player->vehicle = j;
-                        component->vehicle[j]->driver = i;
-                        component->circle_collider[i]->enabled = false;
-                        component->light[i]->enabled = false;
-                        break;
+                    if (component->vehicle[j]) {
+                        if (dist(coord->position, component->coordinate[j]->position) < 3.0) {
+                            player->vehicle = j;
+                            component->vehicle[j]->driver = i;
+                            component->circle_collider[i]->enabled = false;
+                            component->light[i]->enabled = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -126,6 +148,11 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
         }
 
         camera->position = sum(camera->position, mult(10.0 * delta_time, diff(coord->position, camera->position)));
+        if (player->vehicle != -1) {
+            camera->zoom += 10.0 * delta_time * (25.0 - camera->zoom);
+        } else {
+            camera->zoom += 10.0 * delta_time * (40.0 - camera->zoom);
+        }
     }
 }
 
@@ -149,14 +176,15 @@ void draw_player(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
 
-        if (component->player[i]->vehicle == -1) {
-            sfVector2f r = polar_to_cartesian(1.0, component->coordinate[i]->angle + 0.5 * component->player[i]->recoil);
+        if (component->player[i]->vehicle == -1 && component->player[i]->weapon != -1) {
+            WeaponComponent* weapon = component->weapon[component->player[i]->weapon];
+            sfVector2f r = polar_to_cartesian(1.0, component->coordinate[i]->angle + 0.5 * weapon->recoil);
 
             sfVector2f start = sum(component->coordinate[i]->position, mult(0.5, r));
             sfVector2f end = sum(component->coordinate[i]->position, mult(3.0, r));
             draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
 
-            r = polar_to_cartesian(1.0, component->coordinate[i]->angle - 0.5 * component->player[i]->recoil);
+            r = polar_to_cartesian(1.0, component->coordinate[i]->angle - 0.5 * weapon->recoil);
 
             start = sum(component->coordinate[i]->position, mult(0.5, r));
             end = sum(component->coordinate[i]->position, mult(3.0, r));
