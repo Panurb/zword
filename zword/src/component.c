@@ -117,10 +117,12 @@ ParticleComponent* ParticleComponent_create(float angle, float spread, float siz
     particle->iterator = 0;
     particle->max_size = size;
     particle->speed = speed;
+    particle->speed_spread = 0.1;
     for (int i = 0; i < particle->max_particles; i++) {
         particle->position[i] = (sfVector2f) { 0.0, 0.0 };
         particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
-        particle->size[i] = particle->max_size;
+        particle->time[i] = 0.0;
+        particle->lifetime[i] = 1.0;
     }
     particle->shape = sfCircleShape_create();
     sfCircleShape_setFillColor(particle->shape, color);

@@ -112,6 +112,7 @@ void create_weapon(Component* component, float x, float y) {
     //component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0);
     component->weapon[i] = WeaponComponent_create(5.0, 15.0, 0.75);
     component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 100.0, 1, sfWhite);
+    component->particle[i]->speed_spread = 0.0;
 }
 
 

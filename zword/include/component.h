@@ -100,10 +100,12 @@ typedef struct {
     int max_particles;
     int iterator;
     float spread;
+    float speed_spread;
     float speed;
+    float lifetime[100];
     sfVector2f position[100];
     sfVector2f velocity[100];
-    float size[100];
+    float time[100];
     float max_size;
     sfCircleShape* shape;
     float rate;
