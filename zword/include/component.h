@@ -64,7 +64,9 @@ typedef struct {
     int health;
     float acceleration;
     int vehicle;
-    int weapon;
+    int item;
+    int inventory_size;
+    int inventory[4];
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -80,9 +82,10 @@ typedef struct {
     int smoothing;
     sfConvexShape* shape;
     sfCircleShape* shine;
+    float flicker;
 } LightComponent;
 
-LightComponent* LightComponent_create(float range, float angle, int rays, float brightness);
+LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness);
 
 typedef struct {
     int health;
@@ -102,17 +105,20 @@ typedef struct {
     float spread;
     float speed_spread;
     float speed;
-    float lifetime[100];
+    float max_time;
     sfVector2f position[100];
     sfVector2f velocity[100];
     float time[100];
     float max_size;
+    float min_size;
+    sfColor color;
+    sfColor inner_color;
     sfCircleShape* shape;
     float rate;
     float timer;
 } ParticleComponent;
 
-ParticleComponent* ParticleComponent_create(float angle, float spread, float size, float speed, float rate, sfColor color);
+ParticleComponent* ParticleComponent_create(float angle, float spread, float max_size, float min_size, float speed, float rate, sfColor color, sfColor inner_color);
 
 typedef struct {
     int driver;

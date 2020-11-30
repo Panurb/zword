@@ -12,14 +12,15 @@
 #include "component.h"
 #include "camera.h"
 #include "collider.h"
-#include "light.h"
+#include "raycast.h"
 #include "util.h"
 
 
 void shoot(Component* component, ColliderGrid* grid, int i, float delta_time) {
     PlayerComponent* player = component->player[i];
 
-    WeaponComponent* weapon = component->weapon[player->weapon];
+    int item = player->inventory[player->item];
+    WeaponComponent* weapon = component->weapon[item];
 
     if (weapon->cooldown <= 0.0) {
         weapon->cooldown = 1.0 / weapon->fire_rate;
@@ -39,8 +40,9 @@ void shoot(Component* component, ColliderGrid* grid, int i, float delta_time) {
         }
 
         weapon->recoil = fmin(0.5 * M_PI, weapon->recoil + delta_time * weapon->recoil_up);
-        component->particle[player->weapon]->angle = angle;
-        component->particle[player->weapon]->enabled = true;
+        component->particle[item]->angle = angle;
+        component->particle[item]->max_time = dist(pos, info.position) / component->particle[item]->speed;
+        component->particle[item]->enabled = true;
     }
 }
 
@@ -82,8 +84,10 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
 
             coord->angle = atan2(rel_mouse.y, rel_mouse.x);
 
-            if (player->weapon != -1) {
-                WeaponComponent* weapon = component->weapon[player->weapon];
+            int item = player->inventory[player->item];
+
+            if (item != -1) {
+                WeaponComponent* weapon = component->weapon[item];
                 weapon->cooldown -= delta_time;
                 weapon->recoil = fmax(0.1 * norm(phys->velocity), weapon->recoil - delta_time * weapon->recoil_down);
 
@@ -96,11 +100,14 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
                 for (int j = 0; j < component->entities; j++) {
                     if (component->weapon[j]) {
                         if (dist(coord->position, component->coordinate[j]->position) < 1.0) {
-                            player->weapon = j;
-                            component->coordinate[j]->parent = i;
-                            component->coordinate[j]->position = (sfVector2f) { 0.0, 0.0 };
-                            component->coordinate[j]->angle = 0.0;
-                            component->rectangle_collider[j]->enabled = false;
+                            int k = find(-1, player->inventory, player->inventory_size);
+                            if (k != -1) {
+                                player->inventory[k] = j;
+                                component->coordinate[j]->parent = i;
+                                component->coordinate[j]->position = (sfVector2f) { 0.0, 0.0 };
+                                component->coordinate[j]->angle = 0.0;
+                                component->rectangle_collider[j]->enabled = false;
+                            }
                             break;
                         }
                     }
@@ -131,7 +138,7 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
             sfVector2f at = mult(vehicle->acceleration * v.y, r);
             phys->acceleration = sum(phys->acceleration, at);   
 
-            if (norm(phys->velocity) > 1.0) {
+            if (norm(phys->velocity) > 1.2) {
                 phys->angular_acceleration -= sign(v.y) * vehicle->turning * v.x;
             }
 
@@ -167,28 +174,43 @@ void create_player(Component* component, sfVector2f pos) {
     component->physics[i]->max_speed = 5.0;
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
-    component->light[i] = LightComponent_create(10.0, 1.0, 101, 0.25);
+    component->light[i] = LightComponent_create(10.0, 1.0, 101, sfWhite, 0.25);
     //component->particle[i] = ParticleComponent_create(1.0, 0.1, 5.0, sfColor_fromRGBA(255, 255, 0, 128));
 }
 
 
 void draw_player(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
-        if (!component->player[i]) continue;
+        PlayerComponent* player = component->player[i];
 
-        if (component->player[i]->vehicle == -1 && component->player[i]->weapon != -1) {
-            WeaponComponent* weapon = component->weapon[component->player[i]->weapon];
-            sfVector2f r = polar_to_cartesian(1.0, component->coordinate[i]->angle + 0.5 * weapon->recoil);
+        if (!player) continue;
 
-            sfVector2f start = sum(component->coordinate[i]->position, mult(0.5, r));
-            sfVector2f end = sum(component->coordinate[i]->position, mult(3.0, r));
-            draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
+        if (player->vehicle == -1 && player->inventory[player->item] != -1) {
+            WeaponComponent* weapon = component->weapon[player->inventory[player->item]];
+            if (weapon) {
+                sfVector2f r = polar_to_cartesian(1.0, component->coordinate[i]->angle + 0.5 * weapon->recoil);
 
-            r = polar_to_cartesian(1.0, component->coordinate[i]->angle - 0.5 * weapon->recoil);
+                sfVector2f start = sum(component->coordinate[i]->position, mult(0.5, r));
+                sfVector2f end = sum(component->coordinate[i]->position, mult(3.0, r));
+                draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
 
-            start = sum(component->coordinate[i]->position, mult(0.5, r));
-            end = sum(component->coordinate[i]->position, mult(3.0, r));
-            draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
+                r = polar_to_cartesian(1.0, component->coordinate[i]->angle - 0.5 * weapon->recoil);
+
+                start = sum(component->coordinate[i]->position, mult(0.5, r));
+                end = sum(component->coordinate[i]->position, mult(3.0, r));
+                draw_line(window, camera, NULL, start, end, 0.05, sfWhite);
+            }
+        }
+
+        if (sfKeyboard_isKeyPressed(sfKeySpace)) {
+            float angle = get_angle(component, i);
+            player->item = floor(player->inventory_size * mod(angle, 2 * M_PI) / (2 * M_PI));
+            for (int i = 0; i < player->inventory_size; i++) {
+
+                if (player->inventory[i] != -1) {
+
+                }
+            }
         }
     }
 }

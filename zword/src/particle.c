@@ -14,8 +14,7 @@ void add_particle(Component* component, int i) {
     float r = part->speed * float_rand(1.0 - part->speed_spread, 1.0 + part->speed_spread);
     float angle = float_rand(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
     part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(component, i) + angle);
-    part->time[part->iterator] = 0.0;
-    part->lifetime[part->iterator] = 1.0;
+    part->time[part->iterator] = part->max_time;
     if (part->particles < part->max_particles) {
         part->particles++;
     }
@@ -48,8 +47,7 @@ void update_particles(Component* component, float delta_time) {
 
         for (int j = 0; j < part->particles; j++) {
             part->position[j] = sum(part->position[j], mult(delta_time, part->velocity[j]));
-            part->time[j] = fmax(0.0, part->time[j] + delta_time);
-            part->lifetime[j] = 1.0;
+            part->time[j] = fmax(0.0, part->time[j] - delta_time);
         }
     }
 }
@@ -61,12 +59,32 @@ void draw_particles(Component* component, sfRenderWindow* window, Camera* camera
 
         ParticleComponent* part = component->particle[i];
 
+        sfCircleShape_setFillColor(part->shape, part->color);
         for (int j = 0; j < part->particles; j++) {
-            if (part->time[j] > part->lifetime[j]) continue;
+            if (part->time[j] == 0.0) continue;
 
-            sfCircleShape_setPosition(part->shape, world_to_screen(part->position[j], camera));
-            sfCircleShape_setRadius(part->shape, (1.0 - part->time[j] / part->lifetime[j]) * part->max_size * camera->zoom);
-            sfVector2f scale = { 0.5 * norm(part->velocity[j]), 1.0 };
+            float r = (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
+            sfCircleShape_setRadius(part->shape, r);
+            sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
+            sfVector2f pos = world_to_screen(part->position[j], camera);
+            sfCircleShape_setPosition(part->shape, pos);
+            sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
+            sfCircleShape_setScale(part->shape, scale);
+            float angle = atan2(part->velocity[j].y, part->velocity[j].x);
+            sfCircleShape_setRotation(part->shape, -to_degrees(angle));
+            sfRenderWindow_drawCircleShape(window, part->shape, NULL);
+        }
+
+        sfCircleShape_setFillColor(part->shape, part->inner_color);
+        for (int j = 0; j < part->particles; j++) {
+            if (part->time[j] == 0.0) continue;
+
+            float r = 0.5 * (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
+            sfCircleShape_setRadius(part->shape, r);
+            sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
+            sfVector2f pos = world_to_screen(part->position[j], camera);
+            sfCircleShape_setPosition(part->shape, pos);
+            sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
             sfCircleShape_setScale(part->shape, scale);
             float angle = atan2(part->velocity[j].y, part->velocity[j].x);
             sfCircleShape_setRotation(part->shape, -to_degrees(angle));

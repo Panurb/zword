@@ -127,7 +127,7 @@ int main() {
 
         sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
 
-        //draw_grid(window, camera);
+        draw_grid(window, camera);
 
         debug_draw(component, grid, window, camera);
         //draw(component, window, camera);

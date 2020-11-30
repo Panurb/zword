@@ -18,6 +18,7 @@ set(SOURCES
     zword/src/particle.c
     zword/src/physics.c
     zword/src/player.c
+    zword/src/raycast.c
     zword/src/util.c
     zword/src/zword.c
 )

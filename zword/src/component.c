@@ -75,24 +75,29 @@ PlayerComponent* PlayerComponent_create() {
     player->health = 100;
     player->acceleration = 20.0;
     player->vehicle = -1;
-    player->weapon = -1;
+    player->item = 0;
+    player->inventory_size = 4;
+    for (int i = 0; i < player->inventory_size; i++) {
+        player->inventory[i] = -1;
+    }
     return player;
 }
 
 
-LightComponent* LightComponent_create(float range, float angle, int rays, float brightness) {
+LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness) {
     LightComponent* light = malloc(sizeof(LightComponent));
     light->enabled = true;
     light->range = range;
     light->angle = angle;
     light->rays = rays;
-    light->color = sfWhite;
     light->brightness = 0.0;
     light->max_brightness = brightness;
     light->smoothing = 0;
     light->shape = sfConvexShape_create();
+    sfConvexShape_setFillColor(light->shape, color);
     sfConvexShape_setPointCount(light->shape, 3);
     light->shine = sfCircleShape_create();
+    light->flicker = 0.1;
     return light;
 }
 
@@ -106,7 +111,7 @@ EnemyComponent* EnemyComponent_create() {
 }
 
 
-ParticleComponent* ParticleComponent_create(float angle, float spread, float size, float speed, float rate, sfColor color) {
+ParticleComponent* ParticleComponent_create(float angle, float spread, float max_size, float min_size, float speed, float rate, sfColor color, sfColor inner_color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
     particle->enabled = false;
     particle->loop = false;
@@ -115,19 +120,21 @@ ParticleComponent* ParticleComponent_create(float angle, float spread, float siz
     particle->particles = 0;
     particle->max_particles = 100;
     particle->iterator = 0;
-    particle->max_size = size;
+    particle->max_size = max_size;
+    particle->min_size = min_size;
     particle->speed = speed;
-    particle->speed_spread = 0.1;
+    particle->speed_spread = 0.5;
+    particle->max_time = 0.5;
     for (int i = 0; i < particle->max_particles; i++) {
         particle->position[i] = (sfVector2f) { 0.0, 0.0 };
         particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
         particle->time[i] = 0.0;
-        particle->lifetime[i] = 1.0;
     }
     particle->shape = sfCircleShape_create();
-    sfCircleShape_setFillColor(particle->shape, color);
     particle->rate = rate;
     particle->timer = 0.0;
+    particle->color = color;
+    particle->inner_color = inner_color;
     return particle;
 }
 
@@ -206,7 +213,7 @@ sfVector2f get_position(Component* component, int i) {
 
     int parent = component->coordinate[i]->parent;
     if (parent != -1) {
-        position = sum(component->coordinate[parent]->position, rotate(position, component->coordinate[parent]->angle));
+        position = sum(get_position(component, parent), rotate(position, component->coordinate[parent]->angle));
     }
     return position;
 }
@@ -217,7 +224,7 @@ float get_angle(Component* component, int i) {
 
     int parent = component->coordinate[i]->parent;
     if (parent != -1) {
-        angle += component->coordinate[parent]->angle;
+        angle += get_angle(component, parent);
     }
     return angle;
 }
