@@ -30,7 +30,7 @@ ImageComponent* ImageComponent_create(char filename[20], float scale) {
 }
 
 
-PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag) {
+PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = (sfVector2f) { 0, 0 };
     phys->acceleration = (sfVector2f) { 0, 0 };
@@ -43,7 +43,7 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     phys->bounce = bounce;
     phys->drag = drag;
     phys->max_speed = 20.0;
-    phys->angular_drag = 2 * drag;
+    phys->angular_drag = angular_drag;
     phys->max_angular_speed = 2.5;
     return phys;
 }

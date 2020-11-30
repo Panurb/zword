@@ -25,7 +25,7 @@ void create_prop(Component* component, sfVector2f pos) {
 
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
     component->rectangle_collider[i] = RectangleColliderComponent_create(1.0, 1.0);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.5, 0.5, 2.0);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.5, 0.5, 2.0, 4.0);
 }
 
 
@@ -72,7 +72,7 @@ void create_car(Component* component, float x, float y) {
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
     component->rectangle_collider[i] = RectangleColliderComponent_create(6.0, 3.0);
-    component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0);
+    component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0, 20.0);
     component->vehicle[i] = VehicleComponent_create();
 
     i = component->entities;
@@ -100,9 +100,9 @@ void create_weapon(Component* component, float x, float y) {
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
     component->rectangle_collider[i] = RectangleColliderComponent_create(1.5, 0.25);
-    //component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0);
+    component->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
     component->weapon[i] = WeaponComponent_create(5.0, 15.0, 0.75);
-    component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfYellow, sfWhite);
+    component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
     component->particle[i]->speed_spread = 0.0;
 }
 

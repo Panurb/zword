@@ -26,7 +26,6 @@ void update_particles(Component* component, float delta_time) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->particle[i]) continue;
 
-        CoordinateComponent* coord = component->coordinate[i];
         ParticleComponent* part = component->particle[i];
 
         if (part->enabled) {

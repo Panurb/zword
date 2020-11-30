@@ -1,5 +1,3 @@
-#pragma warning disable CSFML_DEPRECATED
-
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -129,7 +127,7 @@ int main() {
 
         draw_grid(window, camera);
 
-        debug_draw(component, grid, window, camera);
+        debug_draw(component, window, camera);
         //draw(component, window, camera);
 
         draw_particles(component, window, camera);

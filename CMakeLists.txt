@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
+set(CMAKE_C_FLAGS "-Wall -Wextra --pedantic -Wno-deprecated-declarations")
+
 project(zword)
 
 include_directories(CSFML/include)

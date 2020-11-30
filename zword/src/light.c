@@ -47,6 +47,15 @@ void draw_lights(Component* component, ColliderGrid* grid, sfRenderWindow* windo
 
         sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
 
+        float brightness = light->brightness;
+        if (light->smoothing != 0) {
+            brightness *= 1.0 / light->smoothing;
+        }
+        
+        sfColor color = sfConvexShape_getFillColor(light->shape);
+        color.a = brightness * 255;
+        sfConvexShape_setFillColor(light->shape, color);
+
         for (int k = 0; k <= light->smoothing; k++) {
             float range = light->range - 0.2 * fabs(k - light->smoothing / 2);
 
@@ -67,15 +76,6 @@ void draw_lights(Component* component, ColliderGrid* grid, sfRenderWindow* windo
                 sfVector2f offset = mult(0.25 - 0.05 * fabs(k - light->smoothing / 2), velocity);
 
                 sfConvexShape_setPoint(light->shape, j % 2 + 1, world_to_texture(sum(end, offset), camera));
-
-                float brightness = light->brightness;
-                if (light->smoothing != 0) {
-                    brightness *= 1.0 / light->smoothing;
-                }
-                
-                sfColor color = sfConvexShape_getFillColor(light->shape);
-                color.a = brightness * 255;
-                sfConvexShape_setFillColor(light->shape, color);
 
                 sfRenderTexture_drawConvexShape(texture, light->shape, &state);
 

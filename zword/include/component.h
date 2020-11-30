@@ -41,7 +41,7 @@ typedef struct {
     float max_angular_speed;
 } PhysicsComponent;
 
-PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag);
+PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag);
 
 typedef struct {
     bool enabled;

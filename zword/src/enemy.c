@@ -46,8 +46,8 @@ void create_enemy(Component* component, sfVector2f pos) {
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
     component->image[i] = ImageComponent_create("player", 1.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.25, 5.0);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.25, 5.0, 10.0);
     component->physics[i]->max_speed = 2.0;
     component->enemy[i] = EnemyComponent_create();
-    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfRed, sfColor_fromRGB(255, 150, 150));
+    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
 }

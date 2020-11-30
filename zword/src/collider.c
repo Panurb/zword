@@ -33,6 +33,7 @@ float axis_half_width(Component* component, int i, sfVector2f axis) {
     } else if (component->circle_collider[i]) {
         return component->circle_collider[i]->radius;
     }
+    return 0.0;
 }
 
 
@@ -197,37 +198,37 @@ void collide(Component* component, ColliderGrid* grid) {
 }
 
 
-void draw_occupied_tiles(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, int i) {
-    Bounds bounds = get_bounds(component, grid, i);
-    for (int j = bounds.left; j <= bounds.right; j++) {
-        for (int k = bounds.bottom; k <= bounds.top; k++) {
-            for (int l = 0; l < 10; l++) {
-                sfRectangleShape* shape = sfRectangleShape_create();
-                sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * camera->zoom, 0.5 * camera->zoom });
+void draw_occupied_tiles(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+    for (int i = 0; i < component->entities; i++) {
+        Bounds bounds = get_bounds(component, grid, i);
+        for (int j = bounds.left; j <= bounds.right; j++) {
+            for (int k = bounds.bottom; k <= bounds.top; k++) {
+                for (int l = 0; l < 10; l++) {
+                    sfRectangleShape* shape = sfRectangleShape_create();
+                    sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * camera->zoom, 0.5 * camera->zoom });
 
-                sfVector2f pos = { j - 31.3, k - 31.3 };
-                sfRectangleShape_setPosition(shape, world_to_screen(pos, camera));
+                    sfVector2f pos = { j - 31.3, k - 31.3 };
+                    sfRectangleShape_setPosition(shape, world_to_screen(pos, camera));
 
-                sfVector2f size = { camera->zoom, camera->zoom };
-                sfRectangleShape_setSize(shape, size);
+                    sfVector2f size = { camera->zoom, camera->zoom };
+                    sfRectangleShape_setSize(shape, size);
 
-                sfRectangleShape_setOutlineColor(shape, sfWhite);
-                sfRectangleShape_setOutlineThickness(shape, 0.1 * camera->zoom);
-                sfRectangleShape_setFillColor(shape, sfTransparent);
+                    sfRectangleShape_setOutlineColor(shape, sfWhite);
+                    sfRectangleShape_setOutlineThickness(shape, 0.1 * camera->zoom);
+                    sfRectangleShape_setFillColor(shape, sfTransparent);
 
-                sfRenderWindow_drawRectangleShape(window, shape, NULL);
+                    sfRenderWindow_drawRectangleShape(window, shape, NULL);
 
-                sfRectangleShape_destroy(shape);
+                    sfRectangleShape_destroy(shape);
+                }
             }
         }
     }
 }
 
 
-void debug_draw(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
-        CoordinateComponent* coord = component->coordinate[i];
-
         if (component->circle_collider[i]) {
             CircleColliderComponent* col = component->circle_collider[i];
 

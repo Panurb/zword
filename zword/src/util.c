@@ -92,7 +92,7 @@ float float_rand(float min, float max) {
 }
 
 int find(int value, int* array, int size) {
-    for (int i; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         if (array[i] == value) {
             return i;
         }
