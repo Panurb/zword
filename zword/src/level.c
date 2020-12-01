@@ -10,6 +10,27 @@
 #include "enemy.h"
 #include "weapon.h"
 #include "vehicle.h"
+#include "navigation.h"
+
+
+int get_index(Component* component) {
+    for (int i = 0; i < component->entities; i++) {
+        if (!component->coordinate[i]) {
+            return i;
+        }
+    }
+
+    component->entities++;
+    return component->entities - 1;
+}
+
+
+void create_waypoint(Component* component, sfVector2f pos) {
+    int i = get_index(component);
+
+    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
+    component->waypoint[i] = WaypointComponent_create();
+}
 
 
 void create_wall(Component* component, sfVector2f pos, float width, float height, float angle) {
@@ -64,6 +85,8 @@ void create_house(Component* component, float x, float y) {
     create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
 
     create_fire(component, pos);
+
+    create_waypoint(component, sum(pos, mult(1.5, sum(w, h))));
 }
 
 

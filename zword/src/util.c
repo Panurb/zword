@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <SFML/System/Vector2.h>
 
@@ -121,4 +122,8 @@ sfVector2f rotate(sfVector2f v, float angle) {
     float c = cosf(angle);
     float s = sinf(angle);
     return (sfVector2f) { v.x * c - v.y * s, v.x * s + v.y * c };
+}
+
+float polar_angle(sfVector2f v) {
+    return atan2(v.y, v.x);
 }

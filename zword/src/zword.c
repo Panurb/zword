@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <SFML/Audio.h>
 #include <SFML/Graphics.h>
@@ -18,6 +20,7 @@
 #include "grid.h"
 #include "enemy.h"
 #include "particle.h"
+#include "navigation.h"
 
 
 // remove from here
@@ -26,6 +29,8 @@
 
 
 int main() {
+    srand(time(NULL));
+
     sfVideoMode mode = { 1280, 720, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
@@ -66,17 +71,8 @@ int main() {
     sfText_setCharacterSize(text, 20);
     sfText_setColor(text, sfWhite);
 
-    Component comp = { .entities=0 };
-    Component* component = &comp;
-    for (int i = 0; i < MAX_ENTITIES; i++) {
-        component->coordinate[i] = NULL;
-        component->image[i] = NULL;
-        component->physics[i] = NULL;
-        component->circle_collider[i] = NULL;
-        component->rectangle_collider[i] = NULL;
-        component->player[i] = NULL;
-    }
-    
+    Component* component = Component_create();
+
     Camera* camera = Camera_create(mode);
 
     ColliderGrid* grid = ColliderGrid_create();
@@ -138,6 +134,8 @@ int main() {
         sfRenderWindow_drawSprite(window, sprite, &state);
 
         draw_player(component, window, camera);
+
+        draw_waypoints(component, window, camera);
 
         frame_avg -= frame_times[i] / FRAME_WINDOW;
         frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));

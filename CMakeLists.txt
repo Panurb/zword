@@ -14,9 +14,11 @@ set(SOURCES
     zword/src/component.c
     zword/src/enemy.c
     zword/src/grid.c
+    zword/src/heap.c
     zword/src/image.c
     zword/src/level.c
     zword/src/light.c
+    zword/src/navigation.c
     zword/src/particle.c
     zword/src/physics.c
     zword/src/player.c

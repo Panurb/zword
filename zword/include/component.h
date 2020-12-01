@@ -5,6 +5,7 @@
 #include <SFML/Graphics.h>
 
 #define MAX_ENTITIES 1000
+#define MAX_NEIGHBORS 20
 
 
 typedef struct {
@@ -149,6 +150,16 @@ typedef struct {
 ItemComponent* ItemComponent_create(int size);
 
 typedef struct {
+    int neighbors[MAX_NEIGHBORS];
+    int weights[MAX_NEIGHBORS];
+    int came_from;
+    float f_score;
+    float g_score;
+} WaypointComponent;
+
+WaypointComponent* WaypointComponent_create();
+
+typedef struct {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     ImageComponent* image[MAX_ENTITIES];
@@ -162,7 +173,10 @@ typedef struct {
     VehicleComponent* vehicle[MAX_ENTITIES];
     WeaponComponent* weapon[MAX_ENTITIES];
     ItemComponent* item[MAX_ENTITIES];
+    WaypointComponent* waypoint[MAX_ENTITIES];
 } Component;
+
+Component* Component_create();
 
 void destroy_entity(Component* component, int i);
 

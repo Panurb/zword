@@ -137,8 +137,21 @@ sfVector2f left_stick() {
 }
 
 
-int get_inventory_slot(PlayerComponent* player, float mouse_angle) {
-    return floor(player->inventory_size * mod(mouse_angle + 0.25 * M_PI, 2 * M_PI) / (2 * M_PI));
+sfVector2f right_stick(Component* component, sfRenderWindow* window, Camera* camera, int i) {
+    sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
+    sfVector2f rel_mouse = diff(mouse, get_position(component, i));
+
+    return normalized(rel_mouse);
+}
+
+
+int get_inventory_slot(Component* component, sfRenderWindow* window, Camera* camera, int i) {
+    PlayerComponent* player = component->player[i];
+
+    sfVector2f rs = right_stick(component, window, camera, i);
+    float angle = polar_angle(rs);
+
+    return floor(player->inventory_size * mod(angle + 0.25 * M_PI, 2 * M_PI) / (2 * M_PI));
 }
 
 
@@ -156,13 +169,9 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
 
             phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
 
-            sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
-            sfVector2f rel_mouse = diff(mouse, coord->position);
-
-            float mouse_angle = atan2(rel_mouse.y, rel_mouse.x);
-
             int item = player->inventory[player->item];
-            int slot = floor(player->inventory_size * mod(mouse_angle + 0.25 * M_PI, 2 * M_PI) / (2 * M_PI));
+
+            int slot = get_inventory_slot(component, window, camera, i);
 
             if (sfKeyboard_isKeyPressed(sfKeySpace)) {
                 if (sfMouse_isButtonPressed(sfMouseLeft)) {
@@ -193,7 +202,7 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
                     pick_up_item(component, i);
                 }
 
-                coord->angle = mouse_angle;
+                coord->angle = polar_angle(right_stick(component, window, camera, i));
 
                 item = player->inventory[player->item];
 
@@ -263,25 +272,37 @@ void draw_player(Component* component, sfRenderWindow* window, Camera* camera) {
             sfColor color = sfWhite;
             sfConvexShape_setPointCount(shape, 4);
 
+            sfRectangleShape* line = sfRectangleShape_create();
+
             float gap = 0.1;
             float slice = (2 * M_PI / player->inventory_size);
+            int slot = get_inventory_slot(component, window, camera, i);
 
             for (int j = 0; j < player->inventory_size; j++) {
                 float offset = 0.0;
-                if (j == player->item) {
-                    offset = 0.1;
+                color.a = 255;
+
+                if (j == slot) {
+                    if (player->grabbed_item == -1) {
+                        offset = 0.1;
+                    } else if (player->inventory[j] == -1) {
+                        offset = 0.1;
+                    }
+                } else {
+                    if (j == player->grabbed_item) {
+                        color.a = 64;
+                        draw_slice_outline(window, camera, line, pos, 1.0 + offset, 1.5 + offset, j * slice, slice - gap);
+                    }
                 }
                 
-                if (player->inventory[j] != -1) {
-                    color.a = 255;
-                } else {
+                if (player->inventory[j] == -1) {
                     color.a = 64;
                 }
 
                 sfConvexShape_setFillColor(shape, color);
 
                 draw_slice(window, camera, shape, pos, 1.0 + offset, 1.5 + offset, j * slice, slice - gap);
-
+            
                 if (player->inventory[j] != -1) {
                     // draw item
                 }

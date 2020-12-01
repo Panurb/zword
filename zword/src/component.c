@@ -169,6 +169,27 @@ ItemComponent* ItemComponent_create(int size) {
 }
 
 
+WaypointComponent* WaypointComponent_create() {
+    WaypointComponent* waypoint = malloc(sizeof(WaypointComponent));
+    return waypoint;
+}
+
+
+Component* Component_create() {
+    Component* component = malloc(sizeof(Component));
+    component->entities = 0;
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        component->coordinate[i] = NULL;
+        component->image[i] = NULL;
+        component->physics[i] = NULL;
+        component->circle_collider[i] = NULL;
+        component->rectangle_collider[i] = NULL;
+        component->player[i] = NULL;
+    }
+    return component;
+}
+
+
 void destroy_entity(Component* component, int i) {
     if (component->coordinate[i]) {
         free(component->coordinate[i]);

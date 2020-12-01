@@ -140,3 +140,32 @@ void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sf
         sfConvexShape_setPoint(shape, 1, world_to_screen(end, camera));
     }
 }
+
+
+void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
+    angle -= 0.5 * spread;
+
+    sfVector2f start = sum(position, polar_to_cartesian(max_range, angle));
+    sfVector2f end = sum(position, polar_to_cartesian(min_range, angle));
+
+    int n = 20;
+    float range = min_range;
+    for (int i = 0; i < 2; i++) {
+        for (int k = 0; k < n / 2 + 1; k++) {
+            if (k > 0) {
+                if (i == 0) {
+                    angle += 2 * spread / n;
+                } else {
+                    angle -= 2 * spread / n;
+                }
+            }
+
+            end = sum(position, polar_to_cartesian(range, angle));
+
+            draw_line(window, camera, shape, start, end, 0.05, sfWhite);
+
+            start = end;
+        }
+        range += max_range - min_range;
+    }
+}
