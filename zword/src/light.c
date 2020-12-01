@@ -27,9 +27,9 @@ void update_lights(Component* component, float delta_time) {
         }
 
         if (light->enabled) {
-            light->brightness = fmin(light->max_brightness, light->brightness + 0.5 * delta_time);
+            light->brightness = fmin(light->max_brightness, light->brightness + light->speed * delta_time);
         } else {
-            light->brightness = fmax(0.0, light->brightness - delta_time);
+            light->brightness = fmax(0.0, light->brightness - light->speed * delta_time);
         }
     }
 }

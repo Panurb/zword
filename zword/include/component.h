@@ -67,6 +67,7 @@ typedef struct {
     int item;
     int inventory_size;
     int inventory[4];
+    int grabbed_item;
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -83,9 +84,10 @@ typedef struct {
     sfConvexShape* shape;
     sfCircleShape* shine;
     float flicker;
+    float speed;
 } LightComponent;
 
-LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness);
+LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness, float speed);
 
 typedef struct {
     int health;
@@ -135,9 +137,16 @@ typedef struct {
     float recoil;
     float recoil_up;
     float recoil_down;
+    sfConvexShape* shape;
 } WeaponComponent;
 
 WeaponComponent* WeaponComponent_create(float fire_rate, float recoil_up, float recoil_down);
+
+typedef struct {
+    int size;
+} ItemComponent;
+
+ItemComponent* ItemComponent_create(int size);
 
 typedef struct {
     int entities;
@@ -152,6 +161,7 @@ typedef struct {
     ParticleComponent* particle[MAX_ENTITIES];
     VehicleComponent* vehicle[MAX_ENTITIES];
     WeaponComponent* weapon[MAX_ENTITIES];
+    ItemComponent* item[MAX_ENTITIES];
 } Component;
 
 void destroy_entity(Component* component, int i);

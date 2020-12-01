@@ -16,6 +16,8 @@ void update(Component* component, float delta_time, ColliderGrid* collision_grid
 
         CoordinateComponent* coord = component->coordinate[i];
 
+        if (coord->parent != -1) continue;
+
         if (physics->collision.velocity.x != 0.0 || physics->collision.velocity.y != 0.0) {
             physics->velocity = physics->collision.velocity;
 

@@ -23,6 +23,8 @@ set(SOURCES
     zword/src/raycast.c
     zword/src/util.c
     zword/src/zword.c
+    zword/src/vehicle.c
+    zword/src/weapon.c
 )
 
 add_executable(zword ${SOURCES})

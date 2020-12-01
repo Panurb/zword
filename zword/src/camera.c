@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -91,5 +93,50 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + (i - nx) };
 
         draw_line(window, camera, camera->grid[i], start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+    }
+}
+
+
+void draw_cone(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread) {
+    sfConvexShape_setPoint(shape, 0, world_to_screen(position, camera));
+    sfConvexShape_setPoint(shape, n - 1, world_to_screen(position, camera));
+
+    angle -= 0.5 * spread;
+
+    for (int k = 1; k < n - 1; k++) {
+        sfVector2f point = sum(position, polar_to_cartesian(range, angle));
+
+        sfConvexShape_setPoint(shape, k, world_to_screen(point, camera));
+
+        angle += spread / (n - 1);
+    }
+
+    sfRenderWindow_drawConvexShape(window, shape, NULL);
+}
+
+
+void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
+    float ang = angle - 0.5 * spread;
+
+    sfVector2f start = sum(position, polar_to_cartesian(min_range, ang));
+    sfVector2f end = sum(position, polar_to_cartesian(max_range, ang));
+
+    sfConvexShape_setPoint(shape, 0, world_to_screen(start, camera));
+    sfConvexShape_setPoint(shape, 1, world_to_screen(end, camera));
+
+    int n = 20;
+    for (int k = 0; k < n; k++) {
+        ang += spread / n;
+
+        start = sum(position, polar_to_cartesian(min_range, ang));
+        end = sum(position, polar_to_cartesian(max_range, ang));
+
+        sfConvexShape_setPoint(shape, 2, world_to_screen(end, camera));
+        sfConvexShape_setPoint(shape, 3, world_to_screen(start, camera));
+
+        sfRenderWindow_drawConvexShape(window, shape, NULL);
+
+        sfConvexShape_setPoint(shape, 0, world_to_screen(start, camera));
+        sfConvexShape_setPoint(shape, 1, world_to_screen(end, camera));
     }
 }

@@ -8,6 +8,8 @@
 #include "player.h"
 #include "util.h"
 #include "enemy.h"
+#include "weapon.h"
+#include "vehicle.h"
 
 
 void create_wall(Component* component, sfVector2f pos, float width, float height, float angle) {
@@ -34,7 +36,7 @@ void create_fire(Component* component, sfVector2f pos) {
     component->entities++;
 
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 201, sfColor_fromRGB(255, 165, 0), 0.25);
+    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 201, sfColor_fromRGB(255, 165, 0), 0.25, 10.0);
     component->particle[i] = ParticleComponent_create(0.5 * M_PI, 1.0, 1.0, 0.2, 1.0, 5.0, sfColor_fromRGB(255, 165, 0), sfColor_fromRGB(255, 255, 0));
     component->particle[i]->loop = true;
     component->particle[i]->enabled = true;
@@ -65,45 +67,17 @@ void create_house(Component* component, float x, float y) {
 }
 
 
-void create_car(Component* component, float x, float y) {
-    int i = component->entities;
-    component->entities++;
-
-    sfVector2f pos = { x, y };
-    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->rectangle_collider[i] = RectangleColliderComponent_create(6.0, 3.0);
-    component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0, 20.0);
-    component->vehicle[i] = VehicleComponent_create();
-
-    i = component->entities;
-    component->entities++;
-
-    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 3.1, 1.0 }, 0.0);
-    component->coordinate[i]->parent = i - 1;
-    component->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4);
-    component->light[i]->enabled = false;
-
-    i = component->entities;
-    component->entities++;
-
-    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 3.1, -1.0 }, 0.0);
-    component->coordinate[i]->parent = i - 2;
-    component->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4);
-    component->light[i]->enabled = false;
-}
-
-
-void create_weapon(Component* component, float x, float y) {
+void create_flashlight(Component* component, float x, float y) {
     int i = component->entities;
     component->entities++;
 
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
-    component->rectangle_collider[i] = RectangleColliderComponent_create(1.5, 0.25);
+    component->rectangle_collider[i] = RectangleColliderComponent_create(1.0, 0.25);
     component->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
-    component->weapon[i] = WeaponComponent_create(5.0, 15.0, 0.75);
-    component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
-    component->particle[i]->speed_spread = 0.0;
+    component->item[i] = ItemComponent_create(1);
+    component->light[i] = LightComponent_create(7.0, 1.0, 51, sfColor_fromRGB(255, 255, 150), 0.75, 10.0);
+    component->light[i]->enabled = false;
 }
 
 
@@ -116,4 +90,6 @@ void create_level(Component* component) {
 
     create_car(component, 0.0, -5.0);
     create_weapon(component, 0.0, 5.0);
+
+    create_flashlight(component, 0.0, 2.0);
 }

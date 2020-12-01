@@ -44,7 +44,7 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
     phys->drag = drag;
     phys->max_speed = 20.0;
     phys->angular_drag = angular_drag;
-    phys->max_angular_speed = 2.5;
+    phys->max_angular_speed = 20.0 * M_PI;
     return phys;
 }
 
@@ -80,11 +80,12 @@ PlayerComponent* PlayerComponent_create() {
     for (int i = 0; i < player->inventory_size; i++) {
         player->inventory[i] = -1;
     }
+    player->grabbed_item = -1;
     return player;
 }
 
 
-LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness) {
+LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness, float speed) {
     LightComponent* light = malloc(sizeof(LightComponent));
     light->enabled = true;
     light->range = range;
@@ -98,6 +99,7 @@ LightComponent* LightComponent_create(float range, float angle, int rays, sfColo
     sfConvexShape_setPointCount(light->shape, 3);
     light->shine = sfCircleShape_create();
     light->flicker = 0.1;
+    light->speed = speed;
     return light;
 }
 
@@ -160,6 +162,13 @@ WeaponComponent* WeaponComponent_create(float fire_rate, float recoil_up, float 
 }
 
 
+ItemComponent* ItemComponent_create(int size) {
+    ItemComponent* item = malloc(sizeof(ItemComponent));
+    item->size = size;
+    return item;
+}
+
+
 void destroy_entity(Component* component, int i) {
     if (component->coordinate[i]) {
         free(component->coordinate[i]);
@@ -201,6 +210,7 @@ void destroy_entity(Component* component, int i) {
         free(component->weapon[i]);
         component->weapon[i] = NULL;
     }
+    if (component->item[i])
 
     if (i == component->entities - 1) {
         component->entities--;
