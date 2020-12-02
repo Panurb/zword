@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_C_FLAGS "-Wall -Wextra --pedantic -Wno-deprecated-declarations")
+set(CMAKE_C_FLAGS "-g -Wall -Wextra --pedantic -Wno-deprecated-declarations")
 
 project(zword)
 
@@ -16,6 +16,7 @@ set(SOURCES
     zword/src/grid.c
     zword/src/heap.c
     zword/src/image.c
+    zword/src/interface.c
     zword/src/level.c
     zword/src/light.c
     zword/src/navigation.c

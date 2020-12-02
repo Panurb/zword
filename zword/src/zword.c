@@ -21,11 +21,7 @@
 #include "enemy.h"
 #include "particle.h"
 #include "navigation.h"
-
-
-// remove from here
-#define MAX_ENTITIES 1000
-#define FRAME_WINDOW 100
+#include "interface.h"
 
 
 int main() {
@@ -54,22 +50,10 @@ int main() {
     sfClock* clock = sfClock_create();
     sfEvent event;
 
-    float frame_times[FRAME_WINDOW] = { 0.0 };
-    float frame_avg = 0.0;
+    FpsCounter* fps = FpsCounter_create();
 
-    float delta_time = 1.0 / 60.0;
+    float time_step = 1.0 / 60.0;
     float elapsed_time = 0.0;
-
-    sfFont* font = sfFont_createFromFile("data/Helvetica.ttf");
-    if (!font) {
-        printf("Font not found!");
-        return 1;
-    }
-
-    sfText* text = sfText_create();
-    sfText_setFont(text, font);
-    sfText_setCharacterSize(text, 20);
-    sfText_setColor(text, sfWhite);
 
     Component* component = Component_create();
 
@@ -85,7 +69,6 @@ int main() {
 
     init_waypoints(component, grid);
 
-    int i = 0;
     while (sfRenderWindow_isOpen(window))
     {
         while (sfRenderWindow_pollEvent(window, &event))
@@ -105,19 +88,19 @@ int main() {
         }
 
         if (focus) {
-            while (elapsed_time > delta_time) {
-                elapsed_time -= delta_time;
+            while (elapsed_time > time_step) {
+                elapsed_time -= time_step;
 
-                input(component, window, grid, camera, delta_time);
+                input(component, window, grid, camera, time_step);
 
                 update_enemy(component, grid);
 
-                update(component, delta_time, grid);
+                update(component, time_step, grid);
                 collide(component, grid);
 
-                update_particles(component, delta_time);
+                update_particles(component, time_step);
 
-                update_lights(component, delta_time);
+                update_lights(component, time_step);
 
                 update_waypoints(component, grid);
             }
@@ -128,7 +111,6 @@ int main() {
         draw_grid(window, camera);
 
         debug_draw(component, window, camera);
-        //draw(component, window, camera);
 
         draw_particles(component, window, camera);
 
@@ -139,22 +121,14 @@ int main() {
 
         draw_player(component, window, camera);
 
-        draw_waypoints(component, window, camera);
+        //draw_waypoints(component, window, camera);
 
         draw_enemies(component, window, camera);
 
-        frame_avg -= frame_times[i] / FRAME_WINDOW;
-        frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));
-        frame_avg += frame_times[i] / FRAME_WINDOW;
+        float delta_time = sfTime_asSeconds(sfClock_restart(clock));
+        elapsed_time += delta_time;
 
-        elapsed_time += frame_times[i];
-        i = (i + 1) % FRAME_WINDOW;
-
-        char buffer[20];
-        snprintf(buffer, 20, "%.0f", 1.0 / frame_avg);
-        sfText_setString(text, buffer);
-
-        sfRenderWindow_drawText(window, text, NULL);
+        draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);
     }

@@ -29,18 +29,20 @@ void update_enemy(Component* component, ColliderGrid* grid) {
             for (int j = 0; j < component->entities; j++) {
                 if (!component->player[j]) continue;
 
-                if (a_star(component, i, j, enemy->path)) {
-                    enemy->target = j;
-                    break;
-               }
+                //enemy->target = j;
+                break;
             }
         } else {
-            if (a_star(component, i, enemy->target, enemy->path)) {
-                int j = find(-1, enemy->path, MAX_PATH_LENGTH);
-                if (j > 1) {
-                    sfVector2f r = diff(get_position(component, enemy->path[j - 2]), get_position(component, i));
-                    phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(r)));
-                }
+            int target = component->player[enemy->target]->vehicle;
+            if (target == -1) {
+                target = enemy->target;
+            }
+
+            a_star(component, target, i, enemy->path);
+
+            if (enemy->path[1] != -1) {
+                sfVector2f r = diff(get_position(component, enemy->path[1]), get_position(component, i));
+                phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(r)));
             }
         }
     }
@@ -55,7 +57,7 @@ void create_enemy(Component* component, sfVector2f pos) {
     component->image[i] = ImageComponent_create("player", 1.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.5, 5.0, 10.0);
-    component->physics[i]->max_speed = 2.0;
+    component->physics[i]->max_speed = 5.0;
     component->enemy[i] = EnemyComponent_create();
     component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
     component->waypoint[i] = WaypointComponent_create();
@@ -73,9 +75,8 @@ void draw_enemies(Component* component, sfRenderWindow* window, Camera* camera) 
             draw_line(window, camera, NULL, get_position(component, enemy->path[j]), get_position(component, enemy->path[j + 1]), 0.05, sfRed);
         }
 
-        int j = find(-1, enemy->path, MAX_PATH_LENGTH);
-        if (j > 1) {
-            draw_circle(window, camera, NULL, get_position(component, enemy->path[j - 2]), 0.1, sfGreen);
+        if (enemy->path[1] != -1) {
+            draw_circle(window, camera, NULL, get_position(component, enemy->path[1]), 0.1, sfGreen);
         }
     }
 }

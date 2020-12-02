@@ -47,7 +47,29 @@ float ray_intersection(Component* component, int i, sfVector2f start, sfVector2f
 }
 
 
-HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range) {
+void calculate_normal(Component* component, HitInfo info) {
+    sfVector2f r = normalized(diff(info.position, component->coordinate[info.object]->position));
+    if (component->circle_collider[info.object]) {
+        info.normal = r;
+    } else if (component->rectangle_collider[info.object]) {
+        sfVector2f hw = polar_to_cartesian(1.0, component->coordinate[info.object]->angle);
+        sfVector2f hh = polar_to_cartesian(1.0, component->coordinate[info.object]->angle + 0.5 * M_PI);
+
+        float width = component->rectangle_collider[info.object]->width;
+        float height = component->rectangle_collider[info.object]->height;
+
+        float rhw = dot(r, hw);
+        float rhh = dot(r, hh);
+        if (0.5 * width - fabs(rhw) > 0.5 * height - fabs(rhh)) {
+            info.normal = mult(sign(rhh), hh);
+        } else {
+            info.normal = mult(sign(rhw), hw);
+        }
+    }
+}
+
+
+HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, int ignore) {
     //http://www.cs.yorku.ca/~amana/research/grid.pdf
 
     velocity = normalized(velocity);
@@ -69,15 +91,17 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
     float t_delta_y = grid->tile_height / fabs(velocity.y);
     
     float t_min = range;
-    int objects[20];
 
+    int objects[20];
     for (int i = 0; i < 20; i++) {
         objects[i] = -1;
     }
+
     while (x > 0 && x < grid->width && y > 0 && y < grid->height) {
         for (int i = 0; i < grid->size; i++) {
             int j = grid->array[x][y][i];
             if (j == -1) continue;
+            if (j == ignore) continue;
 
             bool found = false;
             for (int k = 0; k < 20; k++) {
@@ -111,24 +135,7 @@ HitInfo raycast(Component* component, ColliderGrid* grid, sfVector2f start, sfVe
 
     info.position = sum(start, mult(t_min, velocity));
     if (info.object != -1) {
-        sfVector2f r = normalized(diff(info.position, component->coordinate[info.object]->position));
-        if (component->circle_collider[info.object]) {
-            info.normal = r;
-        } else if (component->rectangle_collider[info.object]) {
-            sfVector2f hw = polar_to_cartesian(1.0, component->coordinate[info.object]->angle);
-            sfVector2f hh = polar_to_cartesian(1.0, component->coordinate[info.object]->angle + 0.5 * M_PI);
-
-            float width = component->rectangle_collider[info.object]->width;
-            float height = component->rectangle_collider[info.object]->height;
-
-            float rhw = dot(r, hw);
-            float rhh = dot(r, hh);
-            if (0.5 * width - fabs(rhw) > 0.5 * height - fabs(rhh)) {
-                info.normal = mult(sign(rhh), hh);
-            } else {
-                info.normal = mult(sign(rhw), hw);
-            }
-        }
+        calculate_normal(component, info);
     }
 
     return info;

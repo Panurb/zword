@@ -154,13 +154,17 @@ VehicleComponent* VehicleComponent_create() {
 }
 
 
-WeaponComponent* WeaponComponent_create(float fire_rate, float recoil_up, float recoil_down) {
+WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazine, float recoil_up, float recoil_down, float max_recoil) {
     WeaponComponent* weapon = malloc(sizeof(WeaponComponent));
     weapon->cooldown = 0.0;
     weapon->fire_rate = fire_rate;
     weapon->recoil = 0.0;
     weapon->recoil_up = recoil_up;
     weapon->recoil_down = recoil_down;
+    weapon->damage = damage;
+    weapon->max_magazine = magazine;
+    weapon->magazine = 0;
+    weapon->max_recoil = max_recoil;
     return weapon;
 }
 

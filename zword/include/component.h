@@ -5,7 +5,7 @@
 #include <SFML/Graphics.h>
 
 #define MAX_ENTITIES 1000
-#define MAX_NEIGHBORS 20
+#define MAX_NEIGHBORS 50
 #define MAX_PATH_LENGTH 50
 
 
@@ -140,10 +140,14 @@ typedef struct {
     float recoil;
     float recoil_up;
     float recoil_down;
+    float max_recoil;
+    int magazine;
+    int max_magazine;
+    int damage;
     sfConvexShape* shape;
 } WeaponComponent;
 
-WeaponComponent* WeaponComponent_create(float fire_rate, float recoil_up, float recoil_down);
+WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazine, float recoil_up, float recoil_down, float max_recoil);
 
 typedef struct {
     int size;

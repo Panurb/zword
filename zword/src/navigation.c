@@ -30,6 +30,7 @@ float heuristic(Component* component, int start, int goal) {
 
 bool a_star(Component* component, int start, int goal, int* path) {
     Heap* open_set = Heap_create(component);
+
     Heap_insert(open_set, start);
 
     for (int i = 0; i < MAX_PATH_LENGTH; i++) {
@@ -45,7 +46,6 @@ bool a_star(Component* component, int start, int goal, int* path) {
     }
 
     component->waypoint[start]->g_score = 0.0;
-
     component->waypoint[start]->f_score = heuristic(component, start, goal);
 
     while (open_set->size > 0) {
@@ -63,8 +63,7 @@ bool a_star(Component* component, int start, int goal, int* path) {
             
             WaypointComponent* neighbor = component->waypoint[n];
 
-            //float d = component->waypoint[current]->weights[i];
-            float d = dist(get_position(component, current), get_position(component, n));
+            float d = component->waypoint[current]->weights[i];
 
             float tentative_g_score = component->waypoint[current]->g_score + d;
 
@@ -89,7 +88,7 @@ float connection_distance(Component* component, ColliderGrid* grid, int i, int j
     sfVector2f b = get_position(component, j);
     sfVector2f v = diff(b, a);
     float d = norm(v);
-    HitInfo info = raycast(component, grid, a, v, 1.1 * d);
+    HitInfo info = raycast(component, grid, a, v, 1.1 * d, i);
 
     if (info.object == j) {
         return d;
@@ -103,9 +102,7 @@ void init_waypoints(Component* component, ColliderGrid* grid) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->waypoint[i]) continue;
 
-        for (int j = 0; j < component->entities; j++) {
-            if (i == j) continue;
-
+        for (int j = i + 1; j < component->entities; j++) {
             if (!component->waypoint[j]) continue;
 
             float d = connection_distance(component, grid, i, j);
@@ -114,16 +111,18 @@ void init_waypoints(Component* component, ColliderGrid* grid) {
                 if (k != -1) {
                     component->waypoint[i]->weights[k] = d;
                 }
+
+                k = replace(-1, i, component->waypoint[j]->neighbors, MAX_NEIGHBORS);
+                if (k != -1) {
+                    component->waypoint[j]->weights[k] = d;
+                }
             }
         }
-    }
 
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->waypoint[i]) continue;
-        if (component->physics[i]) continue;
-
-        free(component->circle_collider[i]);
-        component->circle_collider[i] = NULL;
+        if (!component->physics[i]) {
+            free(component->circle_collider[i]);
+            component->circle_collider[i] = NULL;
+        }
     }
 }
 
@@ -131,6 +130,35 @@ void init_waypoints(Component* component, ColliderGrid* grid) {
 void update_waypoints(Component* component, ColliderGrid* grid) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->waypoint[i]) continue;
+
+        for (int j = i + 1; j < component->entities; j++) {
+            if (!component->waypoint[j]) continue;
+            if (!component->physics[j]) continue;
+
+            int k = find(j, component->waypoint[i]->neighbors, MAX_NEIGHBORS);
+            if (k != -1) {
+                float d = dist(get_position(component, i), get_position(component, j));
+
+                component->waypoint[i]->weights[k] = d;
+
+                int l = find(i, component->waypoint[j]->neighbors, MAX_NEIGHBORS);
+                component->waypoint[j]->weights[l] = d;
+
+                continue;
+            }
+
+            float d = connection_distance(component, grid, i, j);
+            if (d > 0.0) {
+                int k = find(-1, component->waypoint[i]->neighbors, MAX_NEIGHBORS);
+                int l = find(-1, component->waypoint[j]->neighbors, MAX_NEIGHBORS);
+                if (k != -1 && l != -1) {
+                    component->waypoint[i]->neighbors[k] = j;
+                    component->waypoint[j]->neighbors[l] = i;
+                    component->waypoint[i]->weights[k] = d;
+                    component->waypoint[j]->weights[l] = d;
+                }
+            }
+        }
 
         for (int j = 0; j < MAX_NEIGHBORS; j++) {
             int n = component->waypoint[i]->neighbors[j];
@@ -142,29 +170,6 @@ void update_waypoints(Component* component, ColliderGrid* grid) {
                 component->waypoint[i]->neighbors[j] = -1;
 
                 replace(i, -1, component->waypoint[n]->neighbors, MAX_NEIGHBORS);
-            }
-        }
-
-        for (int j = 0; j < component->entities; j++) {
-            if (i == j) continue;
-            if (!component->waypoint[j]) continue;
-            if (!component->physics[j]) continue;
-
-            if (find(j, component->waypoint[i]->neighbors, MAX_NEIGHBORS) != -1) {
-                continue;
-            }
-
-            float d = connection_distance(component, grid, i, j);
-            if (d > 0.0) {
-                int k = replace(-1, j, component->waypoint[i]->neighbors, MAX_NEIGHBORS);
-                if (k != -1) {
-                    component->waypoint[i]->weights[k] = d;
-
-                    int l = replace(-1, i, component->waypoint[j]->neighbors, MAX_NEIGHBORS);
-                    if (l != -1) {
-                        component->waypoint[j]->weights[l] = d;
-                    }
-                }
             }
         }
     }
@@ -192,7 +197,7 @@ void draw_waypoints(Component* component, sfRenderWindow* window, Camera* camera
         for (int j = 0; j < MAX_NEIGHBORS; j++) {
             int k = component->waypoint[i]->neighbors[j];
             if (k != -1) {
-                //draw_line(window, camera, line, pos, get_position(component, k), 0.02, sfWhite);
+                draw_line(window, camera, line, pos, get_position(component, k), 0.02, sfWhite);
             }
         }
     }

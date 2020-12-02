@@ -31,10 +31,6 @@ void pick_up_item(Component* component, int i) {
                     component->coordinate[j]->position = (sfVector2f) { 0.0, 0.0 };
                     component->coordinate[j]->angle = 0.0;
                     component->rectangle_collider[j]->enabled = false;
-
-                    if (component->light[j]) {
-                        component->light[j]->enabled = true;
-                    }
                 }
                 break;
             }
@@ -175,7 +171,7 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
 
             if (sfKeyboard_isKeyPressed(sfKeySpace)) {
                 if (sfMouse_isButtonPressed(sfMouseLeft)) {
-                    if (player->grabbed_item == -1) {
+                    if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
                         player->grabbed_item = slot;
                     }
                 } else {
@@ -191,6 +187,12 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
                         }
 
                         player->item = slot;
+
+                        item = player->inventory[player->item];
+
+                        if (component->light[item]) {
+                            component->light[item]->enabled = true;
+                        }
 
                         if (sfMouse_isButtonPressed(sfMouseRight)) {
                             drop_item(component, i);

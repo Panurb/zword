@@ -64,13 +64,13 @@ void draw_lights(Component* component, ColliderGrid* grid, sfRenderWindow* windo
 
             sfConvexShape_setPoint(light->shape, 0, world_to_texture(start, camera));
 
-            sfVector2f end = raycast(component, grid, start, velocity, range).position;
+            sfVector2f end = raycast(component, grid, start, velocity, range, i).position;
             sfConvexShape_setPoint(light->shape, 1, world_to_texture(end, camera));
 
             for (int j = 1; j <= light->rays; j++) {
                 velocity = polar_to_cartesian(1.0, angle - 0.5 * light->angle + j * (light->angle / light->rays));
 
-                HitInfo info = raycast(component, grid, start, velocity, range);
+                HitInfo info = raycast(component, grid, start, velocity, range, i);
                 sfVector2f end = info.position;
 
                 sfVector2f offset = mult(0.25 - 0.05 * fabs(k - light->smoothing / 2), velocity);
