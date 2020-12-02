@@ -83,6 +83,8 @@ int main() {
         update_grid(component, grid, i);
     }
 
+    init_waypoints(component, grid);
+
     int i = 0;
     while (sfRenderWindow_isOpen(window))
     {
@@ -116,6 +118,8 @@ int main() {
                 update_particles(component, delta_time);
 
                 update_lights(component, delta_time);
+
+                update_waypoints(component, grid);
             }
         }
 
@@ -136,6 +140,8 @@ int main() {
         draw_player(component, window, camera);
 
         draw_waypoints(component, window, camera);
+
+        draw_enemies(component, window, camera);
 
         frame_avg -= frame_times[i] / FRAME_WINDOW;
         frame_times[i] = sfTime_asSeconds(sfClock_restart(clock));

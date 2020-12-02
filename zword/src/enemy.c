@@ -2,10 +2,14 @@
 
 #include <math.h>
 
+#include <SFML/Window.h>
+#include <SFML/System/Vector2.h>
+
 #include "component.h"
 #include "raycast.h"
 #include "grid.h"
 #include "util.h"
+#include "navigation.h"
 
 
 void update_enemy(Component* component, ColliderGrid* grid) {
@@ -25,15 +29,19 @@ void update_enemy(Component* component, ColliderGrid* grid) {
             for (int j = 0; j < component->entities; j++) {
                 if (!component->player[j]) continue;
 
-                sfVector2f velocity = diff(component->coordinate[j]->position, coord->position);
-                if (raycast(component, grid, coord->position, velocity, 20.0).object == j) {
+                if (a_star(component, i, j, enemy->path)) {
                     enemy->target = j;
                     break;
-                }
+               }
             }
         } else {
-            sfVector2f r = diff(component->coordinate[enemy->target]->position, coord->position);
-            phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(r)));
+            if (a_star(component, i, enemy->target, enemy->path)) {
+                int j = find(-1, enemy->path, MAX_PATH_LENGTH);
+                if (j > 1) {
+                    sfVector2f r = diff(get_position(component, enemy->path[j - 2]), get_position(component, i));
+                    phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(r)));
+                }
+            }
         }
     }
 }
@@ -46,8 +54,28 @@ void create_enemy(Component* component, sfVector2f pos) {
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
     component->image[i] = ImageComponent_create("player", 1.0);
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.25, 5.0, 10.0);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.5, 5.0, 10.0);
     component->physics[i]->max_speed = 2.0;
     component->enemy[i] = EnemyComponent_create();
     component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
+    component->waypoint[i] = WaypointComponent_create();
+}
+
+
+void draw_enemies(Component* component, sfRenderWindow* window, Camera* camera) {
+    for (int i = 0; i < component->entities; i++) {
+        EnemyComponent* enemy = component->enemy[i];
+        if (!enemy) continue;
+
+        for (int j = 0; j < MAX_PATH_LENGTH; j++) {
+            if (enemy->path[j + 1] == -1) break;
+
+            draw_line(window, camera, NULL, get_position(component, enemy->path[j]), get_position(component, enemy->path[j + 1]), 0.05, sfRed);
+        }
+
+        int j = find(-1, enemy->path, MAX_PATH_LENGTH);
+        if (j > 1) {
+            draw_circle(window, camera, NULL, get_position(component, enemy->path[j - 2]), 0.1, sfGreen);
+        }
+    }
 }

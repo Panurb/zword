@@ -109,6 +109,9 @@ EnemyComponent* EnemyComponent_create() {
     enemy->health = 100;
     enemy->acceleration = 15.0;
     enemy->target = -1;
+    for (int i = 0; i < MAX_PATH_LENGTH; i++) {
+        enemy->path[i] = -1;
+    }
     return enemy;
 }
 
@@ -171,6 +174,13 @@ ItemComponent* ItemComponent_create(int size) {
 
 WaypointComponent* WaypointComponent_create() {
     WaypointComponent* waypoint = malloc(sizeof(WaypointComponent));
+    waypoint->came_from = -1;
+    waypoint->g_score = INFINITY;
+    waypoint->f_score = INFINITY;
+    for (int i = 0; i < MAX_NEIGHBORS; i++) {
+        waypoint->neighbors[i] = -1;
+        waypoint->weights[i] = 0.0;
+    }
     return waypoint;
 }
 
@@ -187,6 +197,18 @@ Component* Component_create() {
         component->player[i] = NULL;
     }
     return component;
+}
+
+
+int get_index(Component* component) {
+    for (int i = 0; i < component->entities; i++) {
+        if (!component->coordinate[i]) {
+            return i;
+        }
+    }
+
+    component->entities++;
+    return component->entities - 1;
 }
 
 

@@ -37,6 +37,8 @@ float float_rand(float min, float max);
 
 int find(int value, int* array, int size);
 
+int replace(int old, int new, int* array, int size);
+
 int min(int a, int b);
 
 int max(int a, int b);

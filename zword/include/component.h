@@ -6,6 +6,7 @@
 
 #define MAX_ENTITIES 1000
 #define MAX_NEIGHBORS 20
+#define MAX_PATH_LENGTH 50
 
 
 typedef struct {
@@ -94,6 +95,7 @@ typedef struct {
     int health;
     float acceleration;
     int target;
+    int path[MAX_PATH_LENGTH];
 } EnemyComponent;
 
 EnemyComponent* EnemyComponent_create();
@@ -177,6 +179,8 @@ typedef struct {
 } Component;
 
 Component* Component_create();
+
+int get_index(Component* component);
 
 void destroy_entity(Component* component, int i);
 

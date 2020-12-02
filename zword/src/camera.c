@@ -76,6 +76,29 @@ void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, s
 }
 
 
+void draw_circle(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, sfVector2f position, float radius, sfColor color) {
+    bool created = false;
+    if (!shape) {
+        shape = sfCircleShape_create();
+        created = true;
+    }
+
+    sfCircleShape_setOrigin(shape, (sfVector2f) { radius * camera->zoom, radius * camera->zoom });
+
+    sfCircleShape_setPosition(shape, world_to_screen(position, camera));
+
+    sfCircleShape_setRadius(shape, radius * camera->zoom);
+
+    sfCircleShape_setFillColor(shape, color);
+
+    sfRenderWindow_drawCircleShape(window, shape, NULL);
+
+    if (created) {
+        sfCircleShape_destroy(shape);
+    }
+}
+
+
 void draw_grid(sfRenderWindow* window, Camera* camera) {
     int nx = ceil(camera->width / camera->zoom);
     float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);

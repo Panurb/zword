@@ -13,23 +13,12 @@
 #include "navigation.h"
 
 
-int get_index(Component* component) {
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->coordinate[i]) {
-            return i;
-        }
-    }
-
-    component->entities++;
-    return component->entities - 1;
-}
-
-
 void create_waypoint(Component* component, sfVector2f pos) {
     int i = get_index(component);
 
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
     component->waypoint[i] = WaypointComponent_create();
+    component->circle_collider[i] = CircleColliderComponent_create(0.5);
 }
 
 
@@ -86,7 +75,12 @@ void create_house(Component* component, float x, float y) {
 
     create_fire(component, pos);
 
+    create_waypoint(component, sum(pos, mult(0.75, h)));
+    create_waypoint(component, sum(pos, mult(1.5, h)));
     create_waypoint(component, sum(pos, mult(1.5, sum(w, h))));
+    create_waypoint(component, sum(pos, mult(1.5, diff(w, h))));
+    create_waypoint(component, sum(pos, mult(-1.5, sum(w, h))));
+    create_waypoint(component, sum(pos, mult(-1.5, diff(w, h))));
 }
 
 

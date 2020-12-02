@@ -239,7 +239,7 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
         if (player->vehicle != -1) {
             camera->zoom += 10.0 * delta_time * (25.0 - camera->zoom);
         } else {
-            camera->zoom += 10.0 * delta_time * (40.0 - camera->zoom);
+            camera->zoom += 10.0 * delta_time * (25.0 - camera->zoom);
         }
     }
 }
@@ -256,6 +256,7 @@ void create_player(Component* component, sfVector2f pos) {
     component->circle_collider[i] = CircleColliderComponent_create(0.5);
     component->player[i] = PlayerComponent_create();
     component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
+    component->waypoint[i] = WaypointComponent_create();
 }
 
 

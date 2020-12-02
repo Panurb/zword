@@ -102,6 +102,14 @@ int find(int value, int* array, int size) {
     return -1;
 }
 
+int replace(int old, int new, int* array, int size) {
+    int i = find(old, array, size);
+    if (i != -1) {
+        array[i] = new;
+    }
+    return i;
+}
+
 int min(int a, int b) {
     return (a < b) ? a : b;
 }
