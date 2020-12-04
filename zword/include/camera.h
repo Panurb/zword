@@ -8,7 +8,7 @@ typedef struct {
     float zoom;
     float width;
     float height;
-    sfRectangleShape* grid[100];
+    sfRectangleShape* grid;
 } Camera;
 
 Camera* Camera_create(sfVideoMode mode);

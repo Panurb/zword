@@ -8,7 +8,7 @@
 #include "camera.h"
 
 
-void update_enemy(Component* component, ColliderGrid* grid);
+void update_enemies(Component* component);
 
 void create_enemy(Component* component, sfVector2f pos);
 

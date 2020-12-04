@@ -8,39 +8,46 @@
 #include "util.h"
 
 
-void shoot(Component* component, ColliderGrid* grid, int i, float delta_time) {
-    PlayerComponent* player = component->player[i];
-
-    int item = player->inventory[player->item];
-    WeaponComponent* weapon = component->weapon[item];
-
-    if (weapon->magazine > 0 && weapon->cooldown <= 0.0) {
-        weapon->cooldown = 1.0 / weapon->fire_rate;
-
-        float angle = float_rand(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
-        sfVector2f r = polar_to_cartesian(0.6, component->coordinate[i]->angle + angle);
-
-        sfVector2f pos = sum(component->coordinate[i]->position, r);
-
-        HitInfo info = raycast(component, grid, pos, r, 20.0, item);
-
-        if (component->enemy[info.object]) {
-            component->enemy[info.object]->health -= weapon->damage;
-            component->physics[info.object]->velocity = polar_to_cartesian(2.0, component->coordinate[i]->angle + angle);
-
-            component->particle[info.object]->enabled = true;
-        }
-
-        weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-        component->particle[item]->angle = angle;
-        component->particle[item]->max_time = dist(pos, info.position) / component->particle[item]->speed;
-        component->particle[item]->enabled = true;
+void reload(Component* component, int i) {
+    WeaponComponent* weapon = component->weapon[i];
+    if (!weapon->reloading) {
+        weapon->cooldown = weapon->reload_time;
+        weapon->reloading = true;
     }
 }
 
 
-void reload(Component* Component, int i, float delta_time) {
-    
+void shoot(Component* component, ColliderGrid* grid, int i) {
+    WeaponComponent* weapon = component->weapon[i];
+    int parent = component->coordinate[i]->parent;
+
+    if (weapon->magazine > 0) {
+        if (weapon->cooldown == 0.0) {
+            weapon->cooldown = 1.0 / weapon->fire_rate;
+            weapon->magazine--;
+
+            float angle = float_rand(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
+            sfVector2f r = polar_to_cartesian(0.6, get_angle(component, parent) +  angle);
+
+            sfVector2f pos = sum(get_position(component, parent), r);
+
+            HitInfo info = raycast(component, grid, pos, r, 20.0, parent);
+
+            if (component->enemy[info.object]) {
+                component->enemy[info.object]->health -= weapon->damage;
+                component->physics[info.object]->velocity = polar_to_cartesian(2.0, get_angle(component, parent) +  angle);
+
+                component->particle[info.object]->enabled = true;
+            }
+
+            weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
+            component->particle[i]->angle = angle;
+            component->particle[i]->max_time = dist(pos, info.position) / component->particle[i]->speed;
+            component->particle[i]->enabled = true;
+        }
+    } else {
+        reload(component, i);
+    }
 }
 
 

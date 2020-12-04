@@ -165,6 +165,8 @@ WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazin
     weapon->max_magazine = magazine;
     weapon->magazine = 0;
     weapon->max_recoil = max_recoil;
+    weapon->reload_time = 2.0;
+    weapon->reloading = false;
     return weapon;
 }
 

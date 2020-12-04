@@ -16,10 +16,7 @@ FpsCounter* FpsCounter_create() {
     fps->text = sfText_create();
 
     sfFont* font = sfFont_createFromFile("data/Helvetica.ttf");
-    if (!font) {
-        printf("Font not found!");
-    }
-
+    
     sfText_setFont(fps->text, font);
     sfText_setCharacterSize(fps->text, 20);
     sfText_setColor(fps->text, sfWhite);

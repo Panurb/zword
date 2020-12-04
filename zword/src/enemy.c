@@ -12,11 +12,10 @@
 #include "navigation.h"
 
 
-void update_enemy(Component* component, ColliderGrid* grid) {
+void update_enemies(Component* component) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->enemy[i]) continue;
 
-        CoordinateComponent* coord = component->coordinate[i];
         EnemyComponent* enemy = component->enemy[i];
         PhysicsComponent* phys = component->physics[i];
 
@@ -29,7 +28,7 @@ void update_enemy(Component* component, ColliderGrid* grid) {
             for (int j = 0; j < component->entities; j++) {
                 if (!component->player[j]) continue;
 
-                //enemy->target = j;
+                enemy->target = j;
                 break;
             }
         } else {

@@ -144,6 +144,8 @@ typedef struct {
     int magazine;
     int max_magazine;
     int damage;
+    float reload_time;
+    bool reloading;
     sfConvexShape* shape;
 } WeaponComponent;
 

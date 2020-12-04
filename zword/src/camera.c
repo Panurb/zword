@@ -16,13 +16,11 @@
 Camera* Camera_create(sfVideoMode mode) {
     Camera* camera = malloc(sizeof(Camera));
     camera->position = (sfVector2f) { 0.0, 0.0 };
-    camera->zoom = 25.0;
+    camera->zoom = 25.0 * mode.height / 720.0;
     camera->width = mode.width;
     camera->height = mode.height;
-    for (int i = 0; i < 100; i++) {
-        camera->grid[i] = sfRectangleShape_create();
-        sfRectangleShape_setFillColor(camera->grid[i], sfWhite);
-    }
+    camera->grid = sfRectangleShape_create();
+    sfRectangleShape_setFillColor(camera->grid, sfWhite);
     return camera;
 }
 
@@ -100,13 +98,13 @@ void draw_circle(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, s
 
 
 void draw_grid(sfRenderWindow* window, Camera* camera) {
-    int nx = ceil(camera->width / camera->zoom);
+    int nx = ceil(camera->width / camera->zoom) + 1;
     float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);
     for (int i = 0; i < nx; i++) {
         sfVector2f start = { x + i, camera->position.y + 0.5 * camera->height / camera->zoom };
         sfVector2f end = { x + i, camera->position.y - 0.5 * camera->height / camera->zoom };
 
-        draw_line(window, camera, camera->grid[i], start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+        draw_line(window, camera, camera->grid, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
     }
 
     int ny = ceil(camera->height / camera->zoom);    
@@ -115,7 +113,7 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + (i - nx) };
         sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + (i - nx) };
 
-        draw_line(window, camera, camera->grid[i], start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+        draw_line(window, camera, camera->grid, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
     }
 }
 
@@ -147,7 +145,7 @@ void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sf
     sfConvexShape_setPoint(shape, 0, world_to_screen(start, camera));
     sfConvexShape_setPoint(shape, 1, world_to_screen(end, camera));
 
-    int n = 20;
+    int n = 5 * ceil(max_range * spread);
     for (int k = 0; k < n; k++) {
         ang += spread / n;
 
@@ -171,7 +169,7 @@ void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape
     sfVector2f start = sum(position, polar_to_cartesian(max_range, angle));
     sfVector2f end = sum(position, polar_to_cartesian(min_range, angle));
 
-    int n = 20;
+    int n = 5 * ceil(max_range * spread);
     float range = min_range;
     for (int i = 0; i < 2; i++) {
         for (int k = 0; k < n / 2 + 1; k++) {

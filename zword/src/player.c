@@ -170,6 +170,12 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
             int slot = get_inventory_slot(component, window, camera, i);
 
             if (sfKeyboard_isKeyPressed(sfKeySpace)) {
+                if (component->weapon[item]) {
+                    if (component->weapon[item]->reloading) {
+                        component->weapon[item]->reloading = false;
+                    }
+                }
+
                 if (sfMouse_isButtonPressed(sfMouseLeft)) {
                     if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
                         player->grabbed_item = slot;
@@ -209,14 +215,22 @@ void input(Component* component, sfRenderWindow* window, ColliderGrid* grid, Cam
                 item = player->inventory[player->item];
 
                 if (item != -1) {
-                    if (component->weapon[item]) {
-                        WeaponComponent* weapon = component->weapon[item];
-
-                        weapon->cooldown -= delta_time;
+                    WeaponComponent* weapon = component->weapon[item];
+                    if (weapon) {
+                        weapon->cooldown = fmax(0.0, weapon->cooldown - delta_time);
                         weapon->recoil = fmax(0.1 * norm(phys->velocity), weapon->recoil - delta_time * weapon->recoil_down);
 
+                        if (weapon->reloading && weapon->cooldown == 0.0) {
+                            weapon->magazine = weapon->max_magazine;
+                            weapon->reloading = false;
+                        }
+
                         if (sfMouse_isButtonPressed(sfMouseLeft)) {
-                            shoot(component, grid, i, delta_time);
+                            shoot(component, grid, item);
+                        }
+
+                        if (sfKeyboard_isKeyPressed(sfKeyR)) {
+                            reload(component, item);
                         }
                     }
                     
@@ -272,8 +286,8 @@ void draw_player(Component* component, sfRenderWindow* window, Camera* camera) {
             sfVector2f pos = get_position(component, i);
 
             sfConvexShape* shape = sfConvexShape_create();
-            sfColor color = sfWhite;
             sfConvexShape_setPointCount(shape, 4);
+            sfColor color = sfWhite;
 
             sfRectangleShape* line = sfRectangleShape_create();
 
@@ -310,22 +324,34 @@ void draw_player(Component* component, sfRenderWindow* window, Camera* camera) {
                     // draw item
                 }
             }
+            sfConvexShape_destroy(shape);
         } else {
             if (player->vehicle == -1 && player->inventory[player->item] != -1) {
                 WeaponComponent* weapon = component->weapon[player->inventory[player->item]];
                 if (weapon) {
-                    sfConvexShape* shape = sfConvexShape_create();
-                    sfConvexShape_setPointCount(shape, 20);
+                    if (weapon->reloading) {
+                        sfConvexShape* shape = sfConvexShape_create();
+                        sfConvexShape_setPointCount(shape, 4);
 
-                    sfConvexShape_setOutlineColor(shape, sfWhite);
-                    sfConvexShape_setOutlineThickness(shape, 0.02 * camera->zoom);
+                        sfVector2f pos = get_position(component, i);
+                        float prog = 2 * M_PI * (1 - weapon->cooldown / weapon->reload_time);
+                        draw_slice(window, camera, shape, pos, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog);
 
-                    sfColor color = sfWhite;
-                    color.a = 0;
-                    sfConvexShape_setFillColor(shape, color);
+                        sfConvexShape_destroy(shape);
+                    } else {
+                        sfConvexShape* shape = sfConvexShape_create();
+                        sfConvexShape_setPointCount(shape, 20);
 
-                    float spread = fmax(0.01, weapon->recoil);
-                    draw_cone(window, camera, shape, 20, get_position(component, i), 3.0, get_angle(component, i), spread);
+                        sfConvexShape_setOutlineColor(shape, sfWhite);
+                        sfConvexShape_setOutlineThickness(shape, 0.02 * camera->zoom);
+
+                        sfColor color = sfWhite;
+                        color.a = 0;
+                        sfConvexShape_setFillColor(shape, color);
+
+                        float spread = fmax(0.01, weapon->recoil);
+                        draw_cone(window, camera, shape, 20, get_position(component, i), 3.0, get_angle(component, i), spread);
+                    }
                 }
             }
         }
