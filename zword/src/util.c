@@ -6,6 +6,8 @@
 
 #include <SFML/System/Vector2.h>
 
+#include "util.h"
+
 
 float norm(sfVector2f v) {
     return sqrtf(v.x * v.x + v.y * v.y);
@@ -134,4 +136,19 @@ sfVector2f rotate(sfVector2f v, float angle) {
 
 float polar_angle(sfVector2f v) {
     return atan2(v.y, v.x);
+}
+
+Matrix2f rotation_matrix(float angle) {
+    float c = cosf(angle);
+    float s = sinf(angle);
+    return (Matrix2f) { c, -s, s, c };
+}
+
+sfVector2f matrix_mult(Matrix2f m, sfVector2f v) {
+    return (sfVector2f) { m.a * v.x + m.b * v.y, m.c * v.x + m.d * v.y };
+}
+
+Matrix2f matrix_inverse(Matrix2f m) {
+    float det = m.a * m.d - m.b * m.c;
+    return (Matrix2f) { m.d / det, -m.b / det, -m.c / det, m.a / det };
 }

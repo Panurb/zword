@@ -131,7 +131,8 @@ void update_waypoints(Component* component, ColliderGrid* grid) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->waypoint[i]) continue;
 
-        for (int j = i + 1; j < component->entities; j++) {
+        for (int j = 0; j < component->entities; j++) {
+            if (i == j) continue;
             if (!component->waypoint[j]) continue;
             if (!component->physics[j]) continue;
 
@@ -183,7 +184,6 @@ void draw_waypoints(Component* component, sfRenderWindow* window, Camera* camera
     float radius = 0.2 * camera->zoom;
     for (int i = 0; i < component->entities; i++) {
         if (!component->waypoint[i]) continue;
-        //if (!component->enemy[i]) continue;
 
         sfCircleShape_setOrigin(shape, (sfVector2f) { radius, radius });
 

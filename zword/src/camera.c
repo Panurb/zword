@@ -139,26 +139,27 @@ void draw_cone(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, int
 void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
     float ang = angle - 0.5 * spread;
 
-    sfVector2f start = sum(position, polar_to_cartesian(min_range, ang));
-    sfVector2f end = sum(position, polar_to_cartesian(max_range, ang));
+    sfVector2f start = polar_to_cartesian(min_range, ang);
+    sfVector2f end = polar_to_cartesian(max_range, ang);
 
-    sfConvexShape_setPoint(shape, 0, world_to_screen(start, camera));
-    sfConvexShape_setPoint(shape, 1, world_to_screen(end, camera));
+    sfConvexShape_setPoint(shape, 0, world_to_screen(sum(position, start), camera));
+    sfConvexShape_setPoint(shape, 1, world_to_screen(sum(position, end), camera));
 
     int n = 5 * ceil(max_range * spread);
+
+    Matrix2f rot = rotation_matrix(spread / n);
+
     for (int k = 0; k < n; k++) {
-        ang += spread / n;
+        start = matrix_mult(rot, start);
+        end = matrix_mult(rot, end);
 
-        start = sum(position, polar_to_cartesian(min_range, ang));
-        end = sum(position, polar_to_cartesian(max_range, ang));
-
-        sfConvexShape_setPoint(shape, 2, world_to_screen(end, camera));
-        sfConvexShape_setPoint(shape, 3, world_to_screen(start, camera));
+        sfConvexShape_setPoint(shape, 2, world_to_screen(sum(position, end), camera));
+        sfConvexShape_setPoint(shape, 3, world_to_screen(sum(position, start), camera));
 
         sfRenderWindow_drawConvexShape(window, shape, NULL);
 
-        sfConvexShape_setPoint(shape, 0, world_to_screen(start, camera));
-        sfConvexShape_setPoint(shape, 1, world_to_screen(end, camera));
+        sfConvexShape_setPoint(shape, 0, sfConvexShape_getPoint(shape, 3));
+        sfConvexShape_setPoint(shape, 1, sfConvexShape_getPoint(shape, 2));
     }
 }
 
@@ -166,27 +167,25 @@ void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sf
 void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
     angle -= 0.5 * spread;
 
-    sfVector2f start = sum(position, polar_to_cartesian(max_range, angle));
-    sfVector2f end = sum(position, polar_to_cartesian(min_range, angle));
-
     int n = 5 * ceil(max_range * spread);
+
+    Matrix2f rot = rotation_matrix(spread / n);
+
+    sfVector2f start = polar_to_cartesian(min_range, angle);
+    sfVector2f end = polar_to_cartesian(max_range, angle);
+
+    draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+
     float range = min_range;
     for (int i = 0; i < 2; i++) {
-        for (int k = 0; k < n / 2 + 1; k++) {
-            if (k > 0) {
-                if (i == 0) {
-                    angle += 2 * spread / n;
-                } else {
-                    angle -= 2 * spread / n;
-                }
-            }
+        for (int k = 0; k < n; k++) {
+            end = matrix_mult(rot, start);
 
-            end = sum(position, polar_to_cartesian(range, angle));
-
-            draw_line(window, camera, shape, start, end, 0.05, sfWhite);
+            draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
 
             start = end;
         }
-        range += max_range - min_range;
+
+        range = max_range;
     }
 }

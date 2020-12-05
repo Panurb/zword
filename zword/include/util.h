@@ -3,6 +3,13 @@
 #include <SFML/System/Vector2.h>
 
 
+typedef struct {
+    float a;
+    float b;
+    float c;
+    float d;
+} Matrix2f;
+
 float norm(sfVector2f v);
 
 float norm2(sfVector2f v);
@@ -50,3 +57,9 @@ float cross(sfVector2f v, sfVector2f u);
 sfVector2f rotate(sfVector2f v, float angle);
 
 float polar_angle(sfVector2f v);
+
+Matrix2f rotation_matrix(float angle);
+
+sfVector2f matrix_mult(Matrix2f m, sfVector2f v);
+
+Matrix2f matrix_inverse(Matrix2f m);

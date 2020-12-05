@@ -93,7 +93,7 @@ int main() {
 
                 input(component, window, grid, camera, time_step);
 
-                update_enemies(component);
+                //update_enemies(component);
 
                 update(component, time_step, grid);
                 collide(component, grid);
