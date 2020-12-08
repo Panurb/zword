@@ -10,6 +10,7 @@
 #include <SFML/Graphics.h>
 
 #include "camera.h"
+#include "component.h"
 #include "util.h"
 
 
@@ -164,28 +165,48 @@ void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sf
 }
 
 
-void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
-    angle -= 0.5 * spread;
-
-    int n = 5 * ceil(max_range * spread);
+void draw_arc(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float range, float angle, float spread) {
+    int n = 5 * ceil(range * spread);
 
     Matrix2f rot = rotation_matrix(spread / n);
 
-    sfVector2f start = polar_to_cartesian(min_range, angle);
-    sfVector2f end = polar_to_cartesian(max_range, angle);
+    sfVector2f start = polar_to_cartesian(range, angle - 0.5 * spread);
+    sfVector2f end = start;
+
+    for (int k = 0; k < n; k++) {
+        end = matrix_mult(rot, end);
+        draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+        start = end;
+    }
+}
+
+
+void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
+    sfVector2f start = polar_to_cartesian(max_range, angle - 0.5 * spread);
+    sfVector2f end = mult(min_range / max_range, start);
 
     draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
 
-    float range = min_range;
-    for (int i = 0; i < 2; i++) {
-        for (int k = 0; k < n; k++) {
-            end = matrix_mult(rot, start);
+    draw_arc(window, camera, shape, position, min_range, angle, spread);
 
-            draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+    draw_arc(window, camera, shape, position, max_range, angle, spread);
 
-            start = end;
+    start = polar_to_cartesian(min_range, angle + 0.5 * spread);
+    end = mult(max_range / min_range, start);    
+    
+    draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+}
+
+
+void update_camera(Component* component, Camera* camera, float time_step) {
+    sfVector2f pos;
+
+    for (int i = 0; i < component->entities; i++) {
+        if (component->player[i]) {
+            pos = get_position(component, i);
+            break;
         }
-
-        range = max_range;
     }
+    camera->position = sum(camera->position, mult(10.0 * time_step, diff(pos, camera->position)));
+    camera->zoom += 10.0 * time_step * (40.0 - camera->zoom);
 }

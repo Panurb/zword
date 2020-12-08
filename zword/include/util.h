@@ -62,4 +62,6 @@ Matrix2f rotation_matrix(float angle);
 
 sfVector2f matrix_mult(Matrix2f m, sfVector2f v);
 
+Matrix2f transpose(Matrix2f m);
+
 Matrix2f matrix_inverse(Matrix2f m);

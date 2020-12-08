@@ -29,17 +29,18 @@ ColliderGrid* ColliderGrid_create() {
 
 Bounds get_bounds(Component* component, ColliderGrid* grid, int i) {
     CoordinateComponent* coord = component->coordinate[i];
+    ColliderComponent* col = component->collider[i];
     
     int x = floor(coord->position.x + 0.5 * grid->width);
     int y = floor(coord->position.y + 0.5 * grid->height);
 
     int w;
     int h;
-    if (component->rectangle_collider[i]) {
+    if (col->type == RECTANGLE) {
         w = ceil(axis_half_width(component, i, (sfVector2f) { 1.0, 0.0 }));
         h = ceil(axis_half_width(component, i, (sfVector2f) { 0.0, 1.0 }));
-    } else if (component->circle_collider[i]) {
-        w = ceil(component->circle_collider[i]->radius);
+    } else {
+        w = ceil(col->radius);
         h = w;
     }
 

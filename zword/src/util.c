@@ -148,6 +148,10 @@ sfVector2f matrix_mult(Matrix2f m, sfVector2f v) {
     return (sfVector2f) { m.a * v.x + m.b * v.y, m.c * v.x + m.d * v.y };
 }
 
+Matrix2f transpose(Matrix2f m) {
+    return (Matrix2f) { m.a, m.c, m.b, m.d };
+}
+
 Matrix2f matrix_inverse(Matrix2f m) {
     float det = m.a * m.d - m.b * m.c;
     return (Matrix2f) { m.d / det, -m.b / det, -m.c / det, m.a / det };

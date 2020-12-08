@@ -2,6 +2,8 @@
 
 #include <SFML/System/Vector2.h>
 
+#include "component.h"
+
 
 typedef struct {
     sfVector2f position;
@@ -30,3 +32,5 @@ void draw_cone(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, int
 void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread);
 
 void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread);
+
+void update_camera(Component* component, Camera* camera, float time_step);

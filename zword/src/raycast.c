@@ -10,7 +10,11 @@ float ray_intersection(Component* component, int i, sfVector2f start, sfVector2f
     float t_min = range;
 
     CoordinateComponent* coord = component->coordinate[i];
-    if (component->rectangle_collider[i] && component->rectangle_collider[i]->enabled) {
+    ColliderComponent* col = component->collider[i];
+
+    if (!col->enabled) return t_min;
+
+    if (col->type == RECTANGLE) {
         //https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 
         sfVector2f hw = half_width(component, i);
@@ -30,10 +34,10 @@ float ray_intersection(Component* component, int i, sfVector2f start, sfVector2f
                 t_min = t;
             }
         }
-    } else if (component->circle_collider[i] && component->circle_collider[i]->enabled) {
+    } else {
         //https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 
-        float radius = component->circle_collider[i]->radius;
+        float radius = col->radius;
         sfVector2f oc = diff(start, coord->position);
         float delta = powf(dot(velocity, oc), 2) - norm2(oc) + powf(radius, 2);
         float t = -dot(velocity, oc) - sqrtf(delta);
@@ -48,15 +52,17 @@ float ray_intersection(Component* component, int i, sfVector2f start, sfVector2f
 
 
 void calculate_normal(Component* component, HitInfo info) {
+    ColliderComponent* col = component->collider[info.object];
+    
     sfVector2f r = normalized(diff(info.position, component->coordinate[info.object]->position));
-    if (component->circle_collider[info.object]) {
+    if (col->type == CIRCLE) {
         info.normal = r;
-    } else if (component->rectangle_collider[info.object]) {
+    } else {
         sfVector2f hw = polar_to_cartesian(1.0, component->coordinate[info.object]->angle);
         sfVector2f hh = polar_to_cartesian(1.0, component->coordinate[info.object]->angle + 0.5 * M_PI);
 
-        float width = component->rectangle_collider[info.object]->width;
-        float height = component->rectangle_collider[info.object]->height;
+        float width = col->width;
+        float height = col->height;
 
         float rhw = dot(r, hw);
         float rhh = dot(r, hh);

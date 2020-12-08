@@ -27,7 +27,7 @@
 int main() {
     srand(time(NULL));
 
-    sfVideoMode mode = { 1280, 720, 32 };
+    sfVideoMode mode = { 1920, 1080, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -64,6 +64,8 @@ int main() {
     create_level(component);
 
     for (int i = 0; i < component->entities; i++) {
+        if (!component->collider[i]) continue;
+        
         update_grid(component, grid, i);
     }
 
@@ -91,7 +93,9 @@ int main() {
             while (elapsed_time > time_step) {
                 elapsed_time -= time_step;
 
-                input(component, window, grid, camera, time_step);
+                input(component);
+
+                update_players(component, grid, window, camera, time_step);
 
                 //update_enemies(component);
 
@@ -103,6 +107,8 @@ int main() {
                 update_lights(component, time_step);
 
                 update_waypoints(component, grid);
+
+                update_camera(component, camera, time_step);
             }
         }
 
@@ -119,7 +125,7 @@ int main() {
         sfSprite_setTexture(sprite, sfRenderTexture_getTexture(texture), sfTrue);
         sfRenderWindow_drawSprite(window, sprite, &state);
 
-        draw_player(component, window, camera);
+        draw_players(component, window, camera);
 
         //draw_waypoints(component, window, camera);
 

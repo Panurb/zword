@@ -14,7 +14,7 @@ void create_car(Component* component, float x, float y) {
     int i = get_index(component);
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->rectangle_collider[i] = RectangleColliderComponent_create(6.0, 3.0);
+    component->collider[i] = ColliderComponent_create_rectangle(6.0, 3.0);
     component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0, 20.0);
     component->physics[i]->max_angular_speed = 2.5;
     component->vehicle[i] = VehicleComponent_create();

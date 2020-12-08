@@ -45,22 +45,37 @@ typedef struct {
 
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag);
 
+typedef enum {
+    CIRCLE,
+    RECTANGLE
+} ColliderType;
+
 typedef struct {
     bool enabled;
+    ColliderType type;
+    int last_collision;
     float radius;
-    sfCircleShape* shape;
-} CircleColliderComponent;
-
-CircleColliderComponent* CircleColliderComponent_create(float radius);
-
-typedef struct {
-    bool enabled;
     float width;
     float height;
-    sfRectangleShape* shape;
-} RectangleColliderComponent;
+    sfCircleShape* circ;
+    sfRectangleShape* rect;
+} ColliderComponent;
 
-RectangleColliderComponent* RectangleColliderComponent_create(float width, float height);
+ColliderComponent* ColliderComponent_create_circle(float radius);
+
+ColliderComponent* ColliderComponent_create_rectangle(float width, float height);
+
+typedef enum {
+    ON_FOOT,
+    GRAB_ITEM,
+    DROP_ITEM,
+    SHOOT,
+    RELOAD,
+    DRIVE,
+    MENU,
+    MENU_GRAB,
+    MENU_DROP
+} PlayerState;
 
 typedef struct {
     int health;
@@ -70,6 +85,9 @@ typedef struct {
     int inventory_size;
     int inventory[4];
     int grabbed_item;
+    PlayerState state;
+    sfConvexShape* shape;
+    sfRectangleShape* line;
 } PlayerComponent;
 
 PlayerComponent* PlayerComponent_create();
@@ -152,6 +170,7 @@ typedef struct {
 WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazine, float recoil_up, float recoil_down, float max_recoil);
 
 typedef struct {
+    int attachments[5];
     int size;
 } ItemComponent;
 
@@ -159,6 +178,7 @@ ItemComponent* ItemComponent_create(int size);
 
 typedef struct {
     int neighbors[MAX_NEIGHBORS];
+    int neighbors_size;
     int weights[MAX_NEIGHBORS];
     int came_from;
     float f_score;
@@ -172,8 +192,7 @@ typedef struct {
     CoordinateComponent* coordinate[MAX_ENTITIES];
     ImageComponent* image[MAX_ENTITIES];
     PhysicsComponent* physics[MAX_ENTITIES];
-    CircleColliderComponent* circle_collider[MAX_ENTITIES];
-    RectangleColliderComponent* rectangle_collider[MAX_ENTITIES];
+    ColliderComponent* collider[MAX_ENTITIES];
     PlayerComponent* player[MAX_ENTITIES];
     LightComponent* light[MAX_ENTITIES];
     EnemyComponent* enemy[MAX_ENTITIES];

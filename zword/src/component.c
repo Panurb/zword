@@ -49,23 +49,30 @@ PhysicsComponent* PhysicsComponent_create(float mass, float friction, float boun
 }
 
 
-CircleColliderComponent* CircleColliderComponent_create(float radius) {
-    CircleColliderComponent* col = malloc(sizeof(CircleColliderComponent));
+ColliderComponent* ColliderComponent_create_circle(float radius) {
+    ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
+    col->type = CIRCLE;
+    col->last_collision = -1;
     col->radius = radius;
-    col->shape = sfCircleShape_create();
-    sfCircleShape_setFillColor(col->shape, sfColor_fromRGB(150, 0, 150));
+    col->width = 2 * radius;
+    col->height = 2 * radius;
+    col->circ = sfCircleShape_create();
+    sfCircleShape_setFillColor(col->circ, sfColor_fromRGB(150, 0, 150));
     return col;
 }
 
 
-RectangleColliderComponent* RectangleColliderComponent_create(float width, float height) {
-    RectangleColliderComponent* col = malloc(sizeof(RectangleColliderComponent));
+ColliderComponent* ColliderComponent_create_rectangle(float width, float height) {
+    ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
+    col->type = RECTANGLE;
+    col->last_collision = -1;
+    col->radius = sqrtf(width * width + height * height);
     col->width = width;
     col->height = height;
-    col->shape = sfRectangleShape_create();
-    sfRectangleShape_setFillColor(col->shape, sfColor_fromRGB(50, 50, 50));
+    col->rect = sfRectangleShape_create();
+    sfRectangleShape_setFillColor(col->rect, sfColor_fromRGB(50, 50, 50));
     return col;
 }
 
@@ -81,6 +88,13 @@ PlayerComponent* PlayerComponent_create() {
         player->inventory[i] = -1;
     }
     player->grabbed_item = -1;
+    player->state = ON_FOOT;
+
+    player->shape = sfConvexShape_create();
+    sfConvexShape_setPointCount(player->shape, 4);
+
+    player->line = sfRectangleShape_create();
+
     return player;
 }
 
@@ -167,6 +181,14 @@ WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazin
     weapon->max_recoil = max_recoil;
     weapon->reload_time = 2.0;
     weapon->reloading = false;
+
+    weapon->shape = sfConvexShape_create();
+    sfConvexShape_setPointCount(weapon->shape, 20);
+    sfConvexShape_setOutlineColor(weapon->shape, sfWhite);
+    sfColor color = sfWhite;
+    color.a = 0;
+    sfConvexShape_setFillColor(weapon->shape, color);
+
     return weapon;
 }
 
@@ -174,6 +196,9 @@ WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazin
 ItemComponent* ItemComponent_create(int size) {
     ItemComponent* item = malloc(sizeof(ItemComponent));
     item->size = size;
+    for (int i = 0; i < size; i++) {
+        item->attachments[i]= -1;
+    }
     return item;
 }
 
@@ -187,6 +212,7 @@ WaypointComponent* WaypointComponent_create() {
         waypoint->neighbors[i] = -1;
         waypoint->weights[i] = 0.0;
     }
+    waypoint->neighbors_size = 0;
     return waypoint;
 }
 
@@ -198,9 +224,15 @@ Component* Component_create() {
         component->coordinate[i] = NULL;
         component->image[i] = NULL;
         component->physics[i] = NULL;
-        component->circle_collider[i] = NULL;
-        component->rectangle_collider[i] = NULL;
+        component->collider[i] = NULL;
         component->player[i] = NULL;
+        component->light[i] = NULL;
+        component->enemy[i] = NULL;
+        component->particle[i] = NULL;
+        component->vehicle[i] = NULL;
+        component->weapon[i] = NULL;
+        component->item[i] = NULL;
+        component->waypoint[i] = NULL;
     }
     return component;
 }
@@ -231,13 +263,9 @@ void destroy_entity(Component* component, int i) {
         free(component->physics[i]);
         component->physics[i] = NULL;
     }
-    if (component->circle_collider[i]) {
-        free(component->circle_collider[i]);
-        component->circle_collider[i] = NULL;
-    }
-    if (component->rectangle_collider[i]) {
-        free(component->rectangle_collider[i]);
-        component->rectangle_collider[i] = NULL;
+    if (component->collider[i]) {
+        free(component->collider[i]);
+        component->collider[i] = NULL;
     }
     if (component->player[i]) {
         free(component->player[i]);
@@ -255,11 +283,22 @@ void destroy_entity(Component* component, int i) {
         free(component->particle[i]);
         component->particle[i] = NULL;
     }
+    if (component->vehicle[i]) {
+        free(component->vehicle[i]);
+        component->vehicle[i] = NULL;
+    }
     if (component->weapon[i]) {
         free(component->weapon[i]);
         component->weapon[i] = NULL;
     }
-    if (component->item[i])
+    if (component->item[i]) {
+        free(component->item[i]);
+        component->item[i] = NULL;
+    }
+    if (component->waypoint[i]) {
+        free(component->waypoint[i]);
+        component->waypoint[i] = NULL;
+    }
 
     if (i == component->entities - 1) {
         component->entities--;

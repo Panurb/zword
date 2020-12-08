@@ -52,17 +52,27 @@ void shoot(Component* component, ColliderGrid* grid, int i) {
 
 
 void create_weapon(Component* component, float x, float y) {
-    int i = component->entities;
-    component->entities++;
+    int i = get_index(component);
 
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
-    component->rectangle_collider[i] = RectangleColliderComponent_create(1.5, 0.25);
+    component->collider[i] = ColliderComponent_create_rectangle(1.5, 0.25);
     component->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
     component->weapon[i] = WeaponComponent_create(5.0, 20, 30, 0.25, 0.75, 0.5 * M_PI);
     component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
     component->particle[i]->speed_spread = 0.0;
     component->item[i] = ItemComponent_create(1);
+}
+
+
+void create_lasersight(Component* component, float x, float y) {
+    int i = get_index(component);
+
+    sfVector2f pos = { x, y };
+    component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
+    component->collider[i] = ColliderComponent_create_rectangle(1.0, 0.25);
+    component->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
+    component->item[i] = ItemComponent_create(0);
     component->light[i] = LightComponent_create(20.0, 0.01, 1, sfRed, 1.0, 10.0);
     component->light[i]->enabled = false;
 }
