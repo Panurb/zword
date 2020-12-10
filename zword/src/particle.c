@@ -7,7 +7,7 @@
 #include "camera.h"
 
 
-void add_particle(Component* component, int i) {
+void add_particle(ComponentData* component, int i) {
     ParticleComponent* part = component->particle[i];
 
     part->position[part->iterator] = get_position(component, i);
@@ -22,7 +22,7 @@ void add_particle(Component* component, int i) {
 }
 
 
-void update_particles(Component* component, float delta_time) {
+void update_particles(ComponentData* component, float delta_time) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->particle[i]) continue;
 
@@ -52,7 +52,7 @@ void update_particles(Component* component, float delta_time) {
 }
 
 
-void draw_particles(Component* component, sfRenderWindow* window, Camera* camera) {
+void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->particle[i]) continue;
 

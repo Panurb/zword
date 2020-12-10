@@ -37,6 +37,10 @@ int main() {
     }
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
 
+    sfTexture* textures[100];
+
+    load_textures(textures);
+
     sfRenderTexture* texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
     sfSprite* sprite = sfSprite_create();
 
@@ -55,20 +59,45 @@ int main() {
     float time_step = 1.0 / 60.0;
     float elapsed_time = 0.0;
 
-    Component* component = Component_create();
+    ComponentData* component = Component_create();
 
     Camera* camera = Camera_create(mode);
 
     ColliderGrid* grid = ColliderGrid_create();
 
+    int i = get_index(component);
+    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 0.0, 0.0 }, 0.0);
+    int w = grid->tile_width * grid->width;
+    int h = grid->tile_height * grid->height;
+    component->image[i] = ImageComponent_create("grass_tile", w, h, 0);
+
     create_level(component);
 
+    /*
+    int draw_order[MAX_ENTITIES];
+    int draw_order_size = 0;
+
     for (int i = 0; i < component->entities; i++) {
-        if (!component->collider[i]) continue;
-        
-        update_grid(component, grid, i);
+        if (component->image[i]) {
+            draw_order[draw_order_size] = i;
+            draw_order_size++;
+        }
     }
 
+    i = 1;
+    while (i < draw_order_size) {
+        int x = draw_order[i];
+        int j = i - 1;
+        while (j >= 0 && component->image[j]->layer > component->image[i]->layer) {
+            draw_order[j + 1] = draw_order[j];
+            j--;
+        }
+        draw_order[j + 1] = x;
+        i++;
+    }
+    */
+
+    init_grid(component, grid);
     init_waypoints(component, grid);
 
     while (sfRenderWindow_isOpen(window))
@@ -97,7 +126,7 @@ int main() {
 
                 update_players(component, grid, window, camera, time_step);
 
-                //update_enemies(component);
+                update_enemies(component, grid);
 
                 update(component, time_step, grid);
                 collide(component, grid);
@@ -114,13 +143,15 @@ int main() {
 
         sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
 
-        draw_grid(window, camera);
+        //draw_grid(window, camera);
 
-        debug_draw(component, window, camera);
+        //debug_draw(component, window, camera);
+
+        draw(component, window, camera, textures);
 
         draw_particles(component, window, camera);
 
-        draw_lights(component, grid, window, texture, camera, ambient_light);
+        draw_lights(component, grid, window, textures, texture, camera, ambient_light);
         sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
         sfSprite_setTexture(sprite, sfRenderTexture_getTexture(texture), sfTrue);
         sfRenderWindow_drawSprite(window, sprite, &state);
@@ -129,7 +160,7 @@ int main() {
 
         //draw_waypoints(component, window, camera);
 
-        draw_enemies(component, window, camera);
+        //draw_enemies(component, window, camera);
 
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
         elapsed_time += delta_time;

@@ -8,7 +8,7 @@
 #include "util.h"
 
 
-void reload(Component* component, int i) {
+void reload(ComponentData* component, int i) {
     WeaponComponent* weapon = component->weapon[i];
     if (!weapon->reloading) {
         weapon->cooldown = weapon->reload_time;
@@ -17,7 +17,7 @@ void reload(Component* component, int i) {
 }
 
 
-void shoot(Component* component, ColliderGrid* grid, int i) {
+void shoot(ComponentData* component, ColliderGrid* grid, int i) {
     WeaponComponent* weapon = component->weapon[i];
     int parent = component->coordinate[i]->parent;
 
@@ -33,10 +33,20 @@ void shoot(Component* component, ColliderGrid* grid, int i) {
 
             HitInfo info = raycast(component, grid, pos, r, 20.0, parent);
 
-            if (component->enemy[info.object]) {
-                component->enemy[info.object]->health -= weapon->damage;
-                component->physics[info.object]->velocity = polar_to_cartesian(2.0, get_angle(component, parent) +  angle);
+            if (component->health[info.object]) {
+                float x = dot(info.normal, normalized(r));
+                if (x < -0.9) {
+                    component->health[info.object]->health = 0.0;
+                } else {
+                    component->health[info.object]->health -= weapon->damage;
+                }
+            }
 
+            if (component->physics[info.object]) {
+                component->physics[info.object]->velocity = polar_to_cartesian(2.0, get_angle(component, parent) +  angle);
+            }
+
+            if (component->particle[info.object]) {
                 component->particle[info.object]->enabled = true;
             }
 
@@ -51,21 +61,22 @@ void shoot(Component* component, ColliderGrid* grid, int i) {
 }
 
 
-void create_weapon(Component* component, float x, float y) {
+void create_weapon(ComponentData* component, float x, float y) {
     int i = get_index(component);
 
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, float_rand(0.0, 2 * M_PI));
-    component->collider[i] = ColliderComponent_create_rectangle(1.5, 0.25);
+    //component->collider[i] = ColliderComponent_create_rectangle(1.5, 0.25);
     component->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
-    component->weapon[i] = WeaponComponent_create(5.0, 20, 30, 0.25, 0.75, 0.5 * M_PI);
+    component->weapon[i] = WeaponComponent_create(4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
     component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
     component->particle[i]->speed_spread = 0.0;
     component->item[i] = ItemComponent_create(1);
+    component->image[i] = ImageComponent_create("pistol", 1.0, 1.0, 3);
 }
 
 
-void create_lasersight(Component* component, float x, float y) {
+void create_lasersight(ComponentData* component, float x, float y) {
     int i = get_index(component);
 
     sfVector2f pos = { x, y };

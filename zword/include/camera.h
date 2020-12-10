@@ -27,10 +27,12 @@ void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, s
 
 void draw_circle(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, sfVector2f position, float radius, sfColor color);
 
+void draw_rectangle(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color);
+
 void draw_cone(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread);
 
 void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread);
 
 void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread);
 
-void update_camera(Component* component, Camera* camera, float time_step);
+void update_camera(ComponentData* component, Camera* camera, float time_step);

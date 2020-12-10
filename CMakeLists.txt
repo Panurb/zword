@@ -53,4 +53,5 @@ install(FILES ${DLLS}
     DESTINATION ${CMAKE_SOURCE_DIR}/build)
 
 install(DIRECTORY zword/data
-    DESTINATION ${CMAKE_SOURCE_DIR}/build)
+    DESTINATION ${CMAKE_SOURCE_DIR}/build
+    FILES_MATCHING PATTERN "*.png")

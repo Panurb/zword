@@ -6,6 +6,16 @@
 #include "camera.h"
 
 
-sfSprite* load_sprite(char filename[20]);
+typedef sfTexture* TextureArray[100];
 
-void draw(Component* component, sfRenderWindow* window,  Camera* camera);
+void load_textures(TextureArray textures);
+
+int texture_index(Filename filename);
+
+void set_texture(ImageComponent* image, TextureArray textures);
+
+sfTexture* load_texture(Filename filename);
+
+sfSprite* load_sprite(Filename filename, TextureArray textures);
+
+void draw(ComponentData* component, sfRenderWindow* window,  Camera* camera, TextureArray textures);

@@ -4,6 +4,8 @@
 
 #include <SFML/Graphics.h>
 
+#include "util.h"
+
 #define MAX_ENTITIES 1000
 #define MAX_NEIGHBORS 50
 #define MAX_PATH_LENGTH 50
@@ -18,12 +20,16 @@ typedef struct {
 CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle);
 
 typedef struct {
-    sfVector2f scale;
+    bool visible;
+    Filename filename;
+    float width;
+    float height;
     sfSprite* sprite;
     float shine;
+    int layer;
 } ImageComponent;
 
-ImageComponent* ImageComponent_create(char filename[20], float scale);
+ImageComponent* ImageComponent_create(Filename filename, float width, float height, int layer);
 
 typedef struct {
     sfVector2f velocity;
@@ -57,8 +63,6 @@ typedef struct {
     float radius;
     float width;
     float height;
-    sfCircleShape* circ;
-    sfRectangleShape* rect;
 } ColliderComponent;
 
 ColliderComponent* ColliderComponent_create_circle(float radius);
@@ -78,7 +82,6 @@ typedef enum {
 } PlayerState;
 
 typedef struct {
-    int health;
     float acceleration;
     int vehicle;
     int item;
@@ -109,11 +112,20 @@ typedef struct {
 
 LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness, float speed);
 
+typedef enum {
+    IDLE,
+    INVESTIGATE,
+    CHASE,
+    DEAD
+} EnemyState;
+
 typedef struct {
-    int health;
+    EnemyState state;
     float acceleration;
     int target;
     int path[MAX_PATH_LENGTH];
+    float fov;
+    float vision_range;
 } EnemyComponent;
 
 EnemyComponent* EnemyComponent_create();
@@ -188,6 +200,42 @@ typedef struct {
 WaypointComponent* WaypointComponent_create();
 
 typedef struct {
+    int health;
+} HealthComponent;
+
+HealthComponent* HealthComponent_create(int health);
+
+
+
+
+
+
+
+
+typedef union {
+    CoordinateComponent* coordinate;
+    ImageComponent* image;
+    PhysicsComponent* physics;
+    ColliderComponent* collider;
+    PlayerComponent* player;
+    LightComponent* light;
+    EnemyComponent* enemy;
+    ParticleComponent* particle;
+    VehicleComponent* vehicle;
+    WeaponComponent* weapon;
+    ItemComponent* item;
+    WaypointComponent* waypoint;
+    HealthComponent* health;
+} Component;
+
+typedef struct {
+    int size;
+    int max_index;
+    Component* array[MAX_ENTITIES];
+    int order[MAX_ENTITIES];
+} OrderedArray;
+
+typedef struct {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     ImageComponent* image[MAX_ENTITIES];
@@ -201,14 +249,15 @@ typedef struct {
     WeaponComponent* weapon[MAX_ENTITIES];
     ItemComponent* item[MAX_ENTITIES];
     WaypointComponent* waypoint[MAX_ENTITIES];
-} Component;
+    HealthComponent* health[MAX_ENTITIES];
+} ComponentData;
 
-Component* Component_create();
+ComponentData* Component_create();
 
-int get_index(Component* component);
+int get_index(ComponentData* component);
 
-void destroy_entity(Component* component, int i);
+void destroy_entity(ComponentData* component, int i);
 
-sfVector2f get_position(Component* component, int i);
+sfVector2f get_position(ComponentData* component, int i);
 
-float get_angle(Component* component, int i);
+float get_angle(ComponentData* component, int i);

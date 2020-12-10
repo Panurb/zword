@@ -20,10 +20,12 @@ typedef struct{
 
 ColliderGrid* ColliderGrid_create();
 
-void update_grid(Component* component, ColliderGrid* collision_grid, int i);
+void update_grid(ComponentData* component, ColliderGrid* grid, int i);
 
-void clear_grid(Component* component, ColliderGrid* collision_grid, int i);
+void init_grid(ComponentData* component, ColliderGrid* grid);
 
-Bounds get_bounds(Component* component, ColliderGrid* grid, int i);
+void clear_grid(ComponentData* component, ColliderGrid* grid, int i);
 
-void get_neighbors(Component* component, ColliderGrid* grid, int i, int* array, int size);
+Bounds get_bounds(ComponentData* component, ColliderGrid* grid, int i);
+
+void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int* array, int size);

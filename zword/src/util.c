@@ -25,7 +25,7 @@ float dist(sfVector2f a, sfVector2f b) {
 
 sfVector2f normalized(sfVector2f v) {
     float n = norm(v);
-    if (fabs(n) < 1e-6) {
+    if (n == 0.0) {
         return v;
     }
     return (sfVector2f) { v.x / n, v.y / n };

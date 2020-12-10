@@ -11,10 +11,10 @@
 #define MAX_PATH_LENGTH 50
 
 
-bool a_star(Component* component, int start, int goal, int* path);
+bool a_star(ComponentData* component, int start, int goal, int* path);
 
-void init_waypoints(Component* component, ColliderGrid* grid);
+void init_waypoints(ComponentData* component, ColliderGrid* grid);
 
-void update_waypoints(Component* component, ColliderGrid* grid);
+void update_waypoints(ComponentData* component, ColliderGrid* grid);
 
-void draw_waypoints(Component* component, sfRenderWindow* window, Camera* camera);
+void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* camera);

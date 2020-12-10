@@ -98,6 +98,32 @@ void draw_circle(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, s
 }
 
 
+void draw_rectangle(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color) {
+    bool created = false;
+    if (!shape) {
+        shape = sfRectangleShape_create();
+        created = true;
+    }
+
+    sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * width * camera->zoom, 0.5 * height * camera->zoom });
+
+    sfRectangleShape_setPosition(shape, world_to_screen(position, camera));
+
+    sfVector2f size = { width * camera->zoom, height * camera->zoom };
+    sfRectangleShape_setSize(shape, size);
+
+    sfRectangleShape_setRotation(shape, -to_degrees(angle));
+
+    sfRectangleShape_setFillColor(shape, color);
+
+    sfRenderWindow_drawRectangleShape(window, shape, NULL);
+
+    if (created) {
+        sfRectangleShape_destroy(shape);
+    }
+}
+
+
 void draw_grid(sfRenderWindow* window, Camera* camera) {
     int nx = ceil(camera->width / camera->zoom) + 1;
     float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);
@@ -198,15 +224,18 @@ void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape
 }
 
 
-void update_camera(Component* component, Camera* camera, float time_step) {
-    sfVector2f pos;
+void update_camera(ComponentData* component, Camera* camera, float time_step) {
+    sfVector2f pos = { 0.0, 0.0 };
 
+    int n = 0;
     for (int i = 0; i < component->entities; i++) {
         if (component->player[i]) {
-            pos = get_position(component, i);
-            break;
+            n += 1;
+            pos = sum(pos, get_position(component, i));
         }
     }
+    pos = mult(1.0 / n, pos);
+
     camera->position = sum(camera->position, mult(10.0 * time_step, diff(pos, camera->position)));
-    camera->zoom += 10.0 * time_step * (40.0 - camera->zoom);
+    camera->zoom += 10.0 * time_step * (50.0 - camera->zoom);
 }

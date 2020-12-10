@@ -13,7 +13,7 @@
 #define INFINITY 10000.0
 
 
-void reconstruct_path(Component* component, int current, int* path) {
+void reconstruct_path(ComponentData* component, int current, int* path) {
     int i = 0;
     while(current != -1) {
         path[i] = current;
@@ -23,12 +23,12 @@ void reconstruct_path(Component* component, int current, int* path) {
 }
 
 
-float heuristic(Component* component, int start, int goal) {
+float heuristic(ComponentData* component, int start, int goal) {
     return dist(get_position(component, start), get_position(component, goal));
 }
 
 
-bool a_star(Component* component, int start, int goal, int* path) {
+bool a_star(ComponentData* component, int start, int goal, int* path) {
     Heap* open_set = Heap_create(component);
 
     Heap_insert(open_set, start);
@@ -85,7 +85,7 @@ bool a_star(Component* component, int start, int goal, int* path) {
 }
 
 
-float connection_distance(Component* component, ColliderGrid* grid, int i, int j) {
+float connection_distance(ComponentData* component, ColliderGrid* grid, int i, int j) {
     sfVector2f a = get_position(component, i);
     sfVector2f b = get_position(component, j);
     sfVector2f v = diff(b, a);
@@ -100,7 +100,7 @@ float connection_distance(Component* component, ColliderGrid* grid, int i, int j
 }
 
 
-void init_waypoints(Component* component, ColliderGrid* grid) {
+void init_waypoints(ComponentData* component, ColliderGrid* grid) {
     for (int i = 0; i < component->entities; i++) {
         WaypointComponent* waypoint = component->waypoint[i];
         if (!waypoint) continue;
@@ -134,7 +134,7 @@ void init_waypoints(Component* component, ColliderGrid* grid) {
 }
 
 
-void clear_waypoints(Component* component) {
+void clear_waypoints(ComponentData* component) {
     for (int i = 0; i < component->entities; i++) {
         WaypointComponent* waypoint = component->waypoint[i];
         if (!waypoint) continue;
@@ -154,7 +154,7 @@ void clear_waypoints(Component* component) {
 }
 
 
-void update_waypoints(Component* component, ColliderGrid* grid) {
+void update_waypoints(ComponentData* component, ColliderGrid* grid) {
     clear_waypoints(component);
 
     for (int i = 0; i < component->entities; i++) {
@@ -191,7 +191,7 @@ void update_waypoints(Component* component, ColliderGrid* grid) {
 }
 
 
-void draw_waypoints(Component* component, sfRenderWindow* window, Camera* camera) {
+void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* camera) {
     sfCircleShape* shape = sfCircleShape_create();
     sfRectangleShape* line = sfRectangleShape_create();
 

@@ -27,7 +27,7 @@ ColliderGrid* ColliderGrid_create() {
 }
 
 
-Bounds get_bounds(Component* component, ColliderGrid* grid, int i) {
+Bounds get_bounds(ComponentData* component, ColliderGrid* grid, int i) {
     CoordinateComponent* coord = component->coordinate[i];
     ColliderComponent* col = component->collider[i];
     
@@ -54,7 +54,7 @@ Bounds get_bounds(Component* component, ColliderGrid* grid, int i) {
 }
 
 
-void update_grid(Component* component, ColliderGrid* grid, int i) {
+void update_grid(ComponentData* component, ColliderGrid* grid, int i) {
     Bounds bounds = get_bounds(component, grid, i);
 
     for (int j = bounds.left; j <= bounds.right; j++) {
@@ -70,7 +70,17 @@ void update_grid(Component* component, ColliderGrid* grid, int i) {
 }
 
 
-void clear_grid(Component* component, ColliderGrid* grid, int i) {
+void init_grid(ComponentData* component, ColliderGrid* grid) {
+    for (int i = 0; i < component->entities; i++) {
+        if (!component->collider[i]) continue;
+        
+        update_grid(component, grid, i);
+    }
+
+}
+
+
+void clear_grid(ComponentData* component, ColliderGrid* grid, int i) {
     Bounds bounds = get_bounds(component, grid, i);
     
     for (int j = bounds.left; j <= bounds.right; j++) {
@@ -86,7 +96,7 @@ void clear_grid(Component* component, ColliderGrid* grid, int i) {
 }
 
 
-void get_neighbors(Component* component, ColliderGrid* grid, int i, int* array, int size) {
+void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int* array, int size) {
     Bounds bounds = get_bounds(component, grid, i);
 
     for (int j = 0; j < size; j++) {

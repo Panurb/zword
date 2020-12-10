@@ -7,12 +7,14 @@
 #include "grid.h"
 
 
-sfVector2f half_width(Component* component, int i);
+void get_corners(ComponentData* component, int i, sfVector2f* corners) ;
 
-sfVector2f half_height(Component* component, int i);
+sfVector2f half_width(ComponentData* component, int i);
 
-float axis_half_width(Component* component, int i, sfVector2f axis);
+sfVector2f half_height(ComponentData* component, int i);
 
-void collide(Component* component, ColliderGrid* collision_grid);
+float axis_half_width(ComponentData* component, int i, sfVector2f axis);
 
-void debug_draw(Component* component, sfRenderWindow* window, Camera* camera);
+void collide(ComponentData* component, ColliderGrid* collision_grid);
+
+void debug_draw(ComponentData* component, sfRenderWindow* window, Camera* camera);

@@ -17,7 +17,22 @@
 #include "weapon.h"
 
 
-void pick_up_item(Component* component, int i) {
+void create_player(ComponentData* component, sfVector2f pos) {
+    int i = get_index(component);
+
+    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
+    component->image[i] = ImageComponent_create("player", 1.0, 1.0, 4);
+    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0, 0.0);
+    component->physics[i]->max_speed = 5.0;
+    component->collider[i] = ColliderComponent_create_circle(0.5);
+    component->player[i] = PlayerComponent_create();
+    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
+    component->waypoint[i] = WaypointComponent_create();
+    component->health[i] = HealthComponent_create(100);
+}
+
+
+void pick_up_item(ComponentData* component, int i) {
     PlayerComponent* player = component->player[i];
 
     for (int j = 0; j < component->entities; j++) {
@@ -30,7 +45,6 @@ void pick_up_item(Component* component, int i) {
                     component->coordinate[j]->parent = i;
                     component->coordinate[j]->position = (sfVector2f) { 0.0, 0.0 };
                     component->coordinate[j]->angle = 0.0;
-                    component->collider[j]->enabled = false;
                 }
                 break;
             }
@@ -39,7 +53,7 @@ void pick_up_item(Component* component, int i) {
 }
 
 
-void drop_item(Component* component, int i) {
+void drop_item(ComponentData* component, int i) {
     PlayerComponent* player = component->player[i];
 
     int j = player->inventory[player->item];
@@ -48,7 +62,6 @@ void drop_item(Component* component, int i) {
         component->coordinate[j]->parent = -1;
         sfVector2f r = polar_to_cartesian(1.0, get_angle(component, i));
         component->coordinate[j]->position = sum(get_position(component, i), r);
-        component->collider[j]->enabled = true;
         component->physics[j]->velocity = mult(7.0, r);
         component->physics[j]->angular_velocity = 3.0;
 
@@ -59,7 +72,7 @@ void drop_item(Component* component, int i) {
 }
 
 
-bool enter_vehicle(Component* component, int i) {
+bool enter_vehicle(ComponentData* component, int i) {
     for (int j = 0; j < component->entities; j++) {
         if (component->vehicle[j]) {
             float d = dist(get_position(component, i), get_position(component, j));
@@ -82,7 +95,7 @@ bool enter_vehicle(Component* component, int i) {
 }
 
 
-void exit_vehicle(Component* component, int i) {
+void exit_vehicle(ComponentData* component, int i) {
     int j = component->player[i]->vehicle;
     component->player[i]->vehicle = -1;
     component->vehicle[j]->driver = -1;
@@ -90,7 +103,7 @@ void exit_vehicle(Component* component, int i) {
 }
 
 
-void drive_vehicle(Component* component, int i, sfVector2f v, float delta_time) {
+void drive_vehicle(ComponentData* component, int i, sfVector2f v, float delta_time) {
     int j = component->player[i]->vehicle;
 
     VehicleComponent* vehicle = component->vehicle[j];
@@ -136,7 +149,7 @@ sfVector2f left_stick() {
 }
 
 
-sfVector2f right_stick(Component* component, sfRenderWindow* window, Camera* camera, int i) {
+sfVector2f right_stick(ComponentData* component, sfRenderWindow* window, Camera* camera, int i) {
     sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
     sfVector2f rel_mouse = diff(mouse, get_position(component, i));
 
@@ -144,7 +157,7 @@ sfVector2f right_stick(Component* component, sfRenderWindow* window, Camera* cam
 }
 
 
-int get_inventory_slot(Component* component, sfRenderWindow* window, Camera* camera, int i) {
+int get_inventory_slot(ComponentData* component, sfRenderWindow* window, Camera* camera, int i) {
     PlayerComponent* player = component->player[i];
 
     sfVector2f rs = right_stick(component, window, camera, i);
@@ -154,7 +167,7 @@ int get_inventory_slot(Component* component, sfRenderWindow* window, Camera* cam
 }
 
 
-int get_attachment(Component* component, sfRenderWindow* window, Camera* camera, int i) {
+int get_attachment(ComponentData* component, sfRenderWindow* window, Camera* camera, int i) {
     PlayerComponent* player = component->player[i];
     int slot = get_inventory_slot(component, window, camera, i);
     int item = player->inventory[slot];
@@ -175,7 +188,7 @@ int get_attachment(Component* component, sfRenderWindow* window, Camera* camera,
 }
 
 
-void input(Component* component) {
+void input(ComponentData* component) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->player[i]) continue;
         
@@ -265,7 +278,7 @@ void input(Component* component) {
 }
 
 
-void update_players(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step) {
+void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step) {
     for (int i = 0; i < component->entities; i++) {
         PlayerComponent* player = component->player[i];
         if (!player) continue;
@@ -391,7 +404,7 @@ void update_players(Component* component, ColliderGrid* grid, sfRenderWindow* wi
                         player->inventory[slot] = player->grabbed_item;
                         component->coordinate[player->grabbed_item]->parent = i;
                     } else if (atch != -1) {
-                        if (component->item[player->inventory[slot]]->attachments[atch] == -1) {
+                        if (player->inventory[slot] != player->grabbed_item && component->item[player->inventory[slot]]->attachments[atch] == -1) {
                             replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
                             for (int j = 0; j < player->inventory_size; j++) {
                                 if (player->inventory[j] == -1) continue;
@@ -411,21 +424,7 @@ void update_players(Component* component, ColliderGrid* grid, sfRenderWindow* wi
 }
 
 
-void create_player(Component* component, sfVector2f pos) {
-    int i = get_index(component);
-
-    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->image[i] = ImageComponent_create("player", 1.0);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0, 0.0);
-    component->physics[i]->max_speed = 5.0;
-    component->collider[i] = ColliderComponent_create_circle(0.5);
-    component->player[i] = PlayerComponent_create();
-    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
-    component->waypoint[i] = WaypointComponent_create();
-}
-
-
-void draw_menu_slot(Component* component, sfRenderWindow* window, Camera* camera, int i, int j, float offset, float alpha) {
+void draw_menu_slot(ComponentData* component, sfRenderWindow* window, Camera* camera, int i, int j, float offset, float alpha) {
     PlayerComponent* player = component->player[i];
     sfVector2f pos = get_position(component, i);
 
@@ -448,7 +447,7 @@ void draw_menu_slot(Component* component, sfRenderWindow* window, Camera* camera
 }
 
 
-void draw_menu_attachment(Component* component, sfRenderWindow* window, Camera* camera, int i, int j, int k, float offset, float alpha) {
+void draw_menu_attachment(ComponentData* component, sfRenderWindow* window, Camera* camera, int i, int j, int k, float offset, float alpha) {
     PlayerComponent* player = component->player[i];
     sfVector2f pos = get_position(component, i);
     ItemComponent* item = component->item[player->inventory[j]];
@@ -470,7 +469,7 @@ void draw_menu_attachment(Component* component, sfRenderWindow* window, Camera* 
 }
 
 
-void draw_players(Component* component, sfRenderWindow* window, Camera* camera) {
+void draw_players(ComponentData* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         PlayerComponent* player = component->player[i];
         if (!player) continue;
@@ -527,6 +526,13 @@ void draw_players(Component* component, sfRenderWindow* window, Camera* camera) 
                     if (player->inventory[j] != -1) {
                         ItemComponent* item = component->item[player->inventory[j]];
                         for (int k = 0; k < item->size; k++) {
+                            if (j == slot) {
+                                offset = 0.2;
+                                if (k == atch && item->attachments[k] != -1) {
+                                    offset = 0.4;
+                                }
+                            }
+
                             draw_menu_attachment(component, window, camera, i, j, k, offset, alpha);
                         }
                     }

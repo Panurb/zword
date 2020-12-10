@@ -52,7 +52,7 @@ void heapify(Heap* heap, int i) {
 }
 
 
-Heap* Heap_create(Component* component) {
+Heap* Heap_create(ComponentData* component) {
     Heap* heap = malloc(sizeof(Heap));
     heap->size = 0;
     heap->component = component;

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include <SFML/Graphics.h>
 #include <SFML/System/Vector2.h>
@@ -21,11 +22,14 @@ CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle) {
 }
 
 
-ImageComponent* ImageComponent_create(char filename[20], float scale) {
+ImageComponent* ImageComponent_create(Filename filename, float width, float height, int layer) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
-    image->scale = (sfVector2f) { scale, scale };
-    image->sprite = load_sprite(filename);
+    strcpy(image->filename, filename);
+    image->width = width;
+    image->height = height;
+    image->sprite = sfSprite_create();
     image->shine = 0.0;
+    image->layer = layer;
     return image;
 }
 
@@ -57,8 +61,6 @@ ColliderComponent* ColliderComponent_create_circle(float radius) {
     col->radius = radius;
     col->width = 2 * radius;
     col->height = 2 * radius;
-    col->circ = sfCircleShape_create();
-    sfCircleShape_setFillColor(col->circ, sfColor_fromRGB(150, 0, 150));
     return col;
 }
 
@@ -71,15 +73,12 @@ ColliderComponent* ColliderComponent_create_rectangle(float width, float height)
     col->radius = sqrtf(width * width + height * height);
     col->width = width;
     col->height = height;
-    col->rect = sfRectangleShape_create();
-    sfRectangleShape_setFillColor(col->rect, sfColor_fromRGB(50, 50, 50));
     return col;
 }
 
 
 PlayerComponent* PlayerComponent_create() {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
-    player->health = 100;
     player->acceleration = 20.0;
     player->vehicle = -1;
     player->item = 0;
@@ -108,9 +107,11 @@ LightComponent* LightComponent_create(float range, float angle, int rays, sfColo
     light->brightness = 0.0;
     light->max_brightness = brightness;
     light->smoothing = 0;
+
     light->shape = sfConvexShape_create();
     sfConvexShape_setFillColor(light->shape, color);
     sfConvexShape_setPointCount(light->shape, 3);
+
     light->shine = sfCircleShape_create();
     light->flicker = 0.1;
     light->speed = speed;
@@ -120,12 +121,14 @@ LightComponent* LightComponent_create(float range, float angle, int rays, sfColo
 
 EnemyComponent* EnemyComponent_create() {
     EnemyComponent* enemy = malloc(sizeof(EnemyComponent));
-    enemy->health = 100;
+    enemy->state = IDLE;
     enemy->acceleration = 15.0;
     enemy->target = -1;
     for (int i = 0; i < MAX_PATH_LENGTH; i++) {
         enemy->path[i] = -1;
     }
+    enemy->fov = 0.25 * M_PI;
+    enemy->vision_range = 15.0;
     return enemy;
 }
 
@@ -217,8 +220,15 @@ WaypointComponent* WaypointComponent_create() {
 }
 
 
-Component* Component_create() {
-    Component* component = malloc(sizeof(Component));
+HealthComponent* HealthComponent_create(int health) {
+    HealthComponent* comp = malloc(sizeof(HealthComponent));
+    comp->health = health;
+    return comp;
+}
+
+
+ComponentData* Component_create() {
+    ComponentData* component = malloc(sizeof(ComponentData));
     component->entities = 0;
     for (int i = 0; i < MAX_ENTITIES; i++) {
         component->coordinate[i] = NULL;
@@ -233,12 +243,18 @@ Component* Component_create() {
         component->weapon[i] = NULL;
         component->item[i] = NULL;
         component->waypoint[i] = NULL;
+        component->health[i] = NULL;
     }
     return component;
 }
 
 
-int get_index(Component* component) {
+ImageComponent* ImageComponent_get(ComponentData* component, int i) {
+    return component->image[i];
+}
+
+
+int get_index(ComponentData* component) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->coordinate[i]) {
             return i;
@@ -250,7 +266,7 @@ int get_index(Component* component) {
 }
 
 
-void destroy_entity(Component* component, int i) {
+void destroy_entity(ComponentData* component, int i) {
     if (component->coordinate[i]) {
         free(component->coordinate[i]);
         component->coordinate[i] = NULL;
@@ -299,6 +315,10 @@ void destroy_entity(Component* component, int i) {
         free(component->waypoint[i]);
         component->waypoint[i] = NULL;
     }
+    if (component->health[i]) {
+        free(component->health[i]);
+        component->health[i] = NULL;
+    }
 
     if (i == component->entities - 1) {
         component->entities--;
@@ -306,7 +326,7 @@ void destroy_entity(Component* component, int i) {
 }
 
 
-sfVector2f get_position(Component* component, int i) {
+sfVector2f get_position(ComponentData* component, int i) {
     sfVector2f position = component->coordinate[i]->position;
 
     int parent = component->coordinate[i]->parent;
@@ -317,12 +337,13 @@ sfVector2f get_position(Component* component, int i) {
 }
 
 
-float get_angle(Component* component, int i) {
+float get_angle(ComponentData* component, int i) {
     float angle = component->coordinate[i]->angle;
 
     int parent = component->coordinate[i]->parent;
     if (parent != -1) {
         angle += get_angle(component, parent);
     }
+
     return angle;
 }

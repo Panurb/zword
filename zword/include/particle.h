@@ -1,6 +1,6 @@
 #pragma once
 
 
-void update_particles(Component* component, float delta_time);
+void update_particles(ComponentData* component, float delta_time);
 
-void draw_particles(Component* component, sfRenderWindow* window, Camera* camera);
+void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera);

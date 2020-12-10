@@ -8,7 +8,7 @@
 #include "grid.h"
 
 
-void update(Component* component, float delta_time, ColliderGrid* collision_grid) {
+void update(ComponentData* component, float delta_time, ColliderGrid* collision_grid) {
     for (int i = 0; i < component->entities; i++) {
         PhysicsComponent* physics = component->physics[i];
 

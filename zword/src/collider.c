@@ -15,17 +15,30 @@
 #include "grid.h"
 
 
-sfVector2f half_width(Component* component, int i) {
+void get_corners(ComponentData* component, int i, sfVector2f* corners) {
+    CoordinateComponent* coord = component->coordinate[i];
+
+    sfVector2f hw = half_width(component, i);
+    sfVector2f hh = half_height(component, i);
+
+    corners[0] = sum(coord->position, sum(hw, hh));
+    corners[1] = diff(corners[0], mult(2, hh));
+    corners[2] = diff(corners[1], mult(2, hw));
+    corners[3] = sum(corners[2], mult(2, hh));
+}
+
+
+sfVector2f half_width(ComponentData* component, int i) {
     return polar_to_cartesian(0.5 * component->collider[i]->width, component->coordinate[i]->angle);
 }
 
 
-sfVector2f half_height(Component* component, int i) {
+sfVector2f half_height(ComponentData* component, int i) {
     return polar_to_cartesian(0.5 * component->collider[i]->height, component->coordinate[i]->angle + 0.5 * M_PI);
 }
 
 
-float axis_half_width(Component* component, int i, sfVector2f axis) {
+float axis_half_width(ComponentData* component, int i, sfVector2f axis) {
     ColliderComponent* col = component->collider[i];
 
     if (col->type == RECTANGLE) {
@@ -53,7 +66,8 @@ float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f 
     return 0.0;
 }
 
-sfVector2f overlap_circle_circle(Component* component, int i, int j) {
+
+sfVector2f overlap_circle_circle(ComponentData* component, int i, int j) {
     sfVector2f a = component->coordinate[i]->position;
     sfVector2f b = component->coordinate[j]->position;
 
@@ -71,7 +85,8 @@ sfVector2f overlap_circle_circle(Component* component, int i, int j) {
     return mult(r / d - 1, diff(a, b));
 }
 
-sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
+
+sfVector2f overlap_rectangle_circle(ComponentData* component, int i, int j) {
     bool near_corner = true;
 
     float overlaps[2] = { 0.0, 0.0 };
@@ -116,11 +131,11 @@ sfVector2f overlap_rectangle_circle(Component* component, int i, int j) {
     return (sfVector2f) { 0.0, 0.0 };
 }
 
-sfVector2f overlap_circle_rectangle(Component* component, int i, int j) {
+sfVector2f overlap_circle_rectangle(ComponentData* component, int i, int j) {
     return mult(-1.0, overlap_rectangle_circle(component, j, i));
 }
 
-sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
+sfVector2f overlap_rectangle_rectangle(ComponentData* component, int i, int j) {
     sfVector2f hw_i = polar_to_cartesian(1.0, component->coordinate[i]->angle);
     sfVector2f hw_j = polar_to_cartesian(1.0, component->coordinate[j]->angle);
 
@@ -144,7 +159,8 @@ sfVector2f overlap_rectangle_rectangle(Component* component, int i, int j) {
     return mult(overlaps[k], axes[k]);
 }
 
-sfVector2f overlap(Component* component, int i, int j) {
+
+sfVector2f overlap(ComponentData* component, int i, int j) {
     sfVector2f ol = { 0.0, 0.0 };
 
     ColliderComponent* a = component->collider[i];
@@ -172,8 +188,18 @@ sfVector2f overlap(Component* component, int i, int j) {
 }
 
 
-void collide(Component* component, ColliderGrid* grid) {
+void collide(ComponentData* component, ColliderGrid* grid) {
+    // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
+
     for (int i = 0; i < component->entities; i++) {
+        if (!component->collider[i]) continue;
+
+        component->collider[i]->last_collision = -1;
+    }
+
+    for (int i = 0; i < component->entities; i++) {
+        if (!component->collider[i]) continue;
+
         PhysicsComponent* physics = component->physics[i];
         if (!physics) continue;
 
@@ -183,6 +209,7 @@ void collide(Component* component, ColliderGrid* grid) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
                 for (int l = 0; l < grid->size; l++) {
                     int n = grid->array[j][k][l];
+
                     if (n == -1) continue;
                     if (n == i) continue;
                     if (component->collider[n]->last_collision == i) continue;
@@ -193,19 +220,20 @@ void collide(Component* component, ColliderGrid* grid) {
 
                     if (ol.x == 0.0 && ol.y == 0.0) continue;
 
+                    sfVector2f dv = physics->velocity;
+                    sfVector2f no = normalized(ol);
+
                     float m = 1.0;
-                    sfVector2f other_vel = { 0.0, 0.0 };
-                    if (component->physics[n]) {
-                        m = component->physics[n]->mass / (physics->mass + component->physics[n]->mass);
-                        other_vel = component->physics[n]->velocity;
+
+                    PhysicsComponent* other = component->physics[n];
+                    if (other) {
+                        dv = diff(dv, other->velocity);
+                        m = other->mass / (physics->mass + other->mass);
                     }
 
-                    sfVector2f dv = diff(physics->velocity, other_vel);
-                    sfVector2f no = normalized(ol);
                     sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, no), no));
 
                     physics->collision.velocity = sum(physics->collision.velocity, new_vel);
-
                     physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
                 }
             }
@@ -214,7 +242,7 @@ void collide(Component* component, ColliderGrid* grid) {
 }
 
 
-void draw_occupied_tiles(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+void draw_occupied_tiles(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         Bounds bounds = get_bounds(component, grid, i);
         for (int j = bounds.left; j <= bounds.right; j++) {
@@ -243,32 +271,16 @@ void draw_occupied_tiles(Component* component, ColliderGrid* grid, sfRenderWindo
 }
 
 
-void debug_draw(Component* component, sfRenderWindow* window, Camera* camera) {
+void debug_draw(ComponentData* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
         ColliderComponent* col = component->collider[i];
         if (!col) continue;
 
         if (col->type == CIRCLE) {
-            sfCircleShape_setOrigin(col->circ, (sfVector2f) { col->radius * camera->zoom, col->radius * camera->zoom });
-
-            sfVector2f pos = get_position(component, i);
-            sfCircleShape_setPosition(col->circ, world_to_screen(pos, camera));
-
-            sfCircleShape_setRadius(col->circ, col->radius * camera->zoom);
-
-            sfRenderWindow_drawCircleShape(window, col->circ, NULL);
+            draw_circle(window, camera, NULL, get_position(component, i), col->radius, sfColor_fromRGB(150, 0, 150));
         } else {
-            sfRectangleShape_setOrigin(col->rect, (sfVector2f) { 0.5 * col->width * camera->zoom, 0.5 * col->height * camera->zoom });
-
-            sfVector2f pos = get_position(component, i);
-            sfRectangleShape_setPosition(col->rect, world_to_screen(pos, camera));
-
-            sfVector2f size = { col->width * camera->zoom, col->height * camera->zoom };
-            sfRectangleShape_setSize(col->rect, size);
-
-            sfRectangleShape_setRotation(col->rect, -to_degrees(get_angle(component, i)));
-
-            sfRenderWindow_drawRectangleShape(window, col->rect, NULL);
+            sfColor color = sfColor_fromRGB(50, 50, 50);
+            draw_rectangle(window, camera, NULL, get_position(component, i), col->width, col->height, get_angle(component, i), color);
         }
     }
 }

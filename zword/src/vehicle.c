@@ -1,16 +1,7 @@
 #include "component.h"
 
 
-void update_vehicles(Component* component, float delta_time) {
-    for (int i = 0; i < component->entities; i++) {
-        VehicleComponent* vehicle = component->vehicle[i];
-
-        if (!vehicle) continue;
-    }
-}
-
-
-void create_car(Component* component, float x, float y) {
+void create_car(ComponentData* component, float x, float y) {
     int i = get_index(component);
     sfVector2f pos = { x, y };
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
@@ -19,6 +10,8 @@ void create_car(Component* component, float x, float y) {
     component->physics[i]->max_angular_speed = 2.5;
     component->vehicle[i] = VehicleComponent_create();
     component->waypoint[i] = WaypointComponent_create();
+    component->image[i] = ImageComponent_create("car", 6.0, 3.0, 3);
+    //component->image[i]->shine = 1.0;
 
     i = get_index(component);
     component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 3.1, 1.0 }, 0.0);

@@ -3,4 +3,4 @@
 #include "component.h"
 
 
-void update(Component* component, float deltaTime, ColliderGrid* collision_grid);
+void update(ComponentData* component, float deltaTime, ColliderGrid* collision_grid);

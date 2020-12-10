@@ -3,4 +3,4 @@
 #include "component.h"
 
 
-void create_level(Component* component);
+void create_level(ComponentData* component);

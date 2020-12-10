@@ -10,6 +10,8 @@ typedef struct {
     float d;
 } Matrix2f;
 
+typedef char Filename[20];
+
 float norm(sfVector2f v);
 
 float norm2(sfVector2f v);

@@ -5,10 +5,10 @@
 #include "component.h"
 
 
-void input(Component* component);
+void input(ComponentData* component);
 
-void create_player(Component* component, sfVector2f pos);
+void create_player(ComponentData* component, sfVector2f pos);
 
-void update_players(Component* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step);
+void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step);
 
-void draw_players(Component* component, sfRenderWindow* window, Camera* camera);
+void draw_players(ComponentData* component, sfRenderWindow* window, Camera* camera);
