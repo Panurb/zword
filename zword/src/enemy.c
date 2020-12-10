@@ -19,6 +19,7 @@ void update_enemies(ComponentData* component, ColliderGrid* grid) {
 
         EnemyComponent* enemy = component->enemy[i];
         PhysicsComponent* phys = component->physics[i];
+        ImageComponent* image = ImageComponent_get(component, i);
 
         switch (enemy->state) {
             case IDLE:
@@ -64,8 +65,11 @@ void update_enemies(ComponentData* component, ColliderGrid* grid) {
 
                 break;
             case DEAD:
-                component->collider[i]->enabled = false;
-                strcpy(component->image[i]->filename, "zombie_dead");
+                if (norm(phys->velocity) == 0.0) {
+                    component->collider[i]->enabled = false;
+                }
+                strcpy(image->filename, "zombie_dead");
+                image->width = 2.0;
 
                 break;
         }
@@ -82,8 +86,8 @@ void create_enemy(ComponentData* component, sfVector2f pos) {
 
     float angle = float_rand(0.0, 2 * M_PI);
     component->coordinate[i] = CoordinateComponent_create(pos, angle);
-    component->image[i] = ImageComponent_create("zombie", 1.0, 1.0, 4);
-    component->image[i]->shine = 0.5;
+    ImageComponent_add(component, i, "zombie", 1.0, 1.0, 4);
+    //component->image[i]->shine = 0.5;
     component->collider[i] = ColliderComponent_create_circle(0.5);
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.5, 5.0, 10.0);
     component->physics[i]->max_speed = 5.0;

@@ -35,11 +35,15 @@ void shoot(ComponentData* component, ColliderGrid* grid, int i) {
 
             if (component->health[info.object]) {
                 float x = dot(info.normal, normalized(r));
-                if (x < -0.9) {
+                if (x < -0.99) {
                     component->health[info.object]->health = 0.0;
                 } else {
                     component->health[info.object]->health -= weapon->damage;
                 }
+            }
+
+            if (component->enemy[info.object]) {
+                component->coordinate[info.object]->angle = get_angle(component, parent) + angle + M_PI;
             }
 
             if (component->physics[info.object]) {
@@ -72,7 +76,7 @@ void create_weapon(ComponentData* component, float x, float y) {
     component->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
     component->particle[i]->speed_spread = 0.0;
     component->item[i] = ItemComponent_create(1);
-    component->image[i] = ImageComponent_create("pistol", 1.0, 1.0, 3);
+    ImageComponent_add(component, i, "pistol", 1.0, 1.0, 3);
 }
 
 

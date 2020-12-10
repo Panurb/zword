@@ -27,7 +27,7 @@ void create_wall(ComponentData* component, sfVector2f pos, float width, float he
 
     component->coordinate[i] = CoordinateComponent_create(pos, angle);
     component->collider[i] = ColliderComponent_create_rectangle(width, height);
-    component->image[i] = ImageComponent_create("brick_tile", width, height, 2);
+    ImageComponent_add(component, i, "brick_tile", width, height, 2);
 }
 
 
@@ -49,7 +49,7 @@ void create_fire(ComponentData* component, sfVector2f pos) {
     component->particle[i]->loop = true;
     component->particle[i]->enabled = true;
     component->collider[i] = ColliderComponent_create_circle(0.35);
-    component->image[i] = ImageComponent_create("fire", 1.0, 1.0, 5);
+    ImageComponent_add(component, i, "fire", 1.0, 1.0, 5);
 }
 
 
@@ -57,7 +57,7 @@ void create_floor(ComponentData* component, sfVector2f pos, float width, float h
     int i = get_index(component);
 
     component->coordinate[i] = CoordinateComponent_create(pos, angle);
-    component->image[i] = ImageComponent_create("board_tile", width, height, 1);
+    ImageComponent_add(component, i, "board_tile", width, height, 1);
 }
 
 
@@ -103,7 +103,7 @@ void create_flashlight(ComponentData* component, float x, float y) {
     component->item[i] = ItemComponent_create(0);
     component->light[i] = LightComponent_create(7.0, 1.0, 51, sfColor_fromRGB(255, 255, 150), 0.75, 10.0);
     component->light[i]->enabled = false;
-    component->image[i] = ImageComponent_create("flashlight", 1.0, 1.0, 3);
+    ImageComponent_add(component, i, "flashlight", 1.0, 1.0, 3);
 }
 
 

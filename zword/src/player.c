@@ -21,7 +21,7 @@ void create_player(ComponentData* component, sfVector2f pos) {
     int i = get_index(component);
 
     component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->image[i] = ImageComponent_create("player", 1.0, 1.0, 4);
+    ImageComponent_add(component, i, "player", 1.0, 1.0, 5);
     component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0, 0.0);
     component->physics[i]->max_speed = 5.0;
     component->collider[i] = ColliderComponent_create_circle(0.5);

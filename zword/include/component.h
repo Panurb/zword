@@ -29,8 +29,6 @@ typedef struct {
     int layer;
 } ImageComponent;
 
-ImageComponent* ImageComponent_create(Filename filename, float width, float height, int layer);
-
 typedef struct {
     sfVector2f velocity;
     sfVector2f acceleration;
@@ -212,33 +210,19 @@ HealthComponent* HealthComponent_create(int health);
 
 
 
-typedef union {
-    CoordinateComponent* coordinate;
-    ImageComponent* image;
-    PhysicsComponent* physics;
-    ColliderComponent* collider;
-    PlayerComponent* player;
-    LightComponent* light;
-    EnemyComponent* enemy;
-    ParticleComponent* particle;
-    VehicleComponent* vehicle;
-    WeaponComponent* weapon;
-    ItemComponent* item;
-    WaypointComponent* waypoint;
-    HealthComponent* health;
-} Component;
+
 
 typedef struct {
     int size;
     int max_index;
-    Component* array[MAX_ENTITIES];
+    ImageComponent* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
 } OrderedArray;
 
 typedef struct {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
-    ImageComponent* image[MAX_ENTITIES];
+    OrderedArray image;
     PhysicsComponent* physics[MAX_ENTITIES];
     ColliderComponent* collider[MAX_ENTITIES];
     PlayerComponent* player[MAX_ENTITIES];
@@ -252,7 +236,10 @@ typedef struct {
     HealthComponent* health[MAX_ENTITIES];
 } ComponentData;
 
-ComponentData* Component_create();
+ComponentData* ComponentData_create();
+
+void ImageComponent_add(ComponentData* component, int i, Filename filename, float width, float height, int layer);
+ImageComponent* ImageComponent_get(ComponentData* component, int i);
 
 int get_index(ComponentData* component);
 

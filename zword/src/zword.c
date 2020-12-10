@@ -59,7 +59,7 @@ int main() {
     float time_step = 1.0 / 60.0;
     float elapsed_time = 0.0;
 
-    ComponentData* component = Component_create();
+    ComponentData* component = ComponentData_create();
 
     Camera* camera = Camera_create(mode);
 
@@ -69,33 +69,9 @@ int main() {
     component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 0.0, 0.0 }, 0.0);
     int w = grid->tile_width * grid->width;
     int h = grid->tile_height * grid->height;
-    component->image[i] = ImageComponent_create("grass_tile", w, h, 0);
+    ImageComponent_add(component, i, "grass_tile", w, h, 0);
 
     create_level(component);
-
-    /*
-    int draw_order[MAX_ENTITIES];
-    int draw_order_size = 0;
-
-    for (int i = 0; i < component->entities; i++) {
-        if (component->image[i]) {
-            draw_order[draw_order_size] = i;
-            draw_order_size++;
-        }
-    }
-
-    i = 1;
-    while (i < draw_order_size) {
-        int x = draw_order[i];
-        int j = i - 1;
-        while (j >= 0 && component->image[j]->layer > component->image[i]->layer) {
-            draw_order[j + 1] = draw_order[j];
-            j--;
-        }
-        draw_order[j + 1] = x;
-        i++;
-    }
-    */
 
     init_grid(component, grid);
     init_waypoints(component, grid);

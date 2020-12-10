@@ -10,7 +10,7 @@ void create_car(ComponentData* component, float x, float y) {
     component->physics[i]->max_angular_speed = 2.5;
     component->vehicle[i] = VehicleComponent_create();
     component->waypoint[i] = WaypointComponent_create();
-    component->image[i] = ImageComponent_create("car", 6.0, 3.0, 3);
+    ImageComponent_add(component, i, "car", 6.0, 3.0, 4);
     //component->image[i]->shine = 1.0;
 
     i = get_index(component);

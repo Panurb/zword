@@ -22,18 +22,6 @@ CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle) {
 }
 
 
-ImageComponent* ImageComponent_create(Filename filename, float width, float height, int layer) {
-    ImageComponent* image = malloc(sizeof(ImageComponent));
-    strcpy(image->filename, filename);
-    image->width = width;
-    image->height = height;
-    image->sprite = sfSprite_create();
-    image->shine = 0.0;
-    image->layer = layer;
-    return image;
-}
-
-
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = (sfVector2f) { 0, 0 };
@@ -227,12 +215,17 @@ HealthComponent* HealthComponent_create(int health) {
 }
 
 
-ComponentData* Component_create() {
+ComponentData* ComponentData_create() {
     ComponentData* component = malloc(sizeof(ComponentData));
     component->entities = 0;
+
+    component->image.size = 0;
+    component->image.max_index = -1;
+
     for (int i = 0; i < MAX_ENTITIES; i++) {
+        component->image.array[i] = NULL;
+
         component->coordinate[i] = NULL;
-        component->image[i] = NULL;
         component->physics[i] = NULL;
         component->collider[i] = NULL;
         component->player[i] = NULL;
@@ -249,8 +242,40 @@ ComponentData* Component_create() {
 }
 
 
+void ImageComponent_add(ComponentData* component, int i, Filename filename, float width, float height, int layer) {
+    ImageComponent* image = malloc(sizeof(ImageComponent));
+    strcpy(image->filename, filename);
+    image->width = width;
+    image->height = height;
+    image->sprite = sfSprite_create();
+    image->shine = 0.0;
+    image->layer = layer;
+    
+    component->image.array[i] = image;
+    if (i > component->image.max_index) {
+        component->image.max_index = i;
+    }
+
+    component->image.order[component->image.size] = i;
+    component->image.size++;
+
+    int j = 1;
+    while (j < component->image.size) {
+        int x = component->image.order[j];
+        int k = j - 1;
+        while (k >= 0 && component->image.array[component->image.order[k]]->layer > component->image.array[x]->layer) {
+            component->image.order[k + 1] = component->image.order[k];
+            k--;
+        }
+        component->image.order[k + 1] = x;
+        j++;
+    }
+}
+
+
 ImageComponent* ImageComponent_get(ComponentData* component, int i) {
-    return component->image[i];
+    if (i == -1) return NULL;
+    return component->image.array[i];
 }
 
 
@@ -267,6 +292,7 @@ int get_index(ComponentData* component) {
 
 
 void destroy_entity(ComponentData* component, int i) {
+    /*
     if (component->coordinate[i]) {
         free(component->coordinate[i]);
         component->coordinate[i] = NULL;
@@ -323,6 +349,7 @@ void destroy_entity(ComponentData* component, int i) {
     if (i == component->entities - 1) {
         component->entities--;
     }
+    */
 }
 
 

@@ -22,7 +22,8 @@ static const char* IMAGES[] = {
     "grass_tile",
     "pistol",
     "player",
-    "zombie"
+    "zombie",
+    "zombie_dead"
 };
 
 
@@ -75,23 +76,24 @@ void set_texture(ImageComponent* image, TextureArray textures) {
 
 
 void draw(ComponentData* component, sfRenderWindow* window, Camera* camera, TextureArray textures) {
-    for (int i = 0; i < component->entities; i++) {
-        ImageComponent* image = component->image[i];
-        if (!image) continue;
+    for (int j = 0; j < component->image.size; j++) {
+        int i = component->image.order[j];
+
+        ImageComponent* image = ImageComponent_get(component, i);
 
         set_texture(image, textures);
 
-        sfSprite_setPosition(component->image[i]->sprite, world_to_screen(get_position(component, i), camera));
+        sfSprite_setPosition(image->sprite, world_to_screen(get_position(component, i), camera));
 
         sfVector2f scale = { camera->zoom / 128.0, camera->zoom / 128.0 };
-        sfSprite_setScale(component->image[i]->sprite, scale);
+        sfSprite_setScale(image->sprite, scale);
 
-        sfSprite_setRotation(component->image[i]->sprite, to_degrees(-component->coordinate[i]->angle));
+        sfSprite_setRotation(image->sprite, to_degrees(-get_angle(component, i)));
 
-        sfFloatRect gb = sfSprite_getLocalBounds(component->image[i]->sprite);
+        sfFloatRect gb = sfSprite_getLocalBounds(image->sprite);
         sfVector2f origin = { 0.5 * gb.width, 0.5 * gb.height };
-        sfSprite_setOrigin(component->image[i]->sprite, origin);
+        sfSprite_setOrigin(image->sprite, origin);
 
-        sfRenderWindow_drawSprite(window, component->image[i]->sprite, NULL);
+        sfRenderWindow_drawSprite(window, image->sprite, NULL);
     }
 }

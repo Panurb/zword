@@ -97,7 +97,10 @@ void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* w
 
             sfConvexShape_setPoint(light->shape, 1, polar_to_cartesian(camera->zoom * old_dist, -delta_angle));
 
-            if (component->image[info.object] && component->image[info.object]->shine > 0.0) {
+            ImageComponent* image = ImageComponent_get(component, info.object);
+            if (!image) continue;
+
+            if (image->shine > 0.0) {
                 float vn = dot(velocity, info.normal);
                 if (vn < -0.98) {
                     sfCircleShape_setPosition(light->shine, world_to_screen(sum(end, mult(0.05, info.normal)), camera));
