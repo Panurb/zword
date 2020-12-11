@@ -9,6 +9,10 @@
 #include "util.h"
 
 
+sfVector2f zeros() {
+    return (sfVector2f) { 0.0, 0.0 };
+}
+
 float norm(sfVector2f v) {
     return sqrtf(v.x * v.x + v.y * v.y);
 }
@@ -69,6 +73,7 @@ sfVector2f perp(sfVector2f v) {
 }
 
 float sign(float x) {
+    if (x == 0.0) return 0.0;
     return copysignf(1.0, x);
 }
 
@@ -92,6 +97,10 @@ sfVector2f proj(sfVector2f a, sfVector2f b) {
 float float_rand(float min, float max) {
     float scale = rand() / (float) RAND_MAX;
     return min + scale * (max - min);
+}
+
+float rand_angle() {
+    return float_rand(0.0, 2 * M_PI);
 }
 
 int find(int value, int* array, int size) {

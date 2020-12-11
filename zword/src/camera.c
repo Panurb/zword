@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "component.h"
 #include "util.h"
+#include "image.h"
 
 
 Camera* Camera_create(sfVideoMode mode) {
@@ -221,6 +222,22 @@ void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape
     end = mult(max_range / min_range, start);    
     
     draw_line(window, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+}
+
+
+void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle) {
+    sfSprite_setPosition(sprite, world_to_screen(position, camera));
+
+    sfVector2f scale = { camera->zoom / PIXELS_PER_UNIT, camera->zoom / PIXELS_PER_UNIT };
+    sfSprite_setScale(sprite, scale);
+
+    sfSprite_setRotation(sprite, -to_degrees(angle));
+
+    sfFloatRect gb = sfSprite_getLocalBounds(sprite);
+    sfVector2f origin = { 0.5 * gb.width, 0.5 * gb.height };
+    sfSprite_setOrigin(sprite, origin);
+
+    sfRenderWindow_drawSprite(window, sprite, NULL);
 }
 
 

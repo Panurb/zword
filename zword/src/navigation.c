@@ -92,7 +92,7 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
     float d = norm(v);
     HitInfo info = raycast(component, grid, a, v, 1.1 * d, i);
 
-    if (info.object == j) {
+    if (info.object == j || info.object == -1) {
         return d;
     }
 
@@ -123,12 +123,6 @@ void init_waypoints(ComponentData* component, ColliderGrid* grid) {
                     neighbor->neighbors_size++;
                 }
             }
-        }
-
-        if (!component->physics[i]) {
-            clear_grid(component, grid, i);
-            free(component->collider[i]);
-            component->collider[i] = NULL;
         }
     }
 }
@@ -196,18 +190,17 @@ void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* ca
     sfRectangleShape* line = sfRectangleShape_create();
 
     float radius = 0.2 * camera->zoom;
+    sfCircleShape_setOrigin(shape, (sfVector2f) { radius, radius });
+    sfCircleShape_setRadius(shape, radius);
+
     for (int i = 0; i < component->entities; i++) {
         WaypointComponent* waypoint = component->waypoint[i];
         if (!waypoint) continue;
 
         //if (!component->enemy[i]) continue;
 
-        sfCircleShape_setOrigin(shape, (sfVector2f) { radius, radius });
-
         sfVector2f pos = get_position(component, i);
         sfCircleShape_setPosition(shape, world_to_screen(pos, camera));
-
-        sfCircleShape_setRadius(shape, radius);
 
         sfRenderWindow_drawCircleShape(window, shape, NULL);
 

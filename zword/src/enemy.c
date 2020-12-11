@@ -70,6 +70,8 @@ void update_enemies(ComponentData* component, ColliderGrid* grid) {
                 }
                 strcpy(image->filename, "zombie_dead");
                 image->width = 2.0;
+                image->layer = 2;
+                image->texture_changed = true;
 
                 break;
         }
@@ -81,20 +83,21 @@ void update_enemies(ComponentData* component, ColliderGrid* grid) {
 }
 
 
-void create_enemy(ComponentData* component, sfVector2f pos) {
-    int i = get_index(component);
+void create_enemy(ComponentData* components, sfVector2f pos) {
+    int i = get_index(components);
 
     float angle = float_rand(0.0, 2 * M_PI);
-    component->coordinate[i] = CoordinateComponent_create(pos, angle);
-    ImageComponent_add(component, i, "zombie", 1.0, 1.0, 4);
+    
+    CoordinateComponent_add(components, i, pos, angle);
+    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4);
     //component->image[i]->shine = 0.5;
-    component->collider[i] = ColliderComponent_create_circle(0.5);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.5, 5.0, 10.0);
-    component->physics[i]->max_speed = 5.0;
-    component->enemy[i] = EnemyComponent_create();
-    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
-    component->waypoint[i] = WaypointComponent_create();
-    component->health[i] = HealthComponent_create(100);
+    components->collider[i] = ColliderComponent_create_circle(0.5);
+    components->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.5, 5.0, 10.0);
+    components->physics[i]->max_speed = 5.0;
+    components->enemy[i] = EnemyComponent_create();
+    components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
+    components->waypoint[i] = WaypointComponent_create();
+    components->health[i] = HealthComponent_create(100);
 
     //EnemyComponent* enemy = component->enemy[i];
     //component->light[i] = LightComponent_create(enemy->vision_range, enemy->fov, 51, sfGreen, 0.1, 1.0);

@@ -17,10 +17,9 @@ typedef struct {
     int parent;
 } CoordinateComponent;
 
-CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle);
-
 typedef struct {
     bool visible;
+    bool texture_changed;
     Filename filename;
     float width;
     float height;
@@ -69,8 +68,6 @@ ColliderComponent* ColliderComponent_create_rectangle(float width, float height)
 
 typedef enum {
     ON_FOOT,
-    GRAB_ITEM,
-    DROP_ITEM,
     SHOOT,
     RELOAD,
     DRIVE,
@@ -154,10 +151,11 @@ typedef struct {
 ParticleComponent* ParticleComponent_create(float angle, float spread, float max_size, float min_size, float speed, float rate, sfColor color, sfColor inner_color);
 
 typedef struct {
-    int driver;
     float acceleration;
     float max_speed;
     float turning;
+    int riders[4];
+    sfVector2f seats[4];
 } VehicleComponent;
 
 VehicleComponent* VehicleComponent_create();
@@ -238,8 +236,11 @@ typedef struct {
 
 ComponentData* ComponentData_create();
 
-void ImageComponent_add(ComponentData* component, int i, Filename filename, float width, float height, int layer);
-ImageComponent* ImageComponent_get(ComponentData* component, int i);
+CoordinateComponent* CoordinateComponent_add(ComponentData* components, int entity, sfVector2f pos, float angle);
+CoordinateComponent* CoordinateComponent_get(ComponentData* components, int entity);
+
+ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer);
+ImageComponent* ImageComponent_get(ComponentData* components, int entity);
 
 int get_index(ComponentData* component);
 

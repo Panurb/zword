@@ -1,33 +1,111 @@
 #include "component.h"
 
 
-void create_car(ComponentData* component, float x, float y) {
-    int i = get_index(component);
+void create_car(ComponentData* components, float x, float y) {
+    int i = get_index(components);
     sfVector2f pos = { x, y };
-    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    component->collider[i] = ColliderComponent_create_rectangle(6.0, 3.0);
-    component->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0, 20.0);
-    component->physics[i]->max_angular_speed = 2.5;
-    component->vehicle[i] = VehicleComponent_create();
-    component->waypoint[i] = WaypointComponent_create();
-    ImageComponent_add(component, i, "car", 6.0, 3.0, 4);
+
+    CoordinateComponent_add(components, i, pos, 0.0);
+    components->collider[i] = ColliderComponent_create_rectangle(6.0, 3.0);
+    components->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0, 20.0);
+    components->physics[i]->max_angular_speed = 2.5;
+    components->vehicle[i] = VehicleComponent_create();
+    components->waypoint[i] = WaypointComponent_create();
+    ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
     //component->image[i]->shine = 1.0;
 
-    i = get_index(component);
-    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 3.1, 1.0 }, 0.0);
-    component->coordinate[i]->parent = i - 1;
-    component->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4, 1.0);
-    component->light[i]->enabled = false;
+    i = get_index(components);
+    CoordinateComponent_add(components, i, (sfVector2f) { 3.1, 1.0 }, 0.0);
+    components->coordinate[i]->parent = i - 1;
+    components->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4, 1.0);
+    components->light[i]->enabled = false;
 
-    i = get_index(component);
-    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 3.1, -1.0 }, 0.0);
-    component->coordinate[i]->parent = i - 2;
-    component->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4, 1.0);
-    component->light[i]->enabled = false;
+    i = get_index(components);
+    CoordinateComponent_add(components, i, (sfVector2f) { 3.1, -1.0 }, 0.0);
+    components->coordinate[i]->parent = i - 2;
+    components->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4, 1.0);
+    components->light[i]->enabled = false;
 
     /*
     i = get_index(component);
     component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 5.0, 2.0 }, 0.0);
     component->waypoint[i] = WaypointComponent_create();
     */
+}
+
+
+bool enter_vehicle(ComponentData* component, int i) {
+    CoordinateComponent* coord = component->coordinate[i];
+
+    for (int j = 0; j < component->entities; j++) {
+        VehicleComponent* vehicle = component->vehicle[j];
+        if (!vehicle)  continue;
+
+        float min_d = 3.0;
+        int closest = 0;
+        for (int k = 0; k < 4; k++) {
+            sfVector2f r = sum(get_position(component, j), rotate(vehicle->seats[k], get_angle(component, j)));
+            float d = dist(get_position(component, i), r);
+
+            if (d < min_d) {
+                min_d = d;
+                closest = k;
+            }
+        }
+
+        if (min_d < 3.0) {
+            int item = component->player[i]->inventory[component->player[i]->item];
+            if (component->light[item]) {
+                component->light[item]->enabled = false;
+            }
+
+            component->player[i]->vehicle = j;
+            coord->position = vehicle->seats[closest];
+            coord->angle = 0.0;
+            coord->parent = j;
+            component->collider[i]->enabled = false;
+
+            vehicle->riders[closest] = i;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+void exit_vehicle(ComponentData* component, int i) {
+    int j = component->player[i]->vehicle;
+
+    CoordinateComponent* coord = component->coordinate[i];
+    coord->position = sum(coord->position, get_position(component, j));
+    coord->parent = -1;
+
+    component->player[i]->vehicle = -1;
+    replace(i, -1, component->vehicle[j]->riders, 4);
+    component->collider[i]->enabled = true;
+}
+
+
+void drive_vehicle(ComponentData* component, int i, sfVector2f v, float delta_time) {
+    int j = component->player[i]->vehicle;
+
+    VehicleComponent* vehicle = component->vehicle[j];
+
+    if (i != vehicle->riders[0]) return;
+
+    PhysicsComponent* phys = component->physics[j];
+
+    sfVector2f r = polar_to_cartesian(1.0, component->coordinate[j]->angle);
+    sfVector2f at = mult(vehicle->acceleration * v.y, r);
+    phys->acceleration = sum(phys->acceleration, at);   
+
+    if (norm(phys->velocity) > 1.2) {
+        phys->angular_acceleration -= sign(v.y + 0.1) * vehicle->turning * v.x;
+    }
+
+    sfVector2f v_new = rotate(phys->velocity, phys->angular_velocity * delta_time);
+
+    phys->acceleration = sum(phys->acceleration, mult(1.0 / delta_time, diff(v_new, phys->velocity)));
 }

@@ -23,7 +23,7 @@ void update_lights(ComponentData* component, float delta_time) {
         if (component->coordinate[i]->parent != -1) {
             VehicleComponent* vehicle = component->vehicle[component->coordinate[i]->parent];
             if (vehicle) {
-                light->enabled = (vehicle->driver != -1);
+                light->enabled = (vehicle->riders[0] != -1);
             }
         }
 

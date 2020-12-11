@@ -13,15 +13,6 @@
 #include "util.h"
 
 
-CoordinateComponent* CoordinateComponent_create(sfVector2f pos, float angle) {
-    CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
-    coord->position = pos;
-    coord->angle = angle;
-    coord->parent = -1;
-    return coord;
-}
-
-
 PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = (sfVector2f) { 0, 0 };
@@ -153,8 +144,14 @@ VehicleComponent* VehicleComponent_create() {
     VehicleComponent* vehicle = malloc(sizeof(VehicleComponent));
     vehicle->acceleration = 20.0;
     vehicle->max_speed = 10.0;
-    vehicle->driver = -1;
     vehicle->turning = 50.0;
+    for (int i = 0; i < 4; i++) {
+        vehicle->riders[i] = -1;
+    }
+    vehicle->seats[0] = (sfVector2f) { 0.0, 0.75 };
+    vehicle->seats[1] = (sfVector2f) { 0.0, -0.75 };
+    vehicle->seats[2] = (sfVector2f) { -1.5, 0.75 };
+    vehicle->seats[3] = (sfVector2f) { -1.5, -0.75 };
     return vehicle;
 }
 
@@ -242,8 +239,28 @@ ComponentData* ComponentData_create() {
 }
 
 
-void ImageComponent_add(ComponentData* component, int i, Filename filename, float width, float height, int layer) {
+CoordinateComponent* CoordinateComponent_add(ComponentData* components, int entity, sfVector2f pos, float angle) {
+    CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
+    coord->position = pos;
+    coord->angle = angle;
+    coord->parent = -1;
+
+    components->coordinate[entity] = coord;
+
+    return coord;
+}
+
+
+CoordinateComponent* CoordinateComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->coordinate[entity];
+}
+
+
+ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
+    image->visible = true;
+    image->texture_changed = true;
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
@@ -251,31 +268,27 @@ void ImageComponent_add(ComponentData* component, int i, Filename filename, floa
     image->shine = 0.0;
     image->layer = layer;
     
-    component->image.array[i] = image;
-    if (i > component->image.max_index) {
-        component->image.max_index = i;
+    components->image.array[entity] = image;
+    if (entity > components->image.max_index) {
+        components->image.max_index = entity;
     }
 
-    component->image.order[component->image.size] = i;
-    component->image.size++;
-
-    int j = 1;
-    while (j < component->image.size) {
-        int x = component->image.order[j];
-        int k = j - 1;
-        while (k >= 0 && component->image.array[component->image.order[k]]->layer > component->image.array[x]->layer) {
-            component->image.order[k + 1] = component->image.order[k];
-            k--;
-        }
-        component->image.order[k + 1] = x;
-        j++;
+    int i = components->image.size - 1;
+    while (i >= 0 && components->image.array[components->image.order[i]]->layer > components->image.array[entity]->layer) {
+        components->image.order[i + 1] = components->image.order[i];
+        i--;
     }
+    components->image.order[i + 1] = entity;
+
+    components->image.size++;
+
+    return image;
 }
 
 
-ImageComponent* ImageComponent_get(ComponentData* component, int i) {
-    if (i == -1) return NULL;
-    return component->image.array[i];
+ImageComponent* ImageComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->image.array[entity];
 }
 
 

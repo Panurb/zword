@@ -6,6 +6,9 @@
 #include "camera.h"
 
 
+#define PIXELS_PER_UNIT 128
+
+
 typedef sfTexture* TextureArray[100];
 
 void load_textures(TextureArray textures);

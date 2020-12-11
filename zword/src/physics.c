@@ -11,11 +11,9 @@
 void update(ComponentData* component, float delta_time, ColliderGrid* collision_grid) {
     for (int i = 0; i < component->entities; i++) {
         PhysicsComponent* physics = component->physics[i];
-
         if (!physics) continue;
 
         CoordinateComponent* coord = component->coordinate[i];
-
         if (coord->parent != -1) continue;
 
         if (physics->collision.velocity.x != 0.0 || physics->collision.velocity.y != 0.0) {
@@ -28,40 +26,41 @@ void update(ComponentData* component, float delta_time, ColliderGrid* collision_
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
 
-        physics->collision.overlap = (sfVector2f) { 0.0, 0.0 };
-        physics->collision.velocity = (sfVector2f) { 0.0, 0.0 };
+        physics->collision.overlap = zeros();
+        physics->collision.velocity = zeros();
 
-        if (delta_pos.x != 0.0 || delta_pos.y != 0.0) {
+        if (component->collider[i] && (delta_pos.x != 0.0 || delta_pos.y != 0.0)) {
             clear_grid(component, collision_grid, i);
-        }
-
-        coord->position = sum(coord->position, delta_pos);
-
-        if (delta_pos.x != 0.0 || delta_pos.y != 0.0) {
+            coord->position = sum(coord->position, delta_pos);
             update_grid(component, collision_grid, i);
+        } else {
+            coord->position = sum(coord->position, delta_pos);
         }
 
         physics->acceleration = diff(physics->acceleration, mult(physics->drag, normalized(physics->velocity)));
 
         physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
 
-        physics->acceleration = (sfVector2f) { 0.0, 0.0 };
+        physics->acceleration = zeros();
         
         float speed = norm(physics->velocity);
-        if (speed < 1e-3) {
-            physics->velocity = (sfVector2f) { 0.0, 0.0 };
+        if (speed < 0.1) {
+            physics->velocity = zeros();
         } else if (speed > physics->max_speed) {
             physics->velocity = mult(physics->max_speed / speed, physics->velocity);
         }
 
         coord->angle += delta_time * physics->angular_velocity;
 
-        if (physics->angular_velocity != 0.0) {
-            physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
-        }
+        physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
 
         physics->angular_velocity += delta_time * physics->angular_acceleration;
-        if (fabs(physics->angular_velocity) > physics->max_angular_speed) {
+
+        float angular_speed = fabs(physics->angular_velocity);
+
+        if (angular_speed < 0.1) {
+            physics->angular_velocity = 0.0;
+        } else if (angular_speed > physics->max_angular_speed) {
             physics->angular_velocity = physics->max_angular_speed * sign(physics->angular_velocity);
         }
         

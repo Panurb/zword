@@ -35,4 +35,6 @@ void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sf
 
 void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread);
 
+void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle);
+
 void update_camera(ComponentData* component, Camera* camera, float time_step);

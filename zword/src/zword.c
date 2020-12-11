@@ -59,22 +59,22 @@ int main() {
     float time_step = 1.0 / 60.0;
     float elapsed_time = 0.0;
 
-    ComponentData* component = ComponentData_create();
+    ComponentData* components = ComponentData_create();
 
     Camera* camera = Camera_create(mode);
 
     ColliderGrid* grid = ColliderGrid_create();
 
-    int i = get_index(component);
-    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 0.0, 0.0 }, 0.0);
+    int i = get_index(components);
+    CoordinateComponent_add(components, i, zeros(), 0.0);
     int w = grid->tile_width * grid->width;
     int h = grid->tile_height * grid->height;
-    ImageComponent_add(component, i, "grass_tile", w, h, 0);
+    ImageComponent_add(components, i, "grass_tile", w, h, 0);
 
-    create_level(component);
+    create_level(components);
 
-    init_grid(component, grid);
-    init_waypoints(component, grid);
+    init_grid(components, grid);
+    init_waypoints(components, grid);
 
     while (sfRenderWindow_isOpen(window))
     {
@@ -98,22 +98,22 @@ int main() {
             while (elapsed_time > time_step) {
                 elapsed_time -= time_step;
 
-                input(component);
+                input(components);
 
-                update_players(component, grid, window, camera, time_step);
+                update_players(components, grid, window, camera, time_step);
 
-                update_enemies(component, grid);
+                update_enemies(components, grid);
 
-                update(component, time_step, grid);
-                collide(component, grid);
+                update(components, time_step, grid);
+                collide(components, grid);
 
-                update_particles(component, time_step);
+                update_particles(components, time_step);
 
-                update_lights(component, time_step);
+                update_lights(components, time_step);
 
-                update_waypoints(component, grid);
+                update_waypoints(components, grid);
 
-                update_camera(component, camera, time_step);
+                update_camera(components, camera, time_step);
             }
         }
 
@@ -123,16 +123,16 @@ int main() {
 
         //debug_draw(component, window, camera);
 
-        draw(component, window, camera, textures);
+        draw(components, window, camera, textures);
 
-        draw_particles(component, window, camera);
+        draw_particles(components, window, camera);
 
-        draw_lights(component, grid, window, textures, texture, camera, ambient_light);
+        draw_lights(components, grid, window, textures, texture, camera, ambient_light);
         sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
         sfSprite_setTexture(sprite, sfRenderTexture_getTexture(texture), sfTrue);
         sfRenderWindow_drawSprite(window, sprite, &state);
 
-        draw_players(component, window, camera);
+        draw_players(components, window, camera);
 
         //draw_waypoints(component, window, camera);
 
@@ -146,8 +146,8 @@ int main() {
         sfRenderWindow_display(window);
     }
 
-    for (int i = 0; i < component->entities; i++) {
-        destroy_entity(component, i);
+    for (int i = 0; i < components->entities; i++) {
+        destroy_entity(components, i);
     }
 
     sfRenderWindow_destroy(window);

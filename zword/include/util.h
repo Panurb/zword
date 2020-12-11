@@ -12,6 +12,8 @@ typedef struct {
 
 typedef char Filename[20];
 
+sfVector2f zeros();
+
 float norm(sfVector2f v);
 
 float norm2(sfVector2f v);
@@ -43,6 +45,8 @@ sfVector2f mult(float c, sfVector2f v);
 sfVector2f proj(sfVector2f a, sfVector2f b);
 
 float float_rand(float min, float max);
+
+float rand_angle();
 
 int find(int value, int* array, int size);
 

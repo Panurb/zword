@@ -15,114 +15,22 @@
 #include "raycast.h"
 #include "util.h"
 #include "weapon.h"
+#include "vehicle.h"
+#include "item.h"
 
 
-void create_player(ComponentData* component, sfVector2f pos) {
-    int i = get_index(component);
+void create_player(ComponentData* components, sfVector2f pos) {
+    int i = get_index(components);
 
-    component->coordinate[i] = CoordinateComponent_create(pos, 0.0);
-    ImageComponent_add(component, i, "player", 1.0, 1.0, 5);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0, 0.0);
-    component->physics[i]->max_speed = 5.0;
-    component->collider[i] = ColliderComponent_create_circle(0.5);
-    component->player[i] = PlayerComponent_create();
-    component->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
-    component->waypoint[i] = WaypointComponent_create();
-    component->health[i] = HealthComponent_create(100);
-}
-
-
-void pick_up_item(ComponentData* component, int i) {
-    PlayerComponent* player = component->player[i];
-
-    for (int j = 0; j < component->entities; j++) {
-        if (component->item[j] && component->coordinate[j]->parent == -1) {
-            float d = dist(component->coordinate[i]->position, component->coordinate[j]->position);
-            if (d < 1.0) {
-                int k = find(-1, player->inventory, player->inventory_size);
-                if (k != -1) {
-                    player->inventory[k] = j;
-                    component->coordinate[j]->parent = i;
-                    component->coordinate[j]->position = (sfVector2f) { 0.0, 0.0 };
-                    component->coordinate[j]->angle = 0.0;
-                }
-                break;
-            }
-        }
-    }
-}
-
-
-void drop_item(ComponentData* component, int i) {
-    PlayerComponent* player = component->player[i];
-
-    int j = player->inventory[player->item];
-    if (j != -1) {
-        player->inventory[player->item] = -1;
-        component->coordinate[j]->parent = -1;
-        sfVector2f r = polar_to_cartesian(1.0, get_angle(component, i));
-        component->coordinate[j]->position = sum(get_position(component, i), r);
-        component->physics[j]->velocity = mult(7.0, r);
-        component->physics[j]->angular_velocity = 3.0;
-
-        if (component->light[j]) {
-            component->light[j]->enabled = false;
-        }
-    }
-}
-
-
-bool enter_vehicle(ComponentData* component, int i) {
-    for (int j = 0; j < component->entities; j++) {
-        if (component->vehicle[j]) {
-            float d = dist(get_position(component, i), get_position(component, j));
-            if (d < 3.0) {
-                int item = component->player[i]->inventory[component->player[i]->item];
-                if (component->light[item]) {
-                    component->light[item]->enabled = false;
-                }
-
-                component->player[i]->vehicle = j;
-                component->vehicle[j]->driver = i;
-                component->collider[i]->enabled = false;
-
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-
-void exit_vehicle(ComponentData* component, int i) {
-    int j = component->player[i]->vehicle;
-    component->player[i]->vehicle = -1;
-    component->vehicle[j]->driver = -1;
-    component->collider[i]->enabled = true;
-}
-
-
-void drive_vehicle(ComponentData* component, int i, sfVector2f v, float delta_time) {
-    int j = component->player[i]->vehicle;
-
-    VehicleComponent* vehicle = component->vehicle[j];
-
-    PhysicsComponent* phys = component->physics[j];
-
-    component->coordinate[i]->position = component->coordinate[j]->position;
-
-    sfVector2f r = polar_to_cartesian(1.0, component->coordinate[j]->angle);
-    sfVector2f at = mult(vehicle->acceleration * v.y, r);
-    phys->acceleration = sum(phys->acceleration, at);   
-
-    if (norm(phys->velocity) > 1.2) {
-        phys->angular_acceleration -= sign(v.y) * vehicle->turning * v.x;
-    }
-
-    sfVector2f v_new = rotate(phys->velocity, phys->angular_velocity * delta_time);
-
-    phys->acceleration = sum(phys->acceleration, mult(1.0 / delta_time, diff(v_new, phys->velocity)));
+    CoordinateComponent_add(components, i, pos, 0.0);
+    ImageComponent_add(components, i, "player", 1.0, 1.0, 5);
+    components->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0, 0.0);
+    components->physics[i]->max_speed = 5.0;
+    components->collider[i] = ColliderComponent_create_circle(0.5);
+    components->player[i] = PlayerComponent_create();
+    components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
+    components->waypoint[i] = WaypointComponent_create();
+    components->health[i] = HealthComponent_create(100);
 }
 
 
@@ -201,7 +109,7 @@ void input(ComponentData* component) {
                 }
 
                 if (sfMouse_isButtonPressed(sfMouseRight)) {
-                    player->state = GRAB_ITEM;
+                    pick_up_item(component, i);
                 }
 
                 if (sfMouse_isButtonPressed(sfMouseLeft)) {
@@ -209,7 +117,9 @@ void input(ComponentData* component) {
                 }
 
                 if (sfKeyboard_isKeyPressed(sfKeyR)) {
-                    player->state = RELOAD;
+                    if (component->weapon[player->inventory[player->item]]) {
+                        player->state = RELOAD;
+                    }
                 }
 
                 if (sfKeyboard_isKeyPressed(sfKeyF)) {
@@ -217,12 +127,6 @@ void input(ComponentData* component) {
                         player->state = DRIVE;
                     }
                 }
-
-                break;
-            case GRAB_ITEM:
-
-                break;
-            case DROP_ITEM:
 
                 break;
             case SHOOT:
@@ -255,7 +159,7 @@ void input(ComponentData* component) {
                 }
 
                 if (sfMouse_isButtonPressed(sfMouseRight)) {
-                    player->state = DROP_ITEM;
+                    drop_item(component, i);
                 }
 
                 break;
@@ -304,16 +208,6 @@ void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow
             case ON_FOOT:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
                 coord->angle = polar_angle(right_stick(component, window, camera, i));
-
-                break;
-            case GRAB_ITEM:
-                pick_up_item(component, i);
-                player->state = ON_FOOT;
-
-                break;
-            case DROP_ITEM:
-                drop_item(component, i);
-                player->state = MENU;
 
                 break;
             case SHOOT:
@@ -424,9 +318,9 @@ void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow
 }
 
 
-void draw_menu_slot(ComponentData* component, sfRenderWindow* window, Camera* camera, int i, int j, float offset, float alpha) {
-    PlayerComponent* player = component->player[i];
-    sfVector2f pos = get_position(component, i);
+void draw_menu_slot(ComponentData* components, sfRenderWindow* window, Camera* camera, int entity, int slot, float offset, float alpha) {
+    PlayerComponent* player = components->player[entity];
+    sfVector2f pos = get_position(components, entity);
 
     float gap = 0.2;
     float slice = (2 * M_PI / player->inventory_size);
@@ -436,13 +330,17 @@ void draw_menu_slot(ComponentData* component, sfRenderWindow* window, Camera* ca
     sfConvexShape_setFillColor(player->shape, color);
 
     if (alpha == 0.0) {
-        draw_slice_outline(window, camera, player->line, pos, 1.0 + offset, 2.0 + offset, j * slice, slice - gap);
+        draw_slice_outline(window, camera, player->line, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
     } else {
-        draw_slice(window, camera, player->shape, pos, 1.0 + offset, 2.0 + offset, j * slice, slice - gap);
+        draw_slice(window, camera, player->shape, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
     }
 
-    if (player->inventory[j] != -1) {
-        // draw item
+    int item = player->inventory[slot];
+    if (item != -1) {
+        sfSprite* sprite = ImageComponent_get(components, item)->sprite;
+
+        sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice);
+        draw_sprite(window, camera, sprite, sum(pos, r), 0.0);
     }
 }
 
@@ -487,8 +385,6 @@ void draw_players(ComponentData* component, sfRenderWindow* window, Camera* came
 
         switch (player->state) {
             case ON_FOOT:
-            case GRAB_ITEM:
-            case DROP_ITEM:
             case SHOOT:
                 if (weapon) {
                     sfConvexShape_setOutlineThickness(weapon->shape, 0.02 * camera->zoom);

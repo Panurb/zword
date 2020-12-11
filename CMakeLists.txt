@@ -16,6 +16,7 @@ set(SOURCES
     zword/src/grid.c
     zword/src/heap.c
     zword/src/image.c
+    zword/src/item.c
     zword/src/interface.c
     zword/src/level.c
     zword/src/light.c
