@@ -201,6 +201,7 @@ WaypointComponent* WaypointComponent_create() {
         waypoint->weights[i] = 0.0;
     }
     waypoint->neighbors_size = 0;
+    waypoint->range = 1.0;
     return waypoint;
 }
 

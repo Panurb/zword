@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/System/Vector2.h>
+#include <SFML/Graphics.h>
 
 
 typedef struct {
@@ -71,3 +72,5 @@ sfVector2f matrix_mult(Matrix2f m, sfVector2f v);
 Matrix2f transpose(Matrix2f m);
 
 Matrix2f matrix_inverse(Matrix2f m);
+
+sfColor get_color(float r, float g, float b, float a);

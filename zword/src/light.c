@@ -65,7 +65,9 @@ void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* w
 
         sfVector2f r = polar_to_cartesian(camera->zoom * dist(start, end), -delta_angle);
 
-        sfConvexShape_setPoint(light->shape, 0, (sfVector2f) { 0.0, 0.0 });
+        sfConvexShape_setPosition(light->shape, world_to_texture(start, camera));
+
+        sfConvexShape_setPoint(light->shape, 0, zeros());
         sfConvexShape_setPoint(light->shape, 1, r);
 
         float old_dist = dist(start, end);
@@ -83,7 +85,6 @@ void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* w
 
             sfConvexShape_setPoint(light->shape, 2, r);
 
-            sfConvexShape_setPosition(light->shape, world_to_texture(start, camera));
             sfConvexShape_setRotation(light->shape, to_degrees(angle));
             int width = 128 * dist(start, end) / light->range;
             if (dist(start, end) < old_dist) {

@@ -90,6 +90,11 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
     sfVector2f b = get_position(component, j);
     sfVector2f v = diff(b, a);
     float d = norm(v);
+
+    if (d > component->waypoint[i]->range) {
+        return 0.0;
+    }
+
     HitInfo info = raycast(component, grid, a, v, 1.1 * d, i);
 
     if (info.object == j || info.object == -1) {
@@ -111,11 +116,15 @@ void init_waypoints(ComponentData* component, ColliderGrid* grid) {
 
             float d = connection_distance(component, grid, i, j);
             if (d > 0.0) {
+                d = float_rand(0.0, 100.0);
+
                 int k = replace(-1, j, waypoint->neighbors, MAX_NEIGHBORS);
                 if (k != -1) {
                     waypoint->weights[k] = d;
                     waypoint->neighbors_size++;
                 }
+
+                d = float_rand(0.0, 100.0);
 
                 k = replace(-1, i, neighbor->neighbors, MAX_NEIGHBORS);
                 if (k != -1) {
@@ -207,7 +216,10 @@ void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* ca
         for (int j = 0; j < waypoint->neighbors_size; j++) {
             int k = waypoint->neighbors[j];
             if (k != -1) {
-                draw_line(window, camera, line, pos, get_position(component, k), 0.02, sfWhite);
+                sfColor color = sfWhite;
+                color.r = 255 * waypoint->weights[j] / 100.0;
+                color.g = 255 * waypoint->weights[j] / 100.0;
+                draw_line(window, camera, line, pos, get_position(component, k), 0.02, color);
             }
         }
     }

@@ -27,7 +27,7 @@
 int main() {
     srand(time(NULL));
 
-    sfVideoMode mode = { 1920, 1080, 32 };
+    sfVideoMode mode = { 1280, 720, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -71,10 +71,27 @@ int main() {
     int h = grid->tile_height * grid->height;
     ImageComponent_add(components, i, "grass_tile", w, h, 0);
 
-    create_level(components);
+    for (int i = 0; i < 20; i ++) {
+        for (int j = 0; j < 20; j++) {
+            int k = get_index(components);
+
+            sfVector2f pos = { i, j };
+
+            CoordinateComponent_add(components, k, pos, 0.0);
+            components->waypoint[k] = WaypointComponent_create();
+        }
+    }
+
+    //create_level(components);
 
     init_grid(components, grid);
     init_waypoints(components, grid);
+
+    create_player(components, (sfVector2f) { -1.0, -1.0 });
+    int path[MAX_PATH_LENGTH];
+    for (int i = 0; i < MAX_PATH_LENGTH; i++) {
+        path[i] = -1;
+    }
 
     while (sfRenderWindow_isOpen(window))
     {
@@ -111,9 +128,11 @@ int main() {
 
                 update_lights(components, time_step);
 
-                update_waypoints(components, grid);
+                //update_waypoints(components, grid);
 
                 update_camera(components, camera, time_step);
+
+                a_star(components, 1, 400, path);
             }
         }
 
@@ -134,14 +153,22 @@ int main() {
 
         draw_players(components, window, camera);
 
-        //draw_waypoints(component, window, camera);
+        draw_waypoints(components, window, camera);
 
-        //draw_enemies(component, window, camera);
+        //draw_enemies(components, window, camera);
 
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
         elapsed_time += delta_time;
 
         draw_fps(window, fps, delta_time);
+
+        for (int i = 1; i < MAX_PATH_LENGTH; i++) {
+            if (path[i] == -1) break;
+            
+            sfVector2f start = get_position(components, path[i - 1]);
+            sfVector2f end = get_position(components, path[i]);
+            draw_line(window, camera, NULL, start, end, 0.1, sfRed);
+        }
 
         sfRenderWindow_display(window);
     }

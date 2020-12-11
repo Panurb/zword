@@ -52,8 +52,10 @@ void create_fire(ComponentData* component, sfVector2f pos) {
     int i = get_index(component);
 
     CoordinateComponent_add(component, i, pos, 0.0);
-    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 201, sfColor_fromRGB(255, 165, 0), 0.5, 10.0);
-    component->particle[i] = ParticleComponent_create(0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, sfColor_fromRGB(255, 165, 0), sfColor_fromRGB(255, 255, 0));
+    sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
+    sfColor yellow = get_color(1.0, 1.0, 0.0, 1.0);
+    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 201, orange, 0.5, 10.0);
+    component->particle[i] = ParticleComponent_create(0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, orange, yellow);
     component->particle[i]->loop = true;
     component->particle[i]->enabled = true;
     component->collider[i] = ColliderComponent_create_circle(0.35);
@@ -173,9 +175,14 @@ void create_level(ComponentData* component) {
     create_player(component, (sfVector2f) { 0.0, 0.0 });
 
     create_car(component, 0.0, -5.0);
-    create_weapon(component, 0.0, 5.0);
+    create_weapon(component, 1.0, 5.0);
+    create_weapon(component, 1.0, 4.0);
 
     create_flashlight(component, 0.0, 2.0);
+    create_flashlight(component, 0.0, 3.0);
+    create_flashlight(component, 0.0, 4.0);
+    create_flashlight(component, 0.0, 5.0);
+    create_flashlight(component, 0.0, 6.0);
 
-    //create_lasersight(component, -2.0, 0.0);
+    create_lasersight(component, -2.0, 0.0);
 }

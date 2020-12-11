@@ -191,6 +191,7 @@ typedef struct {
     int came_from;
     float f_score;
     float g_score;
+    float range;
 } WaypointComponent;
 
 WaypointComponent* WaypointComponent_create();

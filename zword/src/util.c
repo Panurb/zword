@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include <SFML/System/Vector2.h>
+#include <SFML/Graphics.h>
 
 #include "util.h"
 
@@ -164,4 +165,8 @@ Matrix2f transpose(Matrix2f m) {
 Matrix2f matrix_inverse(Matrix2f m) {
     float det = m.a * m.d - m.b * m.c;
     return (Matrix2f) { m.d / det, -m.b / det, -m.c / det, m.a / det };
+}
+
+sfColor get_color(float r, float g, float b, float a) {
+    return sfColor_fromRGBA(r * 255, g * 255, b * 255, a * 255);
 }

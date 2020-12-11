@@ -82,7 +82,7 @@ void create_weapon(ComponentData* components, float x, float y) {
     components->weapon[i] = WeaponComponent_create(4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
     components->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
     components->particle[i]->speed_spread = 0.0;
-    components->item[i] = ItemComponent_create(1);
+    components->item[i] = ItemComponent_create(5);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
 }
 
@@ -93,9 +93,9 @@ void create_lasersight(ComponentData* components, float x, float y) {
     sfVector2f pos = { x, y };
 
     CoordinateComponent_add(components, i, pos, float_rand(0.0, 2 * M_PI));
-    components->collider[i] = ColliderComponent_create_rectangle(1.0, 0.25);
     components->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
     components->item[i] = ItemComponent_create(0);
     components->light[i] = LightComponent_create(20.0, 0.01, 1, sfRed, 1.0, 10.0);
     components->light[i]->enabled = false;
+    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 3);
 }
