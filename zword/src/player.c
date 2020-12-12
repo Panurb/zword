@@ -342,6 +342,11 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, Camera* c
         sfSprite* sprite = ImageComponent_get(components, i)->sprite;
 
         sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
+
+        if (i == player->grabbed_item) {
+            r = mult(2.5, right_stick(components, window, camera, entity));
+        }
+
         draw_sprite(window, camera, sprite, sum(pos, r), 0.0);
     }
 }
@@ -359,18 +364,22 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, Cam
     float angle = (slot - 0.5) * slice + (atch + 1.5) * spread + (0.5 * atch + 1.5) * gap;
     draw_slice_outline(window, camera, player->line, pos, 1.2 + offset, 1.8 + offset, angle, spread);
 
-    if (item->attachments[atch] != -1) {
+    int a = item->attachments[atch];
+    if (a != -1) {
         sfColor color = sfConvexShape_getFillColor(player->shape);
         color.a = alpha * 255;
         sfConvexShape_setFillColor(player->shape, color);
 
         draw_slice(window, camera, player->shape, pos, 1.2 + offset, 1.8 + offset, angle, spread);
 
-        int a = item->attachments[atch];
-
         sfSprite* sprite = ImageComponent_get(components, a)->sprite;
 
         sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + (atch + 1.5) * slice / (item->size + 1));
+
+        if (a == player->grabbed_item) {
+            r = mult(2.5, right_stick(components, window, camera, entity));
+        }
+
         draw_sprite(window, camera, sprite, sum(pos, r), 0.0);
     }
 }

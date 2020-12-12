@@ -18,7 +18,6 @@ static const char* IMAGES[] = {
     "car",
     "fire",
     "flashlight",
-    "gradient",
     "grass_tile",
     "pistol",
     "player",

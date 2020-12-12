@@ -116,15 +116,11 @@ void init_waypoints(ComponentData* component, ColliderGrid* grid) {
 
             float d = connection_distance(component, grid, i, j);
             if (d > 0.0) {
-                d = float_rand(0.0, 100.0);
-
                 int k = replace(-1, j, waypoint->neighbors, MAX_NEIGHBORS);
                 if (k != -1) {
                     waypoint->weights[k] = d;
                     waypoint->neighbors_size++;
                 }
-
-                d = float_rand(0.0, 100.0);
 
                 k = replace(-1, i, neighbor->neighbors, MAX_NEIGHBORS);
                 if (k != -1) {
@@ -206,8 +202,6 @@ void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* ca
         WaypointComponent* waypoint = component->waypoint[i];
         if (!waypoint) continue;
 
-        //if (!component->enemy[i]) continue;
-
         sfVector2f pos = get_position(component, i);
         sfCircleShape_setPosition(shape, world_to_screen(pos, camera));
 
@@ -217,8 +211,7 @@ void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* ca
             int k = waypoint->neighbors[j];
             if (k != -1) {
                 sfColor color = sfWhite;
-                color.r = 255 * waypoint->weights[j] / 100.0;
-                color.g = 255 * waypoint->weights[j] / 100.0;
+                color.a = 64;
                 draw_line(window, camera, line, pos, get_position(component, k), 0.02, color);
             }
         }

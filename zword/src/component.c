@@ -87,9 +87,11 @@ LightComponent* LightComponent_create(float range, float angle, int rays, sfColo
     light->max_brightness = brightness;
     light->smoothing = 0;
 
-    light->shape = sfConvexShape_create();
-    sfConvexShape_setFillColor(light->shape, color);
-    sfConvexShape_setPointCount(light->shape, 3);
+    light->color = color;
+
+    light->verts = sfVertexArray_create();
+    sfVertexArray_setPrimitiveType(light->verts, sfTriangleFan);
+    sfVertexArray_resize(light->verts, light->rays + 1);
 
     light->shine = sfCircleShape_create();
     light->flicker = 0.1;
@@ -201,7 +203,7 @@ WaypointComponent* WaypointComponent_create() {
         waypoint->weights[i] = 0.0;
     }
     waypoint->neighbors_size = 0;
-    waypoint->range = 1.0;
+    waypoint->range = 20.0;
     return waypoint;
 }
 
@@ -266,7 +268,7 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     image->width = width;
     image->height = height;
     image->sprite = sfSprite_create();
-    image->shine = 0.0;
+    image->shine = 1.0;
     image->layer = layer;
     
     components->image.array[entity] = image;

@@ -65,33 +65,10 @@ int main() {
 
     ColliderGrid* grid = ColliderGrid_create();
 
-    int i = get_index(components);
-    CoordinateComponent_add(components, i, zeros(), 0.0);
-    int w = grid->tile_width * grid->width;
-    int h = grid->tile_height * grid->height;
-    ImageComponent_add(components, i, "grass_tile", w, h, 0);
-
-    for (int i = 0; i < 20; i ++) {
-        for (int j = 0; j < 20; j++) {
-            int k = get_index(components);
-
-            sfVector2f pos = { i, j };
-
-            CoordinateComponent_add(components, k, pos, 0.0);
-            components->waypoint[k] = WaypointComponent_create();
-        }
-    }
-
-    //create_level(components);
+    create_level(components, 64.0, 64.0);
 
     init_grid(components, grid);
     init_waypoints(components, grid);
-
-    create_player(components, (sfVector2f) { -1.0, -1.0 });
-    int path[MAX_PATH_LENGTH];
-    for (int i = 0; i < MAX_PATH_LENGTH; i++) {
-        path[i] = -1;
-    }
 
     while (sfRenderWindow_isOpen(window))
     {
@@ -128,11 +105,9 @@ int main() {
 
                 update_lights(components, time_step);
 
-                //update_waypoints(components, grid);
+                update_waypoints(components, grid);
 
                 update_camera(components, camera, time_step);
-
-                a_star(components, 1, 400, path);
             }
         }
 
@@ -161,14 +136,6 @@ int main() {
         elapsed_time += delta_time;
 
         draw_fps(window, fps, delta_time);
-
-        for (int i = 1; i < MAX_PATH_LENGTH; i++) {
-            if (path[i] == -1) break;
-            
-            sfVector2f start = get_position(components, path[i - 1]);
-            sfVector2f end = get_position(components, path[i]);
-            draw_line(window, camera, NULL, start, end, 0.1, sfRed);
-        }
 
         sfRenderWindow_display(window);
     }

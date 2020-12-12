@@ -99,7 +99,7 @@ typedef struct {
     float brightness;
     float max_brightness;
     int smoothing;
-    sfConvexShape* shape;
+    sfVertexArray* verts;
     sfCircleShape* shine;
     float flicker;
     float speed;

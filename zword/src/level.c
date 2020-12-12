@@ -167,22 +167,34 @@ void create_flashlight(ComponentData* component, float x, float y) {
 }
 
 
-void create_level(ComponentData* component) {
-    create_shed(component, -20.0, 0.0);
-    create_shed(component, 20.0, 0.0);
-    create_house(component, 10.0, 10.0);
+void create_level(ComponentData* components, float width, float height) {
+    int i = get_index(components);
+    CoordinateComponent_add(components, i, zeros(), 0.0);
+    ImageComponent_add(components, i, "grass_tile", width, height, 0);
 
-    create_player(component, (sfVector2f) { 0.0, 0.0 });
+    create_shed(components, -20.0, 0.0);
+    create_shed(components, 20.0, 0.0);
+    create_house(components, 10.0, 10.0);
 
-    create_car(component, 0.0, -5.0);
-    create_weapon(component, 1.0, 5.0);
-    create_weapon(component, 1.0, 4.0);
+    create_player(components, (sfVector2f) { 0.0, 0.0 });
 
-    create_flashlight(component, 0.0, 2.0);
-    create_flashlight(component, 0.0, 3.0);
-    create_flashlight(component, 0.0, 4.0);
-    create_flashlight(component, 0.0, 5.0);
-    create_flashlight(component, 0.0, 6.0);
+    create_car(components, 0.0, -5.0);
+    create_weapon(components, 1.0, 5.0);
+    create_weapon(components, 1.0, 4.0);
 
-    create_lasersight(component, -2.0, 0.0);
+    create_flashlight(components, 0.0, 2.0);
+}
+
+
+void test(ComponentData* components) {
+    for (int i = 0; i < 20; i ++) {
+        for (int j = 0; j < 20; j++) {
+            int k = get_index(components);
+
+            sfVector2f pos = { i, j };
+
+            CoordinateComponent_add(components, k, pos, 0.0);
+            components->waypoint[k] = WaypointComponent_create();
+        }
+    }
 }
