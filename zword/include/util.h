@@ -15,6 +15,8 @@ typedef char Filename[20];
 
 sfVector2f zeros();
 
+sfVector2f ones();
+
 float norm(sfVector2f v);
 
 float norm2(sfVector2f v);
@@ -74,3 +76,7 @@ Matrix2f transpose(Matrix2f m);
 Matrix2f matrix_inverse(Matrix2f m);
 
 sfColor get_color(float r, float g, float b, float a);
+
+void permute(int* array, int size);
+
+float lerp(float a, float b, float t);

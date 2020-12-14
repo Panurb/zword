@@ -13,51 +13,9 @@
 #include "util.h"
 
 
-PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag) {
-    PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
-    phys->velocity = (sfVector2f) { 0, 0 };
-    phys->acceleration = (sfVector2f) { 0, 0 };
-    phys->collision.overlap = (sfVector2f) { 0, 0 };
-    phys->collision.velocity = (sfVector2f) { 0.0, 0.0} ;
-    phys->angular_velocity = 0.0;
-    phys->angular_acceleration = 0.0;
-    phys->mass = mass;
-    phys->friction = friction;
-    phys->bounce = bounce;
-    phys->drag = drag;
-    phys->max_speed = 20.0;
-    phys->angular_drag = angular_drag;
-    phys->max_angular_speed = 20.0 * M_PI;
-    return phys;
-}
-
-
-ColliderComponent* ColliderComponent_create_circle(float radius) {
-    ColliderComponent* col = malloc(sizeof(ColliderComponent));
-    col->enabled = true;
-    col->type = CIRCLE;
-    col->last_collision = -1;
-    col->radius = radius;
-    col->width = 2 * radius;
-    col->height = 2 * radius;
-    return col;
-}
-
-
-ColliderComponent* ColliderComponent_create_rectangle(float width, float height) {
-    ColliderComponent* col = malloc(sizeof(ColliderComponent));
-    col->enabled = true;
-    col->type = RECTANGLE;
-    col->last_collision = -1;
-    col->radius = sqrtf(width * width + height * height);
-    col->width = width;
-    col->height = height;
-    return col;
-}
-
-
 PlayerComponent* PlayerComponent_create() {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
+    player->target = -1;
     player->acceleration = 20.0;
     player->vehicle = -1;
     player->item = 0;
@@ -94,8 +52,9 @@ LightComponent* LightComponent_create(float range, float angle, int rays, sfColo
     sfVertexArray_resize(light->verts, light->rays + 1);
 
     light->shine = sfCircleShape_create();
-    light->flicker = 0.1;
+    light->flicker = 0.0;
     light->speed = speed;
+    light->time = 0.0;
     return light;
 }
 
@@ -183,16 +142,6 @@ WeaponComponent* WeaponComponent_create(float fire_rate, int damage, int magazin
 }
 
 
-ItemComponent* ItemComponent_create(int size) {
-    ItemComponent* item = malloc(sizeof(ItemComponent));
-    item->size = size;
-    for (int i = 0; i < size; i++) {
-        item->attachments[i]= -1;
-    }
-    return item;
-}
-
-
 WaypointComponent* WaypointComponent_create() {
     WaypointComponent* waypoint = malloc(sizeof(WaypointComponent));
     waypoint->came_from = -1;
@@ -262,14 +211,16 @@ CoordinateComponent* CoordinateComponent_get(ComponentData* components, int enti
 
 ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
-    image->visible = true;
     image->texture_changed = true;
+    image->outline = 0.0;
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
     image->sprite = sfSprite_create();
     image->shine = 1.0;
     image->layer = layer;
+    image->scale = ones();
+    image->alpha = 1.0;
     
     components->image.array[entity] = image;
     if (entity > components->image.max_index) {
@@ -293,6 +244,93 @@ ImageComponent* ImageComponent_get(ComponentData* components, int entity) {
     if (entity == -1) return NULL;
     return components->image.array[entity];
 }
+
+
+PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass, float friction, float bounce, float drag, float angular_drag) {
+    PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
+    phys->velocity = zeros();
+    phys->acceleration = zeros();
+    phys->collision.collided = false;
+    phys->collision.overlap = zeros();
+    phys->collision.velocity = zeros();
+    phys->angular_velocity = 0.0;
+    phys->angular_acceleration = 0.0;
+    phys->mass = mass;
+    phys->friction = friction;
+    phys->bounce = bounce;
+    phys->drag = drag;
+    phys->max_speed = 20.0;
+    phys->angular_drag = angular_drag;
+    phys->max_angular_speed = 20.0 * M_PI;
+
+    components->physics[entity] = phys;
+
+    return phys;
+}
+
+
+PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->physics[entity];
+}
+
+
+ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group) {
+    ColliderComponent* col = malloc(sizeof(ColliderComponent));
+    col->enabled = true;
+    col->type = CIRCLE;
+    col->group = group;
+    col->last_collision = -1;
+    col->radius = radius;
+    col->width = 2 * radius;
+    col->height = 2 * radius;
+
+    components->collider[entity] = col;
+
+    return col;
+}
+
+
+ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, int entity, float width, float height, ColliderGroup group) {
+    ColliderComponent* col = malloc(sizeof(ColliderComponent));
+    col->enabled = true;
+    col->type = RECTANGLE;
+    col->group = group;
+    col->last_collision = -1;
+    col->radius = sqrtf(width * width + height * height);
+    col->width = width;
+    col->height = height;
+
+    components->collider[entity] = col;
+
+    return col;
+}
+
+
+ColliderComponent* ColliderComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->collider[entity];
+}
+
+
+ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size) {
+    ItemComponent* item = malloc(sizeof(ItemComponent));
+    item->size = size;
+    for (int i = 0; i < size; i++) {
+        item->attachments[i]= -1;
+    }
+
+    components->item[entity] = item;
+
+    return item;
+}
+
+
+ItemComponent* ItemComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->item[entity];
+}
+
 
 
 int get_index(ComponentData* component) {

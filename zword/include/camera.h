@@ -10,7 +10,7 @@ typedef struct {
     float zoom;
     float width;
     float height;
-    sfRectangleShape* grid;
+    sfShader* shaders[10];
 } Camera;
 
 Camera* Camera_create(sfVideoMode mode);
@@ -35,6 +35,6 @@ void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sf
 
 void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread);
 
-void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle);
+void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index);
 
 void update_camera(ComponentData* component, Camera* camera, float time_step);

@@ -52,42 +52,39 @@ void update_particles(ComponentData* component, float delta_time) {
 }
 
 
-void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->particle[i]) continue;
+void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera, int entity) {
+    ParticleComponent* part = component->particle[entity];
+    if (!part) return;
 
-        ParticleComponent* part = component->particle[i];
+    sfCircleShape_setFillColor(part->shape, part->color);
+    for (int j = 0; j < part->particles; j++) {
+        if (part->time[j] == 0.0) continue;
 
-        sfCircleShape_setFillColor(part->shape, part->color);
-        for (int j = 0; j < part->particles; j++) {
-            if (part->time[j] == 0.0) continue;
+        float r = (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
+        sfCircleShape_setRadius(part->shape, r);
+        sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
+        sfVector2f pos = world_to_screen(part->position[j], camera);
+        sfCircleShape_setPosition(part->shape, pos);
+        sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
+        sfCircleShape_setScale(part->shape, scale);
+        float angle = atan2(part->velocity[j].y, part->velocity[j].x);
+        sfCircleShape_setRotation(part->shape, -to_degrees(angle));
+        sfRenderWindow_drawCircleShape(window, part->shape, NULL);
+    }
 
-            float r = (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
-            sfCircleShape_setRadius(part->shape, r);
-            sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
-            sfVector2f pos = world_to_screen(part->position[j], camera);
-            sfCircleShape_setPosition(part->shape, pos);
-            sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
-            sfCircleShape_setScale(part->shape, scale);
-            float angle = atan2(part->velocity[j].y, part->velocity[j].x);
-            sfCircleShape_setRotation(part->shape, -to_degrees(angle));
-            sfRenderWindow_drawCircleShape(window, part->shape, NULL);
-        }
+    sfCircleShape_setFillColor(part->shape, part->inner_color);
+    for (int j = 0; j < part->particles; j++) {
+        if (part->time[j] == 0.0) continue;
 
-        sfCircleShape_setFillColor(part->shape, part->inner_color);
-        for (int j = 0; j < part->particles; j++) {
-            if (part->time[j] == 0.0) continue;
-
-            float r = 0.5 * (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
-            sfCircleShape_setRadius(part->shape, r);
-            sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
-            sfVector2f pos = world_to_screen(part->position[j], camera);
-            sfCircleShape_setPosition(part->shape, pos);
-            sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
-            sfCircleShape_setScale(part->shape, scale);
-            float angle = atan2(part->velocity[j].y, part->velocity[j].x);
-            sfCircleShape_setRotation(part->shape, -to_degrees(angle));
-            sfRenderWindow_drawCircleShape(window, part->shape, NULL);
-        }
+        float r = 0.5 * (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
+        sfCircleShape_setRadius(part->shape, r);
+        sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
+        sfVector2f pos = world_to_screen(part->position[j], camera);
+        sfCircleShape_setPosition(part->shape, pos);
+        sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
+        sfCircleShape_setScale(part->shape, scale);
+        float angle = atan2(part->velocity[j].y, part->velocity[j].x);
+        sfCircleShape_setRotation(part->shape, -to_degrees(angle));
+        sfRenderWindow_drawCircleShape(window, part->shape, NULL);
     }
 }

@@ -11,26 +11,51 @@
 #include "grid.h"
 #include "util.h"
 #include "navigation.h"
+#include "image.h"
 
 
-void update_enemies(ComponentData* component, ColliderGrid* grid) {
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->enemy[i]) continue;
+void create_enemy(ComponentData* components, sfVector2f pos) {
+    int i = get_index(components);
 
-        EnemyComponent* enemy = component->enemy[i];
-        PhysicsComponent* phys = component->physics[i];
-        ImageComponent* image = ImageComponent_get(component, i);
+    float angle = float_rand(0.0, 2 * M_PI);
+    
+    CoordinateComponent_add(components, i, pos, angle);
+    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4);
+    //component->image[i]->shine = 0.5;
+    ColliderComponent_add_circle(components, i, 0.5, ENEMIES);
+    PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 5.0;
+    components->enemy[i] = EnemyComponent_create();
+    components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
+    components->waypoint[i] = WaypointComponent_create();
+    components->health[i] = HealthComponent_create(100);
+
+    //EnemyComponent* enemy = component->enemy[i];
+    //component->light[i] = LightComponent_create(enemy->vision_range, enemy->fov, 51, sfGreen, 0.1, 1.0);
+}
+
+
+void update_enemies(ComponentData* components, ColliderGrid* grid) {
+    for (int i = 0; i < components->entities; i++) {
+        if (!components->enemy[i]) continue;
+
+        EnemyComponent* enemy = components->enemy[i];
+        PhysicsComponent* phys = components->physics[i];
+        ImageComponent* image = ImageComponent_get(components, i);
+
+        if (components->health[i]->health <= 0) {
+            enemy->state = DEAD;
+        }
 
         switch (enemy->state) {
             case IDLE:
-                for (int j = 0; j < component->entities; j++) {
-                    if (!component->player[j]) continue;
+                for (int j = 0; j < components->entities; j++) {
+                    if (!components->player[j]) continue;
 
-                    sfVector2f r = diff(get_position(component, j), get_position(component, i));
-                    float angle = mod(get_angle(component, i) - polar_angle(r), 2 * M_PI);
+                    sfVector2f r = diff(get_position(components, j), get_position(components, i));
+                    float angle = mod(get_angle(components, i) - polar_angle(r), 2 * M_PI);
 
                     if (angle < 0.5 * enemy->fov) {
-                        HitInfo info = raycast(component, grid, get_position(component, i), r, enemy->vision_range, i);
+                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i);
                         if (info.object == j) {
                             enemy->target = j;
                             enemy->state = CHASE;
@@ -44,15 +69,15 @@ void update_enemies(ComponentData* component, ColliderGrid* grid) {
                 break;
             case CHASE:
                 ;
-                int target = component->player[enemy->target]->vehicle;
+                int target = components->player[enemy->target]->vehicle;
                 if (target == -1) {
                     target = enemy->target;
                 }
 
-                a_star(component, target, i, enemy->path);
+                a_star(components, target, i, enemy->path);
 
                 if (enemy->path[1] != -1) {
-                    sfVector2f r = diff(get_position(component, enemy->path[1]), get_position(component, i));
+                    sfVector2f r = diff(get_position(components, enemy->path[1]), get_position(components, i));
 
                     float d = norm(r);
 
@@ -60,47 +85,24 @@ void update_enemies(ComponentData* component, ColliderGrid* grid) {
                         phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration / d, r));
                     }
 
-                    component->coordinate[i]->angle = polar_angle(r);
+                    components->coordinate[i]->angle = polar_angle(r);
                 }
 
                 break;
             case DEAD:
                 if (norm(phys->velocity) == 0.0) {
-                    component->collider[i]->enabled = false;
+                    components->collider[i]->enabled = false;
                 }
                 strcpy(image->filename, "zombie_dead");
                 image->width = 2.0;
-                image->layer = 2;
                 image->texture_changed = true;
+                change_layer(components, i, 2);
+
+                ColliderComponent_get(components, i)->group = ITEMS;
 
                 break;
         }
-
-        if (component->health[i]->health <= 0) {
-            enemy->state = DEAD;
-        }
     }
-}
-
-
-void create_enemy(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
-
-    float angle = float_rand(0.0, 2 * M_PI);
-    
-    CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4);
-    //component->image[i]->shine = 0.5;
-    components->collider[i] = ColliderComponent_create_circle(0.5);
-    components->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.5, 5.0, 10.0);
-    components->physics[i]->max_speed = 5.0;
-    components->enemy[i] = EnemyComponent_create();
-    components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
-    components->waypoint[i] = WaypointComponent_create();
-    components->health[i] = HealthComponent_create(100);
-
-    //EnemyComponent* enemy = component->enemy[i];
-    //component->light[i] = LightComponent_create(enemy->vision_range, enemy->fov, 51, sfGreen, 0.1, 1.0);
 }
 
 
@@ -118,5 +120,35 @@ void draw_enemies(ComponentData* component, sfRenderWindow* window, Camera* came
         if (enemy->path[1] != -1) {
             draw_circle(window, camera, NULL, get_position(component, enemy->path[1]), 0.1, sfGreen);
         }
+    }
+}
+
+
+void damage(ComponentData* component, int entity, int dmg, int player) {
+    EnemyComponent* enemy = component->enemy[entity];
+    HealthComponent* health = component->health[entity];
+    ParticleComponent* particle = component->particle[entity];
+
+    health->health = max(0, health->health - dmg);
+
+    if (enemy) {
+        enemy->target = player;
+        enemy->state = CHASE;
+    }
+
+    if (particle) {
+        particle->enabled = true;
+        if (dmg > 50) {
+            particle->rate *= 5.0;
+        }
+    }
+
+    int j = get_index(component);
+    CoordinateComponent_add(component, j, get_position(component, entity), rand_angle());
+
+    if (dmg < 50) {
+        ImageComponent_add(component, j, "blood", 1.0, 1.0, 1)->alpha = 0.75;
+    } else {
+        ImageComponent_add(component, j, "blood_large", 2.0, 2.0, 1)->alpha = 0.75;
     }
 }

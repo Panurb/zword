@@ -24,9 +24,8 @@ void create_player(ComponentData* components, sfVector2f pos) {
 
     CoordinateComponent_add(components, i, pos, 0.0);
     ImageComponent_add(components, i, "player", 1.0, 1.0, 5);
-    components->physics[i] = PhysicsComponent_create(1.0, 0.0, 0.0, 10.0, 0.0);
-    components->physics[i]->max_speed = 5.0;
-    components->collider[i] = ColliderComponent_create_circle(0.5);
+    PhysicsComponent_add(components, i, 1.0, 0.0, 0.0, 10.0, 0.0)->max_speed = 5.0;
+    ColliderComponent_add_circle(components, i, 0.5, PLAYERS);
     components->player[i] = PlayerComponent_create();
     components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
     components->waypoint[i] = WaypointComponent_create();
@@ -182,40 +181,63 @@ void input(ComponentData* component) {
 }
 
 
-void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step) {
-    for (int i = 0; i < component->entities; i++) {
-        PlayerComponent* player = component->player[i];
+void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step) {
+    for (int i = 0; i < components->entities; i++) {
+        PlayerComponent* player = components->player[i];
         if (!player) continue;
 
-        PhysicsComponent* phys = component->physics[i];
-        CoordinateComponent* coord = component->coordinate[i];
-        int item = player->inventory[player->item];
+        PhysicsComponent* phys = components->physics[i];
+        CoordinateComponent* coord = CoordinateComponent_get(components, i);
         sfVector2f v = left_stick();
-        int slot = get_inventory_slot(component, window, camera, i);
-        int atch = get_attachment(component, window, camera, i);
+        int slot = get_inventory_slot(components, window, camera, i);
+        int atch = get_attachment(components, window, camera, i);
 
+        int item = player->inventory[player->item];
         WeaponComponent* weapon = NULL;
         if (item != -1) {
-            weapon = component->weapon[item];
-
-            if (weapon) {
-                weapon->cooldown = fmax(0.0, weapon->cooldown - time_step);
-                weapon->recoil = fmax(0.1 * norm(phys->velocity), weapon->recoil - time_step * weapon->recoil_down);
-            }
+            weapon = components->weapon[item];
         }
         
         switch (player->state) {
             case ON_FOOT:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
-                coord->angle = polar_angle(right_stick(component, window, camera, i));
+                coord->angle = polar_angle(right_stick(components, window, camera, i));
+
+
+                sfVector2f pos = get_position(components, i);
+                int entities[100];
+                get_entities(components, grid, pos, 1.0, entities);
+
+                if (player->target != -1) {
+                    ImageComponent_get(components, player->target)->outline = 0.0;
+                }
+                player->target = -1;
+
+                float min_dist = INFINITY;
+                for (int j = 0; j < 100; j++) {
+                    int k = entities[j];
+                    if (k == -1) break;
+                    if (!ItemComponent_get(components, k)) continue;
+                    if (CoordinateComponent_get(components, k)->parent != -1) continue;
+
+                    float d = dist(pos, get_position(components, k));
+                    if (d < min_dist) {
+                        player->target = k;
+                        min_dist = d;
+                    }
+                }
+
+                if (player->target != -1) {
+                    ImageComponent_get(components, player->target)->outline = 0.2;
+                }
 
                 break;
             case SHOOT:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
-                coord->angle = polar_angle(right_stick(component, window, camera, i));
+                coord->angle = polar_angle(right_stick(components, window, camera, i));
 
                 if (weapon) {
-                    shoot(component, grid, item);
+                    shoot(components, grid, item);
 
                     if (weapon->reloading) {
                         player->state = RELOAD;
@@ -225,52 +247,51 @@ void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow
                 break;
             case RELOAD:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
-                coord->angle = polar_angle(right_stick(component, window, camera, i));
+                coord->angle = polar_angle(right_stick(components, window, camera, i));
 
-                reload(component, item);
+                if (weapon) {
+                    reload(components, item);
 
-                if (weapon->cooldown == 0.0) {
-                    weapon->magazine = weapon->max_magazine;
-                    weapon->reloading = false;
-
-                    player->state = ON_FOOT;
+                    if (!weapon->reloading) {
+                        player->state = ON_FOOT;
+                    }
                 }
 
                 break;
             case DRIVE:
-                drive_vehicle(component, i, v, time_step);
+                drive_vehicle(components, i, v, time_step);
 
                 break;
             case MENU:
                 if (item != -1) {
-                    if (component->light[item]) {
-                        component->light[item]->enabled = false;
+                    if (components->light[item]) {
+                        components->light[item]->enabled = false;
                     }
-                    if (component->weapon[item]) {
-                        component->weapon[item]->reloading = false;
+                    if (components->weapon[item]) {
+                        components->weapon[item]->reloading = false;
                     }
 
-                    for (int j = 0; j < component->item[item]->size; j++) {
-                        int a = component->item[item]->attachments[j];
-                        if (component->light[a]) {
-                            component->light[a]->enabled = false;
+                    for (int j = 0; j < components->item[item]->size; j++) {
+                        int a = components->item[item]->attachments[j];
+                        if (components->light[a]) {
+                            components->light[a]->enabled = false;
                         }
                     }
                 }
 
-                player->item = get_inventory_slot(component, window, camera, i);
+                player->item = get_inventory_slot(components, window, camera, i);
 
                 item = player->inventory[player->item];
 
                 if (item != -1) {
-                    if (component->light[item]) {
-                        component->light[item]->enabled = true;
+                    if (components->light[item]) {
+                        components->light[item]->enabled = true;
                     }
 
-                    for (int j = 0; j < component->item[item]->size; j++) {
-                        int a = component->item[item]->attachments[j];
-                        if (component->light[a]) {
-                            component->light[a]->enabled = true;
+                    for (int j = 0; j < components->item[item]->size; j++) {
+                        int a = components->item[item]->attachments[j];
+                        if (components->light[a]) {
+                            components->light[a]->enabled = true;
                         }
                     }
                 }
@@ -280,8 +301,8 @@ void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow
                 if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
                     if (atch == -1) {
                         player->grabbed_item = item;
-                    } else if (component->item[item]->attachments[atch] != -1) {
-                        player->grabbed_item = component->item[item]->attachments[atch];
+                    } else if (components->item[item]->attachments[atch] != -1) {
+                        player->grabbed_item = components->item[item]->attachments[atch];
                     }
                 }
 
@@ -292,21 +313,21 @@ void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow
                         replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
                         for (int j = 0; j < player->inventory_size; j++) {
                             if (player->inventory[j] == -1) continue;
-                            ItemComponent* it = component->item[player->inventory[j]];
+                            ItemComponent* it = components->item[player->inventory[j]];
                             replace(player->grabbed_item, -1, it->attachments, it->size);
                         }
                         player->inventory[slot] = player->grabbed_item;
-                        component->coordinate[player->grabbed_item]->parent = i;
+                        components->coordinate[player->grabbed_item]->parent = i;
                     } else if (atch != -1) {
-                        if (player->inventory[slot] != player->grabbed_item && component->item[player->inventory[slot]]->attachments[atch] == -1) {
+                        if (player->inventory[slot] != player->grabbed_item && components->item[player->inventory[slot]]->attachments[atch] == -1) {
                             replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
                             for (int j = 0; j < player->inventory_size; j++) {
                                 if (player->inventory[j] == -1) continue;
-                                ItemComponent* it = component->item[player->inventory[j]];
+                                ItemComponent* it = components->item[player->inventory[j]];
                                 replace(player->grabbed_item, -1, it->attachments, it->size);
                             }
-                            component->item[player->inventory[slot]]->attachments[atch] = player->grabbed_item;
-                            component->coordinate[player->grabbed_item]->parent = player->inventory[slot];
+                            components->item[player->inventory[slot]]->attachments[atch] = player->grabbed_item;
+                            components->coordinate[player->grabbed_item]->parent = player->inventory[slot];
                         }
                     }
                     player->grabbed_item = -1;
@@ -347,7 +368,7 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, Camera* c
             r = mult(2.5, right_stick(components, window, camera, entity));
         }
 
-        draw_sprite(window, camera, sprite, sum(pos, r), 0.0);
+        draw_sprite(window, camera, sprite, sum(pos, r), 0.0, ones(), 0);
     }
 }
 
@@ -380,7 +401,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, Cam
             r = mult(2.5, right_stick(components, window, camera, entity));
         }
 
-        draw_sprite(window, camera, sprite, sum(pos, r), 0.0);
+        draw_sprite(window, camera, sprite, sum(pos, r), 0.0, mult(0.75, ones()), 0);
     }
 }
 
@@ -414,7 +435,8 @@ void draw_players(ComponentData* component, sfRenderWindow* window, Camera* came
                 break;
             case RELOAD:
                 sfConvexShape_setFillColor(player->shape, sfWhite);
-                float prog = 2 * M_PI * (1 - weapon->cooldown / weapon->reload_time);
+                int akimbo = get_akimbo(component, item);
+                float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
                 draw_slice(window, camera, player->shape, pos, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog);
 
                 break;

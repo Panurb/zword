@@ -21,8 +21,10 @@ Camera* Camera_create(sfVideoMode mode) {
     camera->zoom = 25.0 * mode.height / 720.0;
     camera->width = mode.width;
     camera->height = mode.height;
-    camera->grid = sfRectangleShape_create();
-    sfRectangleShape_setFillColor(camera->grid, sfWhite);
+
+    camera->shaders[0] = NULL;
+    camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "blendColor.frag");
+
     return camera;
 }
 
@@ -132,7 +134,7 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f start = { x + i, camera->position.y + 0.5 * camera->height / camera->zoom };
         sfVector2f end = { x + i, camera->position.y - 0.5 * camera->height / camera->zoom };
 
-        draw_line(window, camera, camera->grid, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+        draw_line(window, camera, NULL, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
     }
 
     int ny = ceil(camera->height / camera->zoom);    
@@ -141,7 +143,7 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + (i - nx) };
         sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + (i - nx) };
 
-        draw_line(window, camera, camera->grid, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+        draw_line(window, camera, NULL, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
     }
 }
 
@@ -225,11 +227,10 @@ void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape
 }
 
 
-void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle) {
+void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index) {
     sfSprite_setPosition(sprite, world_to_screen(position, camera));
 
-    sfVector2f scale = { camera->zoom / PIXELS_PER_UNIT, camera->zoom / PIXELS_PER_UNIT };
-    sfSprite_setScale(sprite, scale);
+    sfSprite_setScale(sprite, mult(camera->zoom / PIXELS_PER_UNIT, scale));
 
     sfSprite_setRotation(sprite, -to_degrees(angle));
 
@@ -237,7 +238,14 @@ void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVec
     sfVector2f origin = { 0.5 * gb.width, 0.5 * gb.height };
     sfSprite_setOrigin(sprite, origin);
 
-    sfRenderWindow_drawSprite(window, sprite, NULL);
+    sfShader* shader = camera->shaders[shader_index];
+    if (shader_index == 1) {
+        sfShader_setTextureUniform(shader, "texture", sfSprite_getTexture(sprite));
+        sfShader_setFloatUniform(shader, "amount", 1.0);
+    }
+
+    sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, shader };
+    sfRenderWindow_drawSprite(window, sprite, &state);
 }
 
 

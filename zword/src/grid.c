@@ -54,6 +54,39 @@ Bounds get_bounds(ComponentData* component, ColliderGrid* grid, int i) {
 }
 
 
+void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius, int entities[100]) {
+    int id = 2 * MAX_ENTITIES + 1;
+
+    int x = floor(origin.x + 0.5 * grid->width);
+    int y = floor(origin.y + 0.5 * grid->height);
+    int rx = radius * grid->tile_width;
+    int ry = radius * grid->tile_height;
+
+    for (int i = 0; i < 100; i++) {
+        entities[i] = -1;
+    }
+
+    int l = 0;
+    for (int i = x - rx; i <= x + rx; i++) {
+        for (int j = y - ry; j <= y + ry; j++) {
+            for (int k = 0; k < grid->size; k++) {
+                int n = grid->array[i][j][k];
+                if (n == -1) continue;
+
+                ColliderComponent* col = ColliderComponent_get(components, n);
+
+                if (col->last_collision == id) continue;
+
+                entities[l] = n;
+                l++;
+
+                col->last_collision = id;
+            }
+        }
+    }
+}
+
+
 void update_grid(ComponentData* component, ColliderGrid* grid, int i) {
     Bounds bounds = get_bounds(component, grid, i);
 

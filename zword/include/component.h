@@ -18,20 +18,23 @@ typedef struct {
 } CoordinateComponent;
 
 typedef struct {
-    bool visible;
     bool texture_changed;
+    float outline;
     Filename filename;
     float width;
     float height;
     sfSprite* sprite;
     float shine;
     int layer;
+    sfVector2f scale;
+    float alpha;
 } ImageComponent;
 
 typedef struct {
     sfVector2f velocity;
     sfVector2f acceleration;
     struct {
+        bool collided;
         sfVector2f overlap;
         sfVector2f velocity;
     } collision;
@@ -46,25 +49,28 @@ typedef struct {
     float max_angular_speed;
 } PhysicsComponent;
 
-PhysicsComponent* PhysicsComponent_create(float mass, float friction, float bounce, float drag, float angular_drag);
-
 typedef enum {
     CIRCLE,
     RECTANGLE
 } ColliderType;
 
+typedef enum {
+    WALLS,
+    ITEMS,
+    PLAYERS,
+    ENEMIES,
+    VEHICLES
+} ColliderGroup;
+
 typedef struct {
     bool enabled;
+    ColliderGroup group;
     ColliderType type;
     int last_collision;
     float radius;
     float width;
     float height;
 } ColliderComponent;
-
-ColliderComponent* ColliderComponent_create_circle(float radius);
-
-ColliderComponent* ColliderComponent_create_rectangle(float width, float height);
 
 typedef enum {
     ON_FOOT,
@@ -77,6 +83,7 @@ typedef enum {
 } PlayerState;
 
 typedef struct {
+    int target;
     float acceleration;
     int vehicle;
     int item;
@@ -103,6 +110,7 @@ typedef struct {
     sfCircleShape* shine;
     float flicker;
     float speed;
+    float time;
 } LightComponent;
 
 LightComponent* LightComponent_create(float range, float angle, int rays, sfColor color, float brightness, float speed);
@@ -182,8 +190,6 @@ typedef struct {
     int size;
 } ItemComponent;
 
-ItemComponent* ItemComponent_create(int size);
-
 typedef struct {
     int neighbors[MAX_NEIGHBORS];
     int neighbors_size;
@@ -242,6 +248,16 @@ CoordinateComponent* CoordinateComponent_get(ComponentData* components, int enti
 
 ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer);
 ImageComponent* ImageComponent_get(ComponentData* components, int entity);
+
+PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass, float friction, float bounce, float drag, float angular_drag);
+PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity);
+
+ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group);
+ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, int entity, float width, float height, ColliderGroup group);
+ColliderComponent* ColliderComponent_get(ComponentData* components, int entity);
+
+ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size);
+ItemComponent* ItemComponent_get(ComponentData* components, int entity);
 
 int get_index(ComponentData* component);
 

@@ -6,6 +6,7 @@
 #include "util.h"
 #include "collider.h"
 #include "grid.h"
+#include "enemy.h"
 
 
 void update(ComponentData* component, float delta_time, ColliderGrid* collision_grid) {
@@ -16,16 +17,25 @@ void update(ComponentData* component, float delta_time, ColliderGrid* collision_
         CoordinateComponent* coord = component->coordinate[i];
         if (coord->parent != -1) continue;
 
-        if (physics->collision.velocity.x != 0.0 || physics->collision.velocity.y != 0.0) {
+        if (physics->collision.collided) {
             physics->velocity = physics->collision.velocity;
 
             sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
             sfVector2f v_t = diff(physics->velocity, v_n);
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0 - physics->friction, v_t));
+
+            HealthComponent* health = component->health[i];
+            if (health) {
+                float v = norm(v_n);
+                if (v > 10.0) {
+                    damage(component, i, 100, -1);
+                }
+            }
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
 
+        physics->collision.collided = false;
         physics->collision.overlap = zeros();
         physics->collision.velocity = zeros();
 

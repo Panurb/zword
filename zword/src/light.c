@@ -32,6 +32,8 @@ void update_lights(ComponentData* component, float delta_time) {
         } else {
             light->brightness = fmax(0.0, light->brightness - light->speed * delta_time);
         }
+
+        light->time = fmod(light->time + delta_time, 400.0 * M_PI);
     }
 }
 
@@ -59,7 +61,7 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, Camera* camer
 }
 
 
-void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, TextureArray textures, sfRenderTexture* texture, Camera* camera, float ambient_light) {
+void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, sfRenderTexture* texture, Camera* camera, float ambient_light) {
     sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0));
     sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
 
@@ -67,35 +69,41 @@ void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* w
         LightComponent* light = component->light[i];
         if (!light) continue;
 
+        float brightness = light->brightness;
+        float range = light->range;
+
+        if (light->enabled) {
+            float f = 1.0 - light->flicker * 0.25 * (sinf(8.0 * light->time) + sinf(12.345 * light->time) + 2.0);
+            brightness *= f;
+            range *= f;
+        }
+
         sfVector2f start = get_position(component, i);
-        float angle = get_angle(component, i) - 0.5 * light->angle;
 
         sfVertex* v = sfVertexArray_getVertex(light->verts, 0);
         v->position = world_to_texture(start, camera);
         sfColor color = light->color;
-        color.a = 255 * light->brightness;
+        color.a = 255 * brightness;
         v->color = color;
 
+        float angle = get_angle(component, i) - 0.5 * light->angle;
         sfVector2f velocity = polar_to_cartesian(1.0, angle);
-
-        HitInfo info = raycast(component, grid, start, velocity, light->range, i);
-        sfVector2f end = info.position;
 
         float delta_angle = light->angle / (light->rays - 1);
         Matrix2f rot = rotation_matrix(delta_angle);
 
         for (int j = 1; j < light->rays + 1; j++) {
-            velocity = matrix_mult(rot, velocity);
+            HitInfo info = raycast(component, grid, start, velocity, range, i);
+            sfVector2f end = info.position;
 
-            info = raycast(component, grid, start, velocity, light->range, i);
-            end = info.position;
-
-            end = sum(end, mult(-0.25, info.normal));
+            end = sum(end, mult(0.25, velocity));
 
             v = sfVertexArray_getVertex(light->verts, j);
             v->position = world_to_texture(end, camera);
-            color.a = 255 * light->brightness * (1.0 - dist(start, end) / (light->range + 0.25));
+            color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
             v->color = color;
+
+            velocity = matrix_mult(rot, velocity);
         }
 
         sfRenderTexture_drawVertexArray(texture, light->verts, &state);

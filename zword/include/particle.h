@@ -3,4 +3,4 @@
 
 void update_particles(ComponentData* component, float delta_time);
 
-void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera);
+void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera, int entity);

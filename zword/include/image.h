@@ -22,3 +22,9 @@ sfTexture* load_texture(Filename filename);
 sfSprite* load_sprite(Filename filename, TextureArray textures);
 
 void draw(ComponentData* component, sfRenderWindow* window,  Camera* camera, TextureArray textures);
+
+void draw_roofs(ComponentData* component, sfRenderWindow* window, Camera* camera, TextureArray textures);
+
+void change_layer(ComponentData* components, int entity, int layer);
+
+void create_noise(sfUint8* pixels, int width, int height, sfColor color, int permutation[512]);

@@ -6,22 +6,20 @@ void create_car(ComponentData* components, float x, float y) {
     sfVector2f pos = { x, y };
 
     CoordinateComponent_add(components, i, pos, 0.0);
-    components->collider[i] = ColliderComponent_create_rectangle(6.0, 3.0);
-    components->physics[i] = PhysicsComponent_create(10.0, 0.0, 0.5, 10.0, 20.0);
-    components->physics[i]->max_angular_speed = 2.5;
+    ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
+    PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0)->max_angular_speed = 2.5;
     components->vehicle[i] = VehicleComponent_create();
     components->waypoint[i] = WaypointComponent_create();
     ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
-    //component->image[i]->shine = 1.0;
 
     i = get_index(components);
-    CoordinateComponent_add(components, i, (sfVector2f) { 3.1, 1.0 }, 0.0);
+    CoordinateComponent_add(components, i, (sfVector2f) { 2.8, 1.0 }, 0.0);
     components->coordinate[i]->parent = i - 1;
     components->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4, 1.0);
     components->light[i]->enabled = false;
 
     i = get_index(components);
-    CoordinateComponent_add(components, i, (sfVector2f) { 3.1, -1.0 }, 0.0);
+    CoordinateComponent_add(components, i, (sfVector2f) { 2.8, -1.0 }, 0.0);
     components->coordinate[i]->parent = i - 2;
     components->light[i] = LightComponent_create(10.0, 1.0, 51, sfWhite, 0.4, 1.0);
     components->light[i]->enabled = false;

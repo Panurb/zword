@@ -14,6 +14,10 @@ sfVector2f zeros() {
     return (sfVector2f) { 0.0, 0.0 };
 }
 
+sfVector2f ones() {
+    return (sfVector2f) { 1.0, 1.0 };
+}
+
 float norm(sfVector2f v) {
     return sqrtf(v.x * v.x + v.y * v.y);
 }
@@ -95,9 +99,9 @@ sfVector2f proj(sfVector2f a, sfVector2f b) {
     return mult(dot(a, b_norm), b_norm);
 }
 
-float float_rand(float min, float max) {
+float float_rand(float low, float upp) {
     float scale = rand() / (float) RAND_MAX;
-    return min + scale * (max - min);
+    return low + scale * (upp - low);
 }
 
 float rand_angle() {
@@ -169,4 +173,18 @@ Matrix2f matrix_inverse(Matrix2f m) {
 
 sfColor get_color(float r, float g, float b, float a) {
     return sfColor_fromRGBA(r * 255, g * 255, b * 255, a * 255);
+}
+
+void permute(int* array, int size) {
+    for (int i = 0; i < size; i++) {
+        // Warning: skewed distribution
+        int j = rand() % (i + 1);
+        int t = array[i];
+        array[i] = array[j];
+        array[j] = t;
+    }
+}
+
+float lerp(float a, float b, float t) {
+    return a + t * (b - a);
 }

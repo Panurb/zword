@@ -11,6 +11,8 @@
 #include "weapon.h"
 #include "vehicle.h"
 #include "navigation.h"
+#include "perlin.h"
+#include "item.h"
 
 
 void create_waypoint(ComponentData* components, sfVector2f pos) {
@@ -25,41 +27,42 @@ void brick_wall(ComponentData* components, sfVector2f pos, float length, float a
     int i = get_index(components);
 
     CoordinateComponent_add(components, i, pos, angle);
-    components->collider[i] = ColliderComponent_create_rectangle(length, 0.75);
+    ColliderComponent_add_rectangle(components, i, length, 0.75, WALLS);
     ImageComponent_add(components, i, "brick_tile", length, 0.75, 2);
 }
 
 
-void wood_wall(ComponentData* component, sfVector2f pos, float length, float angle) {
-    int i = get_index(component);
+void wood_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
+    int i = get_index(components);
 
-    CoordinateComponent_add(component, i, pos, angle);
-    component->collider[i] = ColliderComponent_create_rectangle(length, 0.5);
-    ImageComponent_add(component, i, "wood_tile", length, 0.5, 2);
+    CoordinateComponent_add(components, i, pos, angle);
+    ColliderComponent_add_rectangle(components, i, length, 0.5, WALLS);
+    ImageComponent_add(components, i, "wood_tile", length, 0.5, 2);
 }
 
 
-void create_prop(ComponentData* component, sfVector2f pos) {
-    int i = get_index(component);
+void create_prop(ComponentData* components, sfVector2f pos) {
+    int i = get_index(components);
 
-    CoordinateComponent_add(component, i, pos, float_rand(0.0, 2 * M_PI));
-    component->collider[i] = ColliderComponent_create_rectangle(1.0, 1.0);
-    component->physics[i] = PhysicsComponent_create(1.0, 0.5, 0.5, 2.0, 4.0);
+    CoordinateComponent_add(components, i, pos, float_rand(0.0, 2 * M_PI));
+    ColliderComponent_add_rectangle(components, i, 1.0, 1.0, WALLS);
+    PhysicsComponent_add(components, i, 1.0, 0.5, 0.5, 2.0, 4.0);
 }
 
 
-void create_fire(ComponentData* component, sfVector2f pos) {
-    int i = get_index(component);
+void create_fire(ComponentData* components, sfVector2f pos) {
+    int i = get_index(components);
 
-    CoordinateComponent_add(component, i, pos, 0.0);
+    CoordinateComponent_add(components, i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     sfColor yellow = get_color(1.0, 1.0, 0.0, 1.0);
-    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 201, orange, 0.5, 10.0);
-    component->particle[i] = ParticleComponent_create(0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, orange, yellow);
-    component->particle[i]->loop = true;
-    component->particle[i]->enabled = true;
-    component->collider[i] = ColliderComponent_create_circle(0.35);
-    ImageComponent_add(component, i, "fire", 1.0, 1.0, 5);
+    components->light[i] = LightComponent_create(5.0, 2.0 * M_PI, 201, orange, 0.8, 10.0);
+    components->light[i]->flicker = 0.2;
+    components->particle[i] = ParticleComponent_create(0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, orange, yellow);
+    components->particle[i]->loop = true;
+    components->particle[i]->enabled = true;
+    ColliderComponent_add_circle(components, i, 0.35, WALLS);
+    ImageComponent_add(components, i, "fire", 1.0, 1.0, 5);
 }
 
 
@@ -76,6 +79,14 @@ void create_floor(ComponentData* component, sfVector2f pos, float width, float h
 
     CoordinateComponent_add(component, i, pos, angle);
     ImageComponent_add(component, i, "board_tile", width, height, 1);
+}
+
+
+void create_roof(ComponentData* component, sfVector2f pos, float width, float height, float angle) {
+    int i = get_index(component);
+
+    CoordinateComponent_add(component, i, pos, angle);
+    ImageComponent_add(component, i, "roof_tile", width, height, 6);
 }
 
 
@@ -149,28 +160,43 @@ void create_shed(ComponentData* component, float x, float y) {
     create_waypoint(component, sum(pos, mult(1.5, diff(w, h))));
     create_waypoint(component, sum(pos, mult(-1.5, sum(w, h))));
     create_waypoint(component, sum(pos, mult(-1.5, diff(w, h))));
+
+    create_roof(component, diff(pos, mult(0.665, h)), 8.0, 4.0, angle);
+    create_roof(component, sum(pos, mult(0.665, h)), 8.0, 4.0, angle + M_PI);
 }
 
 
-void create_flashlight(ComponentData* component, float x, float y) {
-    int i = get_index(component);
+void create_ground(ComponentData* components, float width, float height) {
+    int i = get_index(components);
+    CoordinateComponent_add(components, i, zeros(), 0.0);
+    ImageComponent_add(components, i, "grass_tile", width, height, 0);
 
-    sfVector2f pos = { x, y };
+    i = get_index(components);
+    CoordinateComponent_add(components, i, zeros(), 0.0);
+    ImageComponent* image = ImageComponent_add(components, i, "", 4.0, 4.0, 0);
+    image->texture_changed = false;
+    image->scale = mult(16.0, ones());
 
-    CoordinateComponent_add(component, i, pos, float_rand(0.0, 2 * M_PI));
-    //component->collider[i] = ColliderComponent_create_rectangle(1.0, 0.25);
-    component->physics[i] = PhysicsComponent_create(0.5, 0.0, 0.5, 10.0, 2.5);
-    component->item[i] = ItemComponent_create(0);
-    component->light[i] = LightComponent_create(7.0, 1.0, 51, sfColor_fromRGB(255, 255, 200), 0.75, 10.0);
-    component->light[i]->enabled = false;
-    ImageComponent_add(component, i, "flashlight", 1.0, 1.0, 3);
+    int perm[512];
+    init_perlin(perm);
+
+    int w = 512;
+    int h = 512;
+    sfUint8 pixels[512 * 512 * 4];
+    create_noise(pixels, w, h, get_color(0.1, 0.1, 0.0, 0.75), perm);
+
+    sfTexture* texture = sfTexture_create(w, h);
+    sfTexture_updateFromPixels(texture, pixels, w, h, 0, 0);
+    sfTexture_setRepeated(texture, true);
+
+    sfSprite_setTexture(image->sprite, texture, sfFalse);
+    sfIntRect rect = {0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
+    sfSprite_setTextureRect(image->sprite, rect);
 }
 
 
 void create_level(ComponentData* components, float width, float height) {
-    int i = get_index(components);
-    CoordinateComponent_add(components, i, zeros(), 0.0);
-    ImageComponent_add(components, i, "grass_tile", width, height, 0);
+    create_ground(components, width, height);
 
     create_shed(components, -20.0, 0.0);
     create_shed(components, 20.0, 0.0);

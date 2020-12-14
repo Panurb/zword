@@ -1,25 +1,39 @@
 #include "component.h"
+#include "grid.h"
+#include "util.h"
+
+
+void create_flashlight(ComponentData* components, float x, float y) {
+    int i = get_index(components);
+
+    sfVector2f pos = { x, y };
+
+    CoordinateComponent_add(components, i, pos, rand_angle());
+    ColliderComponent_add_rectangle(components, i, 0.5, 0.25, ITEMS);
+    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    ItemComponent_add(components, i, 0);
+    components->light[i] = LightComponent_create(7.0, 1.0, 51, sfColor_fromRGB(255, 255, 200), 0.75, 10.0);
+    components->light[i]->enabled = false;
+    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
+}
 
 
 void pick_up_item(ComponentData* components, int entity) {
     PlayerComponent* player = components->player[entity];
 
-    for (int i = 0; i < components->entities; i++) {
-        if (components->item[i] && components->coordinate[i]->parent == -1) {
-            float d = dist(components->coordinate[entity]->position, components->coordinate[i]->position);
-            if (d < 1.0) {
-                int j = find(-1, player->inventory, player->inventory_size);
-                if (j != -1) {
-                    player->inventory[j] = i;
-                    CoordinateComponent* coord = CoordinateComponent_get(components, i);
-                    coord->parent = entity;
-                    coord->position = zeros();
-                    coord->angle = 0.0;
-                    ImageComponent_get(components, i)->visible = false;
-                }
-                break;
-            }
-        }
+    if (player->target == -1) {
+        return;
+    }
+
+    int i = find(-1, player->inventory, player->inventory_size);
+    if (i != -1) {
+        player->inventory[i] = player->target;
+        CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
+        coord->parent = entity;
+        coord->position = zeros();
+        coord->angle = 0.0;
+        ImageComponent_get(components, player->target)->alpha = 0.0;
+        ColliderComponent_get(components, player->target)->enabled = false;
     }
 }
 
@@ -44,6 +58,7 @@ void drop_item(ComponentData* components, int entity) {
             components->light[i]->enabled = false;
         }
 
-        ImageComponent_get(components, i)->visible = true;
+        ImageComponent_get(components, i)->alpha = 1.0;
+        ColliderComponent_get(components, i)->enabled = true;
     }
 }

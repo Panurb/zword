@@ -14,6 +14,18 @@
 #include "util.h"
 #include "grid.h"
 
+// WALLS,
+// ITEMS,
+// PLAYERS,
+// ENEMIES,
+// VEHICLES
+
+static bool COLLISION_MATRIX[5][5] = { { 1, 0, 0, 0, 0 }, 
+                                       { 1, 0, 0, 0, 0 },
+                                       { 1, 0, 1, 0, 1 },
+                                       { 1, 0, 0, 0, 1 },
+                                       { 1, 0, 1, 1, 1 } };
+
 
 void get_corners(ComponentData* component, int i, sfVector2f* corners) {
     CoordinateComponent* coord = component->coordinate[i];
@@ -166,6 +178,8 @@ sfVector2f overlap(ComponentData* component, int i, int j) {
     ColliderComponent* a = component->collider[i];
     ColliderComponent* b = component->collider[j];
 
+    if (!COLLISION_MATRIX[a->group][b->group]) return ol;
+
     if (!a->enabled || !b->enabled) {
         return ol;
     }
@@ -235,6 +249,7 @@ void collide(ComponentData* component, ColliderGrid* grid) {
 
                     physics->collision.velocity = sum(physics->collision.velocity, new_vel);
                     physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
+                    physics->collision.collided = true;
                 }
             }
         }

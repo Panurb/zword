@@ -22,6 +22,7 @@ set(SOURCES
     zword/src/light.c
     zword/src/navigation.c
     zword/src/particle.c
+    zword/src/perlin.c
     zword/src/physics.c
     zword/src/player.c
     zword/src/raycast.c

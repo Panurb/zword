@@ -22,34 +22,35 @@
 #include "particle.h"
 #include "navigation.h"
 #include "interface.h"
+#include "perlin.h"
+#include "weapon.h"
 
 
 int main() {
     srand(time(NULL));
 
-    sfVideoMode mode = { 1280, 720, 32 };
+    sfVideoMode mode = { 1920, 1080, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
     sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
-    if (!window) {
-        return 1;
-    }
+
+    // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
+    // sfWindow_setFramerateLimit((sfWindow*) window, 60);
+
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
 
     sfTexture* textures[100];
-
     load_textures(textures);
 
-    sfRenderTexture* texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
-    sfSprite* sprite = sfSprite_create();
+    sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
+    sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
+    sfSprite* light_sprite = sfSprite_create();
+    sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), sfTrue);
 
-    float ambient_light = 0.5;
+    float ambient_light = 0.6;
 
     bool focus = true;
-
-    //sfWindow_setVerticalSyncEnabled(window, true);
-    //sfWindow_setFramerateLimit(window, 60);
 
     sfClock* clock = sfClock_create();
     sfEvent event;
@@ -86,6 +87,10 @@ int main() {
             if (event.type == sfEvtClosed) {
                 sfRenderWindow_close(window);
             }
+
+            if (event.type == sfEvtKeyPressed && event.key.code == sfKeyEscape) {
+                sfRenderWindow_close(window);
+            }
         }
 
         if (focus) {
@@ -95,6 +100,8 @@ int main() {
                 input(components);
 
                 update_players(components, grid, window, camera, time_step);
+
+                update_weapons(components, time_step);
 
                 update_enemies(components, grid);
 
@@ -108,29 +115,28 @@ int main() {
                 update_waypoints(components, grid);
 
                 update_camera(components, camera, time_step);
+
+                draw_lights(components, grid, window, light_texture, camera, ambient_light);
             }
         }
 
         sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
 
-        //draw_grid(window, camera);
+        // draw_grid(window, camera);
 
-        //debug_draw(component, window, camera);
+        // debug_draw(component, window, camera);
 
         draw(components, window, camera, textures);
 
-        draw_particles(components, window, camera);
+        sfRenderWindow_drawSprite(window, light_sprite, &state);
 
-        draw_lights(components, grid, window, textures, texture, camera, ambient_light);
-        sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
-        sfSprite_setTexture(sprite, sfRenderTexture_getTexture(texture), sfTrue);
-        sfRenderWindow_drawSprite(window, sprite, &state);
+        // draw_roofs(components, window, camera, textures);
 
         draw_players(components, window, camera);
 
-        draw_waypoints(components, window, camera);
+        // draw_waypoints(components, window, camera);
 
-        //draw_enemies(components, window, camera);
+        // draw_enemies(components, window, camera);
 
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
         elapsed_time += delta_time;
