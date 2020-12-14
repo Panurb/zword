@@ -83,7 +83,7 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     }
 
     int i = components->image.size - 1;
-    while (i >= 0 && components->image.array[components->image.order[i]]->layer > components->image.array[entity]->layer) {
+    while (i >= 0 && ImageComponent_get(components, components->image.order[i])->layer > layer) {
         components->image.order[i + 1] = components->image.order[i];
         i--;
     }
@@ -104,7 +104,26 @@ ImageComponent* ImageComponent_get(ComponentData* components, int entity) {
 void ImageComponent_remove(ComponentData* components, int entity) {
     free(ImageComponent_get(components, entity));
     components->image.array[entity] = NULL;
-    // TODO
+
+    if (entity == components->image.max_index) {
+        for (int i = components->image.max_index - 1; i > -1; i--) {
+            if (ImageComponent_get(components, i)) {
+                components->image.max_index = i;
+                break;
+            }
+
+            if (i == 0) {
+                components->image.max_index = -1;
+            }
+        }
+    }
+
+    int i = find(entity, components->image.order, components->image.size);
+    while (i < components->image.size - 2) {
+        components->image.order[i] = components->image.order[i + 1];
+        i++;
+    }
+    components->image.size--;
 }
 
 
@@ -497,19 +516,32 @@ int get_index(ComponentData* component) {
 
 
 void destroy_entity(ComponentData* components, int entity) {
-    CoordinateComponent_remove(components, entity);
-    CoordinateComponent_remove(components, entity);
-    PhysicsComponent_remove(components, entity);
-    ColliderComponent_remove(components, entity);
-    PlayerComponent_remove(components, entity);
-    LightComponent_remove(components, entity);
-    EnemyComponent_remove(components, entity);
-    ParticleComponent_remove(components, entity);
-    VehicleComponent_remove(components, entity);
-    WeaponComponent_remove(components, entity);
-    ItemComponent_remove(components, entity);
-    WaypointComponent_remove(components, entity);
-    HealthComponent_remove(components, entity);
+    if (CoordinateComponent_get(components, entity))
+        CoordinateComponent_remove(components, entity);
+    if (ImageComponent_get(components, entity))
+        ImageComponent_remove(components, entity);
+    if (PhysicsComponent_get(components, entity))
+        PhysicsComponent_remove(components, entity);
+    if (ColliderComponent_get(components, entity))
+        ColliderComponent_remove(components, entity);
+    if (PlayerComponent_get(components, entity))
+        PlayerComponent_remove(components, entity);
+    if (LightComponent_get(components, entity))
+        LightComponent_remove(components, entity);
+    if (EnemyComponent_get(components, entity))
+        EnemyComponent_remove(components, entity);
+    if (ParticleComponent_get(components, entity))
+        ParticleComponent_remove(components, entity);
+    if (VehicleComponent_get(components, entity))
+        VehicleComponent_remove(components, entity);
+    if (WeaponComponent_get(components, entity))
+        WeaponComponent_remove(components, entity);
+    if (ItemComponent_get(components, entity))
+        ItemComponent_remove(components, entity);
+    if (WaypointComponent_get(components, entity))
+        WaypointComponent_remove(components, entity);
+    if (HealthComponent_get(components, entity))
+        HealthComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;
@@ -517,10 +549,10 @@ void destroy_entity(ComponentData* components, int entity) {
 }
 
 
-sfVector2f get_position(ComponentData* component, int i) {
-    sfVector2f position = component->coordinate[i]->position;
+sfVector2f get_position(ComponentData* component, int entity) {
+    sfVector2f position = component->coordinate[entity]->position;
 
-    int parent = component->coordinate[i]->parent;
+    int parent = component->coordinate[entity]->parent;
     if (parent != -1) {
         position = sum(get_position(component, parent), rotate(position, component->coordinate[parent]->angle));
     }
@@ -528,10 +560,10 @@ sfVector2f get_position(ComponentData* component, int i) {
 }
 
 
-float get_angle(ComponentData* component, int i) {
-    float angle = component->coordinate[i]->angle;
+float get_angle(ComponentData* component, int entity) {
+    float angle = component->coordinate[entity]->angle;
 
-    int parent = component->coordinate[i]->parent;
+    int parent = component->coordinate[entity]->parent;
     if (parent != -1) {
         angle += get_angle(component, parent);
     }

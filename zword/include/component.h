@@ -195,7 +195,7 @@ typedef struct {
 typedef struct {
     int size;
     int max_index;
-    ImageComponent* array[MAX_ENTITIES];
+    void* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
 } OrderedArray;
 

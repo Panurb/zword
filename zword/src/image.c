@@ -135,14 +135,14 @@ void change_layer(ComponentData* components, int entity, int layer) {
 
     if (layer < image->layer) {
         int i = find(entity, components->image.order, components->image.size) - 1;
-        while (i >= 0 && components->image.array[components->image.order[i]]->layer > layer) {
+        while (i >= 0 && ImageComponent_get(components, components->image.order[i])->layer > layer) {
             components->image.order[i + 1] = components->image.order[i];
             i--;
         }
         components->image.order[i + 1] = entity;
     } else {
         int i = find(entity, components->image.order, components->image.size) + 1;
-        while (i < components->image.size && components->image.array[components->image.order[i]]->layer < layer) {
+        while (i < components->image.size && ImageComponent_get(components, components->image.order[i])->layer < layer) {
             components->image.order[i - 1] = components->image.order[i];
             i++;
         }
