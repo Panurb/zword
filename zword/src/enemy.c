@@ -24,10 +24,10 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     //component->image[i]->shine = 0.5;
     ColliderComponent_add_circle(components, i, 0.5, ENEMIES);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 5.0;
-    components->enemy[i] = EnemyComponent_create();
-    components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
-    components->waypoint[i] = WaypointComponent_create();
-    components->health[i] = HealthComponent_create(100);
+    EnemyComponent_add(components, i);
+    ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, get_color(0.78, 0.0, 0.0, 1.0), sfRed);
+    WaypointComponent_add(components, i);
+    HealthComponent_add(components, i, 100);
 
     //EnemyComponent* enemy = component->enemy[i];
     //component->light[i] = LightComponent_create(enemy->vision_range, enemy->fov, 51, sfGreen, 0.1, 1.0);
@@ -36,10 +36,10 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
 
 void update_enemies(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        if (!components->enemy[i]) continue;
+        EnemyComponent* enemy = EnemyComponent_get(components, i);
+        if (!enemy) continue;
 
-        EnemyComponent* enemy = components->enemy[i];
-        PhysicsComponent* phys = components->physics[i];
+        PhysicsComponent* phys = PhysicsComponent_get(components, i);
         ImageComponent* image = ImageComponent_get(components, i);
 
         if (components->health[i]->health <= 0) {
@@ -49,7 +49,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
         switch (enemy->state) {
             case IDLE:
                 for (int j = 0; j < components->entities; j++) {
-                    if (!components->player[j]) continue;
+                    if (!PlayerComponent_get(components, j)) continue;
 
                     sfVector2f r = diff(get_position(components, j), get_position(components, i));
                     float angle = mod(get_angle(components, i) - polar_angle(r), 2 * M_PI);
@@ -69,7 +69,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 break;
             case CHASE:
                 ;
-                int target = components->player[enemy->target]->vehicle;
+                int target = PlayerComponent_get(components, enemy->target)->vehicle;
                 if (target == -1) {
                     target = enemy->target;
                 }
@@ -90,15 +90,18 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
                 break;
             case DEAD:
+                ;
+                ColliderComponent* col = ColliderComponent_get(components, i);
+
                 if (norm(phys->velocity) == 0.0) {
-                    components->collider[i]->enabled = false;
+                    col->enabled = false;
                 }
                 strcpy(image->filename, "zombie_dead");
                 image->width = 2.0;
                 image->texture_changed = true;
                 change_layer(components, i, 2);
 
-                ColliderComponent_get(components, i)->group = ITEMS;
+                col->group = ITEMS;
 
                 break;
         }
@@ -108,7 +111,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
 void draw_enemies(ComponentData* component, sfRenderWindow* window, Camera* camera) {
     for (int i = 0; i < component->entities; i++) {
-        EnemyComponent* enemy = component->enemy[i];
+        EnemyComponent* enemy = EnemyComponent_get(component, i);
         if (!enemy) continue;
 
         for (int j = 0; j < MAX_PATH_LENGTH; j++) {
@@ -147,8 +150,8 @@ void damage(ComponentData* component, int entity, int dmg, int player) {
     CoordinateComponent_add(component, j, get_position(component, entity), rand_angle());
 
     if (dmg < 50) {
-        ImageComponent_add(component, j, "blood", 1.0, 1.0, 1)->alpha = 0.75;
+        ImageComponent_add(component, j, "blood", 1.0, 1.0, 1);
     } else {
-        ImageComponent_add(component, j, "blood_large", 2.0, 2.0, 1)->alpha = 0.75;
+        ImageComponent_add(component, j, "blood_large", 2.0, 2.0, 1);
     }
 }

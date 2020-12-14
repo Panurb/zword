@@ -26,10 +26,10 @@ void create_player(ComponentData* components, sfVector2f pos) {
     ImageComponent_add(components, i, "player", 1.0, 1.0, 5);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.0, 10.0, 0.0)->max_speed = 5.0;
     ColliderComponent_add_circle(components, i, 0.5, PLAYERS);
-    components->player[i] = PlayerComponent_create();
-    components->particle[i] = ParticleComponent_create(0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, sfColor_fromRGB(200, 0, 0), sfColor_fromRGB(255, 0, 0));
-    components->waypoint[i] = WaypointComponent_create();
-    components->health[i] = HealthComponent_create(100);
+    PlayerComponent_add(components, i);
+    ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, get_color(0.78, 0.0, 0.0, 1.0), sfRed);
+    WaypointComponent_add(components, i);
+    HealthComponent_add(components, i, 100);
 }
 
 

@@ -122,8 +122,6 @@ int main() {
 
         sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
 
-        // draw_grid(window, camera);
-
         // debug_draw(component, window, camera);
 
         draw(components, window, camera, textures);
@@ -137,6 +135,8 @@ int main() {
         // draw_waypoints(components, window, camera);
 
         // draw_enemies(components, window, camera);
+        
+        draw_grid(window, camera);
 
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
         elapsed_time += delta_time;

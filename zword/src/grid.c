@@ -59,16 +59,12 @@ void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f orig
 
     int x = floor(origin.x + 0.5 * grid->width);
     int y = floor(origin.y + 0.5 * grid->height);
-    int rx = radius * grid->tile_width;
-    int ry = radius * grid->tile_height;
-
-    for (int i = 0; i < 100; i++) {
-        entities[i] = -1;
-    }
+    int rx = radius / grid->tile_width;
+    int ry = radius / grid->tile_height;
 
     int l = 0;
-    for (int i = x - rx; i <= x + rx; i++) {
-        for (int j = y - ry; j <= y + ry; j++) {
+    for (int i = max(0, x - rx); i <= min(grid->width - 1, x + rx); i++) {
+        for (int j = max(0, y - ry); j <= min(grid->height - 1, y + ry); j++) {
             for (int k = 0; k < grid->size; k++) {
                 int n = grid->array[i][j][k];
                 if (n == -1) continue;
@@ -83,6 +79,10 @@ void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f orig
                 col->last_collision = id;
             }
         }
+    }
+
+    for (int i = l; i < 100; i++) {
+        entities[i] = -1;
     }
 }
 

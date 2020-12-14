@@ -128,13 +128,15 @@ void draw_rectangle(sfRenderWindow* window, Camera* camera, sfRectangleShape* sh
 
 
 void draw_grid(sfRenderWindow* window, Camera* camera) {
+    sfColor color = get_color(1.0, 1.0, 1.0, 0.2);
+
     int nx = ceil(camera->width / camera->zoom) + 1;
     float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);
     for (int i = 0; i < nx; i++) {
         sfVector2f start = { x + i, camera->position.y + 0.5 * camera->height / camera->zoom };
         sfVector2f end = { x + i, camera->position.y - 0.5 * camera->height / camera->zoom };
 
-        draw_line(window, camera, NULL, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+        draw_line(window, camera, NULL, start, end, 0.02, color);
     }
 
     int ny = ceil(camera->height / camera->zoom);    
@@ -143,7 +145,7 @@ void draw_grid(sfRenderWindow* window, Camera* camera) {
         sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + (i - nx) };
         sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + (i - nx) };
 
-        draw_line(window, camera, NULL, start, end, 0.02, sfColor_fromRGB(150, 150, 150));
+        draw_line(window, camera, NULL, start, end, 0.02, color);
     }
 }
 
@@ -249,14 +251,19 @@ void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVec
 }
 
 
-void update_camera(ComponentData* component, Camera* camera, float time_step) {
-    sfVector2f pos = { 0.0, 0.0 };
+void update_camera(ComponentData* components, Camera* camera, float time_step) {
+    sfVector2f pos = zeros();
 
     int n = 0;
-    for (int i = 0; i < component->entities; i++) {
-        if (component->player[i]) {
+    for (int i = 0; i < components->entities; i++) {
+        PlayerComponent* player = PlayerComponent_get(components, i);
+        if (player) {
             n += 1;
-            pos = sum(pos, get_position(component, i));
+            if (player->vehicle == -1) {
+                pos = sum(pos, get_position(components, i));
+            } else {
+                pos = sum(pos, get_position(components, i));
+            }
         }
     }
     pos = mult(1.0 / n, pos);

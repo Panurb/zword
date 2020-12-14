@@ -19,7 +19,7 @@ void create_waypoint(ComponentData* components, sfVector2f pos) {
     int i = get_index(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
-    components->waypoint[i] = WaypointComponent_create();
+    WaypointComponent_add(components, i);
 }
 
 
@@ -56,21 +56,20 @@ void create_fire(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     sfColor yellow = get_color(1.0, 1.0, 0.0, 1.0);
-    components->light[i] = LightComponent_create(5.0, 2.0 * M_PI, 201, orange, 0.8, 10.0);
-    components->light[i]->flicker = 0.2;
-    components->particle[i] = ParticleComponent_create(0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, orange, yellow);
-    components->particle[i]->loop = true;
-    components->particle[i]->enabled = true;
+    LightComponent_add(components, i, 5.0, 2.0 * M_PI, 201, orange, 0.8, 10.0)->flicker = 0.2;
+    ParticleComponent* particle = ParticleComponent_add(components, i, 0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, orange, yellow);
+    particle->loop = true;
+    particle->enabled = true;
     ColliderComponent_add_circle(components, i, 0.35, WALLS);
     ImageComponent_add(components, i, "fire", 1.0, 1.0, 5);
 }
 
 
-void create_light(ComponentData* component, sfVector2f pos) {
-    int i = get_index(component);
+void create_light(ComponentData* components, sfVector2f pos) {
+    int i = get_index(components);
 
-    CoordinateComponent_add(component, i, pos, 0.0);
-    component->light[i] = LightComponent_create(10.0, 2.0 * M_PI, 201, sfColor_fromRGB(255, 255, 150), 0.4, 10.0);
+    CoordinateComponent_add(components, i, pos, 0.0);
+    LightComponent_add(components, i, 10.0, 2.0 * M_PI, 201, get_color(1.0, 1.0, 0.6, 1.0), 0.4, 10.0);
 }
 
 
@@ -220,7 +219,7 @@ void test(ComponentData* components) {
             sfVector2f pos = { i, j };
 
             CoordinateComponent_add(components, k, pos, 0.0);
-            components->waypoint[k] = WaypointComponent_create();
+            WaypointComponent_add(components, k);
         }
     }
 }

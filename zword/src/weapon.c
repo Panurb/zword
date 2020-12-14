@@ -36,11 +36,11 @@ void reload(ComponentData* component, int i) {
 }
 
 
-void shoot(ComponentData* component, ColliderGrid* grid, int i) {
-    WeaponComponent* weapon = component->weapon[i];
-    int parent = component->coordinate[i]->parent;
+void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
+    WeaponComponent* weapon = components->weapon[entity];
+    int parent = components->coordinate[entity]->parent;
 
-    int akimbo = get_akimbo(component, i);
+    int akimbo = get_akimbo(components, entity);
 
     if (weapon->magazine > 0) {
         if (weapon->cooldown == 0.0) {
@@ -48,33 +48,47 @@ void shoot(ComponentData* component, ColliderGrid* grid, int i) {
             weapon->magazine--;
 
             float angle = float_rand(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
-            sfVector2f r = polar_to_cartesian(1.0, get_angle(component, parent) +  angle);
+            sfVector2f r = polar_to_cartesian(1.0, get_angle(components, parent) +  angle);
 
-            sfVector2f pos = get_position(component, parent);
+            sfVector2f pos = get_position(components, parent);
 
-            HitInfo info = raycast(component, grid, pos, r, 20.0, parent);
+            HitInfo info = raycast(components, grid, pos, r, 20.0, parent);
 
-            if (component->health[info.object]) {
+            if (components->health[info.object]) {
                 float x = dot(info.normal, normalized(r));
                 float dmg = weapon->damage;
                 if (x < -0.99) {
                     dmg *= 2.0;
                 }
 
-                damage(component, info.object, dmg, parent);
+                damage(components, info.object, dmg, parent);
             }
             
-            if (component->physics[info.object]) {
-                component->physics[info.object]->velocity = polar_to_cartesian(2.0, get_angle(component, parent) +  angle);
+            if (components->physics[info.object]) {
+                components->physics[info.object]->velocity = polar_to_cartesian(2.0, get_angle(components, parent) +  angle);
             }
 
             weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-            component->particle[i]->angle = angle;
-            component->particle[i]->max_time = dist(pos, info.position) / component->particle[i]->speed;
-            component->particle[i]->enabled = true;
+            components->particle[entity]->angle = angle;
+            components->particle[entity]->max_time = dist(pos, info.position) / components->particle[entity]->speed;
+            components->particle[entity]->enabled = true;
+
+            int entities[100];
+            get_entities(components, grid, pos, 20.0, entities);
+
+            for (int i = 0; i < 100; i++) {
+                int j = entities[i];
+                if (j == -1) break;
+
+                EnemyComponent* enemy = EnemyComponent_get(components, j);
+                if (enemy) {
+                    enemy->target = parent;
+                    enemy->state = CHASE;
+                }
+            }
         }
     } else {
-        reload(component, i);
+        reload(components, entity);
     }
 }
 
@@ -88,9 +102,8 @@ void create_weapon(ComponentData* components, float x, float y) {
     ColliderComponent_add_rectangle(components, i, 0.5, 0.25, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
-    components->weapon[i] = WeaponComponent_create(4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
-    components->particle[i] = ParticleComponent_create(0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite);
-    components->particle[i]->speed_spread = 0.0;
+    WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
+    ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
 }
 
@@ -103,8 +116,7 @@ void create_lasersight(ComponentData* components, float x, float y) {
     CoordinateComponent_add(components, i, pos, float_rand(0.0, 2 * M_PI));
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
-    components->light[i] = LightComponent_create(20.0, 0.01, 1, sfRed, 1.0, 10.0);
-    components->light[i]->enabled = false;
+    LightComponent_add(components, i, 20.0, 0.01, 1, sfRed, 1.0, 10.0)->enabled = false;
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, 3);
 }
 
@@ -116,9 +128,9 @@ void update_weapons(ComponentData* components, float time_step) {
 
         weapon->cooldown = fmax(0.0, weapon->cooldown - time_step);
 
-        int parent = components->coordinate[i]->parent;
+        int parent = CoordinateComponent_get(components, i)->parent;
         if (parent != -1) {
-            PhysicsComponent* phys = components->physics[parent];
+            PhysicsComponent* phys = PhysicsComponent_get(components, parent);
             weapon->recoil = fmax(0.1 * norm(phys->velocity), weapon->recoil - time_step * weapon->recoil_down);
         }
     }
