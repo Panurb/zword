@@ -5,6 +5,7 @@
 #include "component.h"
 #include "collider.h"
 #include "util.h"
+#include "camera.h"
 
 
 ColliderGrid* ColliderGrid_create() {
@@ -153,5 +154,28 @@ void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int* arr
                 }
             }
         }
+    }
+}
+
+
+void draw_grid(ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+    sfColor color = get_color(1.0, 1.0, 1.0, 0.2);
+
+    int nx = ceil((camera->width / camera->zoom) / grid->tile_width) + 1;
+    float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);
+    for (int i = 0; i < nx; i++) {
+        sfVector2f start = { x + i * grid->tile_width, camera->position.y + 0.5 * camera->height / camera->zoom };
+        sfVector2f end = { x + i * grid->tile_width, camera->position.y - 0.5 * camera->height / camera->zoom };
+
+        draw_line(window, camera, NULL, start, end, 0.02, color);
+    }
+
+    int ny = ceil((camera->height / camera->zoom) / grid->tile_height);    
+    float y = floor(camera->position.y - 0.5 * camera->height / camera->zoom);
+    for (int i = 0; i < ny; i++) {
+        sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + i * grid->tile_height };
+        sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + i * grid->tile_height };
+
+        draw_line(window, camera, NULL, start, end, 0.02, color);
     }
 }

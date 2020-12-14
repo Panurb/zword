@@ -1,6 +1,8 @@
 #pragma once
 
 #include "component.h"
+#include "camera.h"
+
 
 typedef struct {
     int left;
@@ -31,3 +33,5 @@ void clear_grid(ComponentData* component, ColliderGrid* grid, int i);
 Bounds get_bounds(ComponentData* component, ColliderGrid* grid, int i);
 
 void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int* array, int size);
+
+void draw_grid(ColliderGrid* grid, sfRenderWindow* window, Camera* camera);

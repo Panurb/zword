@@ -99,7 +99,7 @@ void create_weapon(ComponentData* components, float x, float y) {
     sfVector2f pos = { x, y };
 
     CoordinateComponent_add(components, i, pos, float_rand(0.0, 2 * M_PI));
-    ColliderComponent_add_rectangle(components, i, 0.5, 0.25, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);

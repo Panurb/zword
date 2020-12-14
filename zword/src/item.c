@@ -9,7 +9,7 @@ void create_flashlight(ComponentData* components, float x, float y) {
     sfVector2f pos = { x, y };
 
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 0.5, 0.25, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
     LightComponent_add(components, i, 7.0, 1.0, 51, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
@@ -38,23 +38,25 @@ void pick_up_item(ComponentData* components, int entity) {
 
 
 void drop_item(ComponentData* components, int entity) {
-    PlayerComponent* player = components->player[entity];
+    PlayerComponent* player = PlayerComponent_get(components, entity);
 
     int i = player->inventory[player->item];
     if (i != -1) {
+        PhysicsComponent* physics = PhysicsComponent_get(components, i);
         player->inventory[player->item] = -1;
 
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         coord->parent = -1;
 
         sfVector2f r = polar_to_cartesian(1.0, get_angle(components, entity));
-        coord->position = sum(get_position(components, entity), r);
+        coord->position = get_position(components, entity);
 
-        components->physics[i]->velocity = mult(7.0, r);
-        components->physics[i]->angular_velocity = 3.0;
+        physics->velocity = mult(7.0, r);
+        physics->angular_velocity = 3.0;
 
-        if (components->light[i]) {
-            components->light[i]->enabled = false;
+        LightComponent* light = LightComponent_get(components, entity);
+        if (light) {
+            light->enabled = false;
         }
 
         ImageComponent_get(components, i)->alpha = 1.0;

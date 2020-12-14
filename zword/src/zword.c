@@ -29,7 +29,7 @@
 int main() {
     srand(time(NULL));
 
-    sfVideoMode mode = { 1920, 1080, 32 };
+    sfVideoMode mode = { 1280, 720, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -122,13 +122,13 @@ int main() {
 
         sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
 
-        // debug_draw(component, window, camera);
-
         draw(components, window, camera, textures);
 
         sfRenderWindow_drawSprite(window, light_sprite, &state);
 
         // draw_roofs(components, window, camera, textures);
+
+        debug_draw(components, window, camera);
 
         draw_players(components, window, camera);
 
@@ -136,7 +136,9 @@ int main() {
 
         // draw_enemies(components, window, camera);
         
-        draw_grid(window, camera);
+        // draw_grid(grid, window, camera);
+
+        draw_occupied_tiles(components, grid, window, camera);
 
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
         elapsed_time += delta_time;

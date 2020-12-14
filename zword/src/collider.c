@@ -14,17 +14,12 @@
 #include "util.h"
 #include "grid.h"
 
-// WALLS,
-// ITEMS,
-// PLAYERS,
-// ENEMIES,
-// VEHICLES
 
-static bool COLLISION_MATRIX[5][5] = { { 1, 0, 0, 0, 0 }, 
-                                       { 1, 0, 0, 0, 0 },
-                                       { 1, 0, 1, 0, 1 },
-                                       { 1, 0, 0, 0, 1 },
-                                       { 1, 0, 1, 1, 1 } };
+static int COLLISION_MATRIX[5][5] = { { 0, 0, 0, 0, 0 },    // WALLS
+                                      { 1, 1, 0, 0, 0 },    // ITEMS
+                                      { 1, 0, 2, 2, 1 },    // PLAYERS
+                                      { 1, 0, 2, 2, 1 },    // ENEMIES
+                                      { 1, 0, 0, 0, 1 } };  // VEHICLES
 
 
 void get_corners(ComponentData* component, int i, sfVector2f* corners) {
@@ -202,22 +197,23 @@ sfVector2f overlap(ComponentData* component, int i, int j) {
 }
 
 
-void collide(ComponentData* component, ColliderGrid* grid) {
+void collide(ComponentData* components, ColliderGrid* grid) {
     // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
 
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->collider[i]) continue;
+    for (int i = 0; i < components->entities; i++) {
+        ColliderComponent* collider = ColliderComponent_get(components, i);
+        if (!collider) continue;
 
-        component->collider[i]->last_collision = -1;
+        collider->last_collision = -1;
     }
 
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->collider[i]) continue;
+    for (int i = 0; i < components->entities; i++) {
+        if (!ColliderComponent_get(components, i)) continue;
 
-        PhysicsComponent* physics = component->physics[i];
+        PhysicsComponent* physics = components->physics[i];
         if (!physics) continue;
 
-        Bounds bounds = get_bounds(component, grid, i);
+        Bounds bounds = get_bounds(components, grid, i);
 
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
@@ -226,11 +222,12 @@ void collide(ComponentData* component, ColliderGrid* grid) {
 
                     if (n == -1) continue;
                     if (n == i) continue;
-                    if (component->collider[n]->last_collision == i) continue;
+                    ColliderComponent* collider = ColliderComponent_get(components, n);
+                    if (collider->last_collision == i) continue;
 
-                    component->collider[n]->last_collision = i;
+                    collider->last_collision = i;
 
-                    sfVector2f ol = overlap(component, i, n);
+                    sfVector2f ol = overlap(components, i, n);
 
                     if (ol.x == 0.0 && ol.y == 0.0) continue;
 
@@ -239,7 +236,7 @@ void collide(ComponentData* component, ColliderGrid* grid) {
 
                     float m = 1.0;
 
-                    PhysicsComponent* other = component->physics[n];
+                    PhysicsComponent* other = PhysicsComponent_get(components, n);
                     if (other) {
                         dv = diff(dv, other->velocity);
                         m = other->mass / (physics->mass + other->mass);
@@ -247,9 +244,13 @@ void collide(ComponentData* component, ColliderGrid* grid) {
 
                     sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, no), no));
 
-                    physics->collision.velocity = sum(physics->collision.velocity, new_vel);
-                    physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
-                    physics->collision.collided = true;
+                    if (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group] == 2) {
+                        physics->acceleration = sum(physics->acceleration, mult(10.0, ol));
+                    } else {
+                        physics->collision.velocity = sum(physics->collision.velocity, new_vel);
+                        physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
+                        physics->collision.collided = true;
+                    }
                 }
             }
         }
@@ -257,45 +258,31 @@ void collide(ComponentData* component, ColliderGrid* grid) {
 }
 
 
-void draw_occupied_tiles(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i < component->entities; i++) {
-        Bounds bounds = get_bounds(component, grid, i);
+void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+    for (int i = 0; i < components->entities; i++) {
+        if (!ColliderComponent_get(components, i)) continue;
+
+        Bounds bounds = get_bounds(components, grid, i);
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
-                for (int l = 0; l < 10; l++) {
-                    sfRectangleShape* shape = sfRectangleShape_create();
-                    sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * camera->zoom, 0.5 * camera->zoom });
-
-                    sfVector2f pos = { j - 31.3, k - 31.3 };
-                    sfRectangleShape_setPosition(shape, world_to_screen(pos, camera));
-
-                    sfVector2f size = { camera->zoom, camera->zoom };
-                    sfRectangleShape_setSize(shape, size);
-
-                    sfRectangleShape_setOutlineColor(shape, sfWhite);
-                    sfRectangleShape_setOutlineThickness(shape, 0.1 * camera->zoom);
-                    sfRectangleShape_setFillColor(shape, sfTransparent);
-
-                    sfRenderWindow_drawRectangleShape(window, shape, NULL);
-
-                    sfRectangleShape_destroy(shape);
-                }
+                sfVector2f pos = { (j - 0.5 * grid->width) * grid->tile_width, (k - 0.5 * grid->height) * grid->tile_height };
+                draw_rectangle(window, camera, NULL, pos, grid->tile_width, grid->tile_height, 0.0, get_color(1.0, 1.0, 1.0, 0.25));
             }
         }
     }
 }
 
 
-void debug_draw(ComponentData* component, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i < component->entities; i++) {
-        ColliderComponent* col = component->collider[i];
+void debug_draw(ComponentData* components, sfRenderWindow* window, Camera* camera) {
+    for (int i = 0; i < components->entities; i++) {
+        ColliderComponent* col = components->collider[i];
         if (!col) continue;
 
         if (col->type == CIRCLE) {
-            draw_circle(window, camera, NULL, get_position(component, i), col->radius, sfColor_fromRGB(150, 0, 150));
+            draw_circle(window, camera, NULL, get_position(components, i), col->radius, get_color(1.0, 0.0, 1.0, 0.25));
         } else {
-            sfColor color = sfColor_fromRGB(50, 50, 50);
-            draw_rectangle(window, camera, NULL, get_position(component, i), col->width, col->height, get_angle(component, i), color);
+            sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
+            draw_rectangle(window, camera, NULL, get_position(components, i), col->width, col->height, get_angle(components, i), color);
         }
     }
 }

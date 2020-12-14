@@ -17,4 +17,6 @@ float axis_half_width(ComponentData* component, int i, sfVector2f axis);
 
 void collide(ComponentData* component, ColliderGrid* collision_grid);
 
+void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, Camera* camera);
+
 void debug_draw(ComponentData* component, sfRenderWindow* window, Camera* camera);
