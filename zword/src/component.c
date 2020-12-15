@@ -140,6 +140,7 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     phys->friction = friction;
     phys->bounce = bounce;
     phys->drag = drag;
+    phys->speed = 0.0;
     phys->max_speed = 20.0;
     phys->angular_drag = angular_drag;
     phys->max_angular_speed = 20.0 * M_PI;
@@ -503,7 +504,7 @@ void HealthComponent_remove(ComponentData* components, int entity) {
 }
 
 
-int get_index(ComponentData* component) {
+int create_entity(ComponentData* component) {
     for (int i = 0; i < component->entities; i++) {
         if (!component->coordinate[i]) {
             return i;

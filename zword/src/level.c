@@ -16,7 +16,7 @@
 
 
 void create_waypoint(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
     WaypointComponent_add(components, i);
@@ -24,7 +24,7 @@ void create_waypoint(ComponentData* components, sfVector2f pos) {
 
 
 void brick_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, length, 0.75, WALLS);
@@ -33,7 +33,7 @@ void brick_wall(ComponentData* components, sfVector2f pos, float length, float a
 
 
 void wood_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, length, 0.5, WALLS);
@@ -42,7 +42,7 @@ void wood_wall(ComponentData* components, sfVector2f pos, float length, float an
 
 
 void create_prop(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, float_rand(0.0, 2 * M_PI));
     ColliderComponent_add_rectangle(components, i, 1.0, 1.0, WALLS);
@@ -51,7 +51,7 @@ void create_prop(ComponentData* components, sfVector2f pos) {
 
 
 void create_fire(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
@@ -66,7 +66,7 @@ void create_fire(ComponentData* components, sfVector2f pos) {
 
 
 void create_light(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
     LightComponent_add(components, i, 10.0, 2.0 * M_PI, 201, get_color(1.0, 1.0, 0.6, 1.0), 0.4, 10.0);
@@ -74,7 +74,7 @@ void create_light(ComponentData* components, sfVector2f pos) {
 
 
 void create_floor(ComponentData* component, sfVector2f pos, float width, float height, float angle) {
-    int i = get_index(component);
+    int i = create_entity(component);
 
     CoordinateComponent_add(component, i, pos, angle);
     ImageComponent_add(component, i, "board_tile", width, height, 1);
@@ -82,7 +82,7 @@ void create_floor(ComponentData* component, sfVector2f pos, float width, float h
 
 
 void create_roof(ComponentData* component, sfVector2f pos, float width, float height, float angle) {
-    int i = get_index(component);
+    int i = create_entity(component);
 
     CoordinateComponent_add(component, i, pos, angle);
     ImageComponent_add(component, i, "roof_tile", width, height, 6);
@@ -166,11 +166,11 @@ void create_shed(ComponentData* component, float x, float y) {
 
 
 void create_ground(ComponentData* components, float width, float height) {
-    int i = get_index(components);
+    int i = create_entity(components);
     CoordinateComponent_add(components, i, zeros(), 0.0);
     ImageComponent_add(components, i, "grass_tile", width, height, 0);
 
-    i = get_index(components);
+    i = create_entity(components);
     CoordinateComponent_add(components, i, zeros(), 0.0);
     ImageComponent* image = ImageComponent_add(components, i, "", 4.0, 4.0, 0);
     image->texture_changed = false;
@@ -214,7 +214,7 @@ void create_level(ComponentData* components, float width, float height) {
 void test(ComponentData* components) {
     for (int i = 0; i < 20; i ++) {
         for (int j = 0; j < 20; j++) {
-            int k = get_index(components);
+            int k = create_entity(components);
 
             sfVector2f pos = { i, j };
 

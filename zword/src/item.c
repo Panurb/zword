@@ -4,7 +4,7 @@
 
 
 void create_flashlight(ComponentData* components, float x, float y) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     sfVector2f pos = { x, y };
 

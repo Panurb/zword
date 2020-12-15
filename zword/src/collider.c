@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "util.h"
 #include "grid.h"
+#include "physics.h"
 
 
 static int COLLISION_MATRIX[5][5] = { { 0, 0, 0, 0, 0 },    // WALLS
@@ -245,7 +246,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                     sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, no), no));
 
                     if (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group] == 2) {
-                        physics->acceleration = sum(physics->acceleration, mult(10.0, ol));
+                        apply_force(components, i, mult(50.0, ol));
                     } else {
                         physics->collision.velocity = sum(physics->collision.velocity, new_vel);
                         physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));

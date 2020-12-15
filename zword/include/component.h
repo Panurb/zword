@@ -44,6 +44,7 @@ typedef struct {
     float friction;
     float bounce;
     float drag;
+    float speed;
     float max_speed;
     float angular_drag;
     float max_angular_speed;
@@ -271,7 +272,7 @@ HealthComponent* HealthComponent_add(ComponentData* components, int entity, int 
 HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
 
-int get_index(ComponentData* component);
+int create_entity(ComponentData* component);
 
 void destroy_entity(ComponentData* component, int i);
 

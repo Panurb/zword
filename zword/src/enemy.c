@@ -15,7 +15,7 @@
 
 
 void create_enemy(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     float angle = float_rand(0.0, 2 * M_PI);
     
@@ -93,15 +93,18 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 ;
                 ColliderComponent* col = ColliderComponent_get(components, i);
 
-                if (norm(phys->velocity) == 0.0) {
-                    col->enabled = false;
+                if (col) {
+                    col->group = ITEMS;
+                    if (phys->speed == 0.0) {
+                        clear_grid(components, grid, i);
+                        ColliderComponent_remove(components, i);
+                    }
                 }
+
                 strcpy(image->filename, "zombie_dead");
                 image->width = 2.0;
                 image->texture_changed = true;
                 change_layer(components, i, 2);
-
-                col->group = ITEMS;
 
                 break;
         }
@@ -146,7 +149,7 @@ void damage(ComponentData* component, int entity, int dmg, int player) {
         }
     }
 
-    int j = get_index(component);
+    int j = create_entity(component);
     CoordinateComponent_add(component, j, get_position(component, entity), rand_angle());
 
     if (dmg < 50) {

@@ -20,7 +20,7 @@
 
 
 void create_player(ComponentData* components, sfVector2f pos) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
     ImageComponent_add(components, i, "player", 1.0, 1.0, 5);

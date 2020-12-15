@@ -94,7 +94,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
 
 void create_weapon(ComponentData* components, float x, float y) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     sfVector2f pos = { x, y };
 
@@ -109,7 +109,7 @@ void create_weapon(ComponentData* components, float x, float y) {
 
 
 void create_lasersight(ComponentData* components, float x, float y) {
-    int i = get_index(components);
+    int i = create_entity(components);
 
     sfVector2f pos = { x, y };
 
