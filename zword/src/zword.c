@@ -138,7 +138,7 @@ int main() {
         
         // draw_grid(grid, window, camera);
 
-        draw_occupied_tiles(components, grid, window, camera);
+        // draw_occupied_tiles(components, grid, window, camera);
 
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
         elapsed_time += delta_time;

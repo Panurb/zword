@@ -218,7 +218,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
-                for (int l = 0; l < grid->size; l++) {
+                for (int l = 0; l < grid->tile_size; l++) {
                     int n = grid->array[j][k][l];
 
                     if (n == -1) continue;
@@ -266,7 +266,8 @@ void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRender
         Bounds bounds = get_bounds(components, grid, i);
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
-                sfVector2f pos = { (j - 0.5 * grid->width) * grid->tile_width, (k - 0.5 * grid->height) * grid->tile_height };
+                sfVector2f pos = { j * grid->tile_width - 0.5 * grid->width + 0.5 * grid->tile_width, 
+                                   k * grid->tile_height - 0.5 * grid->height + 0.5 * grid->tile_height };
                 draw_rectangle(window, camera, NULL, pos, grid->tile_width, grid->tile_height, 0.0, get_color(1.0, 1.0, 1.0, 0.25));
             }
         }

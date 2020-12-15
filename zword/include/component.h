@@ -273,9 +273,7 @@ HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* component);
-
 void destroy_entity(ComponentData* component, int i);
 
 sfVector2f get_position(ComponentData* component, int i);
-
 float get_angle(ComponentData* component, int i);

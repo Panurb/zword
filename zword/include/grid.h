@@ -11,13 +11,15 @@ typedef struct {
     int bottom;
 } Bounds;
 
-typedef struct{
+typedef struct {
     int array[64][64][10];
-    int width;
-    int height;
-    int size;
+    int columns;
+    int rows;
+    int tile_size;
     float tile_width;
     float tile_height;
+    float width;
+    float height;
 } ColliderGrid;
 
 ColliderGrid* ColliderGrid_create();
@@ -32,6 +34,6 @@ void clear_grid(ComponentData* component, ColliderGrid* grid, int i);
 
 Bounds get_bounds(ComponentData* component, ColliderGrid* grid, int i);
 
-void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int* array, int size);
+void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int entities[100]);
 
 void draw_grid(ColliderGrid* grid, sfRenderWindow* window, Camera* camera);
