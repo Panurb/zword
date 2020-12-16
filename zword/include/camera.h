@@ -25,6 +25,8 @@ void draw_line(sfRenderWindow* window, Camera* camera, sfRectangleShape* line, s
 
 void draw_circle(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, sfVector2f position, float radius, sfColor color);
 
+void draw_ellipse(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, sfVector2f position, float major, float minor, float angle, sfColor color);
+
 void draw_rectangle(sfRenderWindow* window, Camera* camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color);
 
 void draw_cone(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread);

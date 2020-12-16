@@ -86,13 +86,30 @@ void draw_circle(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, s
     }
 
     sfCircleShape_setOrigin(shape, (sfVector2f) { radius * camera->zoom, radius * camera->zoom });
-
     sfCircleShape_setPosition(shape, world_to_screen(position, camera));
-
     sfCircleShape_setRadius(shape, radius * camera->zoom);
-
     sfCircleShape_setFillColor(shape, color);
+    sfRenderWindow_drawCircleShape(window, shape, NULL);
 
+    if (created) {
+        sfCircleShape_destroy(shape);
+    }
+}
+
+
+void draw_ellipse(sfRenderWindow* window, Camera* camera, sfCircleShape* shape, sfVector2f position, float major, float minor, float angle, sfColor color) {
+    bool created = false;
+    if (!shape) {
+        shape = sfCircleShape_create();
+        created = true;
+    }
+
+    sfCircleShape_setOrigin(shape, (sfVector2f) { major * camera->zoom, major * camera->zoom });
+    sfCircleShape_setPosition(shape, world_to_screen(position, camera));
+    sfCircleShape_setRadius(shape, major * camera->zoom);
+    sfCircleShape_setScale(shape, (sfVector2f) { 1.0, minor / major });
+    sfCircleShape_setFillColor(shape, color);
+    sfCircleShape_setRotation(shape, -to_degrees(angle));
     sfRenderWindow_drawCircleShape(window, shape, NULL);
 
     if (created) {

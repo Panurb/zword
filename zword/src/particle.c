@@ -7,13 +7,30 @@
 #include "camera.h"
 
 
-void add_particle(ComponentData* component, int i) {
-    ParticleComponent* part = component->particle[i];
+void ParticleComponent_add_blood(ComponentData* components, int entity) {
+    sfColor color = get_color(0.78, 0.0, 0.0, 1.0);
+    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.25, 0.0, 5.0, 10.0, color, color);
+}
 
-    part->position[part->iterator] = get_position(component, i);
+
+void ParticleComponent_add_sparks(ComponentData* components, int entity) {
+    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.15, 0.0, 5.0, 5.0, sfWhite, sfWhite);
+}
+
+
+void ParticleComponent_add_dirt(ComponentData* components, int entity) {
+    sfColor color = get_color(0.4, 0.25, 0.13, 1.0);
+    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.25, 0.0, 2.5, 10.0, color, color);
+}
+
+
+void add_particle(ComponentData* components, int entity) {
+    ParticleComponent* part = ParticleComponent_get(components, entity);
+
+    part->position[part->iterator] = sum(get_position(components, entity), part->origin);
     float r = part->speed * float_rand(1.0 - part->speed_spread, 1.0 + part->speed_spread);
     float angle = float_rand(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
-    part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(component, i) + angle);
+    part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(components, entity) + angle);
     part->time[part->iterator] = part->max_time;
     if (part->particles < part->max_particles) {
         part->particles++;
@@ -52,39 +69,37 @@ void update_particles(ComponentData* component, float delta_time) {
 }
 
 
+sfColor color_lerp(sfColor s, sfColor e, float t) {
+    return sfColor_fromRGBA(lerp(s.r, e.r, t), lerp(s.g, e.g, t), lerp(s.b, e.b, t), lerp(s.a, e.a, t));
+}
+
+
 void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera, int entity) {
     ParticleComponent* part = component->particle[entity];
     if (!part) return;
 
-    sfCircleShape_setFillColor(part->shape, part->color);
-    for (int j = 0; j < part->particles; j++) {
-        if (part->time[j] == 0.0) continue;
+    for (int i = part->particles - 1; i >= 0; i--) {
+        if (part->time[i] == 0.0) continue;
 
-        float r = (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
-        sfCircleShape_setRadius(part->shape, r);
-        sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
-        sfVector2f pos = world_to_screen(part->position[j], camera);
-        sfCircleShape_setPosition(part->shape, pos);
-        sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
-        sfCircleShape_setScale(part->shape, scale);
-        float angle = atan2(part->velocity[j].y, part->velocity[j].x);
-        sfCircleShape_setRotation(part->shape, -to_degrees(angle));
-        sfRenderWindow_drawCircleShape(window, part->shape, NULL);
+        float t = 1.0 - part->time[i] / part->max_time;
+        sfColor color = color_lerp(part->start_color, part->end_color, t);
+
+        float r = lerp(part->start_size, part->end_size, t);
+        float angle = polar_angle(part->velocity[i]);
+
+        draw_ellipse(window, camera, part->shape, part->position[i], max(1.0, 0.1 * norm(part->velocity[i])) * r, r, angle, color);
     }
 
-    sfCircleShape_setFillColor(part->shape, part->inner_color);
-    for (int j = 0; j < part->particles; j++) {
-        if (part->time[j] == 0.0) continue;
+    for (int i = part->particles - 1; i >= 0; i--) {
+        if (part->time[i] == 0.0) continue;
 
-        float r = 0.5 * (part->time[j] * part->max_size + (1 - part->time[j]) * part->min_size) * camera->zoom;
-        sfCircleShape_setRadius(part->shape, r);
-        sfCircleShape_setOrigin(part->shape, (sfVector2f) { r, r });
-        sfVector2f pos = world_to_screen(part->position[j], camera);
-        sfCircleShape_setPosition(part->shape, pos);
-        sfVector2f scale = { max(1.0, 0.1 * norm(part->velocity[j])), 1.0 };
-        sfCircleShape_setScale(part->shape, scale);
-        float angle = atan2(part->velocity[j].y, part->velocity[j].x);
-        sfCircleShape_setRotation(part->shape, -to_degrees(angle));
-        sfRenderWindow_drawCircleShape(window, part->shape, NULL);
+        float t = 1.0 - part->time[i] / part->max_time;
+        sfColor color = color_lerp(part->start_color, part->end_color, t);
+        color = color_lerp(color, sfWhite, 0.25);
+
+        float r = 0.5 * lerp(part->start_size, part->end_size, t);
+        float angle = polar_angle(part->velocity[i]);
+
+        draw_ellipse(window, camera, part->shape, part->position[i], max(1.0, 0.1 * norm(part->velocity[i])) * r, r, angle, color);
     }
 }

@@ -237,7 +237,7 @@ LightComponent* LightComponent_add(ComponentData* components, int entity, float 
     light->enabled = true;
     light->range = range;
     light->angle = angle;
-    light->rays = rays;
+    light->rays = angle * 50;
     light->brightness = 0.0;
     light->max_brightness = brightness;
 
@@ -303,7 +303,7 @@ void EnemyComponent_remove(ComponentData* components, int entity) {
 
 
 ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float max_size, 
-                                         float min_size, float speed, float rate, sfColor color, sfColor inner_color) {
+                                         float min_size, float speed, float rate, sfColor start_color, sfColor end_color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
     particle->enabled = false;
     particle->loop = false;
@@ -312,21 +312,22 @@ ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, 
     particle->particles = 0;
     particle->max_particles = 100;
     particle->iterator = 0;
-    particle->max_size = max_size;
-    particle->min_size = min_size;
+    particle->start_size = max_size;
+    particle->end_size = min_size;
     particle->speed = speed;
     particle->speed_spread = 0.5;
     particle->max_time = 0.5;
     for (int i = 0; i < particle->max_particles; i++) {
-        particle->position[i] = (sfVector2f) { 0.0, 0.0 };
-        particle->velocity[i] = (sfVector2f) { 0.0, 0.0 };
+        particle->position[i] = zeros();
+        particle->velocity[i] = zeros();
         particle->time[i] = 0.0;
     }
     particle->shape = sfCircleShape_create();
     particle->rate = rate;
     particle->timer = 0.0;
-    particle->color = color;
-    particle->inner_color = inner_color;
+    particle->start_color = start_color;
+    particle->end_color = end_color;
+    particle->origin = zeros();
 
     components->particle[entity] = particle;
 

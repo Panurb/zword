@@ -12,6 +12,7 @@
 #include "util.h"
 #include "navigation.h"
 #include "image.h"
+#include "particle.h"
 
 
 void create_enemy(ComponentData* components, sfVector2f pos) {
@@ -20,17 +21,13 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     float angle = float_rand(0.0, 2 * M_PI);
     
     CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4);
-    //component->image[i]->shine = 0.5;
+    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4)->shine = 0.5;
     ColliderComponent_add_circle(components, i, 0.5, ENEMIES);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 5.0;
     EnemyComponent_add(components, i);
-    ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, get_color(0.78, 0.0, 0.0, 1.0), sfRed);
+    ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100);
-
-    //EnemyComponent* enemy = component->enemy[i];
-    //component->light[i] = LightComponent_create(enemy->vision_range, enemy->fov, 51, sfGreen, 0.1, 1.0);
 }
 
 
@@ -135,20 +132,12 @@ void draw_enemies(ComponentData* component, sfRenderWindow* window, Camera* came
 void damage(ComponentData* component, int entity, int dmg, int player) {
     EnemyComponent* enemy = component->enemy[entity];
     HealthComponent* health = component->health[entity];
-    ParticleComponent* particle = component->particle[entity];
 
     health->health = max(0, health->health - dmg);
 
     if (enemy) {
         enemy->target = player;
         enemy->state = CHASE;
-    }
-
-    if (particle) {
-        particle->enabled = true;
-        if (dmg > 50) {
-            particle->rate *= 5.0;
-        }
     }
 
     int j = create_entity(component);

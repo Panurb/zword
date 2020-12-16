@@ -13,6 +13,7 @@
 #include "navigation.h"
 #include "perlin.h"
 #include "item.h"
+#include "particle.h"
 
 
 void create_waypoint(ComponentData* components, sfVector2f pos) {
@@ -23,30 +24,23 @@ void create_waypoint(ComponentData* components, sfVector2f pos) {
 }
 
 
-void brick_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
+void create_brick_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, length, 0.75, WALLS);
     ImageComponent_add(components, i, "brick_tile", length, 0.75, 2);
+    ParticleComponent_add_dirt(components, i);
 }
 
 
-void wood_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
+void create_wood_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, length, 0.5, WALLS);
     ImageComponent_add(components, i, "wood_tile", length, 0.5, 2);
-}
-
-
-void create_prop(ComponentData* components, sfVector2f pos) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, float_rand(0.0, 2 * M_PI));
-    ColliderComponent_add_rectangle(components, i, 1.0, 1.0, WALLS);
-    PhysicsComponent_add(components, i, 1.0, 0.5, 0.5, 2.0, 4.0);
+    ParticleComponent_add_dirt(components, i);
 }
 
 
@@ -55,9 +49,8 @@ void create_fire(ComponentData* components, sfVector2f pos) {
 
     CoordinateComponent_add(components, i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
-    sfColor yellow = get_color(1.0, 1.0, 0.0, 1.0);
     LightComponent_add(components, i, 5.0, 2.0 * M_PI, 201, orange, 0.8, 10.0)->flicker = 0.2;
-    ParticleComponent* particle = ParticleComponent_add(components, i, 0.5 * M_PI, 1.0, 0.8, 0.2, 1.0, 5.0, orange, yellow);
+    ParticleComponent* particle = ParticleComponent_add(components, i, 0.5 * M_PI, 1.0, 0.6, 0.2, 1.0, 5.0, orange, orange);
     particle->loop = true;
     particle->enabled = true;
     ColliderComponent_add_circle(components, i, 0.35, WALLS);
@@ -99,18 +92,18 @@ void create_house(ComponentData* component, float x, float y) {
 
     create_floor(component, pos, 10.0, 10.0, angle);
 
-    brick_wall(component, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
-    brick_wall(component, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
+    create_brick_wall(component, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
+    create_brick_wall(component, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
 
-    brick_wall(component, diff(pos, w), 9.25, angle + 0.5 * M_PI);
-    brick_wall(component, diff(pos, h), 10.75, angle);
-    brick_wall(component, sum(pos, h), 10.75, angle);
+    create_brick_wall(component, diff(pos, w), 9.25, angle + 0.5 * M_PI);
+    create_brick_wall(component, diff(pos, h), 10.75, angle);
+    create_brick_wall(component, sum(pos, h), 10.75, angle);
 
-    wood_wall(component, sum(pos, mult(-0.28, h)), 6.5, angle + 0.5 * M_PI);
-    wood_wall(component, sum(pos, mult(0.78, h)), 1.5, angle + 0.5 * M_PI);
+    create_wood_wall(component, sum(pos, mult(-0.28, h)), 6.5, angle + 0.5 * M_PI);
+    create_wood_wall(component, sum(pos, mult(0.78, h)), 1.5, angle + 0.5 * M_PI);
 
-    wood_wall(component, sum(pos, mult(-0.78, w)), 1.5, angle);
-    wood_wall(component, sum(pos, mult(-0.2, w)), 1.5, angle);
+    create_wood_wall(component, sum(pos, mult(-0.78, w)), 1.5, angle);
+    create_wood_wall(component, sum(pos, mult(-0.2, w)), 1.5, angle);
 
     create_light(component, diff(pos, mult(0.51, sum(w, h))));
     create_light(component, sum(pos, mult(0.51, diff(w, h))));
@@ -140,12 +133,12 @@ void create_shed(ComponentData* component, float x, float y) {
 
     create_floor(component, pos, 6.0, 6.0, angle);
 
-    wood_wall(component, sum(pos, w), 5.5, angle + 0.5 * M_PI);
-    wood_wall(component, diff(pos, w), 5.5, angle + 0.5 * M_PI);
-    wood_wall(component, diff(pos, h), 6.5, angle);
+    create_wood_wall(component, sum(pos, w), 5.5, angle + 0.5 * M_PI);
+    create_wood_wall(component, diff(pos, w), 5.5, angle + 0.5 * M_PI);
+    create_wood_wall(component, diff(pos, h), 6.5, angle);
 
-    wood_wall(component, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
-    wood_wall(component, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
+    create_wood_wall(component, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
+    create_wood_wall(component, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
 
     create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));
     create_enemy(component, sum(pos, polar_to_cartesian(2.0, float_rand(0.0, 2 * M_PI))));

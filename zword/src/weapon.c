@@ -70,9 +70,15 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 apply_force(components, info.object, mult(250.0, r));
             }
 
+            ParticleComponent* particle = ParticleComponent_get(components, info.object);
+            if (particle) {
+                particle->origin = diff(info.position, get_position(components, info.object));
+                particle->enabled = true;
+            }
+
             weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
 
-            ParticleComponent* particle = ParticleComponent_get(components, entity);
+            particle = ParticleComponent_get(components, entity);
             particle->angle = angle;
             particle->max_time = dist(pos, info.position) / particle->speed;
             particle->enabled = true;

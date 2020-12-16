@@ -141,13 +141,14 @@ typedef struct {
     sfVector2f position[100];
     sfVector2f velocity[100];
     float time[100];
-    float max_size;
-    float min_size;
-    sfColor color;
-    sfColor inner_color;
+    float start_size;
+    float end_size;
+    sfColor start_color;
+    sfColor end_color;
     sfCircleShape* shape;
     float rate;
     float timer;
+    sfVector2f origin;
 } ParticleComponent;
 
 typedef struct {

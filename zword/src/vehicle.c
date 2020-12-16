@@ -1,4 +1,5 @@
 #include "component.h"
+#include "particle.h"
 
 
 void create_car(ComponentData* components, float x, float y) {
@@ -11,6 +12,7 @@ void create_car(ComponentData* components, float x, float y) {
     VehicleComponent_add(components, i);
     WaypointComponent_add(components, i);
     ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
+    ParticleComponent_add_sparks(components, i);
 
     i = create_entity(components);
     CoordinateComponent_add(components, i, (sfVector2f) { 2.8, 1.0 }, 0.0)->parent = i - 1;
