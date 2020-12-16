@@ -88,6 +88,8 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     components->coordinate[i]->angle = polar_angle(r);
                 }
 
+                
+
                 break;
             case DEAD:
                 ;

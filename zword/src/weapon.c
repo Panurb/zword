@@ -7,6 +7,7 @@
 #include "raycast.h"
 #include "util.h"
 #include "enemy.h"
+#include "physics.h"
 
 
 int get_akimbo(ComponentData* components, int entity) {
@@ -58,20 +59,23 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 float x = dot(info.normal, normalized(r));
                 float dmg = weapon->damage;
                 if (x < -0.99) {
-                    dmg *= 2.0;
+                    dmg *= 4.0;
                 }
 
                 damage(components, info.object, dmg, parent);
             }
             
-            if (components->physics[info.object]) {
-                components->physics[info.object]->velocity = polar_to_cartesian(2.0, get_angle(components, parent) +  angle);
+            PhysicsComponent* physics = PhysicsComponent_get(components, info.object);
+            if (physics) {
+                apply_force(components, info.object, mult(250.0, r));
             }
 
             weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-            components->particle[entity]->angle = angle;
-            components->particle[entity]->max_time = dist(pos, info.position) / components->particle[entity]->speed;
-            components->particle[entity]->enabled = true;
+
+            ParticleComponent* particle = ParticleComponent_get(components, entity);
+            particle->angle = angle;
+            particle->max_time = dist(pos, info.position) / particle->speed;
+            particle->enabled = true;
 
             int entities[100];
             get_entities(components, grid, pos, 20.0, entities);

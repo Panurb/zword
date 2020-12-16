@@ -104,7 +104,6 @@ typedef struct {
     sfColor color;
     float brightness;
     float max_brightness;
-    int smoothing;
     sfVertexArray* verts;
     sfCircleShape* shine;
     float flicker;
@@ -171,7 +170,7 @@ typedef struct {
     int damage;
     float reload_time;
     bool reloading;
-    sfConvexShape* shape;
+    sfConvexShape* shape;   // move to player?
 } WeaponComponent;
 
 typedef struct {
@@ -195,7 +194,6 @@ typedef struct {
 
 typedef struct {
     int size;
-    int max_index;
     void* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
 } OrderedArray;

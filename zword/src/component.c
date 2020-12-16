@@ -18,7 +18,6 @@ ComponentData* ComponentData_create() {
     components->entities = 0;
 
     components->image.size = 0;
-    components->image.max_index = -1;
 
     for (int i = 0; i < MAX_ENTITIES; i++) {
         components->image.array[i] = NULL;
@@ -78,9 +77,6 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     image->alpha = 1.0;
     
     components->image.array[entity] = image;
-    if (entity > components->image.max_index) {
-        components->image.max_index = entity;
-    }
 
     int i = components->image.size - 1;
     while (i >= 0 && ImageComponent_get(components, components->image.order[i])->layer > layer) {
@@ -102,21 +98,10 @@ ImageComponent* ImageComponent_get(ComponentData* components, int entity) {
 
 
 void ImageComponent_remove(ComponentData* components, int entity) {
+    sfSprite_destroy(ImageComponent_get(components, entity)->sprite);
+
     free(ImageComponent_get(components, entity));
     components->image.array[entity] = NULL;
-
-    if (entity == components->image.max_index) {
-        for (int i = components->image.max_index - 1; i > -1; i--) {
-            if (ImageComponent_get(components, i)) {
-                components->image.max_index = i;
-                break;
-            }
-
-            if (i == 0) {
-                components->image.max_index = -1;
-            }
-        }
-    }
 
     int i = find(entity, components->image.order, components->image.size);
     while (i < components->image.size - 2) {
@@ -239,7 +224,10 @@ PlayerComponent* PlayerComponent_get(ComponentData* components, int entity) {
 
 
 void PlayerComponent_remove(ComponentData* components, int entity) {
-    free(PlayerComponent_get(components, entity));
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+    sfConvexShape_destroy(player->shape);
+    sfRectangleShape_destroy(player->line);
+    free(player);
     components->player[entity] = NULL;
 }
 
@@ -252,7 +240,6 @@ LightComponent* LightComponent_add(ComponentData* components, int entity, float 
     light->rays = rays;
     light->brightness = 0.0;
     light->max_brightness = brightness;
-    light->smoothing = 0;
 
     light->color = color;
 
@@ -278,7 +265,10 @@ LightComponent* LightComponent_get(ComponentData* components, int entity) {
 
 
 void LightComponent_remove(ComponentData* components, int entity) {
-    free(LightComponent_get(components, entity));
+    LightComponent* light = LightComponent_get(components, entity);
+    sfVertexArray_destroy(light->verts);
+    sfCircleShape_destroy(light->shine);
+    free(light);
     components->light[entity] = NULL;
 }
 
@@ -351,7 +341,9 @@ ParticleComponent* ParticleComponent_get(ComponentData* components, int entity) 
 
 
 void ParticleComponent_remove(ComponentData* components, int entity) {
-    free(ParticleComponent_get(components, entity));
+    ParticleComponent* particle = ParticleComponent_get(components, entity);
+    sfCircleShape_destroy(particle->shape);
+    free(particle);
     components->particle[entity] = NULL;
 }
 

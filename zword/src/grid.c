@@ -13,8 +13,8 @@ ColliderGrid* ColliderGrid_create() {
     grid->columns = 64;
     grid->rows = 64;
     grid->tile_size = 10;
-    grid->tile_width = 4.0;
-    grid->tile_height = 4.0;
+    grid->tile_width = 1.0;
+    grid->tile_height = 1.0;
     grid->width = grid->columns * grid->tile_width;
     grid->height = grid->rows * grid->tile_height;
 

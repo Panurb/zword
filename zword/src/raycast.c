@@ -71,8 +71,8 @@ HitInfo raycast(ComponentData* component, ColliderGrid* grid, sfVector2f start, 
     info.object = -1;
     info.normal = perp(velocity);
 
-    int x = floor(start.x / grid->tile_width + 0.5 * grid->columns);
-    int y = floor(start.y / grid->tile_height + 0.5 * grid->rows);
+    int x = floorf((start.x + 0.5 * grid->width) / grid->tile_width);
+    int y = floorf((start.y + 0.5 * grid->height) / grid->tile_height);
 
     int step_x = sign(velocity.x);
     int step_y = sign(velocity.y);
