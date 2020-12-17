@@ -1,8 +1,9 @@
 #include "util.h"
 #include "math.h"
+#include "perlin.h"
 
 
-void init_perlin(int p[512]) {
+void init_perlin(Permutation p) {
     for (int i = 0; i < 256; i++) {
         p[i] = i;
     }
@@ -41,7 +42,7 @@ float grad(int hash, float x, float y, float z) {
 }
 
 
-float perlin(float x, float y, float z, int p[512]) {
+float perlin(float x, float y, float z, Permutation p) {
     // https://adrianb.io/2014/08/09/perlinnoise.html
 
     int xi = mod(x, 255);
@@ -89,7 +90,7 @@ float perlin(float x, float y, float z, int p[512]) {
 }
 
 
-float octave_perlin(float x, float y, float z, int p[512], int octaves, float persistence) {
+float octave_perlin(float x, float y, float z, Permutation p, int octaves, float persistence) {
     float total = 0.0;
     float frequency = 1.0;
     float amplitude = 1.0;

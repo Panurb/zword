@@ -18,7 +18,7 @@
 void create_enemy(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
 
-    float angle = float_rand(0.0, 2 * M_PI);
+    float angle = rand_angle();
     
     CoordinateComponent_add(components, i, pos, angle);
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4)->shine = 0.5;

@@ -263,5 +263,5 @@ void update_camera(ComponentData* components, Camera* camera, float time_step) {
     pos = mult(1.0 / n, pos);
 
     camera->position = sum(camera->position, mult(10.0 * time_step, diff(pos, camera->position)));
-    camera->zoom += 10.0 * time_step * (50.0 - camera->zoom);
+    camera->zoom += 10.0 * time_step * (25.0 - camera->zoom);
 }

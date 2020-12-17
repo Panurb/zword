@@ -28,8 +28,8 @@ void add_particle(ComponentData* components, int entity) {
     ParticleComponent* part = ParticleComponent_get(components, entity);
 
     part->position[part->iterator] = sum(get_position(components, entity), part->origin);
-    float r = part->speed * float_rand(1.0 - part->speed_spread, 1.0 + part->speed_spread);
-    float angle = float_rand(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
+    float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
+    float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
     part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(components, entity) + angle);
     part->time[part->iterator] = part->max_time;
     if (part->particles < part->max_particles) {

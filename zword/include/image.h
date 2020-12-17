@@ -4,6 +4,7 @@
 
 #include "component.h"
 #include "camera.h"
+#include "perlin.h"
 
 
 #define PIXELS_PER_UNIT 128
@@ -27,4 +28,4 @@ void draw_roofs(ComponentData* component, sfRenderWindow* window, Camera* camera
 
 void change_layer(ComponentData* components, int entity, int layer);
 
-void create_noise(sfUint8* pixels, int width, int height, sfColor color, int permutation[512]);
+void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);

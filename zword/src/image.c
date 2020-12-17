@@ -153,12 +153,12 @@ void change_layer(ComponentData* components, int entity, int layer) {
 }
 
 
-void create_noise(sfUint8* pixels, int width, int height, sfColor color, int permutation[512]) {
+void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            float x = i / (float) PIXELS_PER_UNIT;
-            float y = j / (float) PIXELS_PER_UNIT;
-            float a = octave_perlin(x, y, 0.0, permutation, 4, 0.5);
+            float x = origin.x + i / (float) PIXELS_PER_UNIT;
+            float y = origin.y + (height - j) / (float) PIXELS_PER_UNIT;
+            float a = octave_perlin(x, y, 0.0, p, 4, 0.5);
             pixels[(i + j * width) * 4] = color.r;
             pixels[(i + j * width) * 4 + 1] = color.g;
             pixels[(i + j * width) * 4 + 2] = color.b;

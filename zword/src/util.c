@@ -99,13 +99,13 @@ sfVector2f proj(sfVector2f a, sfVector2f b) {
     return mult(dot(a, b_norm), b_norm);
 }
 
-float float_rand(float low, float upp) {
+float randf(float low, float upp) {
     float scale = rand() / (float) RAND_MAX;
     return low + scale * (upp - low);
 }
 
 float rand_angle() {
-    return float_rand(0.0, 2 * M_PI);
+    return randf(0.0, 2 * M_PI);
 }
 
 int find(int value, int* array, int size) {

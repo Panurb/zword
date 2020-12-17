@@ -1,8 +1,10 @@
 #pragma once
 
 
-void init_perlin(int p[512]);
+typedef int Permutation[512];
 
-float perlin(float x, float y, float z, int p[512]);
+void init_perlin(Permutation p);
 
-float octave_perlin(float x, float y, float z, int p[512], int octaves, float persistence);
+float perlin(float x, float y, float z, Permutation p);
+
+float octave_perlin(float x, float y, float z, Permutation p, int octaves, float persistence);

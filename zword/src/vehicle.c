@@ -16,11 +16,11 @@ void create_car(ComponentData* components, float x, float y) {
 
     i = create_entity(components);
     CoordinateComponent_add(components, i, (sfVector2f) { 2.8, 1.0 }, 0.0)->parent = i - 1;
-    LightComponent_add(components, i, 10.0, 1.0, 51, sfWhite, 0.4, 1.0)->enabled = false;
+    LightComponent_add(components, i, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
 
     i = create_entity(components);
     CoordinateComponent_add(components, i, (sfVector2f) { 2.8, -1.0 }, 0.0)->parent = i - 2;
-    LightComponent_add(components, i, 10.0, 1.0, 51, sfWhite, 0.4, 1.0)->enabled = false;
+    LightComponent_add(components, i, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
 
     /*
     i = create_entity(component);

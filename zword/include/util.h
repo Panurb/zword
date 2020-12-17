@@ -47,7 +47,7 @@ sfVector2f mult(float c, sfVector2f v);
 
 sfVector2f proj(sfVector2f a, sfVector2f b);
 
-float float_rand(float min, float max);
+float randf(float min, float max);
 
 float rand_angle();
 

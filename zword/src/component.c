@@ -232,7 +232,7 @@ void PlayerComponent_remove(ComponentData* components, int entity) {
 }
 
 
-LightComponent* LightComponent_add(ComponentData* components, int entity, float range, float angle, int rays, sfColor color, float brightness, float speed) {
+LightComponent* LightComponent_add(ComponentData* components, int entity, float range, float angle, sfColor color, float brightness, float speed) {
     LightComponent* light = malloc(sizeof(LightComponent));
     light->enabled = true;
     light->range = range;
@@ -390,7 +390,7 @@ WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, floa
     weapon->recoil_down = recoil_down;
     weapon->damage = damage;
     weapon->max_magazine = magazine;
-    weapon->magazine = 0;
+    weapon->magazine = magazine;
     weapon->max_recoil = max_recoil;
     weapon->reload_time = 2.0;
     weapon->reloading = false;
@@ -470,6 +470,13 @@ WaypointComponent* WaypointComponent_get(ComponentData* components, int entity) 
 
 
 void WaypointComponent_remove(ComponentData* components, int entity) {
+    WaypointComponent* waypoint = WaypointComponent_get(components, entity);
+    for (int i = 0; i < MAX_NEIGHBORS; i++) {
+        int n = waypoint->neighbors[i];
+        if (n == -1) continue;
+        replace(entity, -1, WaypointComponent_get(components, n)->neighbors, MAX_NEIGHBORS);
+    }
+
     free(WaypointComponent_get(components, entity));
     components->waypoint[entity] = NULL;
 }

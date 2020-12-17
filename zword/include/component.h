@@ -239,7 +239,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity);
 PlayerComponent* PlayerComponent_get(ComponentData* components, int entity);
 void PlayerComponent_remove(ComponentData* components, int entity);
 
-LightComponent* LightComponent_add(ComponentData* components, int entity, float range, float angle, int rays, sfColor color, float brightness, float speed);
+LightComponent* LightComponent_add(ComponentData* components, int entity, float range, float angle, sfColor color, float brightness, float speed);
 LightComponent* LightComponent_get(ComponentData* components, int entity);
 void LightComponent_remove(ComponentData* components, int entity);
 

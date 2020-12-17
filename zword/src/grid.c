@@ -10,8 +10,8 @@
 
 ColliderGrid* ColliderGrid_create() {
     ColliderGrid* grid = malloc(sizeof(ColliderGrid));
-    grid->columns = 64;
-    grid->rows = 64;
+    grid->columns = 5 * 32;
+    grid->rows = 5 * 32;
     grid->tile_size = 10;
     grid->tile_width = 1.0;
     grid->tile_height = 1.0;
