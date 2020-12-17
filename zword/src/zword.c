@@ -92,16 +92,16 @@ int main() {
 
                 input(components);
 
+                update(components, time_step, grid);
+                collide(components, grid);
+                update_waypoints(components, grid);
+
                 update_players(components, grid, window, camera, time_step);
                 update_weapons(components, time_step);
                 update_enemies(components, grid);
 
-                update(components, time_step, grid);
-                collide(components, grid);
-
                 update_particles(components, time_step);
                 update_lights(components, time_step);
-                update_waypoints(components, grid);
                 update_camera(components, camera, time_step);
 
                 draw_lights(components, grid, window, light_texture, camera, ambient_light);

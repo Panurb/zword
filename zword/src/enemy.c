@@ -91,13 +91,16 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
             case DEAD:
                 ;
                 ColliderComponent* col = ColliderComponent_get(components, i);
-
                 if (col) {
                     col->group = ITEMS;
                     if (phys->speed == 0.0) {
                         clear_grid(components, grid, i);
                         ColliderComponent_remove(components, i);
                     }
+                }
+
+                if (WaypointComponent_get(components, i)) {
+                    WaypointComponent_remove(components, i);
                 }
 
                 strcpy(image->filename, "zombie_dead");
