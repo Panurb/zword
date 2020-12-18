@@ -166,8 +166,6 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
     CoordinateComponent_add(components, i, position, 0.0);
     ImageComponent_add(components, i, "grass_tile", width, height, 0);
 
-    return;
-
     i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0);
     ImageComponent* image = ImageComponent_add(components, i, "", 4.0, 4.0, 0);

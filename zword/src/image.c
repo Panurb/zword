@@ -91,7 +91,8 @@ void draw(ComponentData* components, sfRenderWindow* window, Camera* camera, Tex
 
         sfVector2f pos = get_position(components, i);
 
-        float r = 0.5 * sqrtf(image->width * image->width + image->height * image->height);
+        sfVector2f rr = { image->scale.x * image->width, image->scale.y * image->height };
+        float r = 0.5 * norm(rr);
         if (!on_screen(pos, r, r, camera)) {
             continue;
         }
