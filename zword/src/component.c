@@ -455,7 +455,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity) 
         waypoint->weights[i] = 0.0;
     }
     waypoint->neighbors_size = 0;
-    waypoint->range = 20.0;
+    waypoint->range = 10.0;
 
     components->waypoint[entity] = waypoint;
 

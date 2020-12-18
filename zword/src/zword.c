@@ -27,9 +27,7 @@
 
 
 int main() {
-    srand(time(NULL));
-
-    sfVideoMode mode = { 1280, 720, 32 };
+    sfVideoMode mode = { 1920, 1080, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -58,8 +56,8 @@ int main() {
     ColliderGrid* grid = ColliderGrid_create();
     Camera* camera = Camera_create(mode);
 
-    float ambient_light = 0.6;
-    create_level(components, 64.0, 64.0);
+    float ambient_light = 0.4;
+    create_level(components, time(NULL));
     init_grid(components, grid);
     init_waypoints(components, grid);
 
@@ -104,7 +102,7 @@ int main() {
                 update_lights(components, time_step);
                 update_camera(components, camera, time_step);
 
-                draw_lights(components, grid, window, light_texture, camera, ambient_light);
+                draw_lights(components, grid, light_texture, camera, ambient_light);
             }
         }
 
@@ -112,7 +110,7 @@ int main() {
 
         draw(components, window, camera, textures);
         sfRenderWindow_drawSprite(window, light_sprite, &state);
-        // draw_roofs(components, window, camera, textures);
+        draw_roofs(components, window, camera, textures);
         draw_players(components, window, camera);
 
         // debug_draw(components, window, camera);
@@ -126,10 +124,6 @@ int main() {
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);
-    }
-
-    for (int i = 0; i < components->entities; i++) {
-        destroy_entity(components, i);
     }
 
     sfRenderWindow_destroy(window);

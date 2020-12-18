@@ -18,9 +18,9 @@
 Camera* Camera_create(sfVideoMode mode) {
     Camera* camera = malloc(sizeof(Camera));
     camera->position = (sfVector2f) { 0.0, 0.0 };
-    camera->zoom = 25.0 * mode.height / 720.0;
-    camera->width = mode.width;
-    camera->height = mode.height;
+    camera->resolution.x = mode.width;
+    camera->resolution.y = mode.height;
+    camera->zoom = 25.0 * camera->resolution.y / 720.0;
 
     camera->shaders[0] = NULL;
     camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "blendColor.frag");
@@ -31,24 +31,24 @@ Camera* Camera_create(sfVideoMode mode) {
 
 sfVector2f world_to_screen(sfVector2f a, Camera* cam) {
     sfVector2f b;
-    b.x = (a.x - cam->position.x) * cam->zoom + 0.5 * cam->width;
-    b.y = (cam->position.y - a.y) * cam->zoom + 0.5 * cam->height;
+    b.x = (a.x - cam->position.x) * cam->zoom + 0.5 * cam->resolution.x;
+    b.y = (cam->position.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
     return b;
 }
 
 
 sfVector2f screen_to_world(sfVector2i a, Camera* cam) {
     sfVector2f b;
-    b.x = (a.x - 0.5 * cam->width) / cam->zoom + cam->position.x;
-    b.y = (0.5 * cam->height - a.y) / cam->zoom + cam->position.y;
+    b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + cam->position.x;
+    b.y = (0.5 * cam->resolution.y - a.y) / cam->zoom + cam->position.y;
     return b;
 }
 
 
 sfVector2f world_to_texture(sfVector2f a, Camera* cam) {
     sfVector2f b;
-    b.x = (a.x - cam->position.x) * cam->zoom + 0.5 * cam->width;
-    b.y = (a.y - cam->position.y) * cam->zoom + 0.5 * cam->height;
+    b.x = (a.x - cam->position.x) * cam->zoom + 0.5 * cam->resolution.x;
+    b.y = (a.y - cam->position.y) * cam->zoom + 0.5 * cam->resolution.y;
     return b;
 }
 
@@ -263,5 +263,15 @@ void update_camera(ComponentData* components, Camera* camera, float time_step) {
     pos = mult(1.0 / n, pos);
 
     camera->position = sum(camera->position, mult(10.0 * time_step, diff(pos, camera->position)));
-    camera->zoom += 10.0 * time_step * (25.0 - camera->zoom);
+    camera->zoom += 10.0 * time_step * (25.0 * camera->resolution.y / 720.0 - camera->zoom);
+}
+
+
+bool on_screen(sfVector2f position, float width, float height, Camera* camera) {
+    if (fabs(position.x - camera->position.x) < width + 0.5 * camera->resolution.x / camera->zoom) {
+        if (fabs(position.y - camera->position.y) < height + 0.5 * camera->resolution.y / camera->zoom) {
+            return true;
+        }
+    }
+    return false;
 }

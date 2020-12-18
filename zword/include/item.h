@@ -3,7 +3,7 @@
 #include "component.h"
 
 
-void create_flashlight(ComponentData* components, float x, float y);
+void create_flashlight(ComponentData* components, sfVector2f position);
 
 void pick_up_item(ComponentData* components, int entity);
 

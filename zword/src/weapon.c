@@ -103,12 +103,10 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 }
 
 
-void create_weapon(ComponentData* components, float x, float y) {
+void create_pistol(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    sfVector2f pos = { x, y };
-
-    CoordinateComponent_add(components, i, pos, randf(0.0, 2 * M_PI));
+    CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
@@ -123,7 +121,7 @@ void create_lasersight(ComponentData* components, float x, float y) {
 
     sfVector2f pos = { x, y };
 
-    CoordinateComponent_add(components, i, pos, randf(0.0, 2 * M_PI));
+    CoordinateComponent_add(components, i, pos, rand_angle());
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
     LightComponent_add(components, i, 20.0, 0.01, sfRed, 1.0, 10.0)->enabled = false;

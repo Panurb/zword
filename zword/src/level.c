@@ -86,42 +86,45 @@ void create_roof(ComponentData* component, sfVector2f pos, float width, float he
 }
 
 
-void create_house(ComponentData* component, sfVector2f pos) {
+void create_house(ComponentData* components, sfVector2f pos) {
     float angle = randf(0.0, 2 * M_PI);
 
     sfVector2f w = polar_to_cartesian(5.0, angle);
     sfVector2f h = perp(w);
 
-    create_floor(component, pos, 10.0, 10.0, angle);
+    create_floor(components, pos, 10.0, 10.0, angle);
 
-    create_brick_wall(component, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
-    create_brick_wall(component, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
+    create_brick_wall(components, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
+    create_brick_wall(components, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
 
-    create_brick_wall(component, diff(pos, w), 9.25, angle + 0.5 * M_PI);
-    create_brick_wall(component, diff(pos, h), 10.75, angle);
-    create_brick_wall(component, sum(pos, h), 10.75, angle);
+    create_brick_wall(components, diff(pos, w), 9.25, angle + 0.5 * M_PI);
+    create_brick_wall(components, diff(pos, h), 10.75, angle);
+    create_brick_wall(components, sum(pos, h), 10.75, angle);
 
-    create_wood_wall(component, sum(pos, mult(-0.28, h)), 6.5, angle + 0.5 * M_PI);
-    create_wood_wall(component, sum(pos, mult(0.78, h)), 1.5, angle + 0.5 * M_PI);
+    create_wood_wall(components, sum(pos, mult(-0.28, h)), 6.5, angle + 0.5 * M_PI);
+    create_wood_wall(components, sum(pos, mult(0.78, h)), 1.5, angle + 0.5 * M_PI);
 
-    create_wood_wall(component, sum(pos, mult(-0.78, w)), 1.5, angle);
-    create_wood_wall(component, sum(pos, mult(-0.2, w)), 1.5, angle);
+    create_wood_wall(components, sum(pos, mult(-0.78, w)), 1.5, angle);
+    create_wood_wall(components, sum(pos, mult(-0.2, w)), 1.5, angle);
 
-    create_light(component, diff(pos, mult(0.51, sum(w, h))));
-    create_light(component, sum(pos, mult(0.51, diff(w, h))));
-    create_light(component, diff(pos, mult(0.51, diff(w, h))));
+    create_light(components, diff(pos, mult(0.51, sum(w, h))));
+    create_light(components, sum(pos, mult(0.51, diff(w, h))));
+    create_light(components, diff(pos, mult(0.51, diff(w, h))));
 
-    create_waypoint(component, sum(pos, mult(0.75, w)));
-    create_waypoint(component, sum(pos, mult(1.5, w)));
+    create_pistol(components, sum(pos, mult(0.51, diff(w, h))));
+    create_flashlight(components, diff(pos, mult(0.51, diff(w, h))));
 
-    create_waypoint(component, sum(pos, mult(1.5, sum(w, h))));
-    create_waypoint(component, sum(pos, mult(1.5, diff(w, h))));
-    create_waypoint(component, sum(pos, mult(-1.5, sum(w, h))));
-    create_waypoint(component, sum(pos, mult(-1.5, diff(w, h))));
+    create_waypoint(components, sum(pos, mult(0.75, w)));
+    create_waypoint(components, sum(pos, mult(1.5, w)));
 
-    create_waypoint(component, sum(pos, mult(0.5, sum(w, h))));
-    create_waypoint(component, diff(pos, mult(0.5, sum(w, h))));
-    create_waypoint(component, diff(pos, mult(0.5, diff(w, h))));
+    create_waypoint(components, sum(pos, mult(1.5, sum(w, h))));
+    create_waypoint(components, sum(pos, mult(1.5, diff(w, h))));
+    create_waypoint(components, sum(pos, mult(-1.5, sum(w, h))));
+    create_waypoint(components, sum(pos, mult(-1.5, diff(w, h))));
+
+    create_waypoint(components, sum(pos, mult(0.5, sum(w, h))));
+    create_waypoint(components, diff(pos, mult(0.5, sum(w, h))));
+    create_waypoint(components, diff(pos, mult(0.5, diff(w, h))));
 }
 
 
@@ -163,6 +166,8 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
     CoordinateComponent_add(components, i, position, 0.0);
     ImageComponent_add(components, i, "grass_tile", width, height, 0);
 
+    return;
+
     i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0);
     ImageComponent* image = ImageComponent_add(components, i, "", 4.0, 4.0, 0);
@@ -187,46 +192,70 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 }
 
 
-void create_chunk(ComponentData* components, int x, int y, Permutation p) {
-    sfVector2f position = { x * CHUNK_WIDTH, y * CHUNK_HEIGHT };
+void create_tree(ComponentData* components, sfVector2f position, float size) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ImageComponent_add(components, i, "tree", 3.0, 3.0, 6)->scale = (sfVector2f) { size, size };
+    ColliderComponent_add_circle(components, i, size, TREES);
+}
 
-    create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, p);
 
-    if (randf(0.0, 1.0) > 0.75) {
-        create_house(components, position);
+void create_forest(ComponentData* components, sfVector2f position, Permutation p, float forestation) {
+    int k = 0;
+    for (int i = -5; i < 6; i++) {
+        for (int j = -5; j < 6; j++) {
+            sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
 
-        sfVector2f r = polar_to_cartesian(15.0, rand_angle());
-
-        create_shed(components, sum(position, r));
-    } else {
-        sfVector2f w = { 0.25 * CHUNK_WIDTH, 0.0 };
-        sfVector2f h = { 0.0, 0.25 * CHUNK_HEIGHT };
-
-        create_waypoint(components, sum(position, sum(w, h)));
-        create_waypoint(components, sum(position, diff(w, h)));
-        create_waypoint(components, diff(position, sum(w, h)));
-        create_waypoint(components, diff(position, diff(w, h)));
+            if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p)) {
+                create_tree(components, r, randf(1.0, 1.5));
+            } else {
+                if (k % 4 == 0) {
+                    create_waypoint(components, r);
+                }
+                k++;
+            }
+        }
     }
 }
 
 
-void create_level(ComponentData* components, float width, float height) {
+void create_chunk(ComponentData* components, sfVector2f position, Permutation p, float forestation) {
+    create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, p);
+
+    if (forestation > 0.1) {
+        create_forest(components, position, p, forestation);
+    } else {
+        create_house(components, position);
+
+        // sfVector2f r = polar_to_cartesian(15.0, rand_angle());
+        // create_shed(components, sum(position, r));
+    }
+}
+
+
+void create_level(ComponentData* components, int seed) {
+    srand(seed);
+
     Permutation p;
     init_perlin(p);
 
-    for (int i = -1; i < 2; i++) {
-        for (int j = -1; j < 2; j++) {
-            create_chunk(components, i, j, p);
+    for (int i = -3; i < 4; i++) {
+        for (int j = -3; j < 4; j++) {
+            float f = randf(0.0, 0.5);
+            if (i == -3 || i == 3) {
+                f = 1.0;
+            } else if (j == -3 || j == 3) {
+                f = 1.0;
+            }
+
+            sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
+            create_chunk(components, position, p, f);
         }
     }
 
     create_player(components, (sfVector2f) { 5.0, 0.0 });
 
-    create_car(components, 0.0, -5.0);
-    // create_weapon(components, 1.0, 5.0);
-    // create_weapon(components, 1.0, 4.0);
-
-    // create_flashlight(components, 0.0, 2.0);
+    create_car(components, 15.0, -5.0);
 }
 
 

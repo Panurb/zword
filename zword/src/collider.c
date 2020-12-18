@@ -16,11 +16,12 @@
 #include "physics.h"
 
 
-static int COLLISION_MATRIX[5][5] = { { 0, 0, 0, 0, 0 },    // WALLS
-                                      { 1, 1, 0, 0, 0 },    // ITEMS
-                                      { 1, 0, 2, 2, 1 },    // PLAYERS
-                                      { 1, 0, 2, 2, 1 },    // ENEMIES
-                                      { 1, 0, 0, 0, 1 } };  // VEHICLES
+static int COLLISION_MATRIX[6][6] = { { 0, 0, 0, 0, 0, 0 },    // WALLS
+                                      { 1, 1, 0, 0, 0, 2 },    // ITEMS
+                                      { 1, 0, 2, 2, 1, 2 },    // PLAYERS
+                                      { 1, 0, 2, 2, 1, 2 },    // ENEMIES
+                                      { 1, 0, 0, 0, 1, 1 },    // VEHICLES
+                                      { 0, 0, 0, 0, 0, 0 } };  // TREES
 
 
 void get_corners(ComponentData* component, int i, sfVector2f* corners) {

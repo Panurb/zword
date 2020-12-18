@@ -6,7 +6,7 @@
 
 #include "util.h"
 
-#define MAX_ENTITIES 1000
+#define MAX_ENTITIES 10000
 #define MAX_NEIGHBORS 50
 #define MAX_PATH_LENGTH 50
 
@@ -60,7 +60,8 @@ typedef enum {
     ITEMS,
     PLAYERS,
     ENEMIES,
-    VEHICLES
+    VEHICLES,
+    TREES
 } ColliderGroup;
 
 typedef struct {

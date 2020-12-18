@@ -61,13 +61,19 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, Camera* camer
 }
 
 
-void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, sfRenderTexture* texture, Camera* camera, float ambient_light) {
+void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture* texture, Camera* camera, float ambient_light) {
     sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0));
     sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
 
-    for (int i = 0; i < component->entities; i++) {
-        LightComponent* light = component->light[i];
+    for (int i = 0; i < components->entities; i++) {
+        LightComponent* light = components->light[i];
         if (!light) continue;
+
+        sfVector2f start = get_position(components, i);
+
+        if (!on_screen(start, light->range, light->range, camera)) {
+            continue;
+        }
 
         float brightness = light->brightness;
         float range = light->range;
@@ -78,22 +84,20 @@ void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* w
             range *= f;
         }
 
-        sfVector2f start = get_position(component, i);
-
         sfVertex* v = sfVertexArray_getVertex(light->verts, 0);
         v->position = world_to_texture(start, camera);
         sfColor color = light->color;
         color.a = 255 * brightness;
         v->color = color;
 
-        float angle = get_angle(component, i) - 0.5 * light->angle;
+        float angle = get_angle(components, i) - 0.5 * light->angle;
         sfVector2f velocity = polar_to_cartesian(1.0, angle);
 
         float delta_angle = light->angle / (light->rays - 1);
         Matrix2f rot = rotation_matrix(delta_angle);
 
         for (int j = 1; j < light->rays + 1; j++) {
-            HitInfo info = raycast(component, grid, start, velocity, range, i);
+            HitInfo info = raycast(components, grid, start, velocity, range, i);
             sfVector2f end = info.position;
 
             end = sum(end, mult(0.25, velocity));

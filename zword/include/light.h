@@ -10,4 +10,4 @@
 
 void update_lights(ComponentData* component, float delta_time);
 
-void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, sfRenderTexture* texture, Camera* camera, float ambient_light);
+void draw_lights(ComponentData* component, ColliderGrid* grid, sfRenderTexture* texture, Camera* camera, float ambient_light);

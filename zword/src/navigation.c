@@ -160,23 +160,24 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid) {
         WaypointComponent* waypoint = WaypointComponent_get(components, i);
         if (!waypoint) continue;
 
-        int j0 = 0;
-        if (PhysicsComponent_get(components, i)) {
-            j0 = i + 1;
-        }
+        int entities[100];
+        get_entities(components, grid, get_position(components, i), waypoint->range, entities);
 
-        for (int j = j0; j < components->entities; j++) {
-            if (!PhysicsComponent_get(components, j)) continue;
+        for (int j = 0; j < 100; j++) {
+            int n = entities[j];
+            if (n == -1) break;
+            if (n == i) continue;
+            if (!PhysicsComponent_get(components, n)) continue;
 
-            WaypointComponent* neighbor = WaypointComponent_get(components, j);
+            WaypointComponent* neighbor = WaypointComponent_get(components, n);
             if (!neighbor) continue;
 
-            float d = connection_distance(components, grid, i, j);
+            float d = connection_distance(components, grid, i, n);
             if (d > 0.0) {
                 int k = waypoint->neighbors_size;
                 int l = neighbor->neighbors_size;
                 if (k < MAX_NEIGHBORS && l < MAX_NEIGHBORS) {
-                    waypoint->neighbors[k] = j;
+                    waypoint->neighbors[k] = n;
                     waypoint->weights[k] = d;
                     waypoint->neighbors_size++;
 

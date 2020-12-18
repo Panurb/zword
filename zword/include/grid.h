@@ -12,7 +12,7 @@ typedef struct {
 } Bounds;
 
 typedef struct {
-    int array[5 * 32][5 * 32][10];
+    int array[6 * 32][6 * 32][10];
     int columns;
     int rows;
     int tile_size;

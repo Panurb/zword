@@ -10,8 +10,8 @@
 
 ColliderGrid* ColliderGrid_create() {
     ColliderGrid* grid = malloc(sizeof(ColliderGrid));
-    grid->columns = 5 * 32;
-    grid->rows = 5 * 32;
+    grid->columns = 6 * 32;
+    grid->rows = 6 * 32;
     grid->tile_size = 10;
     grid->tile_width = 1.0;
     grid->tile_height = 1.0;
@@ -97,9 +97,9 @@ void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
 
 void init_grid(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        if (!ColliderComponent_get(components, i)) continue;
-        
-        update_grid(components, grid, i);
+        if (ColliderComponent_get(components, i)) {
+            update_grid(components, grid, i);
+        }
     }
 }
 
@@ -148,20 +148,20 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 void draw_grid(ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
     sfColor color = get_color(1.0, 1.0, 1.0, 0.2);
 
-    int nx = ceil((camera->width / camera->zoom) / grid->tile_width) + 1;
-    float x = floor(camera->position.x - 0.5 * camera->width / camera->zoom);
+    int nx = ceil((camera->resolution.x / camera->zoom) / grid->tile_width) + 1;
+    float x = floor(camera->position.x - 0.5 * camera->resolution.x / camera->zoom);
     for (int i = 0; i < nx; i++) {
-        sfVector2f start = { x + i * grid->tile_width, camera->position.y + 0.5 * camera->height / camera->zoom };
-        sfVector2f end = { x + i * grid->tile_width, camera->position.y - 0.5 * camera->height / camera->zoom };
+        sfVector2f start = { x + i * grid->tile_width, camera->position.y + 0.5 * camera->resolution.y / camera->zoom };
+        sfVector2f end = { x + i * grid->tile_width, camera->position.y - 0.5 * camera->resolution.y / camera->zoom };
 
         draw_line(window, camera, NULL, start, end, 0.02, color);
     }
 
-    int ny = ceil((camera->height / camera->zoom) / grid->tile_height);    
-    float y = floor(camera->position.y - 0.5 * camera->height / camera->zoom);
+    int ny = ceil((camera->resolution.y / camera->zoom) / grid->tile_height);    
+    float y = floor(camera->position.y - 0.5 * camera->resolution.y / camera->zoom);
     for (int i = 0; i < ny; i++) {
-        sfVector2f start = { camera->position.x - 0.5 * camera->width / camera->zoom, y + i * grid->tile_height };
-        sfVector2f end = { camera->position.x + 0.5 * camera->width / camera->zoom, y + i * grid->tile_height };
+        sfVector2f start = { camera->position.x - 0.5 * camera->resolution.x / camera->zoom, y + i * grid->tile_height };
+        sfVector2f end = { camera->position.x + 0.5 * camera->resolution.x / camera->zoom, y + i * grid->tile_height };
 
         draw_line(window, camera, NULL, start, end, 0.02, color);
     }

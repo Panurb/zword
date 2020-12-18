@@ -149,7 +149,7 @@ sfVector2f rotate(sfVector2f v, float angle) {
 }
 
 float polar_angle(sfVector2f v) {
-    return atan2(v.y, v.x);
+    return atan2f(v.y, v.x);
 }
 
 Matrix2f rotation_matrix(float angle) {

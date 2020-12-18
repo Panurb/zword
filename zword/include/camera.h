@@ -8,8 +8,7 @@
 typedef struct {
     sfVector2f position;
     float zoom;
-    float width;
-    float height;
+    sfVector2i resolution;
     sfShader* shaders[10];
 } Camera;
 
@@ -38,3 +37,5 @@ void draw_slice_outline(sfRenderWindow* window, Camera* camera, sfRectangleShape
 void draw_sprite(sfRenderWindow* window, Camera* camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index);
 
 void update_camera(ComponentData* component, Camera* camera, float time_step);
+
+bool on_screen(sfVector2f position, float width, float height, Camera* camera);

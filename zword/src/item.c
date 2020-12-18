@@ -3,12 +3,10 @@
 #include "util.h"
 
 
-void create_flashlight(ComponentData* components, float x, float y) {
+void create_flashlight(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    sfVector2f pos = { x, y };
-
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
