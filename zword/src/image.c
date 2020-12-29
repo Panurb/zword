@@ -34,6 +34,7 @@ static const char* IMAGES[] = {
 
 void load_textures(TextureArray textures) {
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
+
     for (int i = 0; i < n; i++) {
         char path[100];
         snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");
@@ -91,7 +92,7 @@ void draw(ComponentData* components, sfRenderWindow* window, Camera* camera, Tex
 
         sfVector2f pos = get_position(components, i);
 
-        float r = 0.5 * sqrtf(image->width * image->width + image->height * image->height);
+        float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
         if (!on_screen(pos, r, r, camera)) {
             continue;
         }
@@ -161,16 +162,44 @@ void change_layer(ComponentData* components, int entity, int layer) {
 }
 
 
+void color_pixel(sfUint8* pixels, int width, int x, int y, sfColor color, float alpha) {
+    int k = (x + y * width) * 4;
+
+    pixels[k] = color.r;
+    pixels[k + 1] = color.g;
+    pixels[k + 2] = color.b;
+    pixels[k + 3] = color.a * alpha;
+}
+
+
 void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             float x = origin.x + i / (float) PIXELS_PER_UNIT;
             float y = origin.y + (height - j) / (float) PIXELS_PER_UNIT;
-            float a = octave_perlin(x, y, 0.0, p, 4, 0.5);
-            pixels[(i + j * width) * 4] = color.r;
-            pixels[(i + j * width) * 4 + 1] = color.g;
-            pixels[(i + j * width) * 4 + 2] = color.b;
-            pixels[(i + j * width) * 4 + 3] = color.a * a;
+            float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
+
+            a = smoothstep(a, 0.5, 50.0);
+
+            color_pixel(pixels, width, i, j, color, a);
+        }
+    }
+}
+
+
+void create_noise_tileable(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p) {
+    for (int i = 0; i < width / 2; i++) {
+        for (int j = 0; j < height / 2; j++) {
+            float x = origin.x + i / (float) PIXELS_PER_UNIT;
+            float y = origin.y + (height - j) / (float) PIXELS_PER_UNIT;
+            float a = octave_perlin(x, y, 0.0, p, -1, 4, 0.5);
+
+            a = smoothstep(a, 0.5, 50.0);
+
+            color_pixel(pixels, width, i, j, color, a);
+            color_pixel(pixels, width, width - 1 - i, j, color, a);
+            color_pixel(pixels, width, i, height - 1 - j, color, a);
+            color_pixel(pixels, width, width - 1 - i, height - 1 - j, color, a);
         }
     }
 }

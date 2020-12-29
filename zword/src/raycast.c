@@ -16,10 +16,10 @@ typedef struct {
 } Hit;
 
 
-Hit ray_intersection(ComponentData* component, int i, sfVector2f start, sfVector2f velocity, float range) {
+Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVector2f velocity, float range) {
     Hit hit = { range, perp(velocity) };
 
-    ColliderComponent* col = component->collider[i];
+    ColliderComponent* col = components->collider[i];
 
     if (!col->enabled) return hit;
 
@@ -27,7 +27,7 @@ Hit ray_intersection(ComponentData* component, int i, sfVector2f start, sfVector
         // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 
         sfVector2f corners[4];
-        get_corners(component, i, corners);
+        get_corners(components, i, corners);
 
         for (int k = 0; k < 4; k++) {
             sfVector2f dir = diff(corners[(k + 1) % 4], corners[k]);
@@ -43,14 +43,14 @@ Hit ray_intersection(ComponentData* component, int i, sfVector2f start, sfVector
         // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 
         float radius = col->radius;
-        sfVector2f oc = diff(start, get_position(component, i));
+        sfVector2f oc = diff(start, get_position(components, i));
         float delta = powf(dot(velocity, oc), 2) - norm2(oc) + powf(radius, 2);
         float t = -dot(velocity, oc) - sqrtf(delta);
 
         if (delta >= 0.0 && t >= 0.0 && t < hit.time) {
             hit.time = t;
             sfVector2f p = sum(start, mult(t, velocity));
-            hit.normal = diff(p, get_position(component, i));
+            hit.normal = diff(p, get_position(components, i));
         }
     }
 
@@ -58,7 +58,7 @@ Hit ray_intersection(ComponentData* component, int i, sfVector2f start, sfVector
 }
 
 
-HitInfo raycast(ComponentData* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, int ignore) {
+HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, int ignore) {
     // http://www.cs.yorku.ca/~amana/research/grid.pdf
 
     static int id = MAX_ENTITIES;
@@ -90,17 +90,18 @@ HitInfo raycast(ComponentData* component, ColliderGrid* grid, sfVector2f start, 
             int j = grid->array[x][y][i];
             if (j == -1) continue;
             if (j == ignore) continue;
-            if (component->collider[j]->last_collision == id) continue;
 
-            component->collider[j]->last_collision = id;
+            ColliderComponent* col = ColliderComponent_get(components, j);
+            if (col->last_collision == id) continue;
+            if (col->group == ITEMS) continue;
 
-            Hit hit = ray_intersection(component, j, start, velocity, range);
+            col->last_collision = id;
+
+            Hit hit = ray_intersection(components, j, start, velocity, range);
             if (hit.time < t_min) {
                 t_min = hit.time;
                 info.object = j;
                 info.normal = hit.normal;
-
-                // not sure if correct
                 range = t_min;
             }
         }

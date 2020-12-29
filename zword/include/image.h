@@ -29,3 +29,5 @@ void draw_roofs(ComponentData* component, sfRenderWindow* window, Camera* camera
 void change_layer(ComponentData* components, int entity, int layer);
 
 void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);
+
+void create_noise_tileable(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);

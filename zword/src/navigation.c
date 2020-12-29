@@ -161,7 +161,7 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid) {
         if (!waypoint) continue;
 
         int entities[100];
-        get_entities(components, grid, get_position(components, i), waypoint->range, entities);
+        get_entities(components, grid, get_position(components, i), waypoint->range, entities, i);
 
         for (int j = 0; j < 100; j++) {
             int n = entities[j];

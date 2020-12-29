@@ -125,6 +125,8 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, mult(0.5, sum(w, h))));
     create_waypoint(components, diff(pos, mult(0.5, sum(w, h))));
     create_waypoint(components, diff(pos, mult(0.5, diff(w, h))));
+
+    create_enemy(components, sum(pos, polar_to_cartesian(5.0, rand_angle())));
 }
 
 
@@ -161,7 +163,7 @@ void create_shed(ComponentData* component, sfVector2f pos) {
 }
 
 
-void create_ground(ComponentData* components, sfVector2f position, float width, float height, Permutation p) {
+void create_ground(ComponentData* components, sfVector2f position, float width, float height, sfTexture* noise_texture) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0);
     ImageComponent_add(components, i, "grass_tile", width, height, 0);
@@ -170,25 +172,10 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 
     i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0);
-    ImageComponent* image = ImageComponent_add(components, i, "", 4.0, 4.0, 0);
+    ImageComponent* image = ImageComponent_add(components, i, "", 16.0, 16.0, 0);
+    image->scale = (sfVector2f) { 2.0, 2.0 };
     image->texture_changed = false;
-    image->scale = (sfVector2f) { CHUNK_WIDTH / 4.0, CHUNK_HEIGHT / 4.0 };
-
-    int w = 512;
-    int h = 512;
-    sfUint8 pixels[512 * 512 * 4];
-    int x = position.x / CHUNK_WIDTH + 5;
-    int y = position.y / CHUNK_HEIGHT + 5;
-    sfVector2f origin = { (w / PIXELS_PER_UNIT) * x, (h / PIXELS_PER_UNIT) * y };
-    create_noise(pixels, w, h, origin, get_color(0.1, 0.1, 0.0, 0.75), p);
-
-    sfTexture* texture = sfTexture_create(w, h);
-    sfTexture_updateFromPixels(texture, pixels, w, h, 0, 0);
-    sfTexture_setRepeated(texture, true);
-
-    sfSprite_setTexture(image->sprite, texture, sfFalse);
-    sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
-    sfSprite_setTextureRect(image->sprite, rect);
+    sfSprite_setTexture(image->sprite, noise_texture, false);
 }
 
 
@@ -206,7 +193,7 @@ void create_forest(ComponentData* components, sfVector2f position, Permutation p
         for (int j = -5; j < 6; j++) {
             sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
 
-            if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p)) {
+            if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p, -1)) {
                 create_tree(components, r, randf(1.0, 1.5));
             } else {
                 if (k % 4 == 0) {
@@ -219,8 +206,8 @@ void create_forest(ComponentData* components, sfVector2f position, Permutation p
 }
 
 
-void create_chunk(ComponentData* components, sfVector2f position, Permutation p, float forestation) {
-    create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, p);
+void create_chunk(ComponentData* components, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
+    create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
     if (forestation > 0.1) {
         create_forest(components, position, p, forestation);
@@ -239,17 +226,31 @@ void create_level(ComponentData* components, int seed) {
     Permutation p;
     init_perlin(p);
 
-    for (int i = -3; i < 4; i++) {
-        for (int j = -3; j < 4; j++) {
+    int w = 2048;
+    int h = 2048;
+
+    sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
+
+    create_noise(pixels, w, h, zeros(), get_color(1.0, 1.0, 1.0, 1.0), p);
+
+    sfTexture* noise_texture = sfTexture_create(w, h);
+    sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
+    sfTexture_setRepeated(noise_texture, true);
+
+    free(pixels);
+
+    for (int i = -1; i < 2; i++) {
+        for (int j = -1; j < 2; j++) {
             float f = randf(0.0, 0.5);
-            if (i == -3 || i == 3) {
-                f = 1.0;
-            } else if (j == -3 || j == 3) {
-                f = 1.0;
-            }
+            f = 0.0;
+            // if (i == -3 || i == 3) {
+            //     f = 1.0;
+            // } else if (j == -3 || j == 3) {
+            //     f = 1.0;
+            // }
 
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
-            create_chunk(components, position, p, f);
+            create_chunk(components, position, p, f, noise_texture);
         }
     }
 

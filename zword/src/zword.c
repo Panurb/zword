@@ -35,6 +35,7 @@ int main() {
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
     // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
+    bool focus = true;
 
     TextureArray textures;
     load_textures(textures);
@@ -43,8 +44,6 @@ int main() {
     sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
     sfSprite* light_sprite = sfSprite_create();
     sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), sfTrue);
-
-    bool focus = true;
 
     FpsCounter* fps = FpsCounter_create();
 
@@ -63,6 +62,8 @@ int main() {
 
     while (sfRenderWindow_isOpen(window))
     {
+        float delta_time = sfTime_asSeconds(sfClock_restart(clock));
+
         sfEvent event;
         while (sfRenderWindow_pollEvent(window, &event))
         {
@@ -104,6 +105,8 @@ int main() {
 
                 draw_lights(components, grid, light_texture, camera, ambient_light);
             }
+
+            elapsed_time += delta_time;
         }
 
         sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
@@ -117,10 +120,7 @@ int main() {
         // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
-        // draw_occupied_tiles(components, grid, window, camera);
-
-        float delta_time = sfTime_asSeconds(sfClock_restart(clock));
-        elapsed_time += delta_time;
+        draw_occupied_tiles(components, grid, window, camera);
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);

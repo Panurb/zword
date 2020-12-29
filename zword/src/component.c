@@ -455,7 +455,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity) 
         waypoint->weights[i] = 0.0;
     }
     waypoint->neighbors_size = 0;
-    waypoint->range = 10.0;
+    waypoint->range = 12.0;
 
     components->waypoint[entity] = waypoint;
 
@@ -502,6 +502,15 @@ void HealthComponent_remove(ComponentData* components, int entity) {
     free(HealthComponent_get(components, entity));
     components->health[entity] = NULL;
 }
+
+
+CameraComponent* CameraComponent_add(ComponentData* components, int entity) {
+    CameraComponent* camera = malloc(sizeof(CameraComponent));
+}
+
+
+CameraComponent* CameraComponent_get(ComponentData* components, int entity);
+void CameraComponent_remove(ComponentData* components, int entity);
 
 
 int create_entity(ComponentData* component) {

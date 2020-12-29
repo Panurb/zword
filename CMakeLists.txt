@@ -34,22 +34,24 @@ set(SOURCES
 
 add_executable(zword ${SOURCES})
 
-target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-audio.a)
-target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-graphics.a)
-target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-network.a)
-target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-system.a)
-target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-window.a)
+#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-audio.a)
+#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-graphics.a)
+#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-network.a)
+#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-system.a)
+#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-window.a)
 
 install(TARGETS zword
     DESTINATION ${CMAKE_SOURCE_DIR}/build)
 	
 set(DLLS
-	CSFML/bin/csfml-audio-2.dll
-	CSFML/bin/csfml-graphics-2.dll
-	CSFML/bin/csfml-network-2.dll
-	CSFML/bin/csfml-system-2.dll
-	CSFML/bin/csfml-window-2.dll
+	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-audio-2.dll
+	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-graphics-2.dll
+	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-network-2.dll
+	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-system-2.dll
+	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-window-2.dll
 )
+
+target_link_libraries(zword ${DLLS})
 
 install(FILES ${DLLS}
     DESTINATION ${CMAKE_SOURCE_DIR}/build)

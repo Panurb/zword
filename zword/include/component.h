@@ -195,6 +195,12 @@ typedef struct {
 } HealthComponent;
 
 typedef struct {
+    sfVector2i resolution;
+    float zoom;
+    sfShader* shaders[10];
+} CameraComponent;
+
+typedef struct {
     int size;
     void* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
@@ -215,6 +221,7 @@ typedef struct {
     ItemComponent* item[MAX_ENTITIES];
     WaypointComponent* waypoint[MAX_ENTITIES];
     HealthComponent* health[MAX_ENTITIES];
+    CameraComponent* camera[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -271,6 +278,10 @@ void WaypointComponent_remove(ComponentData* components, int entity);
 HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health);
 HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
+
+CameraComponent* CameraComponent_add(ComponentData* components, int entity);
+CameraComponent* CameraComponent_get(ComponentData* components, int entity);
+void CameraComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* component);
 void destroy_entity(ComponentData* component, int i);

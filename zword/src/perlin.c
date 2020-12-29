@@ -42,8 +42,23 @@ float grad(int hash, float x, float y, float z) {
 }
 
 
-float perlin(float x, float y, float z, Permutation p) {
+int inc(int num, int repeat) {
+    num++;
+    if (repeat > 0) {
+        num %= repeat;
+    }
+    return num;
+}
+
+
+float perlin(float x, float y, float z, Permutation p, int repeat) {
     // https://adrianb.io/2014/08/09/perlinnoise.html
+
+    if (repeat > 0) {
+        x = mod(x, (float) repeat);
+        y = mod(y, (float) repeat);
+        z = mod(z, (float) repeat);
+    }
 
     int xi = mod(x, 255);
     int yi = mod(y, 255);
@@ -58,13 +73,13 @@ float perlin(float x, float y, float z, Permutation p) {
     float w = fade(zf);
 
     int aaa = p[p[p[xi] + yi] + zi];
-    int aba = p[p[p[xi] + yi + 1] + zi];
-    int aab = p[p[p[xi] + yi] + zi + 1];
-    int abb = p[p[p[xi] + yi + 1] + zi + 1];
-    int baa = p[p[p[xi + 1] + yi] + zi];
-    int bba = p[p[p[xi + 1] + yi + 1] + zi];
-    int bab = p[p[p[xi + 1] + yi] + zi + 1];
-    int bbb = p[p[p[xi + 1] + yi + 1] + zi + 1];
+    int aba = p[p[p[xi] + inc(yi, repeat)] + zi];
+    int aab = p[p[p[xi] + yi] + inc(zi, repeat)];
+    int abb = p[p[p[xi] + inc(yi, repeat)] + inc(zi, repeat)];
+    int baa = p[p[p[inc(xi, repeat)] + yi] + zi];
+    int bba = p[p[p[inc(xi, repeat)] + inc(yi, repeat)] + zi];
+    int bab = p[p[p[inc(xi, repeat)] + yi] + inc(zi, repeat)];
+    int bbb = p[p[p[inc(xi, repeat)] + inc(yi, repeat)] + inc(zi, repeat)];
 
     float x1 = lerp(grad(aaa, xf, yf, zf),
                     grad(baa, xf - 1.0, yf, zf),
@@ -90,14 +105,14 @@ float perlin(float x, float y, float z, Permutation p) {
 }
 
 
-float octave_perlin(float x, float y, float z, Permutation p, int octaves, float persistence) {
+float octave_perlin(float x, float y, float z, Permutation p, int repeat, int octaves, float persistence) {
     float total = 0.0;
     float frequency = 1.0;
     float amplitude = 1.0;
     float max_value = 0.0;
 
     for (int i = 0; i < octaves; i++) {
-        total += perlin(x * frequency, y * frequency, z * frequency, p) * amplitude;
+        total += perlin(x * frequency, y * frequency, z * frequency, p, repeat) * amplitude;
 
         max_value += amplitude;
 

@@ -188,3 +188,8 @@ void permute(int* array, int size) {
 float lerp(float a, float b, float t) {
     return a + t * (b - a);
 }
+
+float smoothstep(float x, float mu, float nu) {
+    // https://wernerantweiler.ca/blog.php?item=2018-11-03
+    return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
+}

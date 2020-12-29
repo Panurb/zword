@@ -80,3 +80,5 @@ sfColor get_color(float r, float g, float b, float a);
 void permute(int* array, int size);
 
 float lerp(float a, float b, float t);
+
+float smoothstep(float x, float mu, float nu);
