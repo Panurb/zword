@@ -27,7 +27,7 @@
 
 
 int main() {
-    sfVideoMode mode = { 1920, 1080, 32 };
+    sfVideoMode mode = { 1280, 720, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -93,7 +93,7 @@ int main() {
 
                 update(components, time_step, grid);
                 collide(components, grid);
-                update_waypoints(components, grid);
+                // update_waypoints(components, grid);
 
                 update_players(components, grid, window, camera, time_step);
                 update_weapons(components, time_step);
