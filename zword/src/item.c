@@ -15,6 +15,17 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
 }
 
 
+void create_gas(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ColliderComponent_add_rectangle(components, i, 0.75, 0.8, ITEMS);
+    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 1.0, 2.5);
+    ItemComponent_add(components, i, 0);
+    ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
+}
+
+
 void pick_up_item(ComponentData* components, int entity) {
     PlayerComponent* player = components->player[entity];
 

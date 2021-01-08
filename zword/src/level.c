@@ -130,36 +130,38 @@ void create_house(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_shed(ComponentData* component, sfVector2f pos) {
+void create_shed(ComponentData* components, sfVector2f pos) {
     float angle = randf(0.0, 2 * M_PI);
 
     sfVector2f w = polar_to_cartesian(3.0, angle);
     sfVector2f h = perp(w);
 
-    create_floor(component, pos, 6.0, 6.0, angle);
+    create_floor(components, pos, 6.0, 6.0, angle);
 
-    create_wood_wall(component, sum(pos, w), 5.5, angle + 0.5 * M_PI);
-    create_wood_wall(component, diff(pos, w), 5.5, angle + 0.5 * M_PI);
-    create_wood_wall(component, diff(pos, h), 6.5, angle);
+    create_wood_wall(components, sum(pos, w), 5.5, angle + 0.5 * M_PI);
+    create_wood_wall(components, diff(pos, w), 5.5, angle + 0.5 * M_PI);
+    create_wood_wall(components, diff(pos, h), 6.5, angle);
 
-    create_wood_wall(component, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
-    create_wood_wall(component, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
+    create_wood_wall(components, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
+    create_wood_wall(components, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
 
-    create_enemy(component, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
-    create_enemy(component, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
-    create_enemy(component, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
+    create_enemy(components, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
+    create_enemy(components, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
+    create_enemy(components, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
 
-    create_fire(component, sum(pos, mult(0.01, h)));
+    create_fire(components, sum(pos, mult(0.01, h)));
 
-    create_waypoint(component, sum(pos, mult(0.75, h)));
-    create_waypoint(component, sum(pos, mult(1.5, h)));
-    create_waypoint(component, sum(pos, mult(1.5, sum(w, h))));
-    create_waypoint(component, sum(pos, mult(1.5, diff(w, h))));
-    create_waypoint(component, sum(pos, mult(-1.5, sum(w, h))));
-    create_waypoint(component, sum(pos, mult(-1.5, diff(w, h))));
+    create_waypoint(components, sum(pos, mult(0.75, h)));
+    create_waypoint(components, sum(pos, mult(1.5, h)));
+    create_waypoint(components, sum(pos, mult(1.5, sum(w, h))));
+    create_waypoint(components, sum(pos, mult(1.5, diff(w, h))));
+    create_waypoint(components, sum(pos, mult(-1.5, sum(w, h))));
+    create_waypoint(components, sum(pos, mult(-1.5, diff(w, h))));
 
-    create_roof(component, diff(pos, mult(0.665, h)), 8.0, 4.0, angle);
-    create_roof(component, sum(pos, mult(0.665, h)), 8.0, 4.0, angle + M_PI);
+    create_gas(components, pos);
+
+    // create_roof(component, diff(pos, mult(0.665, h)), 8.0, 4.0, angle);
+    // create_roof(component, sum(pos, mult(0.665, h)), 8.0, 4.0, angle + M_PI);
 }
 
 
@@ -214,8 +216,8 @@ void create_chunk(ComponentData* components, sfVector2f position, Permutation p,
     } else {
         create_house(components, position);
 
-        // sfVector2f r = polar_to_cartesian(15.0, rand_angle());
-        // create_shed(components, sum(position, r));
+        sfVector2f r = polar_to_cartesian(20.0, rand_angle());
+        create_shed(components, sum(position, r));
     }
 }
 
@@ -239,15 +241,18 @@ void create_level(ComponentData* components, int seed) {
 
     free(pixels);
 
-    for (int i = -1; i < 2; i++) {
-        for (int j = -1; j < 2; j++) {
+    for (int i = -2; i < 3; i++) {
+        for (int j = -2; j < 3; j++) {
             float f = randf(0.0, 0.5);
             f = 0.0;
-            // if (i == -3 || i == 3) {
-            //     f = 1.0;
-            // } else if (j == -3 || j == 3) {
-            //     f = 1.0;
-            // }
+            if (i == -2 || i == 2) {
+                f = 1.0;
+            } else if (j == -2 || j == 2) {
+                f = 1.0;
+            }
+            if (i == 0 && j == 0) {
+                f = 0.1;
+            }
 
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
             create_chunk(components, position, p, f, noise_texture);

@@ -84,7 +84,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             particle->enabled = true;
 
             int entities[100];
-            get_entities(components, grid, pos, 20.0, entities, entity);
+            get_entities(components, grid, pos, 20.0, entities);
 
             for (int i = 0; i < 100; i++) {
                 int j = entities[i];

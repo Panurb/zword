@@ -162,30 +162,36 @@ void draw_cone(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, int
 }
 
 
-void draw_slice(sfRenderWindow* window, Camera* camera, sfConvexShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
-    float ang = angle - 0.5 * spread;
+void draw_slice(sfRenderWindow* window, Camera* camera, sfVertexArray* verts, int verts_size, sfVector2f position, float min_range, float max_range, float angle, float spread, sfColor color) {
+    bool created = false;
+    if (!verts) {
+        verts = sfVertexArray_create();
+        sfVertexArray_setPrimitiveType(verts, sfTriangleStrip);
+        sfVertexArray_resize(verts, verts_size);
+    }
 
-    sfVector2f start = polar_to_cartesian(min_range, ang);
-    sfVector2f end = polar_to_cartesian(max_range, ang);
+    sfVector2f start = polar_to_cartesian(min_range, angle - 0.5 * spread);
+    sfVector2f end = polar_to_cartesian(max_range, angle - 0.5 * spread);
 
-    sfConvexShape_setPoint(shape, 0, world_to_screen(sum(position, start), camera));
-    sfConvexShape_setPoint(shape, 1, world_to_screen(sum(position, end), camera));
+    Matrix2f rot = rotation_matrix(2.0 * spread / verts_size);
 
-    int n = 5 * ceil(max_range * spread);
+    for (int k = 0; k < verts_size / 2; k += 1) {
+        sfVertex* v = sfVertexArray_getVertex(verts, 2 * k);
+        v->position = world_to_screen(sum(position, start), camera);
+        v->color = color;
 
-    Matrix2f rot = rotation_matrix(spread / n);
+        v = sfVertexArray_getVertex(verts, 2 * k + 1);
+        v->position = world_to_screen(sum(position, end), camera);
+        v->color = color;
 
-    for (int k = 0; k < n; k++) {
         start = matrix_mult(rot, start);
         end = matrix_mult(rot, end);
+    }
 
-        sfConvexShape_setPoint(shape, 2, world_to_screen(sum(position, end), camera));
-        sfConvexShape_setPoint(shape, 3, world_to_screen(sum(position, start), camera));
+    sfRenderWindow_drawVertexArray(window, verts, NULL);
 
-        sfRenderWindow_drawConvexShape(window, shape, NULL);
-
-        sfConvexShape_setPoint(shape, 0, sfConvexShape_getPoint(shape, 3));
-        sfConvexShape_setPoint(shape, 1, sfConvexShape_getPoint(shape, 2));
+    if (created) {
+        sfVertexArray_destroy(verts);
     }
 }
 

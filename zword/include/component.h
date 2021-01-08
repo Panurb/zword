@@ -153,6 +153,8 @@ typedef struct {
 } ParticleComponent;
 
 typedef struct {
+    float fuel;
+    float max_fuel;
     float acceleration;
     float max_speed;
     float turning;
@@ -259,7 +261,7 @@ ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, 
 ParticleComponent* ParticleComponent_get(ComponentData* components, int entity);
 void ParticleComponent_remove(ComponentData* components, int entity);
 
-VehicleComponent* VehicleComponent_add(ComponentData* components, int entity);
+VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, float max_fuel);
 VehicleComponent* VehicleComponent_get(ComponentData* components, int entity);
 void VehicleComponent_remove(ComponentData* components, int entity);
 

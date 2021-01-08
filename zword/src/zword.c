@@ -33,7 +33,7 @@ int main() {
     settings.antialiasingLevel = 8;
     sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
-    // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
+    sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
     bool focus = true;
 
@@ -117,10 +117,10 @@ int main() {
         draw_players(components, window, camera);
 
         // debug_draw(components, window, camera);
-        // draw_waypoints(components, window, camera);
+        draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
-        draw_occupied_tiles(components, grid, window, camera);
+        // draw_occupied_tiles(components, grid, window, camera);
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);

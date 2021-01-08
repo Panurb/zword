@@ -24,7 +24,7 @@ typedef struct {
 
 ColliderGrid* ColliderGrid_create();
 
-void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius, int entities[100], int entity);
+void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius, int entities[100]);
 
 void update_grid(ComponentData* component, ColliderGrid* grid, int i);
 

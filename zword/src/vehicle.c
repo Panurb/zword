@@ -1,5 +1,10 @@
+#define _USE_MATH_DEFINES
+
+#include <math.h>
+
 #include "component.h"
 #include "particle.h"
+#include "image.h"
 
 
 void create_car(ComponentData* components, float x, float y) {
@@ -9,7 +14,7 @@ void create_car(ComponentData* components, float x, float y) {
     CoordinateComponent_add(components, i, pos, 0.0);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
     PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0)->max_angular_speed = 2.5;
-    VehicleComponent_add(components, i);
+    VehicleComponent_add(components, i, 50.0);
     WaypointComponent_add(components, i);
     ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
     ParticleComponent_add_sparks(components, i);
@@ -84,12 +89,14 @@ void exit_vehicle(ComponentData* component, int i) {
 }
 
 
-void drive_vehicle(ComponentData* component, int i, sfVector2f v, float delta_time) {
+void drive_vehicle(ComponentData* component, int i, sfVector2f v, float time_step) {
     int j = component->player[i]->vehicle;
 
     VehicleComponent* vehicle = component->vehicle[j];
 
     if (i != vehicle->riders[0]) return;
+
+    if (vehicle->fuel == 0.0) return;
 
     PhysicsComponent* phys = component->physics[j];
 
@@ -101,7 +108,9 @@ void drive_vehicle(ComponentData* component, int i, sfVector2f v, float delta_ti
         phys->angular_acceleration -= sign(v.y + 0.1) * vehicle->turning * v.x;
     }
 
-    sfVector2f v_new = rotate(phys->velocity, phys->angular_velocity * delta_time);
+    sfVector2f v_new = rotate(phys->velocity, phys->angular_velocity * time_step);
 
-    phys->acceleration = sum(phys->acceleration, mult(1.0 / delta_time, diff(v_new, phys->velocity)));
+    phys->acceleration = sum(phys->acceleration, mult(1.0 / time_step, diff(v_new, phys->velocity)));
+
+    vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
 }

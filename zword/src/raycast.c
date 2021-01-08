@@ -62,8 +62,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
     // http://www.cs.yorku.ca/~amana/research/grid.pdf
 
     static int id = MAX_ENTITIES;
-
-    id = (id < INT_MAX) ? id + 1 : MAX_ENTITIES;
+    id = (id < 2 * MAX_ENTITIES) ? id + 1 : MAX_ENTITIES;
 
     velocity = normalized(velocity);
 
