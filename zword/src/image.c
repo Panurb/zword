@@ -83,7 +83,7 @@ void set_texture(ImageComponent* image, TextureArray textures) {
 }
 
 
-void draw(ComponentData* components, sfRenderWindow* window, Camera* camera, TextureArray textures) {
+void draw(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
     for (int j = 0; j < components->image.size; j++) {
         int i = components->image.order[j];
 
@@ -94,7 +94,7 @@ void draw(ComponentData* components, sfRenderWindow* window, Camera* camera, Tex
         sfVector2f pos = get_position(components, i);
 
         float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
-        if (!on_screen(pos, r, r, camera)) {
+        if (!on_screen(components, camera, pos, r, r)) {
             continue;
         }
 
@@ -109,10 +109,10 @@ void draw(ComponentData* components, sfRenderWindow* window, Camera* camera, Tex
                 sfVector2f scale = image->scale;
                 scale.x *= (image->width + image->outline) / image->width;
                 scale.y *= (image->height + image->outline) / image->height;
-                draw_sprite(window, camera, image->sprite, pos, get_angle(components, i), scale, 1);
+                draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), scale, 1);
             }
             sfSprite_setColor(image->sprite, get_color(1.0, 1.0, 1.0, image->alpha));
-            draw_sprite(window, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
+            draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
         }
 
         draw_particles(components, window, camera, i);
@@ -120,11 +120,11 @@ void draw(ComponentData* components, sfRenderWindow* window, Camera* camera, Tex
 }
 
 
-void draw_roofs(ComponentData* component, sfRenderWindow* window, Camera* camera, TextureArray textures) {
-    for (int j = 0; j < component->image.size; j++) {
-        int i = component->image.order[j];
+void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
+    for (int j = 0; j < components->image.size; j++) {
+        int i = components->image.order[j];
 
-        ImageComponent* image = ImageComponent_get(component, i);
+        ImageComponent* image = ImageComponent_get(components, i);
 
         if (image->layer < 7) continue;
 
@@ -134,7 +134,7 @@ void draw_roofs(ComponentData* component, sfRenderWindow* window, Camera* camera
         }
 
         if (image->alpha > 0.0) {
-            draw_sprite(window, camera, image->sprite, get_position(component, i), get_angle(component, i), image->scale, 0);
+            draw_sprite(window, components, camera, image->sprite, get_position(components, i), get_angle(components, i), image->scale, 0);
         }
     }
 }

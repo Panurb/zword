@@ -114,19 +114,19 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 }
 
 
-void draw_enemies(ComponentData* component, sfRenderWindow* window, Camera* camera) {
-    for (int i = 0; i < component->entities; i++) {
-        EnemyComponent* enemy = EnemyComponent_get(component, i);
+void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera) {
+    for (int i = 0; i < components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(components, i);
         if (!enemy) continue;
 
         for (int j = 0; j < MAX_PATH_LENGTH; j++) {
             if (enemy->path[j + 1] == -1) break;
 
-            draw_line(window, camera, NULL, get_position(component, enemy->path[j]), get_position(component, enemy->path[j + 1]), 0.05, sfRed);
+            draw_line(window, components, camera, NULL, get_position(components, enemy->path[j]), get_position(components, enemy->path[j + 1]), 0.05, sfRed);
         }
 
         if (enemy->path[1] != -1) {
-            draw_circle(window, camera, NULL, get_position(component, enemy->path[1]), 0.1, sfGreen);
+            draw_circle(window, components, camera, NULL, get_position(components, enemy->path[1]), 0.1, sfGreen);
         }
     }
 }

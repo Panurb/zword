@@ -56,34 +56,34 @@ sfVector2f left_stick() {
 }
 
 
-sfVector2f right_stick(ComponentData* component, sfRenderWindow* window, Camera* camera, int i) {
-    sfVector2f mouse = screen_to_world(sfMouse_getPosition((sfWindow*) window), camera);
-    sfVector2f rel_mouse = diff(mouse, get_position(component, i));
+sfVector2f right_stick(ComponentData* components, sfRenderWindow* window, int camera, int i) {
+    sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
+    sfVector2f rel_mouse = diff(mouse, get_position(components, i));
 
     return normalized(rel_mouse);
 }
 
 
-int get_inventory_slot(ComponentData* component, sfRenderWindow* window, Camera* camera, int i) {
-    PlayerComponent* player = component->player[i];
+int get_inventory_slot(ComponentData* components, sfRenderWindow* window, int camera, int i) {
+    PlayerComponent* player = components->player[i];
 
-    sfVector2f rs = right_stick(component, window, camera, i);
+    sfVector2f rs = right_stick(components, window, camera, i);
     float angle = mod(polar_angle(rs) + 0.25 * M_PI, 2 * M_PI);
 
     return floor(player->inventory_size * angle / (2 * M_PI));
 }
 
 
-int get_attachment(ComponentData* component, sfRenderWindow* window, Camera* camera, int i) {
-    PlayerComponent* player = component->player[i];
-    int slot = get_inventory_slot(component, window, camera, i);
+int get_attachment(ComponentData* components, sfRenderWindow* window, int camera, int i) {
+    PlayerComponent* player = components->player[i];
+    int slot = get_inventory_slot(components, window, camera, i);
     int item = player->inventory[slot];
 
     if (item != -1) {
-        int size = component->item[item]->size;
+        int size = components->item[item]->size;
         if (size > 0) {
             float slot_angle = 2 * M_PI / player->inventory_size;
-            sfVector2f rs = right_stick(component, window, camera, i);
+            sfVector2f rs = right_stick(components, window, camera, i);
             float angle = polar_angle(rs) + 0.25 * M_PI;
             angle = mod(angle, slot_angle);
 
@@ -181,7 +181,7 @@ void input(ComponentData* component) {
 }
 
 
-void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step) {
+void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera, float time_step) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = components->player[i];
         if (!player) continue;
@@ -339,7 +339,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
 }
 
 
-void draw_menu_slot(ComponentData* components, sfRenderWindow* window, Camera* camera, int entity, int slot, float offset, float alpha) {
+void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = components->player[entity];
     sfVector2f pos = get_position(components, entity);
 
@@ -351,9 +351,9 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, Camera* c
     sfConvexShape_setFillColor(player->shape, color);
 
     if (alpha == 0.0) {
-        draw_slice_outline(window, camera, player->line, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
+        draw_slice_outline(window, components, camera, player->line, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
     } else {
-        draw_slice(window, camera, NULL, 50, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap, color);
+        draw_slice(window, components, camera, NULL, 50, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap, color);
     }
 
     int i = player->inventory[slot];
@@ -368,12 +368,12 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, Camera* c
             r = mult(2.5, right_stick(components, window, camera, entity));
         }
 
-        draw_sprite(window, camera, sprite, sum(pos, r), 0.0, ones(), 0);
+        draw_sprite(window, components, camera, sprite, sum(pos, r), 0.0, ones(), 0);
     }
 }
 
 
-void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, Camera* camera, int entity, int slot, int atch, float offset, float alpha) {
+void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, int atch, float offset, float alpha) {
     PlayerComponent* player = components->player[entity];
     sfVector2f pos = get_position(components, entity);
     ItemComponent* item = components->item[player->inventory[slot]];
@@ -383,7 +383,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, Cam
 
     float spread = (slice - 2 * gap - 0.5 * item->size * gap) / (item->size + 1);
     float angle = (slot - 0.5) * slice + (atch + 1.5) * spread + (0.5 * atch + 1.5) * gap;
-    draw_slice_outline(window, camera, player->line, pos, 1.2 + offset, 1.8 + offset, angle, spread);
+    draw_slice_outline(window, components, camera, player->line, pos, 1.2 + offset, 1.8 + offset, angle, spread);
 
     int a = item->attachments[atch];
     if (a != -1) {
@@ -391,7 +391,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, Cam
         color.a = alpha * 255;
         sfConvexShape_setFillColor(player->shape, color);
 
-        draw_slice(window, camera, NULL, 50, pos, 1.2 + offset, 1.8 + offset, angle, spread, color);
+        draw_slice(window, components, camera, NULL, 50, pos, 1.2 + offset, 1.8 + offset, angle, spread, color);
 
         sfSprite* sprite = ImageComponent_get(components, a)->sprite;
 
@@ -401,12 +401,12 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, Cam
             r = mult(2.5, right_stick(components, window, camera, entity));
         }
 
-        draw_sprite(window, camera, sprite, sum(pos, r), 0.0, mult(0.75, ones()), 0);
+        draw_sprite(window, components, camera, sprite, sum(pos, r), 0.0, mult(0.75, ones()), 0);
     }
 }
 
 
-void draw_players(ComponentData* components, sfRenderWindow* window, Camera* camera) {
+void draw_players(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = components->player[i];
         if (!player) continue;
@@ -426,10 +426,11 @@ void draw_players(ComponentData* components, sfRenderWindow* window, Camera* cam
             case ON_FOOT:
             case SHOOT:
                 if (weapon) {
-                    sfConvexShape_setOutlineThickness(weapon->shape, 0.02 * camera->zoom);
+                    CameraComponent* cam = CameraComponent_get(components, camera);
+                    sfConvexShape_setOutlineThickness(weapon->shape, 0.02 * cam->zoom);
 
                     float spread = fmax(0.01, weapon->recoil);
-                    draw_cone(window, camera, weapon->shape, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
+                    draw_cone(window, components, camera, weapon->shape, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
                 }
 
                 break;
@@ -437,14 +438,14 @@ void draw_players(ComponentData* components, sfRenderWindow* window, Camera* cam
                 sfConvexShape_setFillColor(player->shape, sfWhite);
                 int akimbo = get_akimbo(components, item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
-                draw_slice(window, camera, NULL, 50, pos, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
+                draw_slice(window, components, camera, NULL, 50, pos, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
 
                 break;
             case DRIVE:
                 ;
                 VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
                 if (vehicle) {
-                    draw_slice(window, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
+                    draw_slice(window, components, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
                 }
 
                 break;

@@ -13,8 +13,8 @@
 
 bool a_star(ComponentData* component, int start, int goal, int* path);
 
-void init_waypoints(ComponentData* component, ColliderGrid* grid);
+void init_waypoints(ComponentData* components, ColliderGrid* grid);
 
-void update_waypoints(ComponentData* component, ColliderGrid* grid);
+void update_waypoints(ComponentData* components, ColliderGrid* grid);
 
-void draw_waypoints(ComponentData* component, sfRenderWindow* window, Camera* camera);
+void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera);

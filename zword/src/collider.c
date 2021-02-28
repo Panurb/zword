@@ -260,7 +260,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 }
 
 
-void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         if (!ColliderComponent_get(components, i)) continue;
 
@@ -269,23 +269,23 @@ void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRender
             for (int k = bounds.bottom; k <= bounds.top; k++) {
                 sfVector2f pos = { j * grid->tile_width - 0.5 * grid->width + 0.5 * grid->tile_width, 
                                    k * grid->tile_height - 0.5 * grid->height + 0.5 * grid->tile_height };
-                draw_rectangle(window, camera, NULL, pos, grid->tile_width, grid->tile_height, 0.0, get_color(1.0, 1.0, 1.0, 0.25));
+                draw_rectangle(window, components, camera, NULL, pos, grid->tile_width, grid->tile_height, 0.0, get_color(1.0, 1.0, 1.0, 0.25));
             }
         }
     }
 }
 
 
-void debug_draw(ComponentData* components, sfRenderWindow* window, Camera* camera) {
+void debug_draw(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         ColliderComponent* col = components->collider[i];
         if (!col) continue;
 
         if (col->type == CIRCLE) {
-            draw_circle(window, camera, NULL, get_position(components, i), col->radius, get_color(1.0, 0.0, 1.0, 0.25));
+            draw_circle(window, components, camera, NULL, get_position(components, i), col->radius, get_color(1.0, 0.0, 1.0, 0.25));
         } else {
             sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
-            draw_rectangle(window, camera, NULL, get_position(components, i), col->width, col->height, get_angle(components, i), color);
+            draw_rectangle(window, components, camera, NULL, get_position(components, i), col->width, col->height, get_angle(components, i), color);
         }
     }
 }

@@ -53,7 +53,7 @@ int main() {
 
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
-    Camera* camera = Camera_create(mode);
+    int camera = create_camera(components, mode);
 
     float ambient_light = 0.4;
     create_level(components, time(NULL));
@@ -93,7 +93,7 @@ int main() {
 
                 update(components, time_step, grid);
                 collide(components, grid);
-                // update_waypoints(components, grid);
+                update_waypoints(components, grid);
 
                 update_players(components, grid, window, camera, time_step);
                 update_weapons(components, time_step);

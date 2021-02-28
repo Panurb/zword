@@ -191,11 +191,11 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid) {
 }
 
 
-void draw_waypoints(ComponentData* components, sfRenderWindow* window, Camera* camera) {
+void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera) {
     sfCircleShape* shape = sfCircleShape_create();
     sfRectangleShape* line = sfRectangleShape_create();
 
-    float radius = 0.2 * camera->zoom;
+    float radius = 0.2 * CameraComponent_get(components, camera)->zoom;
     sfCircleShape_setOrigin(shape, (sfVector2f) { radius, radius });
     sfCircleShape_setRadius(shape, radius);
 
@@ -204,7 +204,7 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, Camera* c
         if (!waypoint) continue;
 
         sfVector2f pos = get_position(components, i);
-        sfCircleShape_setPosition(shape, world_to_screen(pos, camera));
+        sfCircleShape_setPosition(shape, world_to_screen(components, camera, pos));
 
         sfRenderWindow_drawCircleShape(window, shape, NULL);
 
@@ -213,7 +213,7 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, Camera* c
             if (k != -1) {
                 sfColor color = sfWhite;
                 color.a = 64;
-                draw_line(window, camera, line, pos, get_position(components, k), 0.02, color);
+                draw_line(window, components, camera, line, pos, get_position(components, k), 0.02, color);
             }
         }
     }

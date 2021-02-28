@@ -146,24 +146,27 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 }
 
 
-void draw_grid(ColliderGrid* grid, sfRenderWindow* window, Camera* camera) {
+void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
+    CameraComponent* cam = CameraComponent_get(components, camera);
+    sfVector2f pos = CoordinateComponent_get(components, camera)->position;
+
     sfColor color = get_color(1.0, 1.0, 1.0, 0.2);
 
-    int nx = ceil((camera->resolution.x / camera->zoom) / grid->tile_width) + 1;
-    float x = floor(camera->position.x - 0.5 * camera->resolution.x / camera->zoom);
+    int nx = ceil((cam->resolution.x / cam->zoom) / grid->tile_width) + 1;
+    float x = floor(pos.x - 0.5 * cam->resolution.x / cam->zoom);
     for (int i = 0; i < nx; i++) {
-        sfVector2f start = { x + i * grid->tile_width, camera->position.y + 0.5 * camera->resolution.y / camera->zoom };
-        sfVector2f end = { x + i * grid->tile_width, camera->position.y - 0.5 * camera->resolution.y / camera->zoom };
+        sfVector2f start = { x + i * grid->tile_width, pos.y + 0.5 * cam->resolution.y / cam->zoom };
+        sfVector2f end = { x + i * grid->tile_width, pos.y - 0.5 * cam->resolution.y / cam->zoom };
 
-        draw_line(window, camera, NULL, start, end, 0.02, color);
+        draw_line(window, components, camera, NULL, start, end, 0.02, color);
     }
 
-    int ny = ceil((camera->resolution.y / camera->zoom) / grid->tile_height);    
-    float y = floor(camera->position.y - 0.5 * camera->resolution.y / camera->zoom);
+    int ny = ceil((cam->resolution.y / cam->zoom) / grid->tile_height);    
+    float y = floor(pos.y - 0.5 * cam->resolution.y / cam->zoom);
     for (int i = 0; i < ny; i++) {
-        sfVector2f start = { camera->position.x - 0.5 * camera->resolution.x / camera->zoom, y + i * grid->tile_height };
-        sfVector2f end = { camera->position.x + 0.5 * camera->resolution.x / camera->zoom, y + i * grid->tile_height };
+        sfVector2f start = { pos.x - 0.5 * cam->resolution.x / cam->zoom, y + i * grid->tile_height };
+        sfVector2f end = { pos.x + 0.5 * cam->resolution.x / cam->zoom, y + i * grid->tile_height };
 
-        draw_line(window, camera, NULL, start, end, 0.02, color);
+        draw_line(window, components, camera, NULL, start, end, 0.02, color);
     }
 }

@@ -7,8 +7,8 @@
 
 void input(ComponentData* component);
 
-void create_player(ComponentData* component, sfVector2f pos);
+void create_player(ComponentData* components, sfVector2f pos);
 
-void update_players(ComponentData* component, ColliderGrid* grid, sfRenderWindow* window, Camera* camera, float time_step);
+void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera, float time_step);
 
-void draw_players(ComponentData* component, sfRenderWindow* window, Camera* camera);
+void draw_players(ComponentData* components, sfRenderWindow* window, int camera);

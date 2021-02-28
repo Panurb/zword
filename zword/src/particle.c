@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
@@ -74,8 +75,8 @@ sfColor color_lerp(sfColor s, sfColor e, float t) {
 }
 
 
-void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* camera, int entity) {
-    ParticleComponent* part = component->particle[entity];
+void draw_particles(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+    ParticleComponent* part = components->particle[entity];
     if (!part) return;
 
     for (int i = part->particles - 1; i >= 0; i--) {
@@ -87,7 +88,7 @@ void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* ca
         float r = lerp(part->start_size, part->end_size, t);
         float angle = polar_angle(part->velocity[i]);
 
-        draw_ellipse(window, camera, part->shape, part->position[i], max(1.0, 0.1 * norm(part->velocity[i])) * r, r, angle, color);
+        draw_ellipse(window, components, camera, part->shape, part->position[i], max(1.0, 0.1 * norm(part->velocity[i])) * r, r, angle, color);
     }
 
     for (int i = part->particles - 1; i >= 0; i--) {
@@ -100,6 +101,6 @@ void draw_particles(ComponentData* component, sfRenderWindow* window, Camera* ca
         float r = 0.5 * lerp(part->start_size, part->end_size, t);
         float angle = polar_angle(part->velocity[i]);
 
-        draw_ellipse(window, camera, part->shape, part->position[i], max(1.0, 0.1 * norm(part->velocity[i])) * r, r, angle, color);
+        draw_ellipse(window, components, camera, part->shape, part->position[i], max(1.0, 0.1 * norm(part->velocity[i])) * r, r, angle, color);
     }
 }

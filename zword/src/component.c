@@ -506,24 +506,41 @@ void HealthComponent_remove(ComponentData* components, int entity) {
 }
 
 
-CameraComponent* CameraComponent_add(ComponentData* components, int entity) {
+CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution) {
     CameraComponent* camera = malloc(sizeof(CameraComponent));
+
+    camera->resolution = resolution;
+    camera->zoom = 25.0 * camera->resolution.y / 720.0;
+
+    camera->shaders[0] = NULL;
+    camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "blendColor.frag");
+
+    components->camera[entity] = camera;
+    return camera;
 }
 
 
-CameraComponent* CameraComponent_get(ComponentData* components, int entity);
-void CameraComponent_remove(ComponentData* components, int entity);
+CameraComponent* CameraComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->camera[entity];
+}
 
 
-int create_entity(ComponentData* component) {
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->coordinate[i]) {
+void CameraComponent_remove(ComponentData* components, int entity) {
+    free(CameraComponent_get(components, entity));
+    components->camera[entity] = NULL;
+}
+
+
+int create_entity(ComponentData* components) {
+    for (int i = 0; i < components->entities; i++) {
+        if (!components->coordinate[i]) {
             return i;
         }
     }
 
-    component->entities++;
-    return component->entities - 1;
+    components->entities++;
+    return components->entities - 1;
 }
 
 
@@ -561,23 +578,23 @@ void destroy_entity(ComponentData* components, int entity) {
 }
 
 
-sfVector2f get_position(ComponentData* component, int entity) {
-    sfVector2f position = component->coordinate[entity]->position;
+sfVector2f get_position(ComponentData* components, int entity) {
+    sfVector2f position = components->coordinate[entity]->position;
 
-    int parent = component->coordinate[entity]->parent;
+    int parent = components->coordinate[entity]->parent;
     if (parent != -1) {
-        position = sum(get_position(component, parent), rotate(position, component->coordinate[parent]->angle));
+        position = sum(get_position(components, parent), rotate(position, components->coordinate[parent]->angle));
     }
     return position;
 }
 
 
-float get_angle(ComponentData* component, int entity) {
-    float angle = component->coordinate[entity]->angle;
+float get_angle(ComponentData* components, int entity) {
+    float angle = components->coordinate[entity]->angle;
 
-    int parent = component->coordinate[entity]->parent;
+    int parent = components->coordinate[entity]->parent;
     if (parent != -1) {
-        angle += get_angle(component, parent);
+        angle += get_angle(components, parent);
     }
 
     return angle;

@@ -281,12 +281,12 @@ HealthComponent* HealthComponent_add(ComponentData* components, int entity, int 
 HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
 
-CameraComponent* CameraComponent_add(ComponentData* components, int entity);
+CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution);
 CameraComponent* CameraComponent_get(ComponentData* components, int entity);
 void CameraComponent_remove(ComponentData* components, int entity);
 
-int create_entity(ComponentData* component);
-void destroy_entity(ComponentData* component, int i);
+int create_entity(ComponentData* components);
+void destroy_entity(ComponentData* components, int i);
 
-sfVector2f get_position(ComponentData* component, int i);
-float get_angle(ComponentData* component, int i);
+sfVector2f get_position(ComponentData* components, int i);
+float get_angle(ComponentData* components, int i);

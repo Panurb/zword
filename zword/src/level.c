@@ -188,18 +188,12 @@ void create_tree(ComponentData* components, sfVector2f position, float size) {
 
 
 void create_forest(ComponentData* components, sfVector2f position, Permutation p, float forestation) {
-    int k = 0;
     for (int i = -5; i < 6; i++) {
         for (int j = -5; j < 6; j++) {
             sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
 
             if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p, -1)) {
                 create_tree(components, r, randf(1.0, 1.5));
-            } else {
-                if (k % 4 == 0) {
-                    create_waypoint(components, r);
-                }
-                k++;
             }
         }
     }
