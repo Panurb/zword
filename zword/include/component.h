@@ -61,7 +61,8 @@ typedef enum {
     PLAYERS,
     ENEMIES,
     VEHICLES,
-    TREES
+    TREES,
+    ROADS
 } ColliderGroup;
 
 typedef struct {
@@ -203,6 +204,16 @@ typedef struct {
 } CameraComponent;
 
 typedef struct {
+    bool texture_changed;
+    int prev;
+    int next;
+    float curve;
+    float width;
+    Filename filename;
+    sfConvexShape* shape;
+} RoadComponent;
+
+typedef struct {
     int size;
     void* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
@@ -224,6 +235,7 @@ typedef struct {
     WaypointComponent* waypoint[MAX_ENTITIES];
     HealthComponent* health[MAX_ENTITIES];
     CameraComponent* camera[MAX_ENTITIES];
+    RoadComponent* road[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -284,6 +296,10 @@ void HealthComponent_remove(ComponentData* components, int entity);
 CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution);
 CameraComponent* CameraComponent_get(ComponentData* components, int entity);
 void CameraComponent_remove(ComponentData* components, int entity);
+
+RoadComponent* RoadComponent_add(ComponentData* components, int entity);
+RoadComponent* RoadComponent_get(ComponentData* components, int entity);
+void RoadComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

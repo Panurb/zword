@@ -532,6 +532,36 @@ void CameraComponent_remove(ComponentData* components, int entity) {
 }
 
 
+RoadComponent* RoadComponent_add(ComponentData* components, int entity) {
+    RoadComponent* road = malloc(sizeof(RoadComponent));
+    road->prev = -1;
+    road->next = -1;
+    road->curve = 0.0;
+    road->width = 4.0;
+    road->shape = sfConvexShape_create();
+    sfConvexShape_setPointCount(road->shape, 12);
+    strcpy(road->filename, "road_curve");
+    road->texture_changed = true;
+
+    components->road[entity] = road;
+    return road;
+}
+
+
+RoadComponent* RoadComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->road[entity];
+}
+
+
+void RoadComponent_remove(ComponentData* components, int entity) {
+    RoadComponent* road = RoadComponent_get(components, entity);
+    sfConvexShape_destroy(road->shape);
+    free(road);
+    components->road[entity] = NULL;
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -571,6 +601,10 @@ void destroy_entity(ComponentData* components, int entity) {
         WaypointComponent_remove(components, entity);
     if (HealthComponent_get(components, entity))
         HealthComponent_remove(components, entity);
+    if (CameraComponent_get(components, entity))
+        CameraComponent_remove(components, entity);
+    if (RoadComponent_get(components, entity))
+        RoadComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

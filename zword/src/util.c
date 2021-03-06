@@ -48,6 +48,15 @@ float dot(sfVector2f a, sfVector2f b) {
     return a.x * b.x + a.y * b.y;
 }
 
+float signed_angle(sfVector2f a, sfVector2f b) {
+    // https://stackoverflow.com/questions/2150050/finding-signed-angle-between-vectors
+    return atan2f(a.x * b.y - a.y * b.x, a.x * b.x + a.y * b.y);
+}
+
+sfVector2f bisector(sfVector2f a, sfVector2f b) {
+    return normalized(sum(normalized(a), normalized(b)));
+}
+
 sfVector2f polar_to_cartesian(float length, float angle) {
     sfVector2f v = { length * cosf(angle), length * sinf(angle) };
     return v;
@@ -106,6 +115,10 @@ float randf(float low, float upp) {
 
 float rand_angle() {
     return randf(0.0, 2 * M_PI);
+}
+
+sfVector2f rand_vector() {
+    return polar_to_cartesian(1.0, rand_angle());
 }
 
 int find(int value, int* array, int size) {

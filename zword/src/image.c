@@ -25,6 +25,8 @@ static const char* IMAGES[] = {
     "grass_tile",
     "pistol",
     "player",
+    "road_curve",
+    "road_tile",
     "roof_tile",
     "tree",
     "wood_tile",
@@ -116,6 +118,7 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
         }
 
         draw_particles(components, window, camera, i);
+        draw_road(components, window, camera, textures, i);
     }
 }
 

@@ -24,6 +24,7 @@
 #include "interface.h"
 #include "perlin.h"
 #include "weapon.h"
+#include "road.h"
 
 
 int main() {
@@ -55,7 +56,7 @@ int main() {
     ColliderGrid* grid = ColliderGrid_create();
     int camera = create_camera(components, mode);
 
-    float ambient_light = 0.4;
+    float ambient_light = 0.8;
     create_level(components, time(NULL));
     init_grid(components, grid);
     init_waypoints(components, grid);
@@ -117,7 +118,7 @@ int main() {
         draw_players(components, window, camera);
 
         // debug_draw(components, window, camera);
-        draw_waypoints(components, window, camera);
+        // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
         // draw_occupied_tiles(components, grid, window, camera);

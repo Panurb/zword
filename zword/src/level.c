@@ -203,14 +203,14 @@ void create_forest(ComponentData* components, sfVector2f position, Permutation p
 void create_chunk(ComponentData* components, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
     create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
-    if (forestation > 0.1) {
-        create_forest(components, position, p, forestation);
-    } else {
-        create_house(components, position);
+    // if (forestation > 0.1) {
+    //     create_forest(components, position, p, forestation);
+    // } else {
+    //     create_house(components, position);
 
-        sfVector2f r = polar_to_cartesian(20.0, rand_angle());
-        create_shed(components, sum(position, r));
-    }
+    //     sfVector2f r = polar_to_cartesian(20.0, rand_angle());
+    //     create_shed(components, sum(position, r));
+    // }
 }
 
 
@@ -223,15 +223,15 @@ void create_level(ComponentData* components, int seed) {
     int w = 2048;
     int h = 2048;
 
-    sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
+    // sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
 
-    create_noise(pixels, w, h, zeros(), get_color(1.0, 1.0, 1.0, 1.0), p);
+    // create_noise(pixels, w, h, zeros(), get_color(1.0, 1.0, 1.0, 1.0), p);
 
     sfTexture* noise_texture = sfTexture_create(w, h);
-    sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
-    sfTexture_setRepeated(noise_texture, true);
+    // sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
+    // sfTexture_setRepeated(noise_texture, true);
 
-    free(pixels);
+    // free(pixels);
 
     for (int i = -2; i < 3; i++) {
         for (int j = -2; j < 3; j++) {
@@ -250,6 +250,8 @@ void create_level(ComponentData* components, int seed) {
             create_chunk(components, position, p, f, noise_texture);
         }
     }
+
+    create_road(components, zeros(), mult(200.0, ones()), p);
 
     create_player(components, (sfVector2f) { 5.0, 0.0 });
 

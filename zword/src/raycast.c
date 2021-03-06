@@ -92,7 +92,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
 
             ColliderComponent* col = ColliderComponent_get(components, j);
             if (col->last_collision == id) continue;
-            if (col->group == ITEMS) continue;
+            if (col->group == ITEMS || col->group == ROADS) continue;
 
             col->last_collision = id;
 

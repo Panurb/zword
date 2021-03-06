@@ -156,20 +156,29 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
 
 
 void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread) {
-    sfConvexShape_setPoint(shape, 0, world_to_screen(components, camera, position));
-    sfConvexShape_setPoint(shape, n - 1, world_to_screen(components, camera, position));
+    bool created = false;
+    if (!shape) {
+        shape = sfConvexShape_create();
+        sfConvexShape_setPointCount(shape, n);
+    }
+    
+    sfVector2f start = world_to_screen(components, camera, position);
+    sfConvexShape_setPoint(shape, 0, start);
+    sfConvexShape_setPoint(shape, n - 1, start);
 
     angle -= 0.5 * spread;
 
-    for (int k = 1; k < n - 1; k++) {
+    for (int i = 1; i < n - 1; i++) {
         sfVector2f point = sum(position, polar_to_cartesian(range, angle));
-
-        sfConvexShape_setPoint(shape, k, world_to_screen(components, camera, point));
-
-        angle += spread / (n - 1);
+        sfConvexShape_setPoint(shape, i, world_to_screen(components, camera, point));
+        angle += spread / (n - 3);
     }
 
     sfRenderWindow_drawConvexShape(window, shape, NULL);
+
+    if (created) {
+        sfConvexShape_destroy(shape);
+    }
 }
 
 

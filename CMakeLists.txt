@@ -26,6 +26,7 @@ set(SOURCES
     zword/src/physics.c
     zword/src/player.c
     zword/src/raycast.c
+    zword/src/road.c
     zword/src/util.c
     zword/src/zword.c
     zword/src/vehicle.c
@@ -33,12 +34,6 @@ set(SOURCES
 )
 
 add_executable(zword ${SOURCES})
-
-#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-audio.a)
-#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-graphics.a)
-#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-network.a)
-#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-system.a)
-#target_link_libraries(zword ${CMAKE_SOURCE_DIR}/CSFML/lib/gcc/libcsfml-window.a)
 
 install(TARGETS zword
     DESTINATION ${CMAKE_SOURCE_DIR}/build)

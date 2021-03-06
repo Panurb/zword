@@ -129,6 +129,15 @@ void init_waypoints(ComponentData* components, ColliderGrid* grid) {
                 }
             }
         }
+
+        // if (waypoint->neighbors_size > 0) {
+        //     sfVector2f a = get_position(components, i);
+        //     sfVector2f b = get_position(components, waypoint->neighbors[0]);
+
+        //     int j = create_entity(components);
+        //     CoordinateComponent_add(components, j, mult(0.5, sum(a, b)), polar_angle(diff(a, b)));
+        //     ImageComponent_add(components, j, "road_tile", dist(a, b), 4.0, 1);
+        // }
     }
 }
 

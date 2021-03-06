@@ -29,6 +29,10 @@ double to_degrees(double radians);
 
 float dot(sfVector2f a, sfVector2f b);
 
+float signed_angle(sfVector2f a, sfVector2f b);
+
+sfVector2f bisector(sfVector2f a, sfVector2f b);
+
 sfVector2f polar_to_cartesian(float length, float angle);
 
 int abs_argmin(float* a, int n);
@@ -50,6 +54,8 @@ sfVector2f proj(sfVector2f a, sfVector2f b);
 float randf(float min, float max);
 
 float rand_angle();
+
+sfVector2f rand_vector();
 
 int find(int value, int* array, int size);
 
