@@ -16,6 +16,8 @@
 #include "item.h"
 #include "particle.h"
 #include "road.h"
+#include "grid.h"
+#include "collider.h"
 
 
 void create_waypoint(ComponentData* components, sfVector2f pos) {
@@ -177,32 +179,44 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 }
 
 
-void create_tree(ComponentData* components, sfVector2f position, float size) {
+void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
     ImageComponent_add(components, i, "tree", 3.0, 3.0, 6)->scale = (sfVector2f) { size, size };
-    ColliderComponent_add_circle(components, i, size, TREES);
+    ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.0 * size, TREES);
+
+    if (collides_with(components, grid, i, ROADS)) {
+        destroy_entity(components, i);
+    } else {
+        col->radius = size;
+    }
 }
 
 
-void create_rock(ComponentData* components, sfVector2f position, float size) {
+void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
     ImageComponent_add(components, i, "rock", 3.0, 3.0, 2)->scale = (sfVector2f) { size, size };
-    ColliderComponent_add_circle(components, i, 1.4 * size, TREES);
+    ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.8 * size, TREES);
+
+    if (collides_with(components, grid, i, ROADS)) {
+        destroy_entity(components, i);
+    } else {
+        col->radius = 1.4 * size;
+    }
 }
 
 
-void create_forest(ComponentData* components, sfVector2f position, Permutation p, float forestation) {
+void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation) {
     for (int i = -5; i < 6; i++) {
         for (int j = -5; j < 6; j++) {
             sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
 
             if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p, -1)) {
                 if (randf(0.0, 1.0) < 0.05) {
-                    create_rock(components, r, randf(0.75, 2.0));
+                    create_rock(components, grid, r, randf(0.75, 2.0));
                 } else {
-                    create_tree(components, r, randf(1.0, 1.5));
+                    create_tree(components, grid, r, randf(1.0, 1.5));
                 }
             }
         }
@@ -210,11 +224,11 @@ void create_forest(ComponentData* components, sfVector2f position, Permutation p
 }
 
 
-void create_chunk(ComponentData* components, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
+void create_chunk(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
     create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
     if (forestation > 0.1) {
-        create_forest(components, position, p, forestation);
+        create_forest(components, grid, position, p, forestation);
     } else {
         // create_house(components, position);
 
@@ -224,7 +238,7 @@ void create_chunk(ComponentData* components, sfVector2f position, Permutation p,
 }
 
 
-void create_level(ComponentData* components, int seed) {
+void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     srand(seed);
 
     Permutation perm;
@@ -247,16 +261,19 @@ void create_level(ComponentData* components, int seed) {
     sfVector2f end = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, 4.5 * CHUNK_HEIGHT };
     create_road(components, start, end, perm);
 
+    init_grid(components, grid);
+
+    float f = randf(0.0, 1.0);
     for (int i = -4; i < 5; i++) {
         for (int j = -4; j < 5; j++) {
-            float f = randf(0.0, 1.0);
+            f = 0.5 * (f + randf(0.0, 1.0));
 
             if (i == 0 && j == 0) {
                 f = 0.0;
             }
 
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
-            create_chunk(components, position, perm, f, noise_texture);
+            create_chunk(components, grid, position, perm, f, noise_texture);
         }
     }
 

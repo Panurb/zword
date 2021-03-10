@@ -28,7 +28,7 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
         position = sum(position, delta);
 
         sfVector2f grad = perlin_grad(position, perm);
-        sfVector2f pos = diff(position, mult(1.0, grad));
+        sfVector2f pos = diff(position, mult(2.0, grad));
 
         CoordinateComponent_add(components, current, pos, 0.0);
         RoadComponent* road = RoadComponent_add(components, current);
