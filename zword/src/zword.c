@@ -56,7 +56,7 @@ int main() {
     ColliderGrid* grid = ColliderGrid_create();
     int camera = create_camera(components, mode);
 
-    float ambient_light = 0.8;
+    float ambient_light = 0.6;
     create_level(components, time(NULL));
     init_grid(components, grid);
     init_waypoints(components, grid);

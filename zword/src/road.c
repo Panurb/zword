@@ -33,8 +33,8 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
         CoordinateComponent_add(components, current, pos, 0.0);
         RoadComponent* road = RoadComponent_add(components, current);
         road->next = next;
-        WaypointComponent_add(components, current);
-        ImageComponent_add(components, current, "", 1.1, 1.0, 2);
+        // WaypointComponent_add(components, current);
+        ImageComponent_add(components, current, "", 1.1, 1.0, 1);
 
         if (next != -1) {
             RoadComponent* next_road = RoadComponent_get(components, next);
@@ -75,9 +75,22 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
 
         sfVector2f r = sum(pos, mult((0.5 * length + margin_1) / d, diff(next_pos, pos)));
 
-        CoordinateComponent_add(components, i, r, polar_angle(diff(next_pos, pos)));
+        float angle = polar_angle(diff(next_pos, pos));
+        CoordinateComponent_add(components, i, r, angle);
         ImageComponent_add(components, i, "road_tile", length + 0.25, road->width, 1);
         ColliderComponent_add_rectangle(components, i, d, 1.0, ROADS);
+
+        if (road->prev == -1) {
+            i = create_entity(components);
+            CoordinateComponent_add(components, i, pos, angle);
+            ImageComponent_add(components, i, "road_end", road->width, road->width, 1);
+        }
+
+        if (next_road->next == -1) {
+            i = create_entity(components);
+            CoordinateComponent_add(components, i, next_pos, angle + M_PI);
+            ImageComponent_add(components, i, "road_end", road->width, road->width, 1);
+        }
 
         current = RoadComponent_get(components, current)->next;
     }

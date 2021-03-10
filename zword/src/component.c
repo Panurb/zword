@@ -351,6 +351,7 @@ void ParticleComponent_remove(ComponentData* components, int entity) {
 
 VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, float max_fuel) {
     VehicleComponent* vehicle = malloc(sizeof(VehicleComponent));
+    vehicle->on_road = false;
     vehicle->max_fuel = max_fuel;
     vehicle->fuel = max_fuel;
     vehicle->acceleration = 20.0;

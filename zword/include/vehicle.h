@@ -3,7 +3,7 @@
 #include "component.h"
 
 
-void create_car(ComponentData* component, float x, float y);
+void create_car(ComponentData* component, sfVector2f pos);
 
 bool enter_vehicle(ComponentData* component, int i);
 

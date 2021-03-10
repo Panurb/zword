@@ -2,6 +2,7 @@
 
 #include "component.h"
 #include "camera.h"
+#include "level.h"
 
 
 typedef struct {
@@ -12,7 +13,8 @@ typedef struct {
 } Bounds;
 
 typedef struct {
-    int array[6 * 32][6 * 32][10];
+    // Swap x and y?
+    int array[LEVEL_WIDTH * CHUNK_WIDTH][LEVEL_HEIGHT * CHUNK_HEIGHT][10];
     int columns;
     int rows;
     int tile_size;

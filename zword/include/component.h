@@ -154,6 +154,7 @@ typedef struct {
 } ParticleComponent;
 
 typedef struct {
+    bool on_road;
     float fuel;
     float max_fuel;
     float acceleration;

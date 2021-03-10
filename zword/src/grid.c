@@ -6,12 +6,13 @@
 #include "collider.h"
 #include "util.h"
 #include "camera.h"
+#include "level.h"
 
 
 ColliderGrid* ColliderGrid_create() {
     ColliderGrid* grid = malloc(sizeof(ColliderGrid));
-    grid->columns = 6 * 32;
-    grid->rows = 6 * 32;
+    grid->columns = LEVEL_WIDTH * CHUNK_WIDTH;
+    grid->rows = LEVEL_HEIGHT * CHUNK_HEIGHT;
     grid->tile_size = 10;
     grid->tile_width = 1.0;
     grid->tile_height = 1.0;

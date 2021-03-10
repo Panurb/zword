@@ -20,7 +20,7 @@ static int COLLISION_MATRIX[7][7] = { { 0, 0, 0, 0, 0, 0, 0 },    // WALLS
                                       { 1, 1, 0, 0, 0, 2, 0 },    // ITEMS
                                       { 1, 0, 2, 2, 1, 2, 0 },    // PLAYERS
                                       { 1, 0, 2, 2, 1, 2, 0 },    // ENEMIES
-                                      { 1, 0, 0, 0, 1, 1, 0 },    // VEHICLES
+                                      { 1, 0, 0, 0, 1, 1, 3 },    // VEHICLES
                                       { 0, 0, 0, 0, 0, 0, 0 },    // TREES
                                       { 0, 0, 0, 0, 0, 0, 0 } };  // ROADS
 
@@ -247,12 +247,20 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
                     sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, no), no));
 
-                    if (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group] == 2) {
-                        apply_force(components, i, mult(50.0, ol));
-                    } else {
-                        physics->collision.velocity = sum(physics->collision.velocity, new_vel);
-                        physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
-                        physics->collision.collided = true;
+                    switch (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group]) {
+                        case 1:
+                            physics->collision.velocity = sum(physics->collision.velocity, new_vel);
+                            physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
+                            physics->collision.collided = true;
+                            break;
+                        case 2:
+                            apply_force(components, i, mult(50.0, ol));
+                            break;
+                        case 3:
+                            VehicleComponent_get(components, i)->on_road = true;
+                            break;
+                        default:
+                            break;
                     }
                 }
             }

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "level.h"
 #include "image.h"
 #include "component.h"
 #include "player.h"
@@ -14,10 +15,7 @@
 #include "perlin.h"
 #include "item.h"
 #include "particle.h"
-
-
-#define CHUNK_WIDTH 32
-#define CHUNK_HEIGHT 32
+#include "road.h"
 
 
 void create_waypoint(ComponentData* components, sfVector2f pos) {
@@ -187,13 +185,25 @@ void create_tree(ComponentData* components, sfVector2f position, float size) {
 }
 
 
+void create_rock(ComponentData* components, sfVector2f position, float size) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ImageComponent_add(components, i, "rock", 3.0, 3.0, 2)->scale = (sfVector2f) { size, size };
+    ColliderComponent_add_circle(components, i, 1.4 * size, TREES);
+}
+
+
 void create_forest(ComponentData* components, sfVector2f position, Permutation p, float forestation) {
     for (int i = -5; i < 6; i++) {
         for (int j = -5; j < 6; j++) {
             sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
 
             if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p, -1)) {
-                create_tree(components, r, randf(1.0, 1.5));
+                if (randf(0.0, 1.0) < 0.05) {
+                    create_rock(components, r, randf(0.75, 2.0));
+                } else {
+                    create_tree(components, r, randf(1.0, 1.5));
+                }
             }
         }
     }
@@ -203,22 +213,22 @@ void create_forest(ComponentData* components, sfVector2f position, Permutation p
 void create_chunk(ComponentData* components, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
     create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
-    // if (forestation > 0.1) {
-    //     create_forest(components, position, p, forestation);
-    // } else {
-    //     create_house(components, position);
+    if (forestation > 0.1) {
+        create_forest(components, position, p, forestation);
+    } else {
+        // create_house(components, position);
 
-    //     sfVector2f r = polar_to_cartesian(20.0, rand_angle());
-    //     create_shed(components, sum(position, r));
-    // }
+        // sfVector2f r = polar_to_cartesian(20.0, rand_angle());
+        // create_shed(components, sum(position, r));
+    }
 }
 
 
 void create_level(ComponentData* components, int seed) {
     srand(seed);
 
-    Permutation p;
-    init_perlin(p);
+    Permutation perm;
+    init_perlin(perm);
 
     int w = 2048;
     int h = 2048;
@@ -233,29 +243,26 @@ void create_level(ComponentData* components, int seed) {
 
     // free(pixels);
 
-    for (int i = -2; i < 3; i++) {
-        for (int j = -2; j < 3; j++) {
-            float f = randf(0.0, 0.5);
-            f = 0.0;
-            if (i == -2 || i == 2) {
-                f = 1.0;
-            } else if (j == -2 || j == 2) {
-                f = 1.0;
-            }
+    sfVector2f start = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, -4.5 * CHUNK_HEIGHT };
+    sfVector2f end = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, 4.5 * CHUNK_HEIGHT };
+    create_road(components, start, end, perm);
+
+    for (int i = -4; i < 5; i++) {
+        for (int j = -4; j < 5; j++) {
+            float f = randf(0.0, 1.0);
+
             if (i == 0 && j == 0) {
-                f = 0.1;
+                f = 0.0;
             }
 
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
-            create_chunk(components, position, p, f, noise_texture);
+            create_chunk(components, position, perm, f, noise_texture);
         }
     }
 
-    create_road(components, zeros(), mult(200.0, ones()), p);
+    create_player(components, start);
 
-    create_player(components, (sfVector2f) { 5.0, 0.0 });
-
-    create_car(components, 15.0, -5.0);
+    create_car(components, start);
 }
 
 

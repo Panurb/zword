@@ -7,9 +7,8 @@
 #include "image.h"
 
 
-void create_car(ComponentData* components, float x, float y) {
+void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-    sfVector2f pos = { x, y };
 
     CoordinateComponent_add(components, i, pos, 0.0);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
@@ -104,6 +103,16 @@ void drive_vehicle(ComponentData* component, int i, sfVector2f v, float time_ste
     sfVector2f at = mult(vehicle->acceleration * v.y, r);
     phys->acceleration = sum(phys->acceleration, at);   
 
+    if (vehicle->on_road) {
+        if (phys->speed > vehicle->max_speed) {
+            phys->acceleration = zeros();
+        }
+    } else {
+        if (phys->speed > 0.5 * vehicle->max_speed) {
+            phys->acceleration = zeros();
+        }
+    }
+
     if (norm(phys->velocity) > 1.2) {
         phys->angular_acceleration -= sign(v.y + 0.1) * vehicle->turning * v.x;
     }
@@ -113,4 +122,6 @@ void drive_vehicle(ComponentData* component, int i, sfVector2f v, float time_ste
     phys->acceleration = sum(phys->acceleration, mult(1.0 / time_step, diff(v_new, phys->velocity)));
 
     vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
+
+    vehicle->on_road = false;
 }
