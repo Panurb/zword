@@ -186,9 +186,12 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.0 * size, TREES);
 
     if (collides_with(components, grid, i, ROADS)) {
+        clear_grid(components, grid, i);
         destroy_entity(components, i);
     } else {
         col->radius = size;
+        col->width = 2.0 * col->radius;
+        col->height = 2.0 * col->radius;
     }
 }
 
@@ -200,9 +203,12 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.8 * size, TREES);
 
     if (collides_with(components, grid, i, ROADS)) {
+        clear_grid(components, grid, i);
         destroy_entity(components, i);
     } else {
         col->radius = 1.4 * size;
+        col->width = 2.0 * col->radius;
+        col->height = 2.0 * col->radius;
     }
 }
 

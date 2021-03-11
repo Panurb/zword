@@ -176,8 +176,6 @@ sfVector2f overlap(ComponentData* component, int i, int j) {
     ColliderComponent* a = component->collider[i];
     ColliderComponent* b = component->collider[j];
 
-    // if (!COLLISION_MATRIX[a->group][b->group]) return ol;
-
     if (!a->enabled || !b->enabled) {
         return ol;
     }

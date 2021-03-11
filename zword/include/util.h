@@ -88,3 +88,5 @@ void permute(int* array, int size);
 float lerp(float a, float b, float t);
 
 float smoothstep(float x, float mu, float nu);
+
+int binary_search_filename(Filename filename, char (*array)[], int size);

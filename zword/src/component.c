@@ -11,6 +11,7 @@
 #include "component.h"
 #include "image.h"
 #include "util.h"
+#include "grid.h"
 
 
 ComponentData* ComponentData_create() {
@@ -189,7 +190,6 @@ ColliderComponent* ColliderComponent_get(ComponentData* components, int entity) 
 void ColliderComponent_remove(ComponentData* components, int entity) {
     free(ColliderComponent_get(components, entity));
     components->collider[entity] = NULL;
-    // TODO: clear grid
 }
 
 
@@ -540,7 +540,8 @@ RoadComponent* RoadComponent_add(ComponentData* components, int entity) {
     road->curve = 0.0;
     road->width = 4.0;
     road->shape = sfConvexShape_create();
-    sfConvexShape_setPointCount(road->shape, 12);
+    road->points = 12;
+    sfConvexShape_setPointCount(road->shape, road->points);
     strcpy(road->filename, "road_curve");
     road->texture_changed = true;
 

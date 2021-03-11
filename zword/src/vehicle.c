@@ -10,7 +10,7 @@
 void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, pos, 0.0);
+    CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
     PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0)->max_angular_speed = 2.5;
     VehicleComponent_add(components, i, 50.0);

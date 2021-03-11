@@ -206,3 +206,22 @@ float smoothstep(float x, float mu, float nu) {
     // https://wernerantweiler.ca/blog.php?item=2018-11-03
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
 }
+
+int binary_search_filename(Filename filename, char* array, int size) {
+    int l = 0;
+    int r = size - 1;
+
+    while (l <= r) {
+        int m = floor((l + r) / 2);
+
+        if (strcmp(array[m], filename) < 0) {
+            l = m + 1;
+        } else if (strcmp(array[m], filename) > 0) {
+            r = m - 1;
+        } else {
+            return m;
+        }
+    }
+
+    return -1;
+}

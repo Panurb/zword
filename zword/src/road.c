@@ -97,29 +97,12 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
 }
 
 
-void draw_curve(sfRenderWindow* window, ComponentData* components, int camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread) { 
-    CameraComponent* cam = CameraComponent_get(components, camera);
-    sfConvexShape_setPoint(shape, 0, zeros());
-    sfConvexShape_setPoint(shape, n - 1, zeros());
-
-    float ang = 0.0;
-    for (int i = 1; i < n - 1; i++) {
-        sfVector2f point = polar_to_cartesian(cam->zoom * range, ang);
-        sfConvexShape_setPoint(shape, i, point);
-        ang += spread / (n - 3);
-    }
-
-    sfRenderWindow_drawConvexShape(window, shape, NULL);
-
-    sfConvexShape_setPosition(shape, world_to_screen(components, camera, position));
-    sfConvexShape_setRotation(shape, -to_degrees(angle + 0.5 * spread));
-}
-
-
-
 void draw_road(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures, int entity) {
     RoadComponent* road = RoadComponent_get(components, entity);
     if (!road) return;
+
+    float angle = get_angle(components, entity);
+    float spread = fabs(road->curve);
 
     if (road->texture_changed) {
         int i = texture_index(road->filename);
@@ -127,14 +110,29 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
         float w = PIXELS_PER_UNIT * road->width;
         float h = PIXELS_PER_UNIT * road->width * sinf(fabs(road->curve));
         sfConvexShape_setTextureRect(road->shape, (sfIntRect) { 0, 0, w, h });
+
+        sfConvexShape_setPoint(road->shape, 0, zeros());
+        sfConvexShape_setPoint(road->shape, road->points - 1, zeros());
+
+        float ang = 0.0;
+        for (int i = 1; i < road->points - 1; i++) {
+            sfVector2f point = polar_to_cartesian(road->width, ang);
+            sfConvexShape_setPoint(road->shape, i, point);
+            ang += fabs(road->curve) / (road->points - 3);
+        }
+
+        sfConvexShape_setRotation(road->shape, -to_degrees(angle + 0.5 * spread));
         road->texture_changed = false;
     }
 
     sfVector2f pos = get_position(components, entity);
-    float angle = get_angle(components, entity);
-
-    float margin = 0.5 * road->width * tanf(0.5 * fabs(road->curve));
+    float margin = 0.5 * road->width * tanf(0.5 * spread);
     pos = diff(pos, polar_to_cartesian(sqrtf(margin * margin + 0.25 * road->width * road->width), angle));
 
-    draw_curve(window, components, camera, road->shape, 12, pos, 4.0, angle, fabs(road->curve));
+    CameraComponent* cam = CameraComponent_get(components, camera);
+
+    sfRenderWindow_drawConvexShape(window, road->shape, NULL);
+
+    sfConvexShape_setScale(road->shape, (sfVector2f) { cam->zoom, cam->zoom });
+    sfConvexShape_setPosition(road->shape, world_to_screen(components, camera, pos));
 }

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include <SFML/Graphics.h>
+#include <SFML/Audio.h>
 
 #include "util.h"
 
@@ -212,7 +213,12 @@ typedef struct {
     float width;
     Filename filename;
     sfConvexShape* shape;
+    int points;
 } RoadComponent;
+
+typedef struct {
+    sfSound* sounds[10];
+} SoundComponent;
 
 typedef struct {
     int size;

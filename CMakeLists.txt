@@ -27,6 +27,7 @@ set(SOURCES
     zword/src/player.c
     zword/src/raycast.c
     zword/src/road.c
+    zword/src/sound.c
     zword/src/util.c
     zword/src/zword.c
     zword/src/vehicle.c
@@ -56,4 +57,5 @@ install(DIRECTORY zword/data
     FILES_MATCHING 
         PATTERN "*.png"
         PATTERN "*.ttf"
+        PATTERN "*.wav"
 )

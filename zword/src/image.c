@@ -78,6 +78,7 @@ int texture_index(Filename filename) {
 
 void set_texture(ImageComponent* image, TextureArray textures) {
     int i = texture_index(image->filename);
+    // int i = binary_search_filename(image->filename, IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
     
     if (i != -1) {
         sfSprite_setTexture(image->sprite, textures[i], sfTrue);
