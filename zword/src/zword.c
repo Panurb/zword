@@ -129,6 +129,8 @@ int main() {
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);
+
+        play_sounds(components, window, camera, sounds);
     }
 
     sfRenderWindow_destroy(window);

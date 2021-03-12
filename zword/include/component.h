@@ -217,8 +217,12 @@ typedef struct {
 } RoadComponent;
 
 typedef struct {
-    sfSound* sounds[10];
-    int sounds_size;
+    Filename filename;
+} SoundEvent;
+
+typedef struct {
+    SoundEvent* events[5];
+    int size;
 } SoundComponent;
 
 typedef struct {

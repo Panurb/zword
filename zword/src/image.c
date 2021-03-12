@@ -11,6 +11,7 @@
 #include "component.h"
 #include "perlin.h"
 #include "particle.h"
+#include "road.h"
 
 
 static const char* IMAGES[] = {
@@ -57,7 +58,7 @@ void load_textures(TextureArray textures) {
 
 
 int texture_index(Filename filename) {
-    return binary_search_filename(filename, &IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
+    return binary_search_filename(filename, IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
 }
 
 
@@ -66,7 +67,7 @@ void set_texture(ImageComponent* image, TextureArray textures) {
     
     if (i != -1) {
         sfSprite_setTexture(image->sprite, textures[i], sfTrue);
-        sfIntRect rect = {0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
+        sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
         sfSprite_setTextureRect(image->sprite, rect);
     }
 }

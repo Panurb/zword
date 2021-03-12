@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 #include <SFML/Audio.h>
 
 #include "sound.h"
@@ -24,9 +27,25 @@ void load_sounds(SoundArray sounds) {
 }
 
 
-void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray textures) {
+int sound_index(Filename filename) {
+    return binary_search_filename(filename, SOUNDS, sizeof(SOUNDS) / sizeof(SOUNDS[0]));
+}
+
+
+void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray sounds) {
     for (int i = 0; i < components->entities; i++) {
         SoundComponent* sound = SoundComponent_get(components, i);
-        if (! sound) continue;
+        if (!sound) continue;
+
+        for (int i; i < sound->size; i++) {
+            SoundEvent* event = sound->events[i];
+            if (event) {
+                sfSound* sound = sfSound_create();
+                int j = sound_index(event->filename);
+                sfSound_setBuffer(sound, sounds[j]);
+                sfSound_play(sound);
+                // sound->events[i] = NULL;
+            }
+        }
     }
 }
