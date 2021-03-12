@@ -564,6 +564,25 @@ void RoadComponent_remove(ComponentData* components, int entity) {
 }
 
 
+SoundComponent* SoundComponent_add(ComponentData* components, int entity) {
+    SoundComponent* sound = malloc(sizeof(SoundComponent));
+    components->sound[entity] = sound;
+    return sound;
+}
+
+
+SoundComponent* SoundComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->sound[entity];
+}
+
+
+void SoundComponent_remove(ComponentData* components, int entity) {
+    free(SoundComponent_get(components, entity));
+    components->sound[entity] = NULL;
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -607,6 +626,8 @@ void destroy_entity(ComponentData* components, int entity) {
         CameraComponent_remove(components, entity);
     if (RoadComponent_get(components, entity))
         RoadComponent_remove(components, entity);
+    if (SoundComponent_get(components, entity))
+        SoundComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

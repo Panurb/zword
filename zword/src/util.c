@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Graphics.h>
@@ -207,7 +208,7 @@ float smoothstep(float x, float mu, float nu) {
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
 }
 
-int binary_search_filename(Filename filename, char* array, int size) {
+int binary_search_filename(Filename filename, char** array, int size) {
     int l = 0;
     int r = size - 1;
 

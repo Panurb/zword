@@ -57,28 +57,12 @@ void load_textures(TextureArray textures) {
 
 
 int texture_index(Filename filename) {
-    int l = 0;
-    int r = sizeof(IMAGES) / sizeof(IMAGES[0]) - 1;
-
-    while (l <= r) {
-        int m = floor((l + r) / 2);
-
-        if (strcmp(IMAGES[m], filename) < 0) {
-            l = m + 1;
-        } else if (strcmp(IMAGES[m], filename) > 0) {
-            r = m - 1;
-        } else {
-            return m;
-        }
-    }
-
-    return -1;
+    return binary_search_filename(filename, &IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
 }
 
 
 void set_texture(ImageComponent* image, TextureArray textures) {
     int i = texture_index(image->filename);
-    // int i = binary_search_filename(image->filename, IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
     
     if (i != -1) {
         sfSprite_setTexture(image->sprite, textures[i], sfTrue);

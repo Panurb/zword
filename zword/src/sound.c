@@ -1,6 +1,8 @@
 #include <SFML/Audio.h>
 
 #include "sound.h"
+#include "util.h"
+#include "component.h"
 
 
 static const char* SOUNDS[] = {
@@ -18,5 +20,13 @@ void load_sounds(SoundArray sounds) {
         sfSoundBuffer* sound = sfSoundBuffer_createFromFile(path);
 
         sounds[i] = sound;
+    }
+}
+
+
+void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray textures) {
+    for (int i = 0; i < components->entities; i++) {
+        SoundComponent* sound = SoundComponent_get(components, i);
+        if (! sound) continue;
     }
 }

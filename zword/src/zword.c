@@ -25,6 +25,7 @@
 #include "perlin.h"
 #include "weapon.h"
 #include "road.h"
+#include "sound.h"
 
 
 int main() {
@@ -40,6 +41,9 @@ int main() {
 
     TextureArray textures;
     load_textures(textures);
+
+    SoundArray sounds;
+    load_sounds(sounds);
 
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
     sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
@@ -58,7 +62,6 @@ int main() {
 
     float ambient_light = 1.0;
     create_level(components, grid, time(NULL));
-    printf("%i", components->entities);
     init_grid(components, grid);
     init_waypoints(components, grid);
 

@@ -218,6 +218,7 @@ typedef struct {
 
 typedef struct {
     sfSound* sounds[10];
+    int sounds_size;
 } SoundComponent;
 
 typedef struct {
@@ -243,6 +244,7 @@ typedef struct {
     HealthComponent* health[MAX_ENTITIES];
     CameraComponent* camera[MAX_ENTITIES];
     RoadComponent* road[MAX_ENTITIES];
+    SoundComponent* sound[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -307,6 +309,10 @@ void CameraComponent_remove(ComponentData* components, int entity);
 RoadComponent* RoadComponent_add(ComponentData* components, int entity);
 RoadComponent* RoadComponent_get(ComponentData* components, int entity);
 void RoadComponent_remove(ComponentData* components, int entity);
+
+SoundComponent* SoundComponent_add(ComponentData* components, int entity);
+SoundComponent* SoundComponent_get(ComponentData* components, int entity);
+void SoundComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
