@@ -566,9 +566,9 @@ void RoadComponent_remove(ComponentData* components, int entity) {
 
 SoundComponent* SoundComponent_add(ComponentData* components, int entity) {
     SoundComponent* sound = malloc(sizeof(SoundComponent));
-    sound->size = 5;
+    sound->size = 4;
     for (int i = 0; i < sound->size; i++) {
-        sound->events[i] = NULL;
+        sound->events[i] = (SoundEvent) { "", sfSound_create() };
     }
     components->sound[entity] = sound;
     return sound;

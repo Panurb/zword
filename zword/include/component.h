@@ -218,10 +218,11 @@ typedef struct {
 
 typedef struct {
     Filename filename;
+    sfSound* sound;
 } SoundEvent;
 
 typedef struct {
-    SoundEvent* events[5];
+    SoundEvent events[4];
     int size;
 } SoundComponent;
 

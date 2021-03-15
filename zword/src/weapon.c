@@ -8,6 +8,7 @@
 #include "util.h"
 #include "enemy.h"
 #include "physics.h"
+#include "sound.h"
 
 
 int get_akimbo(ComponentData* components, int entity) {
@@ -45,6 +46,8 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
     if (weapon->magazine > 0) {
         if (weapon->cooldown == 0.0) {
+            add_sound(components, entity, "pistol");
+
             weapon->cooldown = 1.0 / ((1 + akimbo) * weapon->fire_rate);
             weapon->magazine--;
 
@@ -113,6 +116,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
+    SoundComponent_add(components, i);
 }
 
 

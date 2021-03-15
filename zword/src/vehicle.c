@@ -17,6 +17,7 @@ void create_car(ComponentData* components, sfVector2f pos) {
     WaypointComponent_add(components, i);
     ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
     ParticleComponent_add_sparks(components, i);
+    SoundComponent_add(components, i);
 
     i = create_entity(components);
     CoordinateComponent_add(components, i, (sfVector2f) { 2.8, 1.0 }, 0.0)->parent = i - 1;
@@ -25,12 +26,6 @@ void create_car(ComponentData* components, sfVector2f pos) {
     i = create_entity(components);
     CoordinateComponent_add(components, i, (sfVector2f) { 2.8, -1.0 }, 0.0)->parent = i - 2;
     LightComponent_add(components, i, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
-
-    /*
-    i = create_entity(component);
-    component->coordinate[i] = CoordinateComponent_create((sfVector2f) { 5.0, 2.0 }, 0.0);
-    component->waypoint[i] = WaypointComponent_create();
-    */
 }
 
 

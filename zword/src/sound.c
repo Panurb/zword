@@ -32,19 +32,32 @@ int sound_index(Filename filename) {
 }
 
 
+void add_sound(ComponentData* components, int entity, Filename filename) {
+    SoundComponent* scomp = SoundComponent_get(components, entity);
+    for (int i = 0; i < scomp->size; i++) {
+        SoundEvent event = scomp->events[i];
+        if (event.filename[0] == '\0') {
+            if (sfSound_getStatus(event.sound) == sfStopped) {
+                strcpy(scomp->events[i].filename, filename);
+                break;
+            }
+        }
+    }
+}
+
+
 void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray sounds) {
     for (int i = 0; i < components->entities; i++) {
-        SoundComponent* sound = SoundComponent_get(components, i);
-        if (!sound) continue;
+        SoundComponent* scomp = SoundComponent_get(components, i);
+        if (!scomp) continue;
 
-        for (int i; i < sound->size; i++) {
-            SoundEvent* event = sound->events[i];
-            if (event) {
-                sfSound* sound = sfSound_create();
-                int j = sound_index(event->filename);
-                sfSound_setBuffer(sound, sounds[j]);
-                sfSound_play(sound);
-                // sound->events[i] = NULL;
+        for (int i = 0; i < scomp->size; i++) {
+            SoundEvent event = scomp->events[i];
+            if (event.filename[0] != '\0') {
+                int j = sound_index(event.filename);
+                sfSound_setBuffer(event.sound, sounds[j]);
+                sfSound_play(event.sound);
+                strcpy(scomp->events[i].filename, "");
             }
         }
     }
