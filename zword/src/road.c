@@ -34,7 +34,7 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
         RoadComponent* road = RoadComponent_add(components, current);
         road->next = next;
         // WaypointComponent_add(components, current);
-        ImageComponent_add(components, current, "", 1.1, 1.0, 1);
+        ImageComponent_add(components, current, "", 1.0, 1.0, 1);
 
         if (next != -1) {
             RoadComponent* next_road = RoadComponent_get(components, next);

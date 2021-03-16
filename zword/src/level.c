@@ -232,9 +232,9 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
 void create_chunk(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
     create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
-    create_forest(components, grid, position, p, forestation);
+    // create_forest(components, grid, position, p, forestation);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 2; i++) {
         sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
         create_enemy(components, sum(position, r));
     }

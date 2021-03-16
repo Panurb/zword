@@ -284,11 +284,7 @@ void update_camera(ComponentData* components, int camera, float time_step) {
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (player) {
             n += 1;
-            if (player->vehicle == -1) {
-                pos = sum(pos, get_position(components, i));
-            } else {
-                pos = sum(pos, get_position(components, i));
-            }
+            pos = sum(pos, get_position(components, i));
         }
     }
     pos = mult(1.0 / n, pos);

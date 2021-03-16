@@ -109,11 +109,13 @@ void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, 
 
             sfSound* channel = channels[chan];
 
-            sfVector2f r = diff(get_position(components, i), get_position(components, camera));
-            float d = norm(r) + 1e-3;
-            float vol = event->volume * fminf(5.0 / d, 1.0) * 100.0;
-            sfSound_setVolume(channel, vol);
+            sfVector2f r = get_position(components, i);
+            sfSound_setPosition(channel, (sfVector3f) {r.x, 0.0, r.y });
+            sfSound_setVolume(channel, event->volume * 100.0);
             sfSound_setPitch(channel, event->pitch);
+
+            r = get_position(components, camera);
+            sfListener_setPosition((sfVector3f) {r.x, 10.0, r.y });
 
             if (event->channel != -1) {
                 if (!event->loop) {

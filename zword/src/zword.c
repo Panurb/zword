@@ -127,7 +127,7 @@ int main() {
         draw_players(components, window, camera);
 
         // debug_draw(components, window, camera);
-        draw_waypoints(components, window, camera);
+        // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
         // draw_occupied_tiles(components, grid, window, camera);
