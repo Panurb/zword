@@ -7,6 +7,7 @@
 #include "collider.h"
 #include "grid.h"
 #include "enemy.h"
+#include "sound.h"
 
 
 void apply_force(ComponentData* components, int entity, sfVector2f force) {
@@ -36,6 +37,12 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
             if (health) {
                 float v = norm(v_n);
                 if (v > 10.0) {
+                    if (health->health > 0) {
+                        SoundComponent* sound = SoundComponent_get(components, i);
+                        if (sound) {
+                            add_sound(components, i, sound->hit_sound, 1.0, 0.8);
+                        }
+                    }
                     damage(components, i, 100, -1);
                 }
             }

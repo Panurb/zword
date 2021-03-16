@@ -357,7 +357,8 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
     vehicle->acceleration = 20.0;
     vehicle->max_speed = 10.0;
     vehicle->turning = 50.0;
-    for (int i = 0; i < 4; i++) {
+    vehicle->size = 4;
+    for (int i = 0; i < vehicle->size; i++) {
         vehicle->riders[i] = -1;
     }
     vehicle->seats[0] = (sfVector2f) { 0.0, 0.75 };
@@ -564,12 +565,13 @@ void RoadComponent_remove(ComponentData* components, int entity) {
 }
 
 
-SoundComponent* SoundComponent_add(ComponentData* components, int entity) {
+SoundComponent* SoundComponent_add(ComponentData* components, int entity, Filename hit_sound) {
     SoundComponent* sound = malloc(sizeof(SoundComponent));
     sound->size = 4;
     for (int i = 0; i < sound->size; i++) {
-        sound->events[i] = (SoundEvent) { "", sfSound_create() };
+        sound->events[i] = NULL;
     }
+    strcpy(sound->hit_sound, hit_sound);
     components->sound[entity] = sound;
     return sound;
 }

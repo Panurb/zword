@@ -232,14 +232,11 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
 void create_chunk(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
     create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+    create_forest(components, grid, position, p, forestation);
 
-    if (forestation > 0.1) {
-        create_forest(components, grid, position, p, forestation);
-    } else {
-        // create_house(components, position);
-
-        // sfVector2f r = polar_to_cartesian(20.0, rand_angle());
-        // create_shed(components, sum(position, r));
+    for (int i = 0; i < 4; i++) {
+        sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+        create_enemy(components, sum(position, r));
     }
 }
 
@@ -253,14 +250,12 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     int w = 2048;
     int h = 2048;
 
-    // sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
-
-    // create_noise(pixels, w, h, zeros(), get_color(1.0, 1.0, 1.0, 1.0), p);
-
     sfTexture* noise_texture = sfTexture_create(w, h);
+
+    // sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
+    // create_noise(pixels, w, h, zeros(), get_color(0.0, 0.0, 0.0, 0.2), perm);
     // sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
     // sfTexture_setRepeated(noise_texture, true);
-
     // free(pixels);
 
     sfVector2f start = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, -4.5 * CHUNK_HEIGHT };
@@ -272,11 +267,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     float f = randf(0.0, 1.0);
     for (int i = -4; i < 5; i++) {
         for (int j = -4; j < 5; j++) {
-            f = 0.5 * (f + randf(0.0, 1.0));
-
-            if (i == 0 && j == 0) {
-                f = 0.0;
-            }
+            f = randf(0.0, 0.75);
 
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
             create_chunk(components, grid, position, perm, f, noise_texture);
@@ -288,7 +279,6 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     create_car(components, start);
 
     create_pistol(components, sum(start, (sfVector2f) { 0.0, 5.0 }));
-    create_pistol(components, sum(start, (sfVector2f) { 0.5, 5.0 }));
 }
 
 

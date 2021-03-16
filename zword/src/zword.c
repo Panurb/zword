@@ -45,6 +45,11 @@ int main() {
     SoundArray sounds;
     load_sounds(sounds);
 
+    sfSound* channels[MAX_SOUNDS];
+    for (int i = 0; i < MAX_SOUNDS; i++) {
+        channels[i] = sfSound_create();
+    }
+
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
     sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
     sfSprite* light_sprite = sfSprite_create();
@@ -60,7 +65,7 @@ int main() {
     ColliderGrid* grid = ColliderGrid_create();
     int camera = create_camera(components, mode);
 
-    float ambient_light = 1.0;
+    float ambient_light = 0.9;
     create_level(components, grid, time(NULL));
     init_grid(components, grid);
     init_waypoints(components, grid);
@@ -122,7 +127,7 @@ int main() {
         draw_players(components, window, camera);
 
         // debug_draw(components, window, camera);
-        // draw_waypoints(components, window, camera);
+        draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
         // draw_occupied_tiles(components, grid, window, camera);
@@ -130,7 +135,7 @@ int main() {
 
         sfRenderWindow_display(window);
 
-        play_sounds(components, window, camera, sounds);
+        play_sounds(components, window, camera, sounds, channels);
     }
 
     sfRenderWindow_destroy(window);

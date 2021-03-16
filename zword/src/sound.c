@@ -1,5 +1,9 @@
+#define _USE_MATH_DEFINES
+
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <SFML/Audio.h>
 
@@ -9,7 +13,11 @@
 
 
 static const char* SOUNDS[] = {
-    "pistol"
+    "car",
+    "car_door",
+    "metal",
+    "pistol",
+    "squish"
 };
 
 
@@ -32,32 +40,102 @@ int sound_index(Filename filename) {
 }
 
 
-void add_sound(ComponentData* components, int entity, Filename filename) {
+void add_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch) {
     SoundComponent* scomp = SoundComponent_get(components, entity);
     for (int i = 0; i < scomp->size; i++) {
-        SoundEvent event = scomp->events[i];
-        if (event.filename[0] == '\0') {
-            if (sfSound_getStatus(event.sound) == sfStopped) {
-                strcpy(scomp->events[i].filename, filename);
-                break;
+        if (!scomp->events[i]) {
+            SoundEvent* event = malloc(sizeof(SoundEvent));
+            strcpy(event->filename, filename);
+            event->volume = volume;
+            event->pitch = pitch;
+            event->loop = false;
+            event->channel = -1;
+            scomp->events[i] = event;
+            break;
+        }
+    }
+}
+
+
+void loop_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch) {
+    SoundComponent* scomp = SoundComponent_get(components, entity);
+    for (int i = 0; i < scomp->size; i++) {
+        if (!scomp->events[i]) {
+            SoundEvent* event = malloc(sizeof(SoundEvent));
+            strcpy(event->filename, filename);
+            event->volume = volume;
+            event->pitch = pitch;
+            event->loop = true;
+            event->channel = -1;
+            scomp->events[i] = event;
+            break;
+        }
+    }
+}
+
+
+void stop_loop(ComponentData* components, int entity) {
+    SoundComponent* scomp = SoundComponent_get(components, entity);
+    for (int i = 0; i < scomp->size; i++) {
+        SoundEvent* event = scomp->events[i];
+        if (event) {
+            if (event->loop) {
+                event->loop = false;
             }
         }
     }
 }
 
 
-void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray sounds) {
+void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray sounds, sfSound* channels[MAX_SOUNDS]) {
     for (int i = 0; i < components->entities; i++) {
         SoundComponent* scomp = SoundComponent_get(components, i);
         if (!scomp) continue;
 
-        for (int i = 0; i < scomp->size; i++) {
-            SoundEvent event = scomp->events[i];
-            if (event.filename[0] != '\0') {
-                int j = sound_index(event.filename);
-                sfSound_setBuffer(event.sound, sounds[j]);
-                sfSound_play(event.sound);
-                strcpy(scomp->events[i].filename, "");
+        for (int j = 0; j < scomp->size; j++) {
+            SoundEvent* event = scomp->events[j];
+            if (!event) continue;
+
+            int chan = event->channel;
+
+            if (chan == -1) {
+                for (int k = 0; k < MAX_SOUNDS; k++) {
+                    if (sfSound_getStatus(channels[k]) != sfPlaying) {
+                        chan = k;
+                        break;
+                    }
+                }
+            }
+
+            sfSound* channel = channels[chan];
+
+            sfVector2f r = diff(get_position(components, i), get_position(components, camera));
+            float d = norm(r) + 1e-3;
+            float vol = event->volume * fminf(5.0 / d, 1.0) * 100.0;
+            sfSound_setVolume(channel, vol);
+            sfSound_setPitch(channel, event->pitch);
+
+            if (event->channel != -1) {
+                if (!event->loop) {
+                    event->volume *= 0.95;
+                    if (event->volume < 0.01) {
+                        sfSound_setLoop(channel, false);
+                        sfSound_stop(channel);
+                        free(event);
+                        scomp->events[j] = NULL;
+                    }
+                }
+            } else {
+                sfSound_setBuffer(channel, sounds[sound_index(event->filename)]);
+                sfSound_setLoop(channel, event->loop);
+                sfSound_play(channel);
+
+                if (event->loop) {
+                    event->channel = chan;
+                } else {
+                    free(event);
+                    scomp->events[j] = NULL;
+                }
             }
         }
     }

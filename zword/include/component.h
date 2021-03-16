@@ -161,6 +161,7 @@ typedef struct {
     float acceleration;
     float max_speed;
     float turning;
+    int size;
     int riders[4];
     sfVector2f seats[4];
 } VehicleComponent;
@@ -217,13 +218,17 @@ typedef struct {
 } RoadComponent;
 
 typedef struct {
+    bool loop;
+    int channel;
+    float volume;
+    float pitch;
     Filename filename;
-    sfSound* sound;
 } SoundEvent;
 
 typedef struct {
-    SoundEvent events[4];
     int size;
+    SoundEvent* events[4];
+    Filename hit_sound;
 } SoundComponent;
 
 typedef struct {
@@ -315,7 +320,7 @@ RoadComponent* RoadComponent_add(ComponentData* components, int entity);
 RoadComponent* RoadComponent_get(ComponentData* components, int entity);
 void RoadComponent_remove(ComponentData* components, int entity);
 
-SoundComponent* SoundComponent_add(ComponentData* components, int entity);
+SoundComponent* SoundComponent_add(ComponentData* components, int entity, Filename hit_sound);
 SoundComponent* SoundComponent_get(ComponentData* components, int entity);
 void SoundComponent_remove(ComponentData* components, int entity);
 

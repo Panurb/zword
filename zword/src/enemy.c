@@ -28,6 +28,7 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100);
+    SoundComponent_add(components, i, "squish");
 }
 
 

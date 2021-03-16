@@ -46,7 +46,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
     if (weapon->magazine > 0) {
         if (weapon->cooldown == 0.0) {
-            add_sound(components, entity, "pistol");
+            add_sound(components, entity, "pistol", 1.0, 1.0);
 
             weapon->cooldown = 1.0 / ((1 + akimbo) * weapon->fire_rate);
             weapon->magazine--;
@@ -77,6 +77,11 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             if (particle) {
                 particle->origin = diff(info.position, get_position(components, info.object));
                 particle->enabled = true;
+            }
+
+            SoundComponent* scomp = SoundComponent_get(components, info.object);
+            if (scomp) {
+                add_sound(components, info.object, scomp->hit_sound, 0.5, randf(0.9, 1.1));
             }
 
             weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
@@ -116,7 +121,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
-    SoundComponent_add(components, i);
+    SoundComponent_add(components, i, "metal");
 }
 
 

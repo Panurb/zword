@@ -30,7 +30,7 @@ void create_player(ComponentData* components, sfVector2f pos) {
     ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, get_color(0.78, 0.0, 0.0, 1.0), sfRed);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100);
-    SoundComponent_add(components, i);
+    SoundComponent_add(components, i, "squish");
 }
 
 

@@ -83,6 +83,9 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
 
         sfVector2f pos = get_position(components, i);
 
+        // FIXME
+        draw_road(components, window, camera, textures, i);
+
         float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
         if (!on_screen(components, camera, pos, r, r)) {
             continue;
@@ -106,7 +109,6 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
         }
 
         draw_particles(components, window, camera, i);
-        draw_road(components, window, camera, textures, i);
     }
 }
 
@@ -171,27 +173,9 @@ void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfC
             float y = origin.y + (height - j) / (float) PIXELS_PER_UNIT;
             float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
 
-            a = smoothstep(a, 0.5, 50.0);
+            // a = smoothstep(a, 0.5, 50.0);
 
             color_pixel(pixels, width, i, j, color, a);
-        }
-    }
-}
-
-
-void create_noise_tileable(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p) {
-    for (int i = 0; i < width / 2; i++) {
-        for (int j = 0; j < height / 2; j++) {
-            float x = origin.x + i / (float) PIXELS_PER_UNIT;
-            float y = origin.y + (height - j) / (float) PIXELS_PER_UNIT;
-            float a = octave_perlin(x, y, 0.0, p, -1, 4, 0.5);
-
-            a = smoothstep(a, 0.5, 50.0);
-
-            color_pixel(pixels, width, i, j, color, a);
-            color_pixel(pixels, width, width - 1 - i, j, color, a);
-            color_pixel(pixels, width, i, height - 1 - j, color, a);
-            color_pixel(pixels, width, width - 1 - i, height - 1 - j, color, a);
         }
     }
 }
