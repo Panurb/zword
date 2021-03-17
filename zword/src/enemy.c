@@ -23,12 +23,33 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, i, pos, angle);
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4)->shine = 0.5;
     ColliderComponent_add_circle(components, i, 0.5, ENEMIES);
-    PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 5.0;
+    PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 6.0;
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100);
     SoundComponent_add(components, i, "squish");
+}
+
+
+void damage(ComponentData* component, int entity, int dmg, int player) {
+    HealthComponent* health = component->health[entity];
+    health->health = max(0, health->health - dmg);
+
+    EnemyComponent* enemy = component->enemy[entity];
+    if (enemy) {
+        enemy->target = player;
+        enemy->state = CHASE;
+    }
+
+    int j = create_entity(component);
+    CoordinateComponent_add(component, j, get_position(component, entity), rand_angle());
+
+    if (dmg < 50) {
+        ImageComponent_add(component, j, "blood", 1.0, 1.0, 1);
+    } else {
+        ImageComponent_add(component, j, "blood_large", 2.0, 2.0, 1);
+    }
 }
 
 
@@ -47,7 +68,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
         switch (enemy->state) {
             case IDLE:
                 for (int j = 0; j < components->entities; j++) {
-                    if (!PlayerComponent_get(components, j)) continue;
+                    PlayerComponent* player = PlayerComponent_get(components, j);
+                    if (!player) continue;
+                    if (player->state == PLAYER_DEAD) continue;
 
                     sfVector2f r = diff(get_position(components, j), get_position(components, i));
                     float angle = mod(get_angle(components, i) - polar_angle(r), 2 * M_PI);
@@ -67,26 +90,31 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 break;
             case CHASE:
                 ;
-                int target = PlayerComponent_get(components, enemy->target)->vehicle;
-                if (target == -1) {
-                    target = enemy->target;
-                }
+                a_star(components, enemy->target, i, enemy->path);
 
-                a_star(components, target, i, enemy->path);
-
+                sfVector2f r;
                 if (enemy->path[1] != -1) {
-                    sfVector2f r = diff(get_position(components, enemy->path[1]), get_position(components, i));
-
-                    float d = norm(r);
-
-                    if (d > 1.0) {
-                        phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration / d, r));
-                    }
-
-                    components->coordinate[i]->angle = polar_angle(r);
+                    r = diff(get_position(components, enemy->path[1]), get_position(components, i));
+                } else {
+                    r = diff(get_position(components, enemy->target), get_position(components, i));
                 }
 
-                
+                float d = norm(r);
+
+                if (d > 1.0) {
+                    phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration / d, r));
+                }
+
+                components->coordinate[i]->angle = polar_angle(r);
+
+                if (dist(get_position(components, enemy->target), get_position(components, i)) < 1.0) {
+                    damage(components, enemy->target, 50, -1);
+                }
+
+                if (PlayerComponent_get(components, enemy->target)->state == PLAYER_DEAD) {
+                    enemy->target = -1;
+                    enemy->state = IDLE;
+                }
 
                 break;
             case DEAD:
@@ -129,27 +157,5 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
         if (enemy->path[1] != -1) {
             draw_circle(window, components, camera, NULL, get_position(components, enemy->path[1]), 0.1, sfGreen);
         }
-    }
-}
-
-
-void damage(ComponentData* component, int entity, int dmg, int player) {
-    EnemyComponent* enemy = component->enemy[entity];
-    HealthComponent* health = component->health[entity];
-
-    health->health = max(0, health->health - dmg);
-
-    if (enemy) {
-        enemy->target = player;
-        enemy->state = CHASE;
-    }
-
-    int j = create_entity(component);
-    CoordinateComponent_add(component, j, get_position(component, entity), rand_angle());
-
-    if (dmg < 50) {
-        ImageComponent_add(component, j, "blood", 1.0, 1.0, 1);
-    } else {
-        ImageComponent_add(component, j, "blood_large", 2.0, 2.0, 1);
     }
 }

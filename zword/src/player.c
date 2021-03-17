@@ -177,6 +177,8 @@ void input(ComponentData* component) {
                 }
 
                 break;
+            case PLAYER_DEAD:
+                break;
         }
     }
 }
@@ -197,6 +199,12 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
         WeaponComponent* weapon = NULL;
         if (item != -1) {
             weapon = components->weapon[item];
+        }
+
+        ImageComponent* image = ImageComponent_get(components, i);
+
+        if (HealthComponent_get(components, i)->health <= 0) {
+            player->state = PLAYER_DEAD;
         }
         
         switch (player->state) {
@@ -333,6 +341,13 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                     }
                     player->grabbed_item = -1;
                 }
+
+                break;
+            case PLAYER_DEAD:
+                strcpy(image->filename, "player_dead");
+                image->width = 2.0;
+                image->texture_changed = true;
+                change_layer(components, i, 2);
 
                 break;
         }

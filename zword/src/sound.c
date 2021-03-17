@@ -87,7 +87,10 @@ void stop_loop(ComponentData* components, int entity) {
 }
 
 
-void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, SoundArray sounds, sfSound* channels[MAX_SOUNDS]) {
+void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSound* channels[MAX_SOUNDS]) {
+    // sfVector2f r = get_position(components, camera);
+    // sfListener_setPosition((sfVector3f) { r.x, 0.0, r.y });
+
     for (int i = 0; i < components->entities; i++) {
         SoundComponent* scomp = SoundComponent_get(components, i);
         if (!scomp) continue;
@@ -109,19 +112,15 @@ void play_sounds(ComponentData* components, sfRenderWindow* window, int camera, 
 
             sfSound* channel = channels[chan];
 
-            sfVector2f r = get_position(components, i);
-            sfSound_setPosition(channel, (sfVector3f) {r.x, 0.0, r.y });
+            // r = get_position(components, i);
+            // sfSound_setPosition(channel, (sfVector3f) { r.x, 0.0, r.y });
             sfSound_setVolume(channel, event->volume * 100.0);
             sfSound_setPitch(channel, event->pitch);
-
-            r = get_position(components, camera);
-            sfListener_setPosition((sfVector3f) {r.x, 10.0, r.y });
 
             if (event->channel != -1) {
                 if (!event->loop) {
                     event->volume *= 0.95;
                     if (event->volume < 0.01) {
-                        sfSound_setLoop(channel, false);
                         sfSound_stop(channel);
                         free(event);
                         scomp->events[j] = NULL;

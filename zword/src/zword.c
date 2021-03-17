@@ -48,6 +48,7 @@ int main() {
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
         channels[i] = sfSound_create();
+        sfSound_setAttenuation(channels[i], 0.1);
     }
 
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
@@ -58,7 +59,7 @@ int main() {
     FpsCounter* fps = FpsCounter_create();
 
     sfClock* clock = sfClock_create();
-    float time_step = 1.0 / 60.0;
+    float time_step = 1.0 / 30.0;
     float elapsed_time = 0.0;
 
     ComponentData* components = ComponentData_create();
@@ -135,7 +136,7 @@ int main() {
 
         sfRenderWindow_display(window);
 
-        play_sounds(components, window, camera, sounds, channels);
+        play_sounds(components, camera, sounds, channels);
     }
 
     sfRenderWindow_destroy(window);

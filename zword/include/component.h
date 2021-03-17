@@ -83,7 +83,8 @@ typedef enum {
     DRIVE,
     MENU,
     MENU_GRAB,
-    MENU_DROP
+    MENU_DROP,
+    PLAYER_DEAD
 } PlayerState;
 
 typedef struct {
