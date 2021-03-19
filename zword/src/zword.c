@@ -35,20 +35,18 @@ int main() {
     settings.antialiasingLevel = 8;
     sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
-    sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
+    // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
     bool focus = true;
-
-    TextureArray textures;
-    load_textures(textures);
-
-    SoundArray sounds;
-    load_sounds(sounds);
+    
+    sfTexture* textures = load_textures();
+    sfSoundBuffer* sounds = load_sounds();
 
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
         channels[i] = sfSound_create();
         sfSound_setAttenuation(channels[i], 0.1);
+        sfSound_setRelativeToListener(channels[i], true);
     }
 
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
@@ -59,14 +57,14 @@ int main() {
     FpsCounter* fps = FpsCounter_create();
 
     sfClock* clock = sfClock_create();
-    float time_step = 1.0 / 30.0;
+    float time_step = 1.0 / 60.0;
     float elapsed_time = 0.0;
 
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
     int camera = create_camera(components, mode);
 
-    float ambient_light = 0.9;
+    float ambient_light = 0.4;
     create_level(components, grid, time(NULL));
     init_grid(components, grid);
     init_waypoints(components, grid);

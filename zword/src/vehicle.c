@@ -14,8 +14,8 @@ void create_car(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
     PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0)->max_angular_speed = 2.5;
-    VehicleComponent_add(components, i, 50.0);
-    WaypointComponent_add(components, i);
+    VehicleComponent_add(components, i, 25.0);
+    // WaypointComponent_add(components, i);
     ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
     ParticleComponent_add_sparks(components, i);
     SoundComponent_add(components, i, "metal");
@@ -105,7 +105,10 @@ void drive_vehicle(ComponentData* components, int player, sfVector2f v, float ti
 
     if (player != vehicle->riders[0]) return;
 
-    if (vehicle->fuel == 0.0) return;
+    if (vehicle->fuel == 0.0) {
+        stop_loop(components, i);
+        return;
+    }
 
     PhysicsComponent* phys = components->physics[i];
 

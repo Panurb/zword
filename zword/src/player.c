@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window/Keyboard.h>
@@ -17,6 +18,7 @@
 #include "weapon.h"
 #include "vehicle.h"
 #include "item.h"
+#include "image.h"
 
 
 void create_player(ComponentData* components, sfVector2f pos) {
@@ -35,7 +37,7 @@ void create_player(ComponentData* components, sfVector2f pos) {
 
 
 sfVector2f left_stick() {
-    sfVector2f v = { 0.0, 0.0 };
+    sfVector2f v = zeros();
 
     if (sfKeyboard_isKeyPressed(sfKeyA)) {
         v.x -= 1;
@@ -212,7 +214,6 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
                 coord->angle = polar_angle(right_stick(components, window, camera, i));
 
-
                 sfVector2f pos = get_position(components, i);
                 int entities[100];
                 get_entities(components, grid, pos, 1.0, entities);
@@ -272,6 +273,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
 
                 break;
             case MENU:
+                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
+
                 if (item != -1) {
                     if (components->light[item]) {
                         components->light[item]->enabled = false;
@@ -531,6 +534,8 @@ void draw_players(ComponentData* components, sfRenderWindow* window, int camera)
                     }
                 }
 
+                break;
+            case PLAYER_DEAD:
                 break;
         }
     }

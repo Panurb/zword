@@ -250,7 +250,7 @@ LightComponent* LightComponent_add(ComponentData* components, int entity, float 
     light->shine = sfCircleShape_create();
     light->flicker = 0.0;
     light->speed = speed;
-    light->time = 0.0;
+    light->time = randf(0.0, 1.0);
 
     components->light[entity] = light;
 

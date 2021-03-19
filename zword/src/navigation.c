@@ -95,7 +95,7 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
         return 0.0;
     }
 
-    HitInfo info = raycast(component, grid, a, v, 1.1 * d, i);
+    HitInfo info = raycast(component, grid, a, v, 1.1 * d, i, true);
 
     if (info.object == j || info.object == -1) {
         return d;
@@ -129,15 +129,6 @@ void init_waypoints(ComponentData* components, ColliderGrid* grid) {
                 }
             }
         }
-
-        // if (waypoint->neighbors_size > 0) {
-        //     sfVector2f a = get_position(components, i);
-        //     sfVector2f b = get_position(components, waypoint->neighbors[0]);
-
-        //     int j = create_entity(components);
-        //     CoordinateComponent_add(components, j, mult(0.5, sum(a, b)), polar_angle(diff(a, b)));
-        //     ImageComponent_add(components, j, "road_tile", dist(a, b), 4.0, 1);
-        // }
     }
 }
 

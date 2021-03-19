@@ -46,8 +46,6 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
     if (weapon->magazine > 0) {
         if (weapon->cooldown == 0.0) {
-            add_sound(components, entity, "pistol", 1.0, 1.0);
-
             weapon->cooldown = 1.0 / ((1 + akimbo) * weapon->fire_rate);
             weapon->magazine--;
 
@@ -56,7 +54,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
             sfVector2f pos = get_position(components, parent);
 
-            HitInfo info = raycast(components, grid, pos, r, 20.0, parent);
+            HitInfo info = raycast(components, grid, pos, r, 20.0, parent, true);
 
             if (components->health[info.object]) {
                 float x = dot(info.normal, normalized(r));
@@ -80,7 +78,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             }
 
             SoundComponent* scomp = SoundComponent_get(components, info.object);
-            if (scomp) {
+            if (scomp && scomp->hit_sound[0] != '\0') {
                 add_sound(components, info.object, scomp->hit_sound, 0.5, randf(0.9, 1.1));
             }
 
@@ -104,6 +102,10 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     enemy->state = CHASE;
                 }
             }
+
+            LightComponent* light = LightComponent_get(components, entity);
+            light->brightness = light->max_brightness;
+            add_sound(components, entity, "pistol", 1.0, 1.0);
         }
     } else {
         reload(components, entity);
@@ -122,6 +124,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
+    LightComponent_add(components, i, 2.0, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0)->enabled = false;
 }
 
 

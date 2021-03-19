@@ -12,7 +12,7 @@
 
 typedef sfTexture* TextureArray[100];
 
-void load_textures(TextureArray textures);
+sfTexture** load_textures();
 
 int texture_index(Filename filename);
 

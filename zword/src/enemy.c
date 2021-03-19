@@ -13,6 +13,7 @@
 #include "navigation.h"
 #include "image.h"
 #include "particle.h"
+#include "sound.h"
 
 
 void create_enemy(ComponentData* components, sfVector2f pos) {
@@ -32,23 +33,28 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
 }
 
 
-void damage(ComponentData* component, int entity, int dmg, int player) {
-    HealthComponent* health = component->health[entity];
+void damage(ComponentData* components, int entity, int dmg, int player) {
+    HealthComponent* health = components->health[entity];
     health->health = max(0, health->health - dmg);
 
-    EnemyComponent* enemy = component->enemy[entity];
+    EnemyComponent* enemy = components->enemy[entity];
     if (enemy) {
         enemy->target = player;
         enemy->state = CHASE;
     }
 
-    int j = create_entity(component);
-    CoordinateComponent_add(component, j, get_position(component, entity), rand_angle());
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, get_position(components, entity), rand_angle());
 
     if (dmg < 50) {
-        ImageComponent_add(component, j, "blood", 1.0, 1.0, 1);
+        ImageComponent_add(components, j, "blood", 1.0, 1.0, 1);
     } else {
-        ImageComponent_add(component, j, "blood_large", 2.0, 2.0, 1);
+        ImageComponent_add(components, j, "blood_large", 2.0, 2.0, 1);
+    }
+
+    SoundComponent* scomp = SoundComponent_get(components, entity);
+    if (scomp) {
+        add_sound(components, entity, "squish", 0.5, randf(0.9, 1.1));
     }
 }
 
@@ -76,7 +82,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     float angle = mod(get_angle(components, i) - polar_angle(r), 2 * M_PI);
 
                     if (angle < 0.5 * enemy->fov) {
-                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i);
+                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, true);
                         if (info.object == j) {
                             enemy->target = j;
                             enemy->state = CHASE;
@@ -128,9 +134,10 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     }
                 }
 
-                if (WaypointComponent_get(components, i)) {
-                    WaypointComponent_remove(components, i);
-                }
+                // FIXME
+                // if (WaypointComponent_get(components, i)) {
+                //     WaypointComponent_remove(components, i);
+                // }
 
                 strcpy(image->filename, "zombie_dead");
                 image->width = 2.0;

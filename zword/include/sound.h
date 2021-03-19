@@ -7,12 +7,13 @@
 // https://freesound.org/people/FilmmakersManual/sounds/522510/
 // https://freesound.org/people/theshaggyfreak/sounds/276271/
 // https://freesound.org/people/mrickey13/sounds/515618/
+// https://freesound.org/people/cookies+policy/sounds/555926/
 
 #define MAX_SOUNDS 256
 
 typedef sfSoundBuffer* SoundArray[100];
 
-void load_sounds(SoundArray sounds);
+sfSoundBuffer** load_sounds();
 
 void add_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch);
 

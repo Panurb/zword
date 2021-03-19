@@ -38,7 +38,7 @@ void pick_up_item(ComponentData* components, int entity) {
         player->inventory[i] = player->target;
         CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
         coord->parent = entity;
-        coord->position = zeros();
+        coord->position = (sfVector2f) { 1.0, 0.0 };
         coord->angle = 0.0;
         ImageComponent_get(components, player->target)->alpha = 0.0;
         ColliderComponent_get(components, player->target)->enabled = false;

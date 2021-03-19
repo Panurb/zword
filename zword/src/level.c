@@ -18,6 +18,7 @@
 #include "road.h"
 #include "grid.h"
 #include "collider.h"
+#include "sound.h"
 
 
 void create_waypoint(ComponentData* components, sfVector2f pos) {
@@ -125,8 +126,6 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, mult(0.5, sum(w, h))));
     create_waypoint(components, diff(pos, mult(0.5, sum(w, h))));
     create_waypoint(components, diff(pos, mult(0.5, diff(w, h))));
-
-    create_enemy(components, sum(pos, polar_to_cartesian(5.0, rand_angle())));
 }
 
 
@@ -173,7 +172,7 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
     i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0);
     ImageComponent* image = ImageComponent_add(components, i, "", 16.0, 16.0, 0);
-    image->scale = (sfVector2f) { 2.0, 2.0 };
+    image->scale = (sfVector2f) { 8.0, 8.0 };
     image->texture_changed = false;
     sfSprite_setTexture(image->sprite, noise_texture, false);
 }
@@ -185,7 +184,7 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     ImageComponent_add(components, i, "tree", 3.0, 3.0, 6)->scale = (sfVector2f) { size, size };
     ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.0 * size, TREES);
 
-    if (collides_with(components, grid, i, ROADS)) {
+    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
         clear_grid(components, grid, i);
         destroy_entity(components, i);
     } else {
@@ -202,7 +201,7 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     ImageComponent_add(components, i, "rock", 3.0, 3.0, 2)->scale = (sfVector2f) { size, size };
     ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.8 * size, TREES);
 
-    if (collides_with(components, grid, i, ROADS)) {
+    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
         clear_grid(components, grid, i);
         destroy_entity(components, i);
     } else {
@@ -210,6 +209,21 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
         col->width = 2.0 * col->radius;
         col->height = 2.0 * col->radius;
     }
+}
+
+
+void create_uranium(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, rand_angle());
+    float r = randf(0.8, 1.2);
+    ImageComponent_add(components, i, "uranium", r, r, 2);
+    ColliderComponent_add_circle(components, i, 0.5 * r, TREES);
+    LightComponent_add(components, i, randf(3.0, 5.0), 2.0 * M_PI, get_color(0.5, 1.0, 0.0, 1.0), 0.5, 1.0)->flicker = 0.25;
+    SoundComponent_add(components, i, "");
+    ParticleComponent* particle = ParticleComponent_add(components, i, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, 
+                                                        get_color(0.5, 1.0, 0.0, 1.0), get_color(0.5, 1.0, 0.0, 1.0));
+    particle->enabled = true;
+    particle->loop = true;
 }
 
 
@@ -247,19 +261,21 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     Permutation perm;
     init_perlin(perm);
 
-    int w = 2048;
-    int h = 2048;
+    int w = 512;
+    int h = 512;
 
     sfTexture* noise_texture = sfTexture_create(w, h);
 
-    // sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
-    // create_noise(pixels, w, h, zeros(), get_color(0.0, 0.0, 0.0, 0.2), perm);
-    // sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
-    // sfTexture_setRepeated(noise_texture, true);
-    // free(pixels);
+    sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
+    create_noise(pixels, w, h, zeros(), get_color(0.0, 0.0, 0.0, 0.3), perm);
+    sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
+    sfTexture_setRepeated(noise_texture, true);
+    free(pixels);
 
-    sfVector2f start = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, -4.5 * CHUNK_HEIGHT };
-    sfVector2f end = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, 4.5 * CHUNK_HEIGHT };
+    sfVector2f end = { randf(-4.5, 4.5) * CHUNK_WIDTH, randf(-4.5, 4.5) * CHUNK_HEIGHT };
+    create_house(components, end);
+
+    sfVector2f start = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, -4.0 * CHUNK_HEIGHT };
     create_road(components, start, end, perm);
 
     init_grid(components, grid);
@@ -274,11 +290,11 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
         }
     }
 
-    create_player(components, start);
+    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }));
 
     create_car(components, start);
 
-    create_pistol(components, sum(start, (sfVector2f) { 0.0, 5.0 }));
+    create_pistol(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
 }
 
 

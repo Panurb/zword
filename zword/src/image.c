@@ -33,13 +33,16 @@ static const char* IMAGES[] = {
     "rock",
     "roof_tile",
     "tree",
+    "uranium",
     "wood_tile",
     "zombie",
     "zombie_dead"
 };
 
 
-void load_textures(TextureArray textures) {
+sfTexture** load_textures() {
+    sfTexture** textures = malloc(100);
+
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
 
     for (int i = 0; i < n; i++) {
@@ -55,6 +58,8 @@ void load_textures(TextureArray textures) {
 
         textures[i] = texture;
     }
+
+    return textures;
 }
 
 
@@ -170,8 +175,8 @@ void color_pixel(sfUint8* pixels, int width, int x, int y, sfColor color, float 
 void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            float x = origin.x + i / (float) PIXELS_PER_UNIT;
-            float y = origin.y + (height - j) / (float) PIXELS_PER_UNIT;
+            float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;
+            float y = origin.y + 4.0 * (height - j) / (float) PIXELS_PER_UNIT;
             float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
 
             // a = smoothstep(a, 0.5, 50.0);
