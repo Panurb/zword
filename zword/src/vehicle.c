@@ -50,12 +50,13 @@ bool enter_vehicle(ComponentData* components, int i) {
         }
 
         if (min_d < 3.0) {
-            int item = components->player[i]->inventory[components->player[i]->item];
+            PlayerComponent* player = PlayerComponent_get(components, i);
+            int item = player->inventory[player->item];
             if (components->light[item]) {
                 components->light[item]->enabled = false;
             }
 
-            components->player[i]->vehicle = j;
+            player->vehicle = j;
             coord->position = vehicle->seats[closest];
             coord->angle = 0.0;
             coord->parent = j;
@@ -77,7 +78,8 @@ bool enter_vehicle(ComponentData* components, int i) {
 
 
 void exit_vehicle(ComponentData* components, int i) {
-    int j = components->player[i]->vehicle;
+    PlayerComponent* player = PlayerComponent_get(components, i);
+    int j = player->vehicle;
     VehicleComponent* vehicle = VehicleComponent_get(components, j);
 
     int k = find(i, vehicle->riders, vehicle->size);
@@ -89,7 +91,7 @@ void exit_vehicle(ComponentData* components, int i) {
     coord->position = sum(get_position(components, j), r);
     coord->parent = -1;
 
-    components->player[i]->vehicle = -1;
+    player->vehicle = -1;
     vehicle->riders[k] = -1;
     components->collider[i]->enabled = true;
 
@@ -98,12 +100,13 @@ void exit_vehicle(ComponentData* components, int i) {
 }
 
 
-void drive_vehicle(ComponentData* components, int player, sfVector2f v, float time_step) {
-    int i = components->player[player]->vehicle;
+void drive_vehicle(ComponentData* components, int p, sfVector2f v, float time_step) {
+    PlayerComponent* player = PlayerComponent_get(components, p);
+    int i = player->vehicle;
 
     VehicleComponent* vehicle = components->vehicle[i];
 
-    if (player != vehicle->riders[0]) return;
+    if (p != vehicle->riders[0]) return;
 
     if (vehicle->fuel == 0.0) {
         stop_loop(components, i);

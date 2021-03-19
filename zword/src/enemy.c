@@ -73,9 +73,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
         switch (enemy->state) {
             case IDLE:
-                for (int j = 0; j < components->entities; j++) {
+                for (int k = 0; k < components->player.size; k++) {
+                    int j = components->player.order[k];
                     PlayerComponent* player = PlayerComponent_get(components, j);
-                    if (!player) continue;
                     if (player->state == PLAYER_DEAD) continue;
 
                     sfVector2f r = diff(get_position(components, j), get_position(components, i));

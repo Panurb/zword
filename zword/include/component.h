@@ -244,7 +244,7 @@ typedef struct {
     OrderedArray image;
     PhysicsComponent* physics[MAX_ENTITIES];
     ColliderComponent* collider[MAX_ENTITIES];
-    PlayerComponent* player[MAX_ENTITIES];
+    OrderedArray player;
     LightComponent* light[MAX_ENTITIES];
     EnemyComponent* enemy[MAX_ENTITIES];
     ParticleComponent* particle[MAX_ENTITIES];

@@ -68,7 +68,7 @@ sfVector2f right_stick(ComponentData* components, sfRenderWindow* window, int ca
 
 
 int get_inventory_slot(ComponentData* components, sfRenderWindow* window, int camera, int i) {
-    PlayerComponent* player = components->player[i];
+    PlayerComponent* player = PlayerComponent_get(components, i);
 
     sfVector2f rs = right_stick(components, window, camera, i);
     float angle = mod(polar_angle(rs) + 0.25 * M_PI, 2 * M_PI);
@@ -78,7 +78,7 @@ int get_inventory_slot(ComponentData* components, sfRenderWindow* window, int ca
 
 
 int get_attachment(ComponentData* components, sfRenderWindow* window, int camera, int i) {
-    PlayerComponent* player = components->player[i];
+    PlayerComponent* player = PlayerComponent_get(components, i);
     int slot = get_inventory_slot(components, window, camera, i);
     int item = player->inventory[slot];
 
@@ -100,9 +100,8 @@ int get_attachment(ComponentData* components, sfRenderWindow* window, int camera
 
 void input(ComponentData* component) {
     for (int i = 0; i < component->entities; i++) {
-        if (!component->player[i]) continue;
-        
-        PlayerComponent* player = component->player[i];
+        PlayerComponent* player = PlayerComponent_get(component, i);
+        if (!player) continue;
 
         switch (player->state) {
             case ON_FOOT:
@@ -188,7 +187,7 @@ void input(ComponentData* component) {
 
 void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera, float time_step) {
     for (int i = 0; i < components->entities; i++) {
-        PlayerComponent* player = components->player[i];
+        PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
 
         PhysicsComponent* phys = components->physics[i];
@@ -359,7 +358,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
 
 
 void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
-    PlayerComponent* player = components->player[entity];
+    PlayerComponent* player = PlayerComponent_get(components, entity);
     sfVector2f pos = get_position(components, entity);
 
     float gap = 0.2;
@@ -393,7 +392,7 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
 
 
 void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, int atch, float offset, float alpha) {
-    PlayerComponent* player = components->player[entity];
+    PlayerComponent* player = PlayerComponent_get(components, entity);
     sfVector2f pos = get_position(components, entity);
     ItemComponent* item = components->item[player->inventory[slot]];
 
@@ -427,7 +426,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
 
 void draw_players(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
-        PlayerComponent* player = components->player[i];
+        PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
 
         sfVector2f pos = get_position(components, i);

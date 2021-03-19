@@ -19,14 +19,14 @@ ComponentData* ComponentData_create() {
     components->entities = 0;
 
     components->image.size = 0;
+    components->player.size = 0;
 
     for (int i = 0; i < MAX_ENTITIES; i++) {
         components->image.array[i] = NULL;
-
         components->coordinate[i] = NULL;
         components->physics[i] = NULL;
         components->collider[i] = NULL;
-        components->player[i] = NULL;
+        components->player.array[i] = NULL;
         components->light[i] = NULL;
         components->enemy[i] = NULL;
         components->particle[i] = NULL;
@@ -211,7 +211,9 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity) {
 
     player->line = sfRectangleShape_create();
 
-    components->player[entity] = player;
+    components->player.array[entity] = player;
+    components->player.order[components->player.size] = entity;
+    components->player.size++;
 
     return player;
 }
@@ -219,7 +221,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity) {
 
 PlayerComponent* PlayerComponent_get(ComponentData* components, int entity) {
     if (entity == -1) return NULL;
-    return components->player[entity];
+    return components->player.array[entity];
 }
 
 
@@ -228,7 +230,8 @@ void PlayerComponent_remove(ComponentData* components, int entity) {
     sfConvexShape_destroy(player->shape);
     sfRectangleShape_destroy(player->line);
     free(player);
-    components->player[entity] = NULL;
+    components->player.array[entity] = NULL;
+    // TODO
 }
 
 

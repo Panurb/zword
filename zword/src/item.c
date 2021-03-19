@@ -27,7 +27,7 @@ void create_gas(ComponentData* components, sfVector2f position) {
 
 
 void pick_up_item(ComponentData* components, int entity) {
-    PlayerComponent* player = components->player[entity];
+    PlayerComponent* player = PlayerComponent_get(components, entity);
 
     if (player->target == -1) {
         return;
