@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "road.h"
 
 
@@ -13,7 +15,8 @@ sfVector2f perlin_grad(sfVector2f position, Permutation perm) {
     return grad;
 }
 
-void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
+
+int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm, float curviness, float width, Filename filename) {
     int n = dist(start, end) / 5.0;
 
     sfVector2f position = end;
@@ -28,12 +31,11 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
         position = sum(position, delta);
 
         sfVector2f grad = perlin_grad(position, perm);
-        sfVector2f pos = diff(position, mult(2.0, grad));
+        sfVector2f pos = diff(position, mult(curviness, grad));
 
         CoordinateComponent_add(components, current, pos, 0.0);
-        RoadComponent* road = RoadComponent_add(components, current);
+        RoadComponent* road = RoadComponent_add(components, current, width, filename);
         road->next = next;
-        // WaypointComponent_add(components, current);
         ImageComponent_add(components, current, "", 1.0, 1.0, 1);
 
         if (next != -1) {
@@ -55,6 +57,11 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
         next = current;
     }
 
+    return current;
+}
+
+
+void create_road_segments(ComponentData* components, int current) {
     while (true) {
         RoadComponent* road = RoadComponent_get(components, current);
         if (road->next == -1) {
@@ -77,23 +84,39 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Pe
 
         float angle = polar_angle(diff(next_pos, pos));
         CoordinateComponent_add(components, i, r, angle);
-        ImageComponent_add(components, i, "road_tile", length + 0.25, road->width, 1);
-        ColliderComponent_add_rectangle(components, i, d, 1.0, ROADS);
+        Filename filename;
+        snprintf(filename, 20, "%s%s", road->filename, "_tile");
+        ImageComponent_add(components, i, filename, length + 0.25, road->width, 1);
+        ColliderComponent_add_rectangle(components, i, d, road->width, ROADS);
+
+        snprintf(filename, 20, "%s%s", road->filename, "_end");
 
         if (road->prev == -1) {
             i = create_entity(components);
             CoordinateComponent_add(components, i, pos, angle);
-            ImageComponent_add(components, i, "road_end", road->width, road->width, 1);
+            ImageComponent_add(components, i, filename, road->width, road->width, 1);
         }
 
         if (next_road->next == -1) {
             i = create_entity(components);
             CoordinateComponent_add(components, i, next_pos, angle + M_PI);
-            ImageComponent_add(components, i, "road_end", road->width, road->width, 1);
+            ImageComponent_add(components, i, filename, road->width, road->width, 1);
         }
 
         current = RoadComponent_get(components, current)->next;
     }
+}
+
+
+void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
+    int current = create_road_curves(components, start, end, perm, 2.0, 4.0, "road");
+    create_road_segments(components, current);
+}
+
+
+void create_river(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
+    int current = create_road_curves(components, start, end, perm, 1.0, 8.0, "river");
+    create_road_segments(components, current);
 }
 
 
@@ -105,7 +128,10 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
     float spread = fabs(road->curve);
 
     if (road->texture_changed) {
-        int i = texture_index(road->filename);
+        Filename filename;
+        snprintf(filename, 20, "%s%s", road->filename, "_curve");
+        int i = texture_index(filename);
+
         sfConvexShape_setTexture(road->shape, textures[i], false);
         float w = PIXELS_PER_UNIT * road->width;
         float h = PIXELS_PER_UNIT * road->width * sinf(fabs(road->curve));
@@ -135,4 +161,14 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
     sfConvexShape_setScale(road->shape, (sfVector2f) { cam->zoom, cam->zoom });
 
     sfRenderWindow_drawConvexShape(window, road->shape, NULL);
+}
+
+
+void resize_roads(ComponentData* components) {
+    for (int i = 0; i < components->entities; i++) {
+        ColliderComponent* col = ColliderComponent_get(components, i);
+        if (col && col->group == ROADS) {
+            col->height = 1.0;
+        }
+    }
 }

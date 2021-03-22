@@ -537,16 +537,16 @@ void CameraComponent_remove(ComponentData* components, int entity) {
 }
 
 
-RoadComponent* RoadComponent_add(ComponentData* components, int entity) {
+RoadComponent* RoadComponent_add(ComponentData* components, int entity, float width, Filename filename) {
     RoadComponent* road = malloc(sizeof(RoadComponent));
     road->prev = -1;
     road->next = -1;
     road->curve = 0.0;
-    road->width = 4.0;
+    road->width = width;
     road->shape = sfConvexShape_create();
     road->points = 12;
     sfConvexShape_setPointCount(road->shape, road->points);
-    strcpy(road->filename, "road_curve");
+    strcpy(road->filename, filename);
     road->texture_changed = true;
 
     components->road[entity] = road;

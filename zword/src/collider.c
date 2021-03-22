@@ -16,15 +16,6 @@
 #include "physics.h"
 
 
-static int COLLISION_MATRIX[7][7] = { { 0, 0, 0, 0, 0, 0, 0 },    // WALLS
-                                      { 1, 1, 0, 0, 0, 2, 0 },    // ITEMS
-                                      { 1, 0, 2, 2, 1, 2, 0 },    // PLAYERS
-                                      { 1, 0, 2, 2, 1, 2, 0 },    // ENEMIES
-                                      { 1, 0, 0, 0, 1, 1, 3 },    // VEHICLES
-                                      { 0, 0, 0, 0, 0, 0, 0 },    // TREES
-                                      { 0, 0, 0, 0, 0, 0, 0 } };  // ROADS
-
-
 void get_corners(ComponentData* component, int i, sfVector2f* corners) {
     CoordinateComponent* coord = component->coordinate[i];
 

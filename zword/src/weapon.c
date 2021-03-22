@@ -54,7 +54,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
             sfVector2f pos = get_position(components, parent);
 
-            HitInfo info = raycast(components, grid, pos, r, 20.0, parent, true);
+            HitInfo info = raycast(components, grid, pos, r, 20.0, parent, BULLETS);
 
             if (components->health[info.object]) {
                 float x = dot(info.normal, normalized(r));

@@ -82,7 +82,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     float angle = mod(get_angle(components, i) - polar_angle(r), 2 * M_PI);
 
                     if (angle < 0.5 * enemy->fov) {
-                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, true);
+                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, BULLETS);
                         if (info.object == j) {
                             enemy->target = j;
                             enemy->state = CHASE;

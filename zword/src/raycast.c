@@ -58,7 +58,7 @@ Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVecto
 }
 
 
-HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, int ignore, bool ignore_trees) {
+HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, int ignore, ColliderGroup group) {
     // http://www.cs.yorku.ca/~amana/research/grid.pdf
 
     static int id = MAX_ENTITIES;
@@ -92,8 +92,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
 
             ColliderComponent* col = ColliderComponent_get(components, j);
             if (col->last_collision == id) continue;
-            if (col->group == ITEMS || col->group == ROADS) continue;
-            if (ignore_trees && col->group == TREES) continue;
+            if (COLLISION_MATRIX[group][col->group] != 1) continue;
 
             col->last_collision = id;
 

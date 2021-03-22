@@ -63,7 +63,10 @@ typedef enum {
     ENEMIES,
     VEHICLES,
     TREES,
-    ROADS
+    ROADS,
+    RIVERS,
+    BULLETS,
+    LIGHTS
 } ColliderGroup;
 
 typedef struct {
@@ -317,7 +320,7 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
 CameraComponent* CameraComponent_get(ComponentData* components, int entity);
 void CameraComponent_remove(ComponentData* components, int entity);
 
-RoadComponent* RoadComponent_add(ComponentData* components, int entity);
+RoadComponent* RoadComponent_add(ComponentData* components, int entity, float width, Filename filename);
 RoadComponent* RoadComponent_get(ComponentData* components, int entity);
 void RoadComponent_remove(ComponentData* components, int entity);
 

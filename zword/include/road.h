@@ -11,4 +11,8 @@
 
 void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm);
 
+void create_river(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm);
+
 void draw_road(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures, int entity);
+
+void resize_roads(ComponentData* components);

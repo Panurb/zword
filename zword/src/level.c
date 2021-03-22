@@ -181,43 +181,43 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
-    ImageComponent_add(components, i, "tree", 3.0, 3.0, 6)->scale = (sfVector2f) { size, size };
-    ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.0 * size, TREES);
+    ColliderComponent* col = ColliderComponent_add_circle(components, i, size, TREES);
 
     if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
-        clear_grid(components, grid, i);
         destroy_entity(components, i);
-    } else {
-        col->radius = size;
-        col->width = 2.0 * col->radius;
-        col->height = 2.0 * col->radius;
+        return;
     }
+
+    ImageComponent_add(components, i, "tree", 3.0, 3.0, 6)->scale = (sfVector2f) { size, size };
 }
 
 
 void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
-    ImageComponent_add(components, i, "rock", 3.0, 3.0, 2)->scale = (sfVector2f) { size, size };
-    ColliderComponent* col = ColliderComponent_add_circle(components, i, 2.8 * size, TREES);
+    ColliderComponent* col = ColliderComponent_add_circle(components, i, 1.4 * size, TREES);
 
     if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
-        clear_grid(components, grid, i);
         destroy_entity(components, i);
-    } else {
-        col->radius = 1.4 * size;
-        col->width = 2.0 * col->radius;
-        col->height = 2.0 * col->radius;
+        return;
     }
+
+    ImageComponent_add(components, i, "rock", 3.0, 3.0, 2)->scale = (sfVector2f) { size, size };
 }
 
 
-void create_uranium(ComponentData* components, sfVector2f position) {
+void create_uranium(ComponentData* components, ColliderGrid* grid, sfVector2f position) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
     float r = randf(0.8, 1.2);
-    ImageComponent_add(components, i, "uranium", r, r, 2);
     ColliderComponent_add_circle(components, i, 0.5 * r, TREES);
+
+    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
+        destroy_entity(components, i);
+        return;
+    }
+
+    ImageComponent_add(components, i, "uranium", r, r, 2);
     LightComponent_add(components, i, randf(3.0, 5.0), 2.0 * M_PI, get_color(0.5, 1.0, 0.0, 1.0), 0.5, 1.0)->flicker = 0.25;
     SoundComponent_add(components, i, "");
     ParticleComponent* particle = ParticleComponent_add(components, i, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, 
@@ -251,6 +251,11 @@ void create_chunk(ComponentData* components, ColliderGrid* grid, sfVector2f posi
     for (int i = 0; i < 4; i++) {
         sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
         create_enemy(components, sum(position, r));
+    }
+
+    for (int i = 0; i < 2; i++) {
+        sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+        create_uranium(components, grid, sum(position, r));
     }
 }
 
@@ -289,6 +294,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
             create_chunk(components, grid, position, perm, f, noise_texture);
         }
     }
+
+    resize_roads(components);
 
     create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }));
 
