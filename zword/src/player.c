@@ -275,17 +275,22 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
 
                 if (item != -1) {
-                    if (components->light[item]) {
-                        components->light[item]->enabled = false;
-                    }
-                    if (components->weapon[item]) {
-                        components->weapon[item]->reloading = false;
+                    LightComponent* light = components->light[item];
+                    WeaponComponent* weapon = components->weapon[item];
+                    ItemComponent* itco = components->item[item];
+
+                    if (light) {
+                        light->enabled = false;
                     }
 
-                    for (int j = 0; j < components->item[item]->size; j++) {
-                        int a = components->item[item]->attachments[j];
-                        if (components->light[a]) {
-                            components->light[a]->enabled = false;
+                    if (weapon) {
+                        weapon->reloading = false;
+                    } else {
+                        for (int j = 0; j < itco->size; j++) {
+                            LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                            if (a) {
+                                a->enabled = false;
+                            }
                         }
                     }
                 }
@@ -295,14 +300,18 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                 item = player->inventory[player->item];
 
                 if (item != -1) {
-                    if (components->light[item]) {
-                        components->light[item]->enabled = true;
+                    WeaponComponent* weapon = components->weapon[item];
+                    LightComponent* light = components->light[item];
+                    ItemComponent* itco = components->item[item];
+
+                    if (!weapon && light) {
+                        light->enabled = true;
                     }
 
-                    for (int j = 0; j < components->item[item]->size; j++) {
-                        int a = components->item[item]->attachments[j];
-                        if (components->light[a]) {
-                            components->light[a]->enabled = true;
+                    for (int j = 0; j < itco->size; j++) {
+                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        if (a) {
+                            a->enabled = true;
                         }
                     }
                 }
