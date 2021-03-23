@@ -244,22 +244,6 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 }
 
 
-void create_chunk(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation, sfTexture* noise_texture) {
-    create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
-    create_forest(components, grid, position, p, forestation);
-
-    for (int i = 0; i < 4; i++) {
-        sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-        create_enemy(components, sum(position, r));
-    }
-
-    for (int i = 0; i < 2; i++) {
-        sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-        create_uranium(components, grid, sum(position, r));
-    }
-}
-
-
 void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     srand(seed);
 
@@ -277,30 +261,59 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     sfTexture_setRepeated(noise_texture, true);
     free(pixels);
 
-    sfVector2f end = { randf(-4.5, 4.5) * CHUNK_WIDTH, randf(-4.5, 4.5) * CHUNK_HEIGHT };
-    create_house(components, end);
+    int width = floor(LEVEL_WIDTH / 2.0);
+    int height = floor(LEVEL_HEIGHT / 2.0);
 
-    sfVector2f start = { (randf(0.0, 9.0) - 4.5) * CHUNK_WIDTH, -4.0 * CHUNK_HEIGHT };
-    create_road(components, start, end, perm);
+    sfVector2f start = { -(width + 0.5) * CHUNK_WIDTH, -height * CHUNK_HEIGHT };
+    sfVector2f end = { (width + 0.5) * CHUNK_WIDTH, -height * CHUNK_HEIGHT };
+    create_river(components, start, end, perm);
+
+    sfVector2f prev_house = zeros();
+
+    for (int i = -width; i <= width; i++) {
+        for (int j = -height; j <= height; j++) {
+            sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
+            create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+
+            if (abs(i) == width || abs(j) == height) continue;
+
+            float f = randf(0.0, 0.75);
+            if (f < 0.1) {
+                create_house(components, position);
+                if (prev_house.x != 0.0) {
+                    create_road(components, prev_house, position, perm);
+                }
+                prev_house = position;
+            }
+        }
+    }
 
     init_grid(components, grid);
 
-    float f = randf(0.0, 1.0);
-    for (int i = -4; i < 5; i++) {
-        for (int j = -4; j < 5; j++) {
-            f = randf(0.0, 0.75);
-
+    for (int i = -width; i <= width; i++) {
+        for (int j = -height; j <= height; j++) {
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
-            create_chunk(components, grid, position, perm, f, noise_texture);
+
+            float f = randf(0.0, 0.75);
+            create_forest(components, grid, position, perm, f);
+
+            for (int i = 0; i < 4; i++) {
+                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+                create_enemy(components, sum(position, r));
+            }
+
+            for (int i = 0; i < 2; i++) {
+                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+                create_uranium(components, grid, sum(position, r));
+            }
         }
     }
 
     resize_roads(components);
 
+    start = zeros();
     create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }));
-
     create_car(components, start);
-
     create_pistol(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
 }
 

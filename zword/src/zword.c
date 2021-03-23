@@ -29,7 +29,7 @@
 
 
 int main() {
-    sfVideoMode mode = { 1280, 720, 32 };
+    sfVideoMode mode = { 1920, 1080, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -64,7 +64,7 @@ int main() {
     ColliderGrid* grid = ColliderGrid_create();
     int camera = create_camera(components, mode);
 
-    float ambient_light = 0.4;
+    float ambient_light = 0.5;
     create_level(components, grid, time(NULL));
     init_grid(components, grid);
     init_waypoints(components, grid);

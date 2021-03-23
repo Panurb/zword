@@ -358,7 +358,7 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
     vehicle->max_fuel = max_fuel;
     vehicle->fuel = max_fuel;
     vehicle->acceleration = 20.0;
-    vehicle->max_speed = 10.0;
+    vehicle->max_speed = 20.0;
     vehicle->turning = 50.0;
     vehicle->size = 4;
     for (int i = 0; i < vehicle->size; i++) {

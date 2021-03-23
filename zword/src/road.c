@@ -28,8 +28,6 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
     for (int i = 0; i < n; i++) {
         current = create_entity(components);
 
-        position = sum(position, delta);
-
         sfVector2f grad = perlin_grad(position, perm);
         sfVector2f pos = diff(position, mult(curviness, grad));
 
@@ -55,13 +53,14 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
         }
 
         next = current;
+        position = sum(position, delta);
     }
 
     return current;
 }
 
 
-void create_road_segments(ComponentData* components, int current) {
+void create_road_segments(ComponentData* components, int current, ColliderGroup group) {
     while (true) {
         RoadComponent* road = RoadComponent_get(components, current);
         if (road->next == -1) {
@@ -87,7 +86,7 @@ void create_road_segments(ComponentData* components, int current) {
         Filename filename;
         snprintf(filename, 20, "%s%s", road->filename, "_tile");
         ImageComponent_add(components, i, filename, length + 0.25, road->width, 1);
-        ColliderComponent_add_rectangle(components, i, d, road->width, ROADS);
+        ColliderComponent_add_rectangle(components, i, d, road->width, group);
 
         snprintf(filename, 20, "%s%s", road->filename, "_end");
 
@@ -109,14 +108,15 @@ void create_road_segments(ComponentData* components, int current) {
 
 
 void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
-    int current = create_road_curves(components, start, end, perm, 2.0, 4.0, "road");
-    create_road_segments(components, current);
+    sfVector2f r = mult(10.0, normalized(diff(end, start)));
+    int current = create_road_curves(components, sum(start, r), diff(end, r), perm, 2.0, 4.0, "road");
+    create_road_segments(components, current, ROADS);
 }
 
 
 void create_river(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
     int current = create_road_curves(components, start, end, perm, 1.0, 8.0, "river");
-    create_road_segments(components, current);
+    create_road_segments(components, current, RIVERS);
 }
 
 
