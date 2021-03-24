@@ -115,6 +115,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
                 if (dist(get_position(components, enemy->target), get_position(components, i)) < 1.0) {
                     damage(components, enemy->target, 50, -1);
+                    ParticleComponent_get(components, enemy->target)->enabled = true;
                 }
 
                 if (PlayerComponent_get(components, enemy->target)->state == PLAYER_DEAD) {

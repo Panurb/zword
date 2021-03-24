@@ -315,6 +315,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }));
     create_car(components, start);
     create_pistol(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+    create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
 }
 
 

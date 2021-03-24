@@ -197,12 +197,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
         int atch = get_attachment(components, window, camera, i);
 
         int item = player->inventory[player->item];
-        WeaponComponent* weapon = NULL;
-        if (item != -1) {
-            weapon = components->weapon[item];
-        }
-
-        ImageComponent* image = ImageComponent_get(components, i);
+        WeaponComponent* weapon = WeaponComponent_get(components, item);
+        LightComponent* light = LightComponent_get(components, item);
 
         if (HealthComponent_get(components, i)->health <= 0) {
             player->state = PLAYER_DEAD;
@@ -251,6 +247,9 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                     if (weapon->reloading) {
                         player->state = RELOAD;
                     }
+                } else if (light) {
+                    light->enabled = !light->enabled;
+                    player->state = ON_FOOT;
                 }
 
                 break;
@@ -273,46 +272,32 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                 break;
             case MENU:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
+                
+                if (light) {
+                    light->enabled = false;
+                }
 
-                if (item != -1) {
-                    LightComponent* light = components->light[item];
-                    WeaponComponent* weapon = components->weapon[item];
-                    ItemComponent* itco = components->item[item];
-
-                    if (light) {
-                        light->enabled = false;
-                    }
-
-                    if (weapon) {
-                        weapon->reloading = false;
-                    } else {
-                        for (int j = 0; j < itco->size; j++) {
-                            LightComponent* a = LightComponent_get(components, itco->attachments[j]);
-                            if (a) {
-                                a->enabled = false;
-                            }
+                ItemComponent* itco = ItemComponent_get(components, item);
+                if (weapon) {
+                    weapon->reloading = false;
+                } else if (itco) {
+                    for (int j = 0; j < itco->size; j++) {
+                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        if (a) {
+                            a->enabled = false;
                         }
                     }
                 }
 
                 player->item = get_inventory_slot(components, window, camera, i);
 
-                item = player->inventory[player->item];
-
-                if (item != -1) {
-                    WeaponComponent* weapon = components->weapon[item];
-                    LightComponent* light = components->light[item];
-                    ItemComponent* itco = components->item[item];
-
-                    if (!weapon && light) {
-                        light->enabled = true;
+                int new_item = player->inventory[player->item];
+                if (new_item != item) {
+                    if (item != -1) {
+                        ImageComponent_get(components, item)->alpha = 0.0;
                     }
-
-                    for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
-                        if (a) {
-                            a->enabled = true;
-                        }
+                    if (new_item != -1) {
+                        ImageComponent_get(components, new_item)->alpha = 1.0;
                     }
                 }
 
@@ -354,7 +339,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                 }
 
                 break;
-            case PLAYER_DEAD:
+            case PLAYER_DEAD:;
+                ImageComponent* image = ImageComponent_get(components, i);
                 strcpy(image->filename, "player_dead");
                 image->width = 2.0;
                 image->texture_changed = true;
