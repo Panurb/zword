@@ -12,10 +12,14 @@
 
 
 int get_akimbo(ComponentData* components, int entity) {
-    ItemComponent* item = components->item[entity];
-    if (item->attachments[0] != -1 && components->weapon[item->attachments[0]]) {
-        return 1;
+    ItemComponent* item = ItemComponent_get(components, entity);
+
+    if (item->size > 0) {
+        if (item->attachments[0] != -1 && components->weapon[item->attachments[0]]) {
+            return 1;
+        }
     }
+
     return 0;
 }
 
@@ -54,7 +58,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
             sfVector2f pos = get_position(components, parent);
 
-            HitInfo info = raycast(components, grid, pos, r, 20.0, parent, BULLETS);
+            HitInfo info = raycast(components, grid, pos, r, weapon->range, parent, BULLETS);
 
             if (components->health[info.object]) {
                 float x = dot(info.normal, normalized(r));
@@ -85,9 +89,11 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             weapon->recoil = fmin(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
 
             particle = ParticleComponent_get(components, entity);
-            particle->angle = angle;
-            particle->max_time = dist(pos, info.position) / particle->speed;
-            particle->enabled = true;
+            if (particle) {
+                particle->angle = angle;
+                particle->max_time = dist(pos, info.position) / particle->speed;
+                particle->enabled = true;
+            }
 
             int entities[100];
             get_entities(components, grid, pos, 20.0, entities);
@@ -104,8 +110,13 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             }
 
             LightComponent* light = LightComponent_get(components, entity);
-            light->brightness = light->max_brightness;
-            add_sound(components, entity, "pistol", 1.0, 1.0);
+            if (light) {
+                light->brightness = light->max_brightness;
+            }
+
+            if (SoundComponent_get(components, entity)) {
+                add_sound(components, entity, "pistol", 1.0, 1.0);
+            }
         }
     } else {
         reload(components, entity);
@@ -120,11 +131,24 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
-    WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI);
+    WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI, 25.0);
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 2.0, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0)->enabled = false;
+}
+
+
+void create_axe(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ColliderComponent_add_rectangle(components, i, 1.5, 0.5, ITEMS);
+    ImageComponent_add(components, i, "axe", 2.0, 1.0, 3);
+    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    WeaponComponent_add(components, i, 4.0, 100, 1, 0.25, 0.0, 0.0, 2.0);
+    // ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
+    ItemComponent_add(components, i, 0);
 }
 
 

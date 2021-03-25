@@ -15,6 +15,7 @@
 
 
 static const char* IMAGES[] = {
+    "axe",
     "blood",
     "blood_large",
     "board_tile",
