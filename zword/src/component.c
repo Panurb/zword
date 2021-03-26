@@ -389,7 +389,7 @@ void VehicleComponent_remove(ComponentData* components, int entity) {
 
 WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, 
                                      int magazine, float recoil_up, float recoil_down, float max_recoil,
-                                     float range) {
+                                     float range, float reload_time) {
     WeaponComponent* weapon = malloc(sizeof(WeaponComponent));
     weapon->cooldown = 0.0;
     weapon->fire_rate = fire_rate;
@@ -399,10 +399,14 @@ WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, floa
     weapon->damage = damage;
     weapon->max_magazine = magazine;
     weapon->magazine = magazine;
+    if (magazine == -1) {
+        weapon->magazine = 1;
+    }
     weapon->max_recoil = max_recoil;
-    weapon->reload_time = 2.0;
+    weapon->reload_time = reload_time;
     weapon->reloading = false;
     weapon->range = range;
+    weapon->sound_range = range;
 
     weapon->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(weapon->shape, 20);

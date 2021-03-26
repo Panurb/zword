@@ -26,6 +26,10 @@ int get_akimbo(ComponentData* components, int entity) {
 void reload(ComponentData* component, int i) {
     WeaponComponent* weapon = component->weapon[i];
 
+    if (weapon->max_magazine == -1) {
+        return;
+    }
+
     int akimbo = get_akimbo(component, i);
 
     if (weapon->reloading) {
@@ -51,7 +55,9 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
     if (weapon->magazine > 0) {
         if (weapon->cooldown == 0.0) {
             weapon->cooldown = 1.0 / ((1 + akimbo) * weapon->fire_rate);
-            weapon->magazine--;
+            if (weapon->max_magazine != -1) {
+                weapon->magazine--;
+            }
 
             float angle = randf(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
             sfVector2f r = polar_to_cartesian(1.0, get_angle(components, parent) +  angle);
@@ -96,7 +102,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             }
 
             int entities[100];
-            get_entities(components, grid, pos, 20.0, entities);
+            get_entities(components, grid, pos, weapon->sound_range, entities);
 
             for (int i = 0; i < 100; i++) {
                 int j = entities[i];
@@ -131,7 +137,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
-    WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI, 25.0);
+    WeaponComponent_add(components, i, 4.0, 20, 12, 0.25, 0.75, 0.25 * M_PI, 25.0, 2.0);
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
@@ -146,7 +152,7 @@ void create_axe(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.5, 0.5, ITEMS);
     ImageComponent_add(components, i, "axe", 2.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
-    WeaponComponent_add(components, i, 4.0, 100, 1, 0.25, 0.0, 0.0, 2.0);
+    WeaponComponent_add(components, i, 2.0, 100, -1, 0.25, 0.0, 0.0, 2.0, 0.5);
     // ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 0);
 }
