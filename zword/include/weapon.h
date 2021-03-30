@@ -14,6 +14,6 @@ void create_pistol(ComponentData* component, sfVector2f position);
 
 void create_axe(ComponentData* component, sfVector2f position);
 
-void create_lasersight(ComponentData* component, float x, float y);
+void create_lasersight(ComponentData* component, sfVector2f pos);
 
 void update_weapons(ComponentData* components, float time_step);

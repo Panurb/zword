@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include <SFML/System/Vector2.h>
 #include <SFML/Graphics.h>
 
@@ -90,3 +92,5 @@ float lerp(float a, float b, float t);
 float smoothstep(float x, float mu, float nu);
 
 int binary_search_filename(Filename filename, char** array, int size);
+
+bool non_zero(sfVector2f v);

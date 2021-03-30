@@ -13,7 +13,9 @@ void create_car(ComponentData* components, sfVector2f pos) {
 
     CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
-    PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0)->max_angular_speed = 2.5;
+    PhysicsComponent* phys = PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0);
+    phys->max_angular_speed = 2.5;
+    phys->drag_sideways = 50.0;
     VehicleComponent_add(components, i, 100.0);
     // WaypointComponent_add(components, i);
     ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
@@ -129,13 +131,9 @@ void drive_vehicle(ComponentData* components, int p, sfVector2f v, float time_st
         }
     }
 
-    if (norm(phys->velocity) > 1.2) {
+    if (phys->speed > 1.5) {
         phys->angular_acceleration -= sign(v.y + 0.1) * vehicle->turning * v.x;
     }
-
-    sfVector2f v_new = rotate(phys->velocity, phys->angular_velocity * time_step);
-
-    phys->acceleration = sum(phys->acceleration, mult(1.0 / time_step, diff(v_new, phys->velocity)));
 
     vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
 

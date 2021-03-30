@@ -45,6 +45,7 @@ typedef struct {
     float friction;
     float bounce;
     float drag;
+    float drag_sideways;
     float speed;
     float max_speed;
     float angular_drag;

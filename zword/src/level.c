@@ -181,7 +181,7 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent* col = ColliderComponent_add_circle(components, i, size, TREES);
+    ColliderComponent_add_circle(components, i, size, TREES);
 
     if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
         destroy_entity(components, i);
@@ -195,7 +195,7 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
 void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent* col = ColliderComponent_add_circle(components, i, 1.4 * size, TREES);
+    ColliderComponent_add_circle(components, i, 1.4 * size, TREES);
 
     if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
         destroy_entity(components, i);
@@ -292,6 +292,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     for (int i = -width; i <= width; i++) {
         for (int j = -height; j <= height; j++) {
+            if (i == 0 && j == 0) continue;
+            
             sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
 
             float f = randf(0.0, 0.75);

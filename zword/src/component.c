@@ -126,6 +126,7 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     phys->friction = friction;
     phys->bounce = bounce;
     phys->drag = drag;
+    phys->drag_sideways = drag;
     phys->speed = 0.0;
     phys->max_speed = 20.0;
     phys->angular_drag = angular_drag;

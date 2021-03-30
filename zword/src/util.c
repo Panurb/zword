@@ -226,3 +226,7 @@ int binary_search_filename(Filename filename, char** array, int size) {
 
     return -1;
 }
+
+bool non_zero(sfVector2f v) {
+    return (v.x != 0.0f || v.y != 0.0f);
+}

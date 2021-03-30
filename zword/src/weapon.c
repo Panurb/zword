@@ -158,11 +158,8 @@ void create_axe(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_lasersight(ComponentData* components, float x, float y) {
+void create_lasersight(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-
-    sfVector2f pos = { x, y };
-
     CoordinateComponent_add(components, i, pos, rand_angle());
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);

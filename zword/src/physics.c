@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <math.h>
 
 #include <SFML/System/Vector2.h>
@@ -50,11 +52,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
 
-        physics->collision.collided = false;
-        physics->collision.overlap = zeros();
-        physics->collision.velocity = zeros();
-
-        if (ColliderComponent_get(components, i) && (delta_pos.x != 0.0 || delta_pos.y != 0.0)) {
+        if (ColliderComponent_get(components, i) && non_zero(delta_pos)) {
             clear_grid(components, collision_grid, i);
             coord->position = sum(coord->position, delta_pos);
             update_grid(components, collision_grid, i);
@@ -62,7 +60,12 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
             coord->position = sum(coord->position, delta_pos);
         }
 
-        physics->acceleration = diff(physics->acceleration, mult(physics->drag, normalized(physics->velocity)));
+        sfVector2f v_hat = normalized(physics->velocity);
+        sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
+        sfVector2f v_sideways = diff(v_hat, v_forward);
+        sfVector2f a = sum(mult(physics->drag, v_forward), mult(physics->drag_sideways, v_sideways));
+
+        physics->acceleration = diff(physics->acceleration, a);
 
         physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
 
@@ -90,7 +93,15 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
         } else if (angular_speed > physics->max_angular_speed) {
             physics->angular_velocity = physics->max_angular_speed * sign(physics->angular_velocity);
         }
+
+        if (physics->collision.collided) {
+            physics->angular_velocity = 0.0;
+        }
         
         physics->angular_acceleration = 0.0;
+
+        physics->collision.collided = false;
+        physics->collision.overlap = zeros();
+        physics->collision.velocity = zeros();
     }
 }
