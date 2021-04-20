@@ -200,6 +200,7 @@ typedef struct {
     bool reloading;
     float range;
     float sound_range;
+    float spread;
     sfConvexShape* shape;   // move to player?
 } WeaponComponent;
 

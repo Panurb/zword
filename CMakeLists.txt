@@ -21,6 +21,7 @@ set(SOURCES
     zword/src/interface.c
     zword/src/level.c
     zword/src/light.c
+    zword/src/list.c
     zword/src/navigation.c
     zword/src/particle.c
     zword/src/perlin.c

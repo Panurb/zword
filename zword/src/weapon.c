@@ -59,6 +59,15 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 weapon->magazine--;
             }
 
+            if (weapon->spread > 0.0f) {
+                int entities[100];
+                get_entities(components, grid, get_position(components, entity), weapon->range, entities);
+                for (int i = 0; i < 100; i++) {
+                    if (entities[i] == -1) break;
+                    
+                }
+            }
+
             float angle = randf(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
             sfVector2f r = polar_to_cartesian(1.0, get_angle(components, parent) +  angle);
 

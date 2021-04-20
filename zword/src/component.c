@@ -432,6 +432,7 @@ WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, floa
     weapon->reloading = false;
     weapon->range = range;
     weapon->sound_range = range;
+    weapon->spread = 0.0;
 
     weapon->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(weapon->shape, 20);

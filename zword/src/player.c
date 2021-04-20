@@ -20,6 +20,7 @@
 #include "item.h"
 #include "image.h"
 #include "input.h"
+#include "particle.h"
 
 
 void create_player(ComponentData* components, sfVector2f pos, int joystick) {
@@ -30,7 +31,7 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.0, 10.0, 0.0)->max_speed = 5.0;
     ColliderComponent_add_circle(components, i, 0.5, PLAYERS);
     PlayerComponent_add(components, i, joystick);
-    ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, get_color(0.78, 0.0, 0.0, 1.0), sfRed);
+    ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i)->range = 12.0;
     HealthComponent_add(components, i, 100);
     SoundComponent_add(components, i, "squish");
@@ -326,6 +327,15 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             case PLAYER_DEAD:;
+                ColliderComponent* col = ColliderComponent_get(components, i);
+                if (col) {
+                    col->group = ITEMS;
+                    if (phys->speed == 0.0) {
+                        clear_grid(components, grid, i);
+                        ColliderComponent_remove(components, i);
+                    }
+                }
+
                 ImageComponent* image = ImageComponent_get(components, i);
                 strcpy(image->filename, "player_dead");
                 image->width = 2.0;
