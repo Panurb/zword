@@ -11,7 +11,7 @@
 #define MAX_PATH_LENGTH 50
 
 
-bool a_star(ComponentData* component, int start, int goal, int* path);
+bool a_star(ComponentData* component, int start, int goal, List* path);
 
 void init_waypoints(ComponentData* components, ColliderGrid* grid);
 

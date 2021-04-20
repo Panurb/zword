@@ -37,12 +37,19 @@ void List_remove(List* list, int value) {
 }
 
 
-void List_delete(List* list) {
+void List_clear(List* list) {
     ListNode* current = list->head;
     while (current) {
         ListNode* next = current->next;
         free(current);
         current = next;
     }
+    list->head = NULL;
+    list->size = 0;
+}
+
+
+void List_delete(List* list) {
+    List_clear(list);
     free(list);
 }

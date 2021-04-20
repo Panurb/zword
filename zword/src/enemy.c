@@ -95,12 +95,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
             case INVESTIGATE:
                 break;
             case CHASE:
-                ;
-                a_star(components, enemy->target, i, enemy->path);
+                a_star(components, i, enemy->target, enemy->path);
 
                 sfVector2f r;
-                if (enemy->path[1] != -1) {
-                    r = diff(get_position(components, enemy->path[1]), get_position(components, i));
+                if (enemy->path->size > 1) {
+                    r = diff(get_position(components, enemy->path->head->next->value), get_position(components, i));
                 } else {
                     r = diff(get_position(components, enemy->target), get_position(components, i));
                 }
@@ -155,14 +154,16 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
         EnemyComponent* enemy = EnemyComponent_get(components, i);
         if (!enemy) continue;
 
-        for (int j = 0; j < MAX_PATH_LENGTH; j++) {
-            if (enemy->path[j + 1] == -1) break;
-
-            draw_line(window, components, camera, NULL, get_position(components, enemy->path[j]), get_position(components, enemy->path[j + 1]), 0.05, sfRed);
+        for (ListNode* current = enemy->path->head; current; current = current->next) {
+            if (current->next) {
+                sfVector2f start = get_position(components, current->value);
+                sfVector2f end = get_position(components, current->next->value);
+                draw_line(window, components, camera, NULL, start, end, 0.05, sfRed);
+            }
         }
 
-        if (enemy->path[1] != -1) {
-            draw_circle(window, components, camera, NULL, get_position(components, enemy->path[1]), 0.1, sfGreen);
-        }
+        // if (enemy->path[1] != -1) {
+        //     draw_circle(window, components, camera, NULL, get_position(components, enemy->path[1]), 0.1, sfGreen);
+        // }
     }
 }

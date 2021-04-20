@@ -6,6 +6,7 @@
 #include <SFML/Audio.h>
 
 #include "util.h"
+#include "list.h"
 
 #define MAX_ENTITIES 10000
 #define MAX_NEIGHBORS 50
@@ -145,7 +146,7 @@ typedef struct {
     EnemyState state;
     float acceleration;
     int target;
-    int path[MAX_PATH_LENGTH];
+    List* path;
     float fov;
     float vision_range;
 } EnemyComponent;

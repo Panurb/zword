@@ -306,9 +306,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     enemy->state = IDLE;
     enemy->acceleration = 15.0;
     enemy->target = -1;
-    for (int i = 0; i < MAX_PATH_LENGTH; i++) {
-        enemy->path[i] = -1;
-    }
+    enemy->path = List_create();
     enemy->fov = 0.25 * M_PI;
     enemy->vision_range = 15.0;
 
@@ -325,7 +323,9 @@ EnemyComponent* EnemyComponent_get(ComponentData* components, int entity) {
 
 
 void EnemyComponent_remove(ComponentData* components, int entity) {
-    free(EnemyComponent_get(components, entity));
+    EnemyComponent* enemy = EnemyComponent_get(components, entity);
+    List_delete(enemy->path);
+    free(enemy);
     components->enemy[entity] = NULL;
 }
 

@@ -13,12 +13,10 @@
 #define INFINITY 10000.0
 
 
-void reconstruct_path(ComponentData* component, int current, int* path) {
-    int i = 0;
+void reconstruct_path(ComponentData* component, int current, List* path) {
     while(current != -1) {
-        path[i] = current;
+        List_add(path, current);
         current = component->waypoint[current]->came_from;
-        i++;
     }
 }
 
@@ -28,14 +26,12 @@ float heuristic(ComponentData* component, int start, int goal) {
 }
 
 
-bool a_star(ComponentData* component, int start, int goal, int* path) {
+bool a_star(ComponentData* component, int start, int goal, List* path) {
     Heap* open_set = Heap_create(component);
 
     Heap_insert(open_set, start);
 
-    for (int i = 0; i < MAX_PATH_LENGTH; i++) {
-        path[i] = -1;
-    }
+    List_clear(path);
 
     for (int i = 0; i < component->entities; i++) {
         if (component->waypoint[i]) {

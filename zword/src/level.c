@@ -113,7 +113,7 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_light(components, diff(pos, mult(0.51, diff(w, h))));
 
     create_pistol(components, sum(pos, mult(0.51, diff(w, h))));
-    create_flashlight(components, diff(pos, mult(0.51, diff(w, h))));
+    // create_flashlight(components, diff(pos, mult(0.51, diff(w, h))));
 
     create_waypoint(components, sum(pos, mult(0.75, w)));
     create_waypoint(components, sum(pos, mult(1.5, w)));
@@ -315,7 +315,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     start = zeros();
     create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), -1);
-    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
+    // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
     create_car(components, start);
     create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
     create_pistol(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
