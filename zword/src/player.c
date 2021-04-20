@@ -188,8 +188,6 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 }
 
                 sfVector2f pos = get_position(components, i);
-                int entities[100];
-                get_entities(components, grid, pos, 1.0, entities);
 
                 if (player->target != -1) {
                     ImageComponent_get(components, player->target)->outline = 0.0;
@@ -197,8 +195,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 player->target = -1;
 
                 float min_dist = 9999.0;
-                for (int j = 0; j < 100; j++) {
-                    int k = entities[j];
+
+                List* list = get_entities(components, grid, pos, 1.0);
+                for (ListNode* current = list->head; current != NULL; current = current->next) {
+                    int k = current->value;
                     if (k == -1) break;
                     if (!ItemComponent_get(components, k)) continue;
                     if (CoordinateComponent_get(components, k)->parent != -1) continue;

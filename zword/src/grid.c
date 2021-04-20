@@ -7,6 +7,7 @@
 #include "util.h"
 #include "camera.h"
 #include "level.h"
+#include "list.h"
 
 
 ColliderGrid* ColliderGrid_create() {
@@ -50,15 +51,16 @@ Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
 }
 
 
-void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius, int entities[100]) {
+List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius) {
+    List* list = List_create();
+
     static int id = 2 * MAX_ENTITIES;
     id = (id < 3 * MAX_ENTITIES) ? id + 1 : 2 * MAX_ENTITIES;
 
-    float x = (origin.x + 0.5 * grid->width) / grid->tile_width;
-    float y = (origin.y + 0.5 * grid->height) / grid->tile_height;
+    float x = (origin.x + 0.5f * grid->width) / grid->tile_width;
+    float y = (origin.y + 0.5f * grid->height) / grid->tile_height;
     float r = radius / grid->tile_width;
 
-    int l = 0;
     for (int i = max(0, x - r); i <= min(grid->columns - 1, x + r); i++) {
         for (int j = max(0, y - r); j <= min(grid->rows - 1, y + r); j++) {
             for (int k = 0; k < grid->tile_size; k++) {
@@ -69,15 +71,14 @@ void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f orig
                 ColliderComponent* col = ColliderComponent_get(components, n);
                 if (col->last_collision == id) continue;
 
-                entities[l] = n;
-                l++;
+                List_append(list, n);
 
                 col->last_collision = id;
             }
         }
     }
 
-    entities[l] = -1;
+    return list;
 }
 
 

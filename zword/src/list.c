@@ -3,35 +3,38 @@
 #include "list.h"
 
 
-List* List_create(int value) {
-    List* head = malloc(sizeof(List));
-    head->value = value;
-    head->next = NULL;
-    return head;
+List* List_create() {
+    List* list = malloc(sizeof(List));
+    list->head = NULL;
+    list->size = 0;
+    return list;
 }
 
 
-void List_append(List* head, int value) {
-    List* new = malloc(sizeof(List));
+void List_append(List* list, int value) {
+    ListNode* new = malloc(sizeof(List));
     new->value = value;
     new->next = NULL;
 
-    List* current = head;
-    while (1) {
-        if (!current->next) {
-            current->next = new;
-            break;
+    if (list->head) {
+        ListNode* current = list->head;
+        while (current->next) {
+            current = current->next;
         }
-        current = current->next;
+        current->next = new;
+    } else {
+        list->head = new;
     }
+    list->size++;
 }
 
 
-void List_delete(List* head) {
-    List* current = head;
+void List_delete(List* list) {
+    ListNode* current = list->head;
     while (current) {
-        List* next = current->next;
+        ListNode* next = current->next;
         free(current);
         current = next;
     }
+    free(list);
 }

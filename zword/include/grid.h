@@ -2,6 +2,7 @@
 
 #include "component.h"
 #include "camera.h"
+#include "list.h"
 
 
 #define CHUNK_WIDTH 32
@@ -31,7 +32,7 @@ typedef struct {
 
 ColliderGrid* ColliderGrid_create();
 
-void get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius, int entities[100]);
+List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius);
 
 void update_grid(ComponentData* component, ColliderGrid* grid, int i);
 

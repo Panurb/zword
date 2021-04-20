@@ -160,12 +160,9 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid) {
         WaypointComponent* waypoint = WaypointComponent_get(components, i);
         if (!waypoint) continue;
 
-        int entities[100];
-        get_entities(components, grid, get_position(components, i), waypoint->range, entities);
-
-        for (int j = 0; j < 100; j++) {
-            int n = entities[j];
-            if (n == -1) break;
+        List* list = get_entities(components, grid, get_position(components, i), waypoint->range);
+        for (ListNode* current = list->head; current != NULL; current = current->next) {
+            int n = current->value;
             if (n == i) continue;
             if (!PhysicsComponent_get(components, n)) continue;
 
@@ -187,6 +184,8 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid) {
                 }
             }
         }
+
+        List_delete(list);
     }
 }
 

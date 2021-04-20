@@ -60,12 +60,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             }
 
             if (weapon->spread > 0.0f) {
-                int entities[100];
-                get_entities(components, grid, get_position(components, entity), weapon->range, entities);
-                for (int i = 0; i < 100; i++) {
-                    if (entities[i] == -1) break;
-                    
-                }
+                get_entities(components, grid, get_position(components, entity), weapon->range);
             }
 
             float angle = randf(-0.5 * weapon->recoil, 0.5 * weapon->recoil);
@@ -110,11 +105,9 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 particle->enabled = true;
             }
 
-            int entities[100];
-            get_entities(components, grid, pos, weapon->sound_range, entities);
-
-            for (int i = 0; i < 100; i++) {
-                int j = entities[i];
+            List* list = get_entities(components, grid, pos, weapon->sound_range);
+            for (ListNode* current = list->head; current != NULL; current = current->next) {
+                int j = current->value;
                 if (j == -1) break;
 
                 EnemyComponent* enemy = EnemyComponent_get(components, j);
@@ -123,6 +116,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     enemy->state = CHASE;
                 }
             }
+            List_delete(list);
 
             LightComponent* light = LightComponent_get(components, entity);
             if (light) {
