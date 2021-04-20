@@ -92,6 +92,20 @@ typedef enum {
 } PlayerState;
 
 typedef struct {
+    int joystick;
+    int buttons[12];
+    bool buttons_down[12];
+    bool buttons_pressed[12];
+    bool buttons_released[12];
+    int axes[8];
+    sfVector2f left_stick;
+    sfVector2f right_stick;
+    sfVector2f dpad;
+    float left_trigger;
+    float right_trigger;
+} Controller;
+
+typedef struct {
     int target;
     float acceleration;
     int vehicle;
@@ -102,6 +116,7 @@ typedef struct {
     PlayerState state;
     sfConvexShape* shape;
     sfRectangleShape* line;
+    Controller controller;
 } PlayerComponent;
 
 typedef struct {
@@ -283,7 +298,7 @@ ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, in
 ColliderComponent* ColliderComponent_get(ComponentData* components, int entity);
 void ColliderComponent_remove(ComponentData* components, int entity);
 
-PlayerComponent* PlayerComponent_add(ComponentData* components, int entity);
+PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int joystick);
 PlayerComponent* PlayerComponent_get(ComponentData* components, int entity);
 void PlayerComponent_remove(ComponentData* components, int entity);
 

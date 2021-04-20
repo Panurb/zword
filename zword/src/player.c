@@ -19,16 +19,17 @@
 #include "vehicle.h"
 #include "item.h"
 #include "image.h"
+#include "input.h"
 
 
-void create_player(ComponentData* components, sfVector2f pos) {
+void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
     ImageComponent_add(components, i, "player", 1.0, 1.0, 5);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.0, 10.0, 0.0)->max_speed = 5.0;
     ColliderComponent_add_circle(components, i, 0.5, PLAYERS);
-    PlayerComponent_add(components, i);
+    PlayerComponent_add(components, i, joystick);
     ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.5, 0.0, 5.0, 10.0, get_color(0.78, 0.0, 0.0, 1.0), sfRed);
     WaypointComponent_add(components, i)->range = 12.0;
     HealthComponent_add(components, i, 100);
@@ -36,57 +37,26 @@ void create_player(ComponentData* components, sfVector2f pos) {
 }
 
 
-sfVector2f left_stick() {
-    sfVector2f v = zeros();
-
-    if (sfKeyboard_isKeyPressed(sfKeyA)) {
-        v.x -= 1;
-    }
-
-    if (sfKeyboard_isKeyPressed(sfKeyD)) {
-        v.x += 1;
-    }
-
-    if (sfKeyboard_isKeyPressed(sfKeyW)) {
-        v.y += 1;
-    }
-
-    if (sfKeyboard_isKeyPressed(sfKeyS)) {
-        v.y -= 1;
-    }
-
-    return normalized(v);
-}
-
-
-sfVector2f right_stick(ComponentData* components, sfRenderWindow* window, int camera, int i) {
-    sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
-    sfVector2f rel_mouse = diff(mouse, get_position(components, i));
-
-    return normalized(rel_mouse);
-}
-
-
-int get_inventory_slot(ComponentData* components, sfRenderWindow* window, int camera, int i) {
+int get_inventory_slot(ComponentData* components, int i) {
     PlayerComponent* player = PlayerComponent_get(components, i);
 
-    sfVector2f rs = right_stick(components, window, camera, i);
+    sfVector2f rs = player->controller.right_stick;
     float angle = mod(polar_angle(rs) + 0.25 * M_PI, 2 * M_PI);
 
     return floor(player->inventory_size * angle / (2 * M_PI));
 }
 
 
-int get_attachment(ComponentData* components, sfRenderWindow* window, int camera, int i) {
+int get_attachment(ComponentData* components, int i) {
     PlayerComponent* player = PlayerComponent_get(components, i);
-    int slot = get_inventory_slot(components, window, camera, i);
+    int slot = get_inventory_slot(components, i);
     int item = player->inventory[slot];
 
     if (item != -1) {
         int size = components->item[item]->size;
         if (size > 0) {
             float slot_angle = 2 * M_PI / player->inventory_size;
-            sfVector2f rs = right_stick(components, window, camera, i);
+            sfVector2f rs = player->controller.right_stick;
             float angle = polar_angle(rs) + 0.25 * M_PI;
             angle = mod(angle, slot_angle);
 
@@ -98,80 +68,84 @@ int get_attachment(ComponentData* components, sfRenderWindow* window, int camera
 }
 
 
-void input(ComponentData* component) {
-    for (int i = 0; i < component->entities; i++) {
-        PlayerComponent* player = PlayerComponent_get(component, i);
+void input(ComponentData* components, sfRenderWindow* window, int camera) {
+    for (int i = 0; i < components->entities; i++) {
+        PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
+
+        update_controller(components, window, camera, i);
+        Controller controller = player->controller;
 
         switch (player->state) {
             case ON_FOOT:
-                if (sfKeyboard_isKeyPressed(sfKeySpace)) {
+                if (controller.buttons_down[BUTTON_LB]) {
                     player->state = MENU;
                 }
 
-                if (sfMouse_isButtonPressed(sfMouseRight)) {
-                    pick_up_item(component, i);
+                if (controller.buttons_pressed[BUTTON_RB]) {
+                    pick_up_item(components, i);
                 }
 
-                if (sfMouse_isButtonPressed(sfMouseLeft)) {
+                if (controller.buttons_pressed[BUTTON_RT]) {
                     player->state = SHOOT;
                 }
 
-                if (sfKeyboard_isKeyPressed(sfKeyR)) {
-                    if (component->weapon[player->inventory[player->item]]) {
+                if (controller.buttons_pressed[BUTTON_X]) {
+                    WeaponComponent* weapon = WeaponComponent_get(components, player->inventory[player->item]);
+                    if (weapon) {
                         player->state = RELOAD;
                     }
                 }
 
-                if (sfKeyboard_isKeyPressed(sfKeyF)) {
-                    if (enter_vehicle(component, i)) {
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    if (enter_vehicle(components, i)) {
                         player->state = DRIVE;
                     }
                 }
 
                 break;
             case SHOOT:
-                if (!sfMouse_isButtonPressed(sfMouseLeft)) {
+                if (!controller.buttons_down[BUTTON_RT]) {
                     player->state = ON_FOOT;
                 }
 
                 break;
             case RELOAD:
-                if (sfKeyboard_isKeyPressed(sfKeySpace)) {
+                if (controller.buttons_down[BUTTON_LB]) {
                     player->state = MENU;
                 }
 
                 break;
             case DRIVE:
-                if (sfKeyboard_isKeyPressed(sfKeyE)) {
-                    exit_vehicle(component, i);
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    exit_vehicle(components, i);
 
                     player->state = ON_FOOT;
                 }
 
                 break;
             case MENU:
-                if (sfMouse_isButtonPressed(sfMouseLeft)) {
+                if (controller.buttons_pressed[BUTTON_RT]) {
                     player->state = MENU_GRAB;
                 }
 
-                if (!sfKeyboard_isKeyPressed(sfKeySpace)) {
+                if (!controller.buttons_down[BUTTON_LB]) {
                     player->state = ON_FOOT;
                 }
 
-                if (sfMouse_isButtonPressed(sfMouseRight)) {
-                    drop_item(component, i);
+                if (controller.buttons_pressed[BUTTON_RB]) {
+                    drop_item(components, i);
                 }
 
                 break;
             case MENU_GRAB:
-                if (!sfMouse_isButtonPressed(sfMouseLeft)) {
+                if (controller.buttons_released[BUTTON_RT]) {
                     player->state = MENU_DROP;
                 }
 
                 break;
             case MENU_DROP:
-                if (sfKeyboard_isKeyPressed(sfKeySpace)) {
+                if (controller.buttons_down[BUTTON_LB]) {
                     player->state = MENU;
                 } else {
                     player->state = ON_FOOT;
@@ -185,16 +159,17 @@ void input(ComponentData* component) {
 }
 
 
-void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera, float time_step) {
+void update_players(ComponentData* components, ColliderGrid* grid, float time_step) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
 
         PhysicsComponent* phys = components->physics[i];
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
-        sfVector2f v = left_stick();
-        int slot = get_inventory_slot(components, window, camera, i);
-        int atch = get_attachment(components, window, camera, i);
+        sfVector2f left_stick = player->controller.left_stick;
+        sfVector2f right_stick = player->controller.right_stick;
+        int slot = get_inventory_slot(components, i);
+        int atch = get_attachment(components, i);
 
         int item = player->inventory[player->item];
         WeaponComponent* weapon = WeaponComponent_get(components, item);
@@ -206,8 +181,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
         
         switch (player->state) {
             case ON_FOOT:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
-                coord->angle = polar_angle(right_stick(components, window, camera, i));
+                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+                if (non_zero(right_stick)) {
+                    coord->angle = polar_angle(right_stick);
+                }
 
                 sfVector2f pos = get_position(components, i);
                 int entities[100];
@@ -238,8 +215,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
 
                 break;
             case SHOOT:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
-                coord->angle = polar_angle(right_stick(components, window, camera, i));
+                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+                if (non_zero(right_stick)) {
+                    coord->angle = polar_angle(right_stick);
+                }
 
                 if (weapon) {
                     shoot(components, grid, item);
@@ -254,8 +233,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
 
                 break;
             case RELOAD:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
-                coord->angle = polar_angle(right_stick(components, window, camera, i));
+                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+                if (non_zero(right_stick)) {
+                    coord->angle = polar_angle(right_stick);
+                }
 
                 if (weapon) {
                     reload(components, item);
@@ -267,11 +248,16 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
 
                 break;
             case DRIVE:
-                drive_vehicle(components, i, v, time_step);
+                if (player->controller.joystick == -1) {
+                    drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x), time_step);
+                } else {
+                    float gas = player->controller.right_trigger - player->controller.left_trigger;
+                    drive_vehicle(components, i, gas, left_stick.x, time_step);
+                }
 
                 break;
             case MENU:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, v));
+                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
                 
                 if (light) {
                     light->enabled = false;
@@ -289,7 +275,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, sfRenderWindo
                     }
                 }
 
-                player->item = get_inventory_slot(components, window, camera, i);
+                player->item = get_inventory_slot(components, i);
 
                 int new_item = player->inventory[player->item];
                 if (new_item != item) {
@@ -378,7 +364,7 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
         sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
 
         if (i == player->grabbed_item) {
-            r = mult(2.5, right_stick(components, window, camera, entity));
+            r = mult(2.5, player->controller.right_stick);
         }
 
         draw_sprite(window, components, camera, sprite, sum(pos, r), 0.0, ones(), 0);
@@ -411,7 +397,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
         sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + (atch + 1.5) * slice / (item->size + 1));
 
         if (a == player->grabbed_item) {
-            r = mult(2.5, right_stick(components, window, camera, entity));
+            r = mult(2.5, player->controller.right_stick);
         }
 
         draw_sprite(window, components, camera, sprite, sum(pos, r), 0.0, mult(0.75, ones()), 0);
@@ -426,8 +412,8 @@ void draw_players(ComponentData* components, sfRenderWindow* window, int camera)
 
         sfVector2f pos = get_position(components, i);
 
-        int slot = get_inventory_slot(components, window, camera, i);
-        int atch = get_attachment(components, window, camera, i);
+        int slot = get_inventory_slot(components, i);
+        int atch = get_attachment(components, i);
 
         int item = player->inventory[player->item];
         WeaponComponent* weapon = NULL;
@@ -443,7 +429,7 @@ void draw_players(ComponentData* components, sfRenderWindow* window, int camera)
                     sfConvexShape_setOutlineThickness(weapon->shape, 0.02 * cam->zoom);
 
                     float spread = fmax(0.01, weapon->recoil);
-                    draw_cone(window, components, camera, weapon->shape, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
+                    // draw_cone(window, components, camera, weapon->shape, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
                 }
 
                 break;

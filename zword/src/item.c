@@ -40,8 +40,11 @@ void pick_up_item(ComponentData* components, int entity) {
         coord->parent = entity;
         coord->position = (sfVector2f) { 0.75, 0.0 };
         coord->angle = 0.0;
-        ImageComponent_get(components, player->target)->alpha = 0.0;
         ColliderComponent_get(components, player->target)->enabled = false;
+
+        if (player->item != i) {
+            ImageComponent_get(components, player->target)->alpha = 0.0;
+        }
     }
 }
 

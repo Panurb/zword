@@ -38,6 +38,7 @@ int main() {
     // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
     bool focus = true;
+    sfJoystick_update();
     
     sfTexture* textures = load_textures();
     sfSoundBuffer* sounds = load_sounds();
@@ -98,13 +99,14 @@ int main() {
             while (elapsed_time > time_step) {
                 elapsed_time -= time_step;
 
-                input(components);
+                sfJoystick_update();
+                input(components, window, camera);
 
                 update(components, time_step, grid);
                 collide(components, grid);
                 update_waypoints(components, grid);
 
-                update_players(components, grid, window, camera, time_step);
+                update_players(components, grid, time_step);
                 update_weapons(components, time_step);
                 update_enemies(components, grid);
 

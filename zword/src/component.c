@@ -194,7 +194,7 @@ void ColliderComponent_remove(ComponentData* components, int entity) {
 }
 
 
-PlayerComponent* PlayerComponent_add(ComponentData* components, int entity) {
+PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int joystick) {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->target = -1;
     player->acceleration = 20.0;
@@ -211,6 +211,30 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity) {
     sfConvexShape_setPointCount(player->shape, 4);
 
     player->line = sfRectangleShape_create();
+    player->controller.joystick = joystick;
+
+    if (joystick == -1) {
+        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeySpace, -1, sfKeyEscape, sfKeyEnter, sfKeyZ, sfKeyX, -1, -1 };
+        memcpy(player->controller.buttons, buttons, sizeof(buttons));
+    } else if (strstr(sfJoystick_getIdentification(joystick).name, "Xbox")) {
+        int buttons[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9 };
+        memcpy(player->controller.buttons, buttons, sizeof(buttons));
+        int axes[8] = { 0, 1, 4, 5, 2, 2, 6, 7 };
+        memcpy(player->controller.axes, axes, sizeof(axes));
+    } else {
+        int buttons[12] = { 1, 2, 0, 3, 4, 5, 9, 8, 10, 11, 6, 7 };
+        memcpy(player->controller.buttons, buttons, sizeof(buttons));
+        int axes[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+        memcpy(player->controller.axes, axes, sizeof(axes));
+    }
+
+    for (int i = 0; i < 12; i++) {
+        player->controller.buttons_down[i] = false;
+        player->controller.buttons_pressed[i] = false;
+        player->controller.buttons_released[i] = false;
+    }
+
+
 
     components->player.array[entity] = player;
     components->player.order[components->player.size] = entity;

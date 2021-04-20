@@ -102,7 +102,7 @@ void exit_vehicle(ComponentData* components, int i) {
 }
 
 
-void drive_vehicle(ComponentData* components, int p, sfVector2f v, float time_step) {
+void drive_vehicle(ComponentData* components, int p, float gas, float steering, float time_step) {
     PlayerComponent* player = PlayerComponent_get(components, p);
     int i = player->vehicle;
 
@@ -118,7 +118,7 @@ void drive_vehicle(ComponentData* components, int p, sfVector2f v, float time_st
     PhysicsComponent* phys = components->physics[i];
 
     sfVector2f r = polar_to_cartesian(1.0, components->coordinate[i]->angle);
-    sfVector2f at = mult(vehicle->acceleration * v.y, r);
+    sfVector2f at = mult(vehicle->acceleration * gas, r);
     phys->acceleration = sum(phys->acceleration, at);   
 
     if (vehicle->on_road) {
@@ -131,9 +131,7 @@ void drive_vehicle(ComponentData* components, int p, sfVector2f v, float time_st
         }
     }
 
-    if (phys->speed > 1.5) {
-        phys->angular_acceleration -= sign(v.y + 0.1) * vehicle->turning * v.x;
-    }
+    phys->angular_acceleration = -sign(gas + 0.1) * vehicle->turning * steering * steering * steering;
 
     vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
 
