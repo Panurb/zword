@@ -194,8 +194,8 @@ bool collides_with(ComponentData* components, ColliderGrid* grid, int i, Collide
 
     for (int j = bounds.left; j <= bounds.right; j++) {
         for (int k = bounds.bottom; k <= bounds.top; k++) {
-            for (int l = 0; l < grid->tile_size; l++) {
-                int n = grid->array[j][k][l];
+            for (ListNode* current = grid->array[j][k]->head; current != NULL; current = current->next) {
+                int n = current->value;
                 if (n == -1) continue;
                 if (n == i) continue;
 
@@ -238,10 +238,8 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
-                for (int l = 0; l < grid->tile_size; l++) {
-                    int n = grid->array[j][k][l];
-
-                    if (n == -1) continue;
+                for (ListNode* current = grid->array[j][k]->head; current != NULL; current = current->next) {
+                    int n = current->value;
                     if (n == i) continue;
                     ColliderComponent* collider = ColliderComponent_get(components, n);
                     if (collider->last_collision == i) continue;
@@ -289,7 +287,14 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
 void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
-        if (!ColliderComponent_get(components, i)) continue;
+        ColliderComponent* col = ColliderComponent_get(components, i);
+        if (!col) continue;
+
+        sfVector2f pos = get_position(components, i);
+        float r = col->radius;
+        if (!on_screen(components, camera, pos, r, r)) {
+            continue;
+        }
 
         Bounds bounds = get_bounds(components, grid, i);
         for (int j = bounds.left; j <= bounds.right; j++) {

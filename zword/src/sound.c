@@ -119,7 +119,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
 
             sfSound* channel = channels[chan];
 
-            sfSound_setPosition(channel, (sfVector3f) { r.x, 0.0, r.y });
+            // sfSound_setPosition(channel, (sfVector3f) { r.x, 0.0, r.y });
             sfSound_setVolume(channel, event->volume * 100.0);
             sfSound_setPitch(channel, event->pitch);
 

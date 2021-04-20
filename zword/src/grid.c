@@ -22,9 +22,7 @@ ColliderGrid* ColliderGrid_create() {
 
     for (int i = 0; i < grid->columns; i++) {
         for (int j = 0; j < grid->rows; j++) {
-            for (int k = 0; k < grid->tile_size; k++) {
-                grid->array[i][j][k] = -1;
-            }
+            grid->array[i][j] = List_create();
         }
     }
 
@@ -63,15 +61,15 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
 
     for (int i = max(0, x - r); i <= min(grid->columns - 1, x + r); i++) {
         for (int j = max(0, y - r); j <= min(grid->rows - 1, y + r); j++) {
-            for (int k = 0; k < grid->tile_size; k++) {
-                int n = grid->array[i][j][k];
+            for (ListNode* current = grid->array[i][j]->head; current != NULL; current = current->next) {
+                int n = current->value;
                 if (n == -1) continue;
                 if (dist(origin, get_position(components, n)) > radius) continue;
 
                 ColliderComponent* col = ColliderComponent_get(components, n);
                 if (col->last_collision == id) continue;
 
-                List_append(list, n);
+                List_add(list, n);
 
                 col->last_collision = id;
             }
@@ -87,12 +85,7 @@ void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
 
     for (int i = bounds.left; i <= bounds.right; i++) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
-            for (int k = 0; k < grid->tile_size; k++) {
-                if (grid->array[i][j][k] == -1) {
-                    grid->array[i][j][k] = entity;
-                    break;
-                }
-            }
+            List_add(grid->array[i][j], entity);
         }
     }
 }
@@ -112,12 +105,7 @@ void clear_grid(ComponentData* components, ColliderGrid* grid, int entity) {
     
     for (int i = bounds.left; i <= bounds.right; i++) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
-            for (int k = 0; k < grid->tile_size; k++) {
-                if (grid->array[i][j][k] == entity) {
-                    grid->array[i][j][k] = -1;
-                    break;
-                }
-            }
+            List_remove(grid->array[i][j], entity);
         }
     }
 }
@@ -131,8 +119,8 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
     int l = 0;
     for (int i = bounds.left; i <= bounds.right; i++) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
-            for (int k = 0; k < grid->tile_size; k++) {
-                int n = grid->array[i][j][k];
+            for (ListNode* current = grid->array[i][j]->head; current != NULL; current = current->next) {
+                int n = current->value;
                 if (n == -1 || n == entity) continue;
 
                 ColliderComponent* col = ColliderComponent_get(components, n);

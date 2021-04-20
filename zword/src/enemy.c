@@ -124,12 +124,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 }
 
                 break;
-            case DEAD:
-                ;
+            case DEAD:;
                 ColliderComponent* col = ColliderComponent_get(components, i);
                 if (col) {
                     col->group = ITEMS;
-                    if (phys->speed == 0.0) {
+                    if (phys->speed == 0.0f) {
                         clear_grid(components, grid, i);
                         ColliderComponent_remove(components, i);
                     }

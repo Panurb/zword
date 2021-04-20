@@ -11,21 +11,29 @@ List* List_create() {
 }
 
 
-void List_append(List* list, int value) {
+void List_add(List* list, int value) {
     ListNode* new = malloc(sizeof(List));
     new->value = value;
-    new->next = NULL;
-
-    if (list->head) {
-        ListNode* current = list->head;
-        while (current->next) {
-            current = current->next;
-        }
-        current->next = new;
-    } else {
-        list->head = new;
-    }
+    new->next = list->head;
+    list->head = new;
     list->size++;
+}
+
+
+void List_remove(List* list, int value) {
+    ListNode* prev = NULL;
+    for (ListNode* current = list->head; current; current = current->next) {
+        if (current->value == value) {
+            if (current == list->head) {
+                list->head = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            free(current);
+            break;
+        }
+        prev = current;
+    }
 }
 
 

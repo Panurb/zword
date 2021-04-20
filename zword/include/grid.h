@@ -20,7 +20,7 @@ typedef struct {
 
 typedef struct {
     // Swap x and y?
-    int array[LEVEL_WIDTH * CHUNK_WIDTH][LEVEL_HEIGHT * CHUNK_HEIGHT][10];
+    List* array[LEVEL_WIDTH * CHUNK_WIDTH][LEVEL_HEIGHT * CHUNK_HEIGHT];
     int columns;
     int rows;
     int tile_size;

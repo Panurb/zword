@@ -85,8 +85,8 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
     float t_min = range;
 
     while (x > 0 && x < grid->columns && y > 0 && y < grid->rows) {
-        for (int i = 0; i < grid->tile_size; i++) {
-            int j = grid->array[x][y][i];
+        for (ListNode* current = grid->array[x][y]->head; current != NULL; current = current->next) {
+            int j = current->value;
             if (j == -1) continue;
             if (j == ignore) continue;
 
