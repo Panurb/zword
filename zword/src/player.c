@@ -196,8 +196,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 float min_dist = 9999.0;
 
-                List* list = get_entities(components, grid, pos, 1.0);
-                for (ListNode* current = list->head; current != NULL; current = current->next) {
+                List* list = get_entities(components, grid, pos, 1.0f);
+                for (ListNode* current = list->head; current; current = current->next) {
                     int k = current->value;
                     if (k == -1) break;
                     if (!ItemComponent_get(components, k)) continue;
@@ -209,9 +209,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                         min_dist = d;
                     }
                 }
+                List_delete(list);
 
                 if (player->target != -1) {
-                    ImageComponent_get(components, player->target)->outline = 0.2;
+                    ImageComponent_get(components, player->target)->outline = 0.05f;
                 }
 
                 break;

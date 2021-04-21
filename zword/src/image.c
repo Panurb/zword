@@ -106,19 +106,33 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
             image->texture_changed = false;
         }
 
-        if (image->alpha > 0.0) {
-            if (image->outline > 0.0) {
-                sfSprite_setColor(image->sprite, get_color(1.0, 1.0, 1.0, 1.0));
-                sfVector2f scale = image->scale;
-                scale.x *= (image->width + image->outline) / image->width;
-                scale.y *= (image->height + image->outline) / image->height;
-                draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), scale, 1);
-            }
+        if (image->alpha > 0.0f) {
             sfSprite_setColor(image->sprite, get_color(1.0, 1.0, 1.0, image->alpha));
             draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
         }
 
         draw_particles(components, window, camera, i);
+    }
+}
+
+
+void draw_outlines(ComponentData* components, sfRenderWindow* window, int camera) {
+    for (int j = 0; j < components->image.size; j++) {
+        int i = components->image.order[j];
+        ImageComponent* image = ImageComponent_get(components, i);
+        if (image->layer == 7) break;
+
+        sfVector2f pos = get_position(components, i);
+
+        float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
+        if (!on_screen(components, camera, pos, r, r)) {
+            continue;
+        }
+
+        if (image->outline > 0.0f) {
+            sfShader_setFloatUniform(CameraComponent_get(components, camera)->shaders[1], "offset", image->outline);
+            draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 1);
+        }
     }
 }
 

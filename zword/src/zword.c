@@ -125,6 +125,7 @@ int main() {
         draw(components, window, camera, textures);
         sfRenderWindow_drawSprite(window, light_sprite, &state);
         draw_roofs(components, window, camera, textures);
+        draw_outlines(components, window, camera);
         draw_players(components, window, camera);
 
         // debug_draw(components, window, camera);

@@ -543,7 +543,7 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
     camera->zoom = 25.0 * camera->resolution.y / 720.0;
 
     camera->shaders[0] = NULL;
-    camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "blendColor.frag");
+    camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "outline.frag");
 
     components->camera[entity] = camera;
     return camera;

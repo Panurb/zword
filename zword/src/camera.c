@@ -253,9 +253,7 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
     CameraComponent* cam = CameraComponent_get(components, camera);
 
     sfSprite_setPosition(sprite, world_to_screen(components, camera, position));
-
     sfSprite_setScale(sprite, mult(cam->zoom / PIXELS_PER_UNIT, scale));
-
     sfSprite_setRotation(sprite, -to_degrees(angle));
 
     sfFloatRect gb = sfSprite_getLocalBounds(sprite);
@@ -263,10 +261,6 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
     sfSprite_setOrigin(sprite, origin);
 
     sfShader* shader = cam->shaders[shader_index];
-    if (shader_index == 1) {
-        sfShader_setTextureUniform(shader, "texture", sfSprite_getTexture(sprite));
-        sfShader_setFloatUniform(shader, "amount", 1.0);
-    }
 
     sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, shader };
     sfRenderWindow_drawSprite(window, sprite, &state);

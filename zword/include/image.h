@@ -24,6 +24,8 @@ sfSprite* load_sprite(Filename filename, TextureArray textures);
 
 void draw(ComponentData* component, sfRenderWindow* window,  int camera, TextureArray textures);
 
+void draw_outlines(ComponentData* component, sfRenderWindow* window,  int camera);
+
 void draw_roofs(ComponentData* component, sfRenderWindow* window, int camera, TextureArray textures);
 
 void change_layer(ComponentData* components, int entity, int layer);

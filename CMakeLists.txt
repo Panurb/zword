@@ -34,6 +34,7 @@ set(SOURCES
     zword/src/zword.c
     zword/src/vehicle.c
     zword/src/weapon.c
+    zword/src/outline.frag
 )
 
 add_executable(zword ${SOURCES})
@@ -60,4 +61,12 @@ install(DIRECTORY zword/data
         PATTERN "*.png"
         PATTERN "*.ttf"
         PATTERN "*.wav"
+)
+
+set(SHADERS
+    ${CMAKE_SOURCE_DIR}/zword/src/outline.frag
+)
+
+install(FILES ${SHADERS}
+    DESTINATION ${CMAKE_SOURCE_DIR}/build
 )
