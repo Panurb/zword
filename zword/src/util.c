@@ -230,3 +230,7 @@ int binary_search_filename(Filename filename, char** array, int size) {
 bool non_zero(sfVector2f v) {
     return (v.x != 0.0f || v.y != 0.0f);
 }
+
+float clamp(float val, float min_val, float max_val) {
+    return fmaxf(fminf(val, max_val), min_val);
+}

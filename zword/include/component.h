@@ -202,7 +202,8 @@ typedef struct {
     float range;
     float sound_range;
     float spread;
-    sfConvexShape* shape;   // move to player?
+    int shots;
+    bool melee;
 } WeaponComponent;
 
 typedef struct {
@@ -320,7 +321,7 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
 VehicleComponent* VehicleComponent_get(ComponentData* components, int entity);
 void VehicleComponent_remove(ComponentData* components, int entity);
 
-WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int magazine, float recoil_up, float recoil_down, float max_recoil, float range, float reload_time);
+WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots, float spread, int magazine, float recoil, float range, float reload_time, bool melee);
 WeaponComponent* WeaponComponent_get(ComponentData* components, int entity);
 void WeaponComponent_remove(ComponentData* components, int entity);
 

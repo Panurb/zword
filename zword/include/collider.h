@@ -5,6 +5,7 @@
 #include "component.h"
 #include "camera.h"
 #include "grid.h"
+#include "raycast.h"
 
 
 static int COLLISION_MATRIX[10][10] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },    // WALLS
@@ -34,3 +35,5 @@ void collide(ComponentData* component, ColliderGrid* collision_grid);
 void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera);
 
 void debug_draw(ComponentData* component, sfRenderWindow* window, int camera);
+
+void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f dir, int dmg);

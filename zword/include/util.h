@@ -94,3 +94,5 @@ float smoothstep(float x, float mu, float nu);
 int binary_search_filename(Filename filename, char** array, int size);
 
 bool non_zero(sfVector2f v);
+
+float clamp(float val, float min_val, float max_val);

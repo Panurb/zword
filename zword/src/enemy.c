@@ -14,6 +14,7 @@
 #include "image.h"
 #include "particle.h"
 #include "sound.h"
+#include "collider.h"
 
 
 void create_enemy(ComponentData* components, sfVector2f pos) {
@@ -30,32 +31,6 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100);
     SoundComponent_add(components, i, "squish");
-}
-
-
-void damage(ComponentData* components, int entity, int dmg, int player) {
-    HealthComponent* health = components->health[entity];
-    health->health = max(0, health->health - dmg);
-
-    EnemyComponent* enemy = components->enemy[entity];
-    if (enemy) {
-        enemy->target = player;
-        enemy->state = CHASE;
-    }
-
-    int j = create_entity(components);
-    CoordinateComponent_add(components, j, get_position(components, entity), rand_angle());
-
-    if (dmg < 50) {
-        ImageComponent_add(components, j, "blood", 1.0, 1.0, 1);
-    } else {
-        ImageComponent_add(components, j, "blood_large", 2.0, 2.0, 1);
-    }
-
-    SoundComponent* scomp = SoundComponent_get(components, entity);
-    if (scomp) {
-        add_sound(components, entity, "squish", 0.5, randf(0.9, 1.1));
-    }
 }
 
 
@@ -113,7 +88,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 components->coordinate[i]->angle = polar_angle(r);
 
                 if (dist(get_position(components, enemy->target), get_position(components, i)) < 1.0) {
-                    damage(components, enemy->target, 50, -1);
+                    damage(components, enemy->target, get_position(components, enemy->target), r, 50);
                     ParticleComponent_get(components, enemy->target)->enabled = true;
                 }
 

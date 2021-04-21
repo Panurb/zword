@@ -45,7 +45,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
                             add_sound(components, i, sound->hit_sound, 1.0, 0.8);
                         }
                     }
-                    damage(components, i, 100, -1);
+                    damage(components, i, get_position(components, i), v_n, 100);
                 }
             }
         }

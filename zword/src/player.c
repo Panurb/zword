@@ -436,10 +436,9 @@ void draw_players(ComponentData* components, sfRenderWindow* window, int camera)
             case SHOOT:
                 if (weapon) {
                     CameraComponent* cam = CameraComponent_get(components, camera);
-                    sfConvexShape_setOutlineThickness(weapon->shape, 0.02 * cam->zoom);
 
                     float spread = fmax(0.01, weapon->recoil);
-                    // draw_cone(window, components, camera, weapon->shape, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
+                    // draw_cone(window, components, camera, NULL, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
                 }
 
                 break;

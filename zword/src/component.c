@@ -412,37 +412,30 @@ void VehicleComponent_remove(ComponentData* components, int entity) {
 }
 
 
-WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, 
-                                     int magazine, float recoil_up, float recoil_down, float max_recoil,
-                                     float range, float reload_time) {
+WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots,
+                                     float spread, int magazine, float recoil, float range, float reload_time, bool melee) {
     WeaponComponent* weapon = malloc(sizeof(WeaponComponent));
     weapon->cooldown = 0.0;
     weapon->fire_rate = fire_rate;
     weapon->recoil = 0.0;
-    weapon->recoil_up = recoil_up;
-    weapon->recoil_down = recoil_down;
+    weapon->recoil_up = recoil;
+    weapon->recoil_down = 3.0f * recoil;
     weapon->damage = damage;
     weapon->max_magazine = magazine;
     weapon->magazine = magazine;
     if (magazine == -1) {
         weapon->magazine = 1;
     }
-    weapon->max_recoil = max_recoil;
+    weapon->max_recoil = recoil * M_PI;
     weapon->reload_time = reload_time;
     weapon->reloading = false;
     weapon->range = range;
     weapon->sound_range = range;
-    weapon->spread = 0.0;
-
-    weapon->shape = sfConvexShape_create();
-    sfConvexShape_setPointCount(weapon->shape, 20);
-    sfConvexShape_setOutlineColor(weapon->shape, sfWhite);
-    sfColor color = sfWhite;
-    color.a = 0;
-    sfConvexShape_setFillColor(weapon->shape, color);
+    weapon->spread = spread;
+    weapon->melee = melee;
+    weapon->shots = shots;
 
     components->weapon[entity] = weapon;
-
     return weapon;
 }
 
