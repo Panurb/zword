@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "grid.h"
 #include "raycast.h"
+#include "list.h"
 
 
 #define INFINITY 10000.0
@@ -54,15 +55,12 @@ bool a_star(ComponentData* components, int start, int goal, List* path) {
 
         WaypointComponent* waypoint = components->waypoint[current];
 
-        for (int i = 0; i < waypoint->neighbors_size; i++) {
-            int n = waypoint->neighbors[i];
-
-            if (n == -1) continue;
+        for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
+            int n = node->value;
             
             WaypointComponent* neighbor = components->waypoint[n];
 
-            float d = waypoint->weights[i];
-            // float d = heuristic(components, current, n);
+            float d = heuristic(components, current, n);
 
             float tentative_g_score = waypoint->g_score + d;
 
@@ -112,18 +110,9 @@ void init_waypoints(ComponentData* components, ColliderGrid* grid) {
             if (!neighbor) continue;
 
             float d = connection_distance(components, grid, i, j);
-            if (d > 0.0) {
-                int k = replace(-1, j, waypoint->neighbors, MAX_NEIGHBORS);
-                if (k != -1) {
-                    waypoint->weights[k] = d;
-                    waypoint->neighbors_size++;
-                }
-
-                k = replace(-1, i, neighbor->neighbors, MAX_NEIGHBORS);
-                if (k != -1) {
-                    neighbor->weights[k] = d;
-                    neighbor->neighbors_size++;
-                }
+            if (d > 0.0f) {
+                List_add(waypoint->neighbors, j);
+                List_add(neighbor->neighbors, i);
             }
         }
     }
@@ -135,13 +124,16 @@ void clear_waypoints(ComponentData* components) {
         WaypointComponent* waypoint = WaypointComponent_get(components, i);
         if (!waypoint) continue;
 
-        if (components->physics[i]) {
-            waypoint->neighbors_size = 0;
+        if (PhysicsComponent_get(components, i)) {
+            List_clear(waypoint->neighbors);
         } else {
-            for (int j = 0; j < waypoint->neighbors_size; j++) {
-                int n = waypoint->neighbors[j];
+            ListNode* current = waypoint->neighbors->head;
+            while (current) {
+                int n = current->value;
                 if (PhysicsComponent_get(components, n)) {
-                    waypoint->neighbors_size = j;
+                    List_remove(waypoint->neighbors, n);
+                    current = waypoint->neighbors->head;
+                } else {
                     break;
                 }
             }
@@ -167,21 +159,11 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid) {
             if (!neighbor) continue;
 
             float d = connection_distance(components, grid, i, n);
-            if (d > 0.0) {
-                int k = waypoint->neighbors_size;
-                int l = neighbor->neighbors_size;
-                if (k < MAX_NEIGHBORS && l < MAX_NEIGHBORS) {
-                    waypoint->neighbors[k] = n;
-                    waypoint->weights[k] = d;
-                    waypoint->neighbors_size++;
-
-                    neighbor->neighbors[l] = i;
-                    neighbor->weights[l] = d;
-                    neighbor->neighbors_size++;
-                }
+            if (d > 0.0f) {
+                List_add(waypoint->neighbors, n);
+                List_add(neighbor->neighbors, i);
             }
         }
-
         List_delete(list);
     }
 }
@@ -204,13 +186,11 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
 
         sfRenderWindow_drawCircleShape(window, shape, NULL);
 
-        for (int j = 0; j < waypoint->neighbors_size; j++) {
-            int k = waypoint->neighbors[j];
-            if (k != -1) {
-                sfColor color = sfWhite;
-                color.a = 64;
-                draw_line(window, components, camera, line, pos, get_position(components, k), 0.02, color);
-            }
+        for (ListNode* current = waypoint->neighbors->head; current != NULL; current = current->next) {
+            int k = current->value;
+            sfColor color = sfWhite;
+            color.a = 64;
+            draw_line(window, components, camera, line, pos, get_position(components, k), 0.02, color);
         }
     }
 

@@ -13,3 +13,5 @@ void update_enemies(ComponentData* component, ColliderGrid* grid);
 void create_enemy(ComponentData* component, sfVector2f pos);
 
 void draw_enemies(ComponentData* component, sfRenderWindow* window, int camera);
+
+void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range);

@@ -106,18 +106,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
                 weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
 
-                List* list = get_entities(components, grid, pos, weapon->sound_range);
-                for (ListNode* current = list->head; current; current = current->next) {
-                    int j = current->value;
-                    if (j == -1) break;
-
-                    EnemyComponent* enemy = EnemyComponent_get(components, j);
-                    if (enemy) {
-                        enemy->target = parent;
-                        enemy->state = CHASE;
-                    }
-                }
-                List_delete(list);
+                alert_enemies(components, grid, parent, weapon->range);
 
                 LightComponent* light = LightComponent_get(components, entity);
                 if (light) {
@@ -142,7 +131,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
-    WeaponComponent_add(components, i, 4.0f, 20, 1, 0.0f, 12, 0.25f, 25.0f, 2.0f, false);
+    WeaponComponent_add(components, i, 4.0f, 20, 1, 0.0f, 12, 0.2f, 25.0f, 2.0f, false);
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
@@ -162,6 +151,21 @@ void create_shotgun(ComponentData* components, sfVector2f position) {
     ItemComponent_add(components, i, 0);
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 2.0, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0)->enabled = false;
+}
+
+
+void create_assault_rifle(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ColliderComponent_add_rectangle(components, i, 1.0f, 0.5f, ITEMS);
+    ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, 3);
+    PhysicsComponent_add(components, i, 0.5f, 0.0f, 0.5f, 10.0f, 2.5f);
+    WeaponComponent_add(components, i, 10.0f, 40, 1, 0.0f, 30, 0.05f, 30.0f, 3.0f, false);
+    ParticleComponent_add(components, i, 0.0f, 0.0f, 0.125f, 0.125f, 100.0f, 1, sfWhite, sfWhite)->speed_spread = 0.0f;
+    ItemComponent_add(components, i, 1);
+    SoundComponent_add(components, i, "metal");
+    LightComponent_add(components, i, 4.0f, 2.0f * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0)->enabled = false;
 }
 
 
@@ -199,8 +203,7 @@ void update_weapons(ComponentData* components, float time_step) {
         if (parent != -1) {
             PhysicsComponent* phys = PhysicsComponent_get(components, parent);
             weapon->recoil -= time_step * weapon->recoil_down;
-            weapon->recoil = fmaxf(weapon->recoil, weapon->spread);
-            weapon->recoil = fmaxf(0.1f * norm(phys->velocity), weapon->recoil);
+            weapon->recoil = fmaxf(weapon->recoil_up * phys->speed / phys->max_speed, weapon->recoil);
 
             if (weapon->melee) {
                 float x_max = 1.0f / weapon->fire_rate;

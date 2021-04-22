@@ -9,8 +9,6 @@
 #include "list.h"
 
 #define MAX_ENTITIES 10000
-#define MAX_NEIGHBORS 50
-#define MAX_PATH_LENGTH 50
 
 
 typedef struct {
@@ -212,9 +210,7 @@ typedef struct {
 } ItemComponent;
 
 typedef struct {
-    int neighbors[MAX_NEIGHBORS];
-    int neighbors_size;
-    int weights[MAX_NEIGHBORS];
+    List* neighbors;
     int came_from;
     float f_score;
     float g_score;

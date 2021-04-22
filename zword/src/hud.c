@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "player.h"
+#include "weapon.h"
 
 
 void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
@@ -33,7 +34,7 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
             r = mult(2.5, player->controller.right_stick);
         }
 
-        draw_sprite(window, components, camera, sprite, sum(pos, r), 0.0, ones(), 0);
+        draw_sprite(window, components, camera, sprite, sum(pos, r), (slot - 1) * 0.5f * M_PI, ones(), 0);
     }
 }
 
@@ -66,7 +67,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
             r = mult(2.5, player->controller.right_stick);
         }
 
-        draw_sprite(window, components, camera, sprite, sum(pos, r), 0.0, mult(0.75, ones()), 0);
+        draw_sprite(window, components, camera, sprite, sum(pos, r), (slot - 1) * 0.5f * M_PI, mult(0.75, ones()), 0);
     }
 }
 

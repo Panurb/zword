@@ -383,7 +383,7 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
     vehicle->max_fuel = max_fuel;
     vehicle->fuel = max_fuel;
     vehicle->acceleration = 20.0;
-    vehicle->max_speed = 20.0;
+    vehicle->max_speed = 10.0;
     vehicle->turning = 50.0;
     vehicle->size = 4;
     for (int i = 0; i < vehicle->size; i++) {
@@ -482,11 +482,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity) 
     waypoint->came_from = -1;
     waypoint->g_score = INFINITY;
     waypoint->f_score = INFINITY;
-    for (int i = 0; i < MAX_NEIGHBORS; i++) {
-        waypoint->neighbors[i] = -1;
-        waypoint->weights[i] = 0.0;
-    }
-    waypoint->neighbors_size = 0;
+    waypoint->neighbors = List_create();
     waypoint->range = 12.0;
 
     components->waypoint[entity] = waypoint;
@@ -503,12 +499,11 @@ WaypointComponent* WaypointComponent_get(ComponentData* components, int entity) 
 
 void WaypointComponent_remove(ComponentData* components, int entity) {
     WaypointComponent* waypoint = WaypointComponent_get(components, entity);
-    for (int i = 0; i < MAX_NEIGHBORS; i++) {
-        int n = waypoint->neighbors[i];
-        if (n == -1) continue;
-        replace(entity, -1, WaypointComponent_get(components, n)->neighbors, MAX_NEIGHBORS);
+    for (ListNode* current = waypoint->neighbors->head; current; current = current->next) {
+        int n = current->value;
+        List_remove(WaypointComponent_get(components, n)->neighbors, entity);
     }
-
+    List_delete(waypoint->neighbors);
     free(WaypointComponent_get(components, entity));
     components->waypoint[entity] = NULL;
 }

@@ -21,6 +21,7 @@
 #include "image.h"
 #include "input.h"
 #include "particle.h"
+#include "enemy.h"
 
 
 void create_player(ComponentData* components, sfVector2f pos, int joystick) {
@@ -70,6 +71,8 @@ int get_attachment(ComponentData* components, int i) {
 
 
 void input(ComponentData* components, sfRenderWindow* window, int camera) {
+    sfJoystick_update();
+
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
@@ -184,14 +187,16 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             change_layer(components, i, 2);
             player->state = PLAYER_DEAD;
         }
+
+        if (player->state != PLAYER_DEAD && player->state != DRIVE) {
+            phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+            if (non_zero(right_stick)) {
+                coord->angle = polar_angle(right_stick);
+            }
+        }
         
         switch (player->state) {
-            case ON_FOOT:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
-                if (non_zero(right_stick)) {
-                    coord->angle = polar_angle(right_stick);
-                }
-
+            case ON_FOOT:;
                 sfVector2f pos = get_position(components, i);
 
                 if (player->target != -1) {
@@ -222,11 +227,6 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             case SHOOT:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
-                if (non_zero(right_stick)) {
-                    coord->angle = polar_angle(right_stick);
-                }
-
                 if (weapon) {
                     shoot(components, grid, item);
 
@@ -240,11 +240,6 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             case RELOAD:
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
-                if (non_zero(right_stick)) {
-                    coord->angle = polar_angle(right_stick);
-                }
-
                 if (weapon) {
                     reload(components, item);
 
@@ -261,6 +256,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     float gas = player->controller.right_trigger - player->controller.left_trigger;
                     drive_vehicle(components, i, gas, left_stick.x, time_step);
                 }
+
+                alert_enemies(components, grid, i, 10.0f);
 
                 break;
             case MENU:

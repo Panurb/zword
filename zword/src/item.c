@@ -73,8 +73,8 @@ void drop_item(ComponentData* components, int entity) {
             light->enabled = false;
         }
 
-        change_layer(components, player->target, 3);
-        ImageComponent_get(components, player->target)->alpha = 1.0;
+        change_layer(components, i, 3);
+        ImageComponent_get(components, i)->alpha = 1.0f;
         ColliderComponent_get(components, i)->enabled = true;
     }
 }

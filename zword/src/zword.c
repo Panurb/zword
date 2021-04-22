@@ -100,7 +100,6 @@ int main() {
             while (elapsed_time > time_step) {
                 elapsed_time -= time_step;
 
-                sfJoystick_update();
                 input(components, window, camera);
 
                 update(components, time_step, grid);

@@ -141,3 +141,19 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
         // }
     }
 }
+
+
+void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range) {
+    List* list = get_entities(components, grid, get_position(components, player), range);
+    for (ListNode* current = list->head; current; current = current->next) {
+        int j = current->value;
+        if (j == -1) break;
+
+        EnemyComponent* enemy = EnemyComponent_get(components, j);
+        if (enemy) {
+            enemy->target = player;
+            enemy->state = CHASE;
+        }
+    }
+    List_delete(list);
+}

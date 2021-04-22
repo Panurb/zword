@@ -276,6 +276,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
             create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
             if (abs(i) == width || abs(j) == height) continue;
+            if (i == 0 && j == 0) continue;
 
             float f = randf(0.0, 0.75);
             if (f < 0.1) {
@@ -318,7 +319,9 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
     create_car(components, start);
     create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+    create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
     create_shotgun(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+    create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
     create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
 }
 
