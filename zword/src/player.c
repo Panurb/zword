@@ -176,7 +176,12 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         WeaponComponent* weapon = WeaponComponent_get(components, item);
         LightComponent* light = LightComponent_get(components, item);
 
-        if (HealthComponent_get(components, i)->health <= 0) {
+        if (player->state != PLAYER_DEAD && HealthComponent_get(components, i)->health <= 0) {
+            ImageComponent* image = ImageComponent_get(components, i);
+            strcpy(image->filename, "player_dead");
+            image->width = 2.0;
+            image->texture_changed = true;
+            change_layer(components, i, 2);
             player->state = PLAYER_DEAD;
         }
         
@@ -336,12 +341,6 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                         ColliderComponent_remove(components, i);
                     }
                 }
-
-                ImageComponent* image = ImageComponent_get(components, i);
-                strcpy(image->filename, "player_dead");
-                image->width = 2.0;
-                image->texture_changed = true;
-                change_layer(components, i, 2);
 
                 break;
         }

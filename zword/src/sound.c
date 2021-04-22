@@ -23,9 +23,8 @@ static const char* SOUNDS[] = {
 
 
 sfSoundBuffer** load_sounds() {
-    sfSoundBuffer** sounds = malloc(100);
-
     int n = sizeof(SOUNDS) / sizeof(SOUNDS[0]);
+    sfSoundBuffer** sounds = malloc(n * sizeof(sfSoundBuffer*));
 
     for (int i = 0; i < n; i++) {
         char path[100];

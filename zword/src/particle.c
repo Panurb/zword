@@ -25,18 +25,20 @@ void ParticleComponent_add_dirt(ComponentData* components, int entity) {
 }
 
 
-void add_particle(ComponentData* components, int entity) {
+void add_particles(ComponentData* components, int entity, int n) {
     ParticleComponent* part = ParticleComponent_get(components, entity);
 
-    part->position[part->iterator] = sum(get_position(components, entity), part->origin);
-    float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
-    float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
-    part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(components, entity) + angle);
-    part->time[part->iterator] = part->max_time;
-    if (part->particles < part->max_particles) {
-        part->particles++;
+    for (int i = 0; i < n; i++) {
+        part->position[part->iterator] = sum(get_position(components, entity), part->origin);
+        float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
+        float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
+        part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(components, entity) + angle);
+        part->time[part->iterator] = part->max_time;
+        if (part->particles < part->max_particles) {
+            part->particles++;
+        }
+        part->iterator = (part->iterator + 1) % part->max_particles;
     }
-    part->iterator = (part->iterator + 1) % part->max_particles;
 }
 
 
@@ -49,15 +51,13 @@ void update_particles(ComponentData* component, float delta_time) {
         if (part->enabled) {
             if (part->loop) {
                 while (part->timer <= 0.0) {
-                    add_particle(component, i);
+                    add_particles(component, i, 1);
                     part->timer += 1.0 / part->rate;
                 }
 
                 part->timer -= delta_time;
             } else {
-                for (int j = 0; j < part->rate; j++) {
-                    add_particle(component, i);
-                }
+                add_particles(component, i, part->rate);
                 part->enabled = false;
             }
         }

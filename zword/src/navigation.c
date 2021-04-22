@@ -13,62 +13,63 @@
 #define INFINITY 10000.0
 
 
-void reconstruct_path(ComponentData* component, int current, List* path) {
+void reconstruct_path(ComponentData* components, int current, List* path) {
     while(current != -1) {
         List_add(path, current);
-        current = component->waypoint[current]->came_from;
+        current = components->waypoint[current]->came_from;
     }
 }
 
 
-float heuristic(ComponentData* component, int start, int goal) {
-    return dist(get_position(component, start), get_position(component, goal));
+float heuristic(ComponentData* components, int start, int goal) {
+    return dist(get_position(components, start), get_position(components, goal));
 }
 
 
-bool a_star(ComponentData* component, int start, int goal, List* path) {
-    Heap* open_set = Heap_create(component);
+bool a_star(ComponentData* components, int start, int goal, List* path) {
+    Heap* open_set = Heap_create(components);
 
     Heap_insert(open_set, start);
 
     List_clear(path);
 
-    for (int i = 0; i < component->entities; i++) {
-        if (component->waypoint[i]) {
-            component->waypoint[i]->came_from = -1;
-            component->waypoint[i]->g_score = INFINITY;
-            component->waypoint[i]->f_score = INFINITY;
+    for (int i = 0; i < components->entities; i++) {
+        if (components->waypoint[i]) {
+            components->waypoint[i]->came_from = -1;
+            components->waypoint[i]->g_score = INFINITY;
+            components->waypoint[i]->f_score = INFINITY;
         }
     }
 
-    component->waypoint[start]->g_score = 0.0;
-    component->waypoint[start]->f_score = heuristic(component, start, goal);
+    components->waypoint[start]->g_score = 0.0;
+    components->waypoint[start]->f_score = heuristic(components, start, goal);
 
     while (open_set->size > 0) {
         int current = Heap_extract(open_set);
 
         if (current == goal) {
-            reconstruct_path(component, current, path);
+            reconstruct_path(components, current, path);
             return true;
         }
 
-        WaypointComponent* waypoint = component->waypoint[current];
+        WaypointComponent* waypoint = components->waypoint[current];
 
         for (int i = 0; i < waypoint->neighbors_size; i++) {
             int n = waypoint->neighbors[i];
 
             if (n == -1) continue;
             
-            WaypointComponent* neighbor = component->waypoint[n];
+            WaypointComponent* neighbor = components->waypoint[n];
 
             float d = waypoint->weights[i];
+            // float d = heuristic(components, current, n);
 
             float tentative_g_score = waypoint->g_score + d;
 
             if (tentative_g_score < neighbor->g_score) {
                 neighbor->came_from = current;
                 neighbor->g_score = tentative_g_score;
-                neighbor->f_score = neighbor->g_score + heuristic(component, n, goal);
+                neighbor->f_score = neighbor->g_score + heuristic(components, n, goal);
                 
                 if (Heap_find(open_set, n) == -1) {
                     Heap_insert(open_set, n);
@@ -91,7 +92,7 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
         return 0.0;
     }
 
-    HitInfo info = raycast(component, grid, a, v, 1.1 * d, i, true);
+    HitInfo info = raycast(component, grid, a, v, 1.1f * d, i, BULLETS);
 
     if (info.object == j || info.object == -1) {
         return d;

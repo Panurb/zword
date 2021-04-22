@@ -42,7 +42,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
         PhysicsComponent* phys = PhysicsComponent_get(components, i);
         ImageComponent* image = ImageComponent_get(components, i);
 
-        if (components->health[i]->health <= 0) {
+        if (enemy->state != DEAD && components->health[i]->health <= 0) {
+            strcpy(image->filename, "zombie_dead");
+            image->width = 2.0;
+            image->texture_changed = true;
+            change_layer(components, i, 2);
             enemy->state = DEAD;
         }
 
@@ -112,11 +116,6 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 // if (WaypointComponent_get(components, i)) {
                 //     WaypointComponent_remove(components, i);
                 // }
-
-                strcpy(image->filename, "zombie_dead");
-                image->width = 2.0;
-                image->texture_changed = true;
-                change_layer(components, i, 2);
 
                 break;
         }

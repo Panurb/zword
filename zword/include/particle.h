@@ -9,7 +9,7 @@ void ParticleComponent_add_sparks(ComponentData* components, int entity);
 
 void ParticleComponent_add_dirt(ComponentData* components, int entity);
 
-void add_particle(ComponentData* components, int entity);
+void add_particles(ComponentData* components, int entity, int n);
 
 void update_particles(ComponentData* components, float delta_time);
 

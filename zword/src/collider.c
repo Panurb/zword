@@ -165,7 +165,7 @@ sfVector2f overlap_rectangle_rectangle(ComponentData* component, int i, int j) {
 
 
 sfVector2f overlap(ComponentData* component, int i, int j) {
-    sfVector2f ol = { 0.0, 0.0 };
+    sfVector2f ol = zeros();
 
     ColliderComponent* a = component->collider[i];
     ColliderComponent* b = component->collider[j];
@@ -241,7 +241,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {
-                for (ListNode* current = grid->array[j][k]->head; current != NULL; current = current->next) {
+                for (ListNode* current = grid->array[j][k]->head; current; current = current->next) {
                     int n = current->value;
                     if (n == i) continue;
                     ColliderComponent* collider = ColliderComponent_get(components, n);
@@ -343,7 +343,7 @@ void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f di
 
     EnemyComponent* enemy = components->enemy[entity];
     if (enemy) {
-        // CoordinateComponent_get(components, entity)->angle = -polar_angle(dir);
+        CoordinateComponent_get(components, entity)->angle = -polar_angle(dir);
     }
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);
@@ -354,11 +354,11 @@ void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f di
     ParticleComponent* particle = ParticleComponent_get(components, entity);
     if (particle) {
         particle->origin = diff(pos, get_position(components, entity));
-        add_particle(components, entity);
+        add_particles(components, entity, particle->rate / 50.0f * dmg);
     }
 
     SoundComponent* scomp = SoundComponent_get(components, entity);
     if (scomp && scomp->hit_sound[0] != '\0') {
-        add_sound(components, entity, scomp->hit_sound, 0.5f, randf(0.9f, 1.1f));
+        add_sound(components, entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
     }
 }

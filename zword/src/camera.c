@@ -284,10 +284,9 @@ void update_camera(ComponentData* components, int camera, float time_step) {
     }
     if (n != 0) {
         pos = mult(1.0 / n, pos);
+        coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
+        cam->zoom += 10.0 * time_step * (25.0 * cam->resolution.y / 720.0 - cam->zoom);
     }
-
-    coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
-    cam->zoom += 10.0 * time_step * (25.0 * cam->resolution.y / 720.0 - cam->zoom);
 }
 
 

@@ -36,6 +36,7 @@ static const char* IMAGES[] = {
     "road_tile",
     "rock",
     "roof_tile",
+    "shotgun",
     "tree",
     "uranium",
     "wood_tile",
@@ -45,9 +46,9 @@ static const char* IMAGES[] = {
 
 
 sfTexture** load_textures() {
-    sfTexture** textures = malloc(100);
-
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
+
+    sfTexture** textures = malloc(sizeof(IMAGES) * sizeof(sfTexture*));
 
     for (int i = 0; i < n; i++) {
         char path[100];

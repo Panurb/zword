@@ -1,6 +1,7 @@
 #include "component.h"
 #include "grid.h"
 #include "util.h"
+#include "image.h"
 
 
 void create_flashlight(ComponentData* components, sfVector2f position) {
@@ -41,6 +42,7 @@ void pick_up_item(ComponentData* components, int entity) {
         coord->position = (sfVector2f) { 0.75, 0.0 };
         coord->angle = 0.0;
         ColliderComponent_get(components, player->target)->enabled = false;
+        change_layer(components, player->target, 6);
 
         if (player->item != i) {
             ImageComponent_get(components, player->target)->alpha = 0.0;
@@ -71,7 +73,8 @@ void drop_item(ComponentData* components, int entity) {
             light->enabled = false;
         }
 
-        ImageComponent_get(components, i)->alpha = 1.0;
+        change_layer(components, player->target, 3);
+        ImageComponent_get(components, player->target)->alpha = 1.0;
         ColliderComponent_get(components, i)->enabled = true;
     }
 }
