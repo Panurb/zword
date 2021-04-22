@@ -15,6 +15,7 @@ set(SOURCES
     zword/src/enemy.c
     zword/src/grid.c
     zword/src/heap.c
+    zword/src/hud.c
     zword/src/image.c
     zword/src/item.c
     zword/src/input.c

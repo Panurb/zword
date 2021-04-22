@@ -26,6 +26,7 @@
 #include "weapon.h"
 #include "road.h"
 #include "sound.h"
+#include "hud.h"
 
 
 int main() {
@@ -126,7 +127,7 @@ int main() {
         sfRenderWindow_drawSprite(window, light_sprite, &state);
         draw_roofs(components, window, camera, textures);
         draw_outlines(components, window, camera);
-        draw_players(components, window, camera);
+        draw_hud(components, window, camera);
 
         // debug_draw(components, window, camera);
         // draw_waypoints(components, window, camera);
