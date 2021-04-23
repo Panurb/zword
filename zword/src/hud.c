@@ -103,10 +103,12 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
             strcpy(text, "12-gauge");
             break;
     }
-    draw_text(window, components, camera, NULL, sum(sum(pos, polar_to_cartesian(1.5f + offset, slot * slice)), (sfVector2f) { 0.0f, 0.5f }), text);
+    pos = sum(pos, polar_to_cartesian(1.5f + offset, slot * slice));
+    // draw_sprite(window, components, camera, NULL, pos, 0.0f, ones(), 0);
+    draw_text(window, components, camera, NULL, sum(pos, (sfVector2f) { 0.0f, 0.5f }), text);
     char buffer[20];
     snprintf(buffer, 20, "%i", player->ammo[slot]);
-    draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice)), buffer);
+    draw_text(window, components, camera, NULL, pos, buffer);
 }
 
 

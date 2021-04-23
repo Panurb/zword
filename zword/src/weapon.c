@@ -247,7 +247,7 @@ void create_ammo(ComponentData* components, sfVector2f position, AmmoType type) 
         default:
             break;
     }
-    
+    AmmoComponent_add(components, i, type);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
     SoundComponent_add(components, i, "metal");

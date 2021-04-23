@@ -88,7 +88,8 @@ typedef enum {
     MENU_GRAB,
     MENU_DROP,
     PLAYER_AMMO_MENU,
-    PLAYER_DEAD
+    PLAYER_DEAD,
+    PLAYER_PICK_UP
 } PlayerState;
 
 typedef struct {
@@ -266,6 +267,11 @@ typedef struct {
 } SoundComponent;
 
 typedef struct {
+    AmmoType type;
+    int size;
+} AmmoComponent;
+
+typedef struct {
     int size;
     void* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
@@ -289,6 +295,7 @@ typedef struct {
     CameraComponent* camera[MAX_ENTITIES];
     RoadComponent* road[MAX_ENTITIES];
     SoundComponent* sound[MAX_ENTITIES];
+    AmmoComponent* ammo[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -357,6 +364,10 @@ void RoadComponent_remove(ComponentData* components, int entity);
 SoundComponent* SoundComponent_add(ComponentData* components, int entity, Filename hit_sound);
 SoundComponent* SoundComponent_get(ComponentData* components, int entity);
 void SoundComponent_remove(ComponentData* components, int entity);
+
+AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType type);
+AmmoComponent* AmmoComponent_get(ComponentData* components, int entity);
+void AmmoComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

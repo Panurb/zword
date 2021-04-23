@@ -208,7 +208,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->state = ON_FOOT;
     player->ammo_size = 3;
     for (int i = 0; i < player->ammo_size; i++) {
-        player->ammo[i] = 30;
+        player->ammo[i] = 0;
     }
 
     player->shape = sfConvexShape_create();
@@ -618,6 +618,44 @@ void SoundComponent_remove(ComponentData* components, int entity) {
 }
 
 
+AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType type) {
+    AmmoComponent* ammo = malloc(sizeof(AmmoComponent));
+    ammo->type = type;
+    switch (type) {
+        case AMMO_PISTOL:
+            ammo->size = 12;
+            break;
+        case AMMO_RIFLE:
+            ammo->size = 30;
+            break;
+        case AMMO_SHOTGUN:
+            ammo->size = 8;
+            break;
+        default:
+            ammo->size = 0;
+            break;
+    }
+
+    components->ammo[entity] = ammo;
+    return ammo;
+}
+
+
+AmmoComponent* AmmoComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->ammo[entity];
+}
+
+
+void AmmoComponent_remove(ComponentData* components, int entity) {
+    AmmoComponent* ammo = AmmoComponent_get(components, entity);
+    if (ammo) {
+        free(ammo);
+        components->ammo[entity] = NULL;
+    }
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -663,6 +701,7 @@ void destroy_entity(ComponentData* components, int entity) {
         RoadComponent_remove(components, entity);
     if (SoundComponent_get(components, entity))
         SoundComponent_remove(components, entity);
+    AmmoComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

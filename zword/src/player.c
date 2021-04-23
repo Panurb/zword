@@ -87,7 +87,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_RB]) {
-                    pick_up_item(components, i);
+                    player->state = PLAYER_PICK_UP;
                 }
 
                 if (controller.buttons_pressed[BUTTON_RT]) {
@@ -235,6 +235,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     ImageComponent_get(components, player->target)->outline = 0.05f;
                 }
 
+                break;
+            case PLAYER_PICK_UP:
+                pick_up_item(components, grid, i);
+                player->state = ON_FOOT;
                 break;
             case SHOOT:
                 if (weapon) {

@@ -27,25 +27,33 @@ void create_gas(ComponentData* components, sfVector2f position) {
 }
 
 
-void pick_up_item(ComponentData* components, int entity) {
+void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     PlayerComponent* player = PlayerComponent_get(components, entity);
 
     if (player->target == -1) {
         return;
     }
 
-    int i = find(-1, player->inventory, player->inventory_size);
-    if (i != -1) {
-        player->inventory[i] = player->target;
-        CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
-        coord->parent = entity;
-        coord->position = (sfVector2f) { 0.75, 0.0 };
-        coord->angle = 0.0;
-        ColliderComponent_get(components, player->target)->enabled = false;
-        change_layer(components, player->target, 6);
+    AmmoComponent* ammo = AmmoComponent_get(components, player->target);
+    if (ammo) {
+        player->ammo[ammo->type - 1] += ammo->size;
+        clear_grid(components, grid, player->target);
+        destroy_entity(components, player->target);
+        player->target = -1;
+    } else {
+        int i = find(-1, player->inventory, player->inventory_size);
+        if (i != -1) {
+            player->inventory[i] = player->target;
+            CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
+            coord->parent = entity;
+            coord->position = (sfVector2f) { 0.75, 0.0 };
+            coord->angle = 0.0;
+            ColliderComponent_get(components, player->target)->enabled = false;
+            change_layer(components, player->target, 6);
 
-        if (player->item != i) {
-            ImageComponent_get(components, player->target)->alpha = 0.0;
+            if (player->item != i) {
+                ImageComponent_get(components, player->target)->alpha = 0.0;
+            }
         }
     }
 }
