@@ -15,6 +15,9 @@
 
 
 static const char* IMAGES[] = {
+    "ammo_pistol",
+    "ammo_rifle",
+    "ammo_shotgun",
     "assault_rifle",
     "axe",
     "blood",

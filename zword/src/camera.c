@@ -267,6 +267,30 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
 }
 
 
+void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100]) {
+    bool created = false;
+    if (!text) {
+        text = sfText_create();
+    }
+
+    sfText_setFont(text, CameraComponent_get(components, camera)->fonts[0]);
+    sfText_setCharacterSize(text, 20);
+    sfText_setColor(text, sfWhite);
+
+    sfText_setString(text, string);
+    sfText_setPosition(text, world_to_screen(components, camera, position));
+
+    sfFloatRect bounds = sfText_getLocalBounds(text);
+    sfText_setOrigin(text, (sfVector2f) { bounds.left + 0.5f * bounds.width, bounds.top + 0.5f * bounds.height });
+
+    sfRenderWindow_drawText(window, text, NULL);
+
+    if (created) {
+        sfText_destroy(text);
+    }
+}
+
+
 void update_camera(ComponentData* components, int camera, float time_step) {
     CoordinateComponent* coord = CoordinateComponent_get(components, camera);
     CameraComponent* cam = CameraComponent_get(components, camera);

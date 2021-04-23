@@ -30,6 +30,15 @@ ColliderGrid* ColliderGrid_create() {
 }
 
 
+void ColliderGrid_clear(ColliderGrid* grid) {
+    for (int i = 0; i < grid->columns; i++) {
+        for (int j = 0; j < grid->rows; j++) {
+            List_clear(grid->array[i][j]);
+        }
+    }
+}
+
+
 Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
     sfVector2f pos = get_position(components, i);
     

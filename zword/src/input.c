@@ -33,7 +33,8 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         right_stick = diff(mouse, get_position(components, i));
         player->controller.right_stick = normalized(right_stick);
 
-        player->controller.right_trigger = (sfMouse_isButtonPressed(sfMouseLeft)) ? 1.0f : 0.0f;
+        player->controller.left_trigger = sfKeyboard_isKeyPressed(player->controller.buttons[BUTTON_LT]) ? 1.0f : 0.0f;
+        player->controller.right_trigger = sfMouse_isButtonPressed(sfMouseLeft) ? 1.0f : 0.0f;
 
         for (int b = BUTTON_A; b <= BUTTON_RT; b++) {
             bool down = sfKeyboard_isKeyPressed(player->controller.buttons[b]);

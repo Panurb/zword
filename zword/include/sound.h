@@ -8,6 +8,8 @@
 // https://freesound.org/people/theshaggyfreak/sounds/276271/
 // https://freesound.org/people/mrickey13/sounds/515618/
 // https://freesound.org/people/cookies+policy/sounds/555926/
+// https://freesound.org/people/ninebilly/sounds/520934/
+// https://freesound.org/people/FilmmakersManual/sounds/522284/
 
 #define MAX_SOUNDS 256
 

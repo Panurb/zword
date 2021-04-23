@@ -206,6 +206,10 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     }
     player->grabbed_item = -1;
     player->state = ON_FOOT;
+    player->ammo_size = 3;
+    for (int i = 0; i < player->ammo_size; i++) {
+        player->ammo[i] = 30;
+    }
 
     player->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(player->shape, 4);
@@ -214,7 +218,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->controller.joystick = joystick;
 
     if (joystick == -1) {
-        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeySpace, -1, sfKeyEscape, sfKeyEnter, sfKeyZ, sfKeyX, -1, -1 };
+        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeyLShift, -1, sfKeyEscape, sfKeyEnter, sfKeyZ, sfKeyX, sfKeySpace, -1 };
         memcpy(player->controller.buttons, buttons, sizeof(buttons));
     } else if (strstr(sfJoystick_getIdentification(joystick).name, "Xbox")) {
         int buttons[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9 };
@@ -233,8 +237,6 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
         player->controller.buttons_pressed[i] = false;
         player->controller.buttons_released[i] = false;
     }
-
-
 
     components->player.array[entity] = player;
     components->player.order[components->player.size] = entity;
@@ -413,7 +415,7 @@ void VehicleComponent_remove(ComponentData* components, int entity) {
 
 
 WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots,
-                                     float spread, int magazine, float recoil, float range, float reload_time, bool melee) {
+                                     float spread, int magazine, float recoil, float range, float reload_time, AmmoType ammo_type, Filename sound) {
     WeaponComponent* weapon = malloc(sizeof(WeaponComponent));
     weapon->cooldown = 0.0;
     weapon->fire_rate = fire_rate;
@@ -432,8 +434,10 @@ WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, floa
     weapon->range = range;
     weapon->sound_range = range;
     weapon->spread = spread;
-    weapon->melee = melee;
     weapon->shots = shots;
+    weapon->ammo_type = ammo_type;
+    strcpy(weapon->sound, sound);
+    weapon->automatic = false;
 
     components->weapon[entity] = weapon;
     return weapon;
@@ -539,6 +543,8 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
 
     camera->shaders[0] = NULL;
     camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "outline.frag");
+
+    camera->fonts[0] = sfFont_createFromFile("data/Helvetica.ttf");
 
     components->camera[entity] = camera;
     return camera;
@@ -661,6 +667,14 @@ void destroy_entity(ComponentData* components, int entity) {
     if (entity == components->entities - 1) {
         components->entities--;
     }
+}
+
+
+void ComponentData_clear(ComponentData* components) {
+    for (int i = 0; i < components->entities; i++) {
+        destroy_entity(components, i);
+    }
+    components->entities = 0;
 }
 
 

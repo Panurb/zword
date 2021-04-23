@@ -9,7 +9,7 @@ void input(ComponentData* component, sfRenderWindow* window, int camera);
 
 void create_player(ComponentData* components, sfVector2f pos, int joystick);
 
-int get_inventory_slot(ComponentData* components, int i);
+int get_slot(ComponentData* components, int i, int size);
 
 int get_attachment(ComponentData* components, int i);
 

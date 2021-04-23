@@ -1,5 +1,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "player.h"
 #include "weapon.h"
@@ -72,6 +74,55 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
 }
 
 
+void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+    sfVector2f pos = get_position(components, entity);
+
+    float gap = 0.2f;
+    float slice = (2 * M_PI / player->ammo_size);
+
+    sfColor color = sfConvexShape_getFillColor(player->shape);
+    color.a = alpha * 255;
+    sfConvexShape_setFillColor(player->shape, color);
+
+    if (alpha == 0.0f) {
+        draw_slice_outline(window, components, camera, player->line, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap);
+    } else {
+        draw_slice(window, components, camera, NULL, 50, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap, color);
+    }
+
+    char text[20] = "";
+    switch (slot + 1) {
+        case AMMO_PISTOL:
+            strcpy(text, "9mm");
+            break;
+        case AMMO_RIFLE:
+            strcpy(text, "7.62x39mm");
+            break;
+        case AMMO_SHOTGUN:
+            strcpy(text, "12-gauge");
+            break;
+    }
+    draw_text(window, components, camera, NULL, sum(sum(pos, polar_to_cartesian(1.5f + offset, slot * slice)), (sfVector2f) { 0.0f, 0.5f }), text);
+    char buffer[20];
+    snprintf(buffer, 20, "%i", player->ammo[slot]);
+    draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice)), buffer);
+}
+
+
+void draw_ammo_menu(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+
+    int slot = get_slot(components, entity, player->ammo_size);
+
+    for (int i = 0; i < player->ammo_size; i++) {
+        float offset = (i == slot) ? 0.2f : 0.0f;
+        float alpha = (player->ammo[i] == 0) ? 0.25f : 0.5f;
+        draw_ammo_slot(components, window, camera, entity, i, offset, alpha);
+    }
+}
+
+
 void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
@@ -79,7 +130,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
 
         sfVector2f pos = get_position(components, i);
 
-        int slot = get_inventory_slot(components, i);
+        int slot = get_slot(components, i, player->inventory_size);
         int atch = get_attachment(components, i);
 
         int item = player->inventory[player->item];
@@ -149,6 +200,10 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                         }
                     }
                 }
+
+                break;
+            case PLAYER_AMMO_MENU:
+                draw_ammo_menu(components, window, camera, i);
 
                 break;
             case PLAYER_DEAD:

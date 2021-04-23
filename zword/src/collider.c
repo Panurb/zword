@@ -343,7 +343,7 @@ void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f di
 
     EnemyComponent* enemy = components->enemy[entity];
     if (enemy) {
-        CoordinateComponent_get(components, entity)->angle = -polar_angle(dir);
+        CoordinateComponent_get(components, entity)->angle = polar_angle(mult(-1.0, dir));
     }
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);

@@ -322,7 +322,10 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
     create_shotgun(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
     create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-    create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+    // create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+    create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+    create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+    create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
 }
 
 

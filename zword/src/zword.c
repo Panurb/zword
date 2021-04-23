@@ -47,8 +47,6 @@ int main() {
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
         channels[i] = sfSound_create();
-        sfSound_setAttenuation(channels[i], 0.1);
-        sfSound_setRelativeToListener(channels[i], true);
     }
 
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
@@ -59,40 +57,53 @@ int main() {
     FpsCounter* fps = FpsCounter_create();
 
     sfClock* clock = sfClock_create();
-    float time_step = 1.0 / 60.0;
-    float elapsed_time = 0.0;
+    float time_step = 1.0f / 60.0f;
+    float elapsed_time = 0.0f;
+    int steps = 0;
 
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
-    int camera = create_camera(components, mode);
 
-    float ambient_light = 0.5;
-    create_level(components, grid, time(NULL));
+    float ambient_light = 0.5f;
+    int seed = time(NULL);
+
+    int camera = create_camera(components, mode);
+    create_level(components, grid, seed);
     init_grid(components, grid);
     init_waypoints(components, grid);
 
-    while (sfRenderWindow_isOpen(window))
-    {
+    while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
 
         sfEvent event;
-        while (sfRenderWindow_pollEvent(window, &event))
-        {
-            if (event.type == sfEvtLostFocus) {
-                focus = false;
-            }
+        while (sfRenderWindow_pollEvent(window, &event)) {
+            switch (event.type) {
+                case sfEvtLostFocus:
+                    focus = false;
+                    break;
+                case sfEvtGainedFocus:
+                    focus = true;
+                    sfClock_restart(clock);
+                    break;
+                case sfEvtClosed:
+                    sfRenderWindow_close(window);
+                    break;
+                case sfEvtKeyPressed:
+                    if (event.key.code == sfKeyEscape) {
+                        sfRenderWindow_close(window);
+                    } else if (event.key.code == sfKeyF5) {
+                        ColliderGrid_clear(grid);
+                        ComponentData_clear(components);
 
-            if (event.type == sfEvtGainedFocus) {
-                focus = true;
-                sfClock_restart(clock);
-            }
-
-            if (event.type == sfEvtClosed) {
-                sfRenderWindow_close(window);
-            }
-
-            if (event.type == sfEvtKeyPressed && event.key.code == sfKeyEscape) {
-                sfRenderWindow_close(window);
+                        camera = create_camera(components, mode);
+                        create_level(components, grid, seed);
+                        init_grid(components, grid);
+                        init_waypoints(components, grid);
+                        sfClock_restart(clock);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -104,7 +115,9 @@ int main() {
 
                 update(components, time_step, grid);
                 collide(components, grid);
-                update_waypoints(components, grid);
+                if (steps % 10 == 0) {
+                    update_waypoints(components, grid);
+                }
 
                 update_players(components, grid, time_step);
                 update_weapons(components, time_step);
@@ -115,6 +128,8 @@ int main() {
                 update_camera(components, camera, time_step);
 
                 draw_lights(components, grid, light_texture, camera, ambient_light);
+
+                steps++;
             }
 
             elapsed_time += delta_time;

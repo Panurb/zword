@@ -13,11 +13,14 @@
 
 
 static const char* SOUNDS[] = {
+    "assault_rifle",
+    "axe",
     "car",
     "car_door",
     "geiger",
     "metal",
     "pistol",
+    "shotgun",
     "squish"
 };
 

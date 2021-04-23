@@ -87,6 +87,7 @@ typedef enum {
     MENU,
     MENU_GRAB,
     MENU_DROP,
+    PLAYER_AMMO_MENU,
     PLAYER_DEAD
 } PlayerState;
 
@@ -116,6 +117,8 @@ typedef struct {
     sfConvexShape* shape;
     sfRectangleShape* line;
     Controller controller;
+    int ammo_size;
+    int ammo[4];
 } PlayerComponent;
 
 typedef struct {
@@ -185,6 +188,13 @@ typedef struct {
     sfVector2f seats[4];
 } VehicleComponent;
 
+typedef enum {
+    AMMO_MELEE,
+    AMMO_PISTOL,
+    AMMO_RIFLE,
+    AMMO_SHOTGUN
+} AmmoType;
+
 typedef struct {
     float cooldown;
     float fire_rate;
@@ -201,7 +211,9 @@ typedef struct {
     float sound_range;
     float spread;
     int shots;
-    bool melee;
+    bool automatic;
+    AmmoType ammo_type;
+    Filename sound;
 } WeaponComponent;
 
 typedef struct {
@@ -225,6 +237,7 @@ typedef struct {
     sfVector2i resolution;
     float zoom;
     sfShader* shaders[10];
+    sfFont* fonts[1];
 } CameraComponent;
 
 typedef struct {
@@ -286,7 +299,7 @@ void CoordinateComponent_remove(ComponentData* components, int entity);
 
 ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer);
 ImageComponent* ImageComponent_get(ComponentData* components, int entity);
-void CoordinateComponent_remove(ComponentData* components, int entity);
+void ImageComponent_remove(ComponentData* components, int entity);
 
 PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass, float friction, float bounce, float drag, float angular_drag);
 PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity);
@@ -317,7 +330,7 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
 VehicleComponent* VehicleComponent_get(ComponentData* components, int entity);
 void VehicleComponent_remove(ComponentData* components, int entity);
 
-WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots, float spread, int magazine, float recoil, float range, float reload_time, bool melee);
+WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots, float spread, int magazine, float recoil, float range, float reload_time, AmmoType ammo_type, Filename sound);
 WeaponComponent* WeaponComponent_get(ComponentData* components, int entity);
 void WeaponComponent_remove(ComponentData* components, int entity);
 
@@ -347,6 +360,8 @@ void SoundComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
+
+void ComponentData_clear(ComponentData* components);
 
 sfVector2f get_position(ComponentData* components, int i);
 float get_angle(ComponentData* components, int i);

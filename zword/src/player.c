@@ -39,19 +39,19 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
 }
 
 
-int get_inventory_slot(ComponentData* components, int i) {
+int get_slot(ComponentData* components, int i, int size) {
     PlayerComponent* player = PlayerComponent_get(components, i);
 
     sfVector2f rs = player->controller.right_stick;
     float angle = mod(polar_angle(rs) + 0.25 * M_PI, 2 * M_PI);
 
-    return floor(player->inventory_size * angle / (2 * M_PI));
+    return floor(size * angle / (2 * M_PI));
 }
 
 
 int get_attachment(ComponentData* components, int i) {
     PlayerComponent* player = PlayerComponent_get(components, i);
-    int slot = get_inventory_slot(components, i);
+    int slot = get_slot(components, i, player->inventory_size);
     int item = player->inventory[slot];
 
     if (item != -1) {
@@ -82,7 +82,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
 
         switch (player->state) {
             case ON_FOOT:
-                if (controller.buttons_down[BUTTON_LB]) {
+                if (controller.buttons_down[BUTTON_LT]) {
                     player->state = MENU;
                 }
 
@@ -107,6 +107,10 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                     }
                 }
 
+                if (controller.buttons_down[BUTTON_LB]) {
+                    player->state = PLAYER_AMMO_MENU;
+                }
+
                 break;
             case SHOOT:
                 if (!controller.buttons_down[BUTTON_RT]) {
@@ -115,7 +119,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
 
                 break;
             case RELOAD:
-                if (controller.buttons_down[BUTTON_LB]) {
+                if (controller.buttons_down[BUTTON_LT]) {
                     player->state = MENU;
                 }
 
@@ -133,7 +137,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                     player->state = MENU_GRAB;
                 }
 
-                if (!controller.buttons_down[BUTTON_LB]) {
+                if (!controller.buttons_down[BUTTON_LT]) {
                     player->state = ON_FOOT;
                 }
 
@@ -149,9 +153,15 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
 
                 break;
             case MENU_DROP:
-                if (controller.buttons_down[BUTTON_LB]) {
+                if (controller.buttons_down[BUTTON_LT]) {
                     player->state = MENU;
                 } else {
+                    player->state = ON_FOOT;
+                }
+
+                break;
+            case PLAYER_AMMO_MENU:
+                if (!controller.buttons_down[BUTTON_LB]) {
                     player->state = ON_FOOT;
                 }
 
@@ -172,7 +182,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         sfVector2f left_stick = player->controller.left_stick;
         sfVector2f right_stick = player->controller.right_stick;
-        int slot = get_inventory_slot(components, i);
+        int slot = get_slot(components, i, player->inventory_size);
         int atch = get_attachment(components, i);
 
         int item = player->inventory[player->item];
@@ -232,6 +242,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                     if (weapon->reloading) {
                         player->state = RELOAD;
+                    } else if (!weapon->automatic) {
+                        player->state = ON_FOOT;
                     }
                 } else if (light) {
                     light->enabled = !light->enabled;
@@ -279,7 +291,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     }
                 }
 
-                player->item = get_inventory_slot(components, i);
+                player->item = get_slot(components, i, player->inventory_size);
 
                 int new_item = player->inventory[player->item];
                 if (new_item != item) {
@@ -328,6 +340,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     player->grabbed_item = -1;
                 }
 
+                break;
+            case PLAYER_AMMO_MENU:
                 break;
             case PLAYER_DEAD:;
                 ColliderComponent* col = ColliderComponent_get(components, i);
