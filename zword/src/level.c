@@ -315,17 +315,20 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     resize_roads(components);
 
     start = zeros();
-    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
-    // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
+    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
+    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 1);
+    create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 2);
     create_car(components, start);
-    create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
-    create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
-    create_shotgun(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-    create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-    // create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
-    create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
-    create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
-    create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
+    for (int i = 0; i < 4; i++) {
+        create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+        create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
+        create_shotgun(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+        create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+        create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+        create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+        create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+        create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
+    }
 }
 
 

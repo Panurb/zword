@@ -111,7 +111,9 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
 
                 if (controller.buttons_pressed[BUTTON_A]) {
                     if (enter_vehicle(components, i)) {
-                        player->state = DRIVE;
+                        if (VehicleComponent_get(components, player->vehicle)->riders[0] == i) {
+                            player->state = DRIVE;
+                        }
                     }
                 }
 
@@ -206,12 +208,35 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             image->texture_changed = true;
             change_layer(components, i, 2);
             player->state = PLAYER_DEAD;
+
+            for (int j = 0; j < player->inventory_size; j++) {
+                if (player->inventory[j] != -1) {
+                    coord->angle = rand_angle();
+                    player->item = j;
+                    drop_item(components, i);
+                }
+            }
+
+            for (int j = 1; j < player->ammo_size; j++) {
+                AmmoComponent* ammo = AmmoComponent_get(components, player->ammo[j]);
+                while (ammo->size > 0) {
+                    sfVector2f pos = get_position(components, i);
+                    int k = create_ammo(components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
+                    int size = fminf(AmmoComponent_get(components, k)->size, ammo->size);
+                    AmmoComponent* drop = AmmoComponent_get(components, k);
+                    drop->size = size;
+                    ammo->size -= size;
+                }
+            }
         }
 
         if (player->state != PLAYER_DEAD && player->state != DRIVE) {
             phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
             if (non_zero(right_stick)) {
                 coord->angle = polar_angle(right_stick);
+                if (coord->parent != -1) {
+                    coord->angle -= get_angle(components, coord->parent);
+                }
             }
         }
         

@@ -30,7 +30,7 @@
 
 
 int main() {
-    sfVideoMode mode = { 1920, 1080, 32 };
+    sfVideoMode mode = { 1366, 768, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
@@ -64,7 +64,7 @@ int main() {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
 
-    float ambient_light = 0.5f;
+    float ambient_light = 0.75f;
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);

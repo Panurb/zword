@@ -84,7 +84,7 @@ void drop_item(ComponentData* components, int entity) {
         coord->parent = -1;
 
         sfVector2f r = polar_to_cartesian(1.0, get_angle(components, entity));
-        coord->position = get_position(components, entity);
+        coord->position = sum(get_position(components, entity), r);
 
         physics->velocity = mult(7.0, r);
         physics->angular_velocity = 3.0;

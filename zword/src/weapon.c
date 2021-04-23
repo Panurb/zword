@@ -99,7 +99,11 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                         angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                     }
                     sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, parent, BULLETS);
+                    int ignore = PlayerComponent_get(components, parent)->vehicle;
+                    if (ignore == -1) {
+                        ignore = parent;
+                    }
+                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, ignore, BULLETS);
 
                     int dmg = weapon->damage;
                     if (dot(info.normal, dir) < -0.99f) {
