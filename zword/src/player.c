@@ -31,11 +31,19 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     ImageComponent_add(components, i, "player", 1.0, 1.0, 5);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.0, 10.0, 0.0)->max_speed = 5.0;
     ColliderComponent_add_circle(components, i, 0.5, PLAYERS);
-    PlayerComponent_add(components, i, joystick);
+    PlayerComponent* player = PlayerComponent_add(components, i, joystick);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i)->range = 12.0;
     HealthComponent_add(components, i, 100);
     SoundComponent_add(components, i, "squish");
+
+    for (AmmoType type = AMMO_PISTOL; type <= AMMO_SHOTGUN; type++) {
+        int j = create_ammo(components, zeros(), type);
+        player->ammo[type] = j;
+        CoordinateComponent_get(components, j)->parent = i;
+        ImageComponent_get(components, j)->alpha = 0.0f;
+        AmmoComponent_get(components, j)->size = 0;
+    }
 }
 
 
@@ -111,6 +119,8 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                     player->state = PLAYER_AMMO_MENU;
                 }
 
+                break;
+            case PLAYER_PICK_UP:
                 break;
             case SHOOT:
                 if (!controller.buttons_down[BUTTON_RT]) {

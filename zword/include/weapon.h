@@ -22,4 +22,4 @@ void create_axe(ComponentData* component, sfVector2f position);
 
 void create_lasersight(ComponentData* component, sfVector2f pos);
 
-void create_ammo(ComponentData* components, sfVector2f position, AmmoType type);
+int create_ammo(ComponentData* components, sfVector2f position, AmmoType type);

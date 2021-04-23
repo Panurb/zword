@@ -206,9 +206,9 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     }
     player->grabbed_item = -1;
     player->state = ON_FOOT;
-    player->ammo_size = 3;
+    player->ammo_size = 4;
     for (int i = 0; i < player->ammo_size; i++) {
-        player->ammo[i] = 0;
+        player->ammo[i] = -1;
     }
 
     player->shape = sfConvexShape_create();
@@ -309,7 +309,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     enemy->acceleration = 15.0;
     enemy->target = -1;
     enemy->path = List_create();
-    enemy->fov = 0.25 * M_PI;
+    enemy->fov = 0.5f * M_PI;
     enemy->vision_range = 15.0;
 
     components->enemy[entity] = enemy;

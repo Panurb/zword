@@ -58,9 +58,10 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     if (player->state == PLAYER_DEAD) continue;
 
                     sfVector2f r = diff(get_position(components, j), get_position(components, i));
-                    float angle = mod(get_angle(components, i) - polar_angle(r), 2 * M_PI);
+                    sfVector2f s = polar_to_cartesian(1.0f, get_angle(components, i));
+                    float angle = acosf(dot(normalized(r), s));
 
-                    if (angle < 0.5 * enemy->fov) {
+                    if (norm(r) < enemy->vision_range && angle < 0.5f * enemy->fov) {
                         HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, BULLETS);
                         if (info.object == j) {
                             enemy->target = j;

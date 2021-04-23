@@ -32,7 +32,8 @@ void reload(ComponentData* components, int i) {
     }
 
     PlayerComponent* player = PlayerComponent_get(components, CoordinateComponent_get(components, i)->parent);
-    if (player->ammo[weapon->ammo_type - 1] == 0) {
+    AmmoComponent* ammo = AmmoComponent_get(components, player->ammo[weapon->ammo_type]);
+    if (ammo->size == 0) {
         return;
     }
 
@@ -40,9 +41,9 @@ void reload(ComponentData* components, int i) {
 
     if (weapon->reloading) {
         if (weapon->cooldown == 0.0f) {
-            int ammo = fminf(player->ammo[weapon->ammo_type - 1], (1 + akimbo) * (weapon->max_magazine - weapon->magazine));
-            weapon->magazine += ammo;
-            player->ammo[weapon->ammo_type - 1] -= ammo;
+            int a = fminf(ammo->size, (1 + akimbo) * (weapon->max_magazine - weapon->magazine));
+            weapon->magazine += a;
+            ammo->size -= a;
             weapon->reloading = false;
         }
     } else {
@@ -168,7 +169,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
-    WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.2f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
+    WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
@@ -229,7 +230,7 @@ void create_lasersight(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
+int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
@@ -251,4 +252,5 @@ void create_ammo(ComponentData* components, sfVector2f position, AmmoType type) 
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
     SoundComponent_add(components, i, "metal");
+    return i;
 }
