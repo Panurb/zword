@@ -30,12 +30,13 @@
 
 
 int main() {
-    sfVideoMode mode = { 1366, 768, 32 };
+    sfVideoMode mode = { 1920, 1080, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
     sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
+    sfRenderWindow_setMouseCursorVisible(window, false);
     // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
     bool focus = true;
@@ -64,7 +65,7 @@ int main() {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
 
-    float ambient_light = 0.75f;
+    float ambient_light = 0.4f;
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);

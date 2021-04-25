@@ -66,7 +66,9 @@ typedef enum {
     ROADS,
     RIVERS,
     BULLETS,
-    LIGHTS
+    LIGHTS,
+    GROUP_CORPSES,
+    GROUP_FLOORS
 } ColliderGroup;
 
 typedef struct {
@@ -84,6 +86,7 @@ typedef enum {
     SHOOT,
     RELOAD,
     DRIVE,
+    PLAYER_PASSENGER,
     MENU,
     MENU_GRAB,
     MENU_DROP,
@@ -120,6 +123,7 @@ typedef struct {
     Controller controller;
     int ammo_size;
     int ammo[4];
+    sfCircleShape* crosshair;
 } PlayerComponent;
 
 typedef struct {

@@ -273,7 +273,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                             physics->collision.collided = true;
                             break;
                         case 2:
-                            apply_force(components, i, mult(50.0, ol));
+                            apply_force(components, i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
                             break;
                         case 3:
                             VehicleComponent_get(components, i)->on_road = true;

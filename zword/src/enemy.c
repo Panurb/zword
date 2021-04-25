@@ -106,7 +106,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
             case DEAD:;
                 ColliderComponent* col = ColliderComponent_get(components, i);
                 if (col) {
-                    col->group = ITEMS;
+                    col->group = GROUP_CORPSES;
                     if (phys->speed == 0.0f) {
                         clear_grid(components, grid, i);
                         ColliderComponent_remove(components, i);
@@ -114,9 +114,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 }
 
                 // FIXME
-                // if (WaypointComponent_get(components, i)) {
-                //     WaypointComponent_remove(components, i);
-                // }
+                if (WaypointComponent_get(components, i)) {
+                    WaypointComponent_remove(components, i);
+                }
 
                 break;
         }

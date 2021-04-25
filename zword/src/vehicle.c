@@ -71,6 +71,7 @@ bool enter_vehicle(ComponentData* components, int i) {
             }
             add_sound(components, j, "car_door", 0.75, 1.0);
 
+            PhysicsComponent_get(components, i)->velocity = zeros();
             return true;
         }
     }
@@ -88,7 +89,7 @@ void exit_vehicle(ComponentData* components, int i) {
 
     CoordinateComponent* coord = components->coordinate[i];
     sfVector2f r = vehicle->seats[k];
-    r.x *= 2.0;
+    r.y *= 2.0;
     r = rotate(r, get_angle(components, j));
     coord->position = sum(get_position(components, j), r);
     coord->parent = -1;
@@ -131,7 +132,7 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering, 
         }
     }
 
-    phys->angular_acceleration = -sign(gas + 0.1) * vehicle->turning * steering * steering * steering;
+    phys->angular_acceleration = -sign(gas + 0.1) * phys->speed * vehicle->turning * steering;
 
     vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
 

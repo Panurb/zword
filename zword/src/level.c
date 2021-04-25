@@ -71,11 +71,12 @@ void create_light(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_floor(ComponentData* component, sfVector2f pos, float width, float height, float angle) {
-    int i = create_entity(component);
+void create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle) {
+    int i = create_entity(components);
 
-    CoordinateComponent_add(component, i, pos, angle);
-    ImageComponent_add(component, i, "board_tile", width, height, 1);
+    CoordinateComponent_add(components, i, pos, angle);
+    ImageComponent_add(components, i, "board_tile", width, height, 1);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
 }
 
 
@@ -84,6 +85,27 @@ void create_roof(ComponentData* component, sfVector2f pos, float width, float he
 
     CoordinateComponent_add(component, i, pos, angle);
     ImageComponent_add(component, i, "roof_tile", width, height, 6);
+}
+
+
+void create_item(ComponentData* components, sfVector2f position) {
+    switch (rand() % 5) {
+        case 0:
+            create_pistol(components, position);
+            break;
+        case 1:
+            create_assault_rifle(components, position);
+            break;
+        case 2:
+            create_shotgun(components, position);
+            break;
+        case 3:
+            create_gas(components, position);
+            break;
+        case 4:
+            create_flashlight(components, position);
+            break;
+    }
 }
 
 
@@ -112,9 +134,6 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_light(components, sum(pos, mult(0.51, diff(w, h))));
     create_light(components, diff(pos, mult(0.51, diff(w, h))));
 
-    create_pistol(components, sum(pos, mult(0.51, diff(w, h))));
-    // create_flashlight(components, diff(pos, mult(0.51, diff(w, h))));
-
     create_waypoint(components, sum(pos, mult(0.75, w)));
     create_waypoint(components, sum(pos, mult(1.5, w)));
 
@@ -126,6 +145,10 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, mult(0.5, sum(w, h))));
     create_waypoint(components, diff(pos, mult(0.5, sum(w, h))));
     create_waypoint(components, diff(pos, mult(0.5, diff(w, h))));
+
+    create_item(components, sum(pos, mult(0.51, diff(w, h))));
+    create_item(components, diff(pos, mult(0.51, diff(w, h))));
+    create_item(components, diff(pos, mult(0.51, sum(w, h))));
 }
 
 
@@ -183,7 +206,7 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_circle(components, i, size, TREES);
 
-    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
+    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS) || collides_with(components, grid, i, GROUP_FLOORS)) {
         destroy_entity(components, i);
         return;
     }
@@ -197,7 +220,7 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_circle(components, i, 1.4 * size, TREES);
 
-    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
+    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS) || collides_with(components, grid, i, GROUP_FLOORS)) {
         destroy_entity(components, i);
         return;
     }
@@ -212,7 +235,7 @@ void create_uranium(ComponentData* components, ColliderGrid* grid, sfVector2f po
     float r = randf(0.8, 1.2);
     ColliderComponent_add_circle(components, i, 0.5 * r, TREES);
 
-    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS)) {
+    if (collides_with(components, grid, i, ROADS) || collides_with(components, grid, i, WALLS) || collides_with(components, grid, i, GROUP_FLOORS)) {
         destroy_entity(components, i);
         return;
     }
@@ -315,20 +338,18 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     resize_roads(components);
 
     start = zeros();
-    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
-    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 1);
-    create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 2);
+    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
+    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
+    // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
     create_car(components, start);
-    for (int i = 0; i < 4; i++) {
-        create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
-        create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
-        create_shotgun(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-        create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-        create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
-        create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
-        create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
-        create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
-    }
+    create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+    create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
+    create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
+    create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+    create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+    create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+    create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+    create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
 }
 
 

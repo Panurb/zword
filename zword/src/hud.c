@@ -121,7 +121,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
 
-        sfVector2f pos = get_position(components, i);
+        sfVector2f position = get_position(components, i);
 
         int slot = get_slot(components, i, player->inventory_size);
         int atch = get_attachment(components, i);
@@ -132,22 +132,34 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             weapon = components->weapon[item];
         }
 
+        sfVector2f pos;
+        if (player->controller.joystick == -1) {
+            pos = screen_to_world(components, camera, sfMouse_getPosition(window));
+        } else {
+            pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(components, i));
+            pos = sum(position, pos);
+        }
+        if (weapon) {
+            float r = fmaxf(dist(pos, position) * tanf(0.5f * fmaxf(weapon->spread, weapon->recoil)), 0.1f);
+            if (weapon->ammo_type == AMMO_MELEE) {
+                r = 0.1f;
+            }
+            sfColor color = (r == 0.1f) ? sfWhite : sfTransparent;
+            draw_circle(window, components, camera, player->crosshair, pos, r, color);
+        } else {
+            draw_circle(window, components, camera, player->crosshair, pos, 0.1f, sfWhite);
+        }
+
         switch (player->state) {
             case ON_FOOT:
+                break;
             case SHOOT:
-                if (weapon) {
-                    CameraComponent* cam = CameraComponent_get(components, camera);
-
-                    float spread = fmax(0.01, weapon->recoil);
-                    // draw_cone(window, components, camera, NULL, 20, get_position(components, i), 3.0, get_angle(components, i), spread);
-                }
-
                 break;
             case RELOAD:
                 sfConvexShape_setFillColor(player->shape, sfWhite);
                 int akimbo = get_akimbo(components, item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
-                draw_slice(window, components, camera, NULL, 50, pos, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
+                draw_slice(window, components, camera, NULL, 50, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
 
                 break;
             case DRIVE:

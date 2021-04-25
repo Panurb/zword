@@ -110,15 +110,20 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_A]) {
-                    if (enter_vehicle(components, i)) {
-                        if (VehicleComponent_get(components, player->vehicle)->riders[0] == i) {
-                            player->state = DRIVE;
-                        }
-                    }
+                    enter_vehicle(components, i);
                 }
 
                 if (controller.buttons_down[BUTTON_LB]) {
                     player->state = PLAYER_AMMO_MENU;
+                }
+
+                VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
+                if (vehicle) {
+                    if (vehicle->riders[0] == i) {
+                        player->state = DRIVE;
+                    } else {
+                        player->state = PLAYER_PASSENGER;
+                    }
                 }
 
                 break;
@@ -139,7 +144,21 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
             case DRIVE:
                 if (controller.buttons_pressed[BUTTON_A]) {
                     exit_vehicle(components, i);
+                    player->state = ON_FOOT;
+                }
 
+                break;
+            case PLAYER_PASSENGER:
+                if (controller.buttons_down[BUTTON_LT]) {
+                    player->state = MENU;
+                }
+
+                if (controller.buttons_pressed[BUTTON_RT]) {
+                    player->state = SHOOT;
+                }
+
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    exit_vehicle(components, i);
                     player->state = ON_FOOT;
                 }
 

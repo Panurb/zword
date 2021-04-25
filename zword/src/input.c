@@ -63,10 +63,13 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         }
         player->controller.left_stick = left_stick;
 
-        right_stick.x = sfJoystick_getAxisPosition(joystick, axes[sfJoystickZ]);
-        right_stick.y = -sfJoystick_getAxisPosition(joystick, axes[sfJoystickR]);
-        if (norm(right_stick) < 50.0f) {
+        right_stick.x = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickZ]);
+        right_stick.y = -0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickR]);
+        if (norm(right_stick) < 0.25f) {
             right_stick = zeros();
+        }
+        if (norm(right_stick) > 1.0f) {
+            right_stick = normalized(right_stick);
         }
         player->controller.right_stick = right_stick;
 

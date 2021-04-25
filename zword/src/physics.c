@@ -15,7 +15,7 @@
 void apply_force(ComponentData* components, int entity, sfVector2f force) {
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);
 
-    sfVector2f a = mult(1.0 / physics->mass, force);
+    sfVector2f a = mult(1.0f / physics->mass, force);
     physics->acceleration = sum(physics->acceleration, a);
 }
 
@@ -38,7 +38,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
             HealthComponent* health = components->health[i];
             if (health) {
                 float v = norm(v_n);
-                if (v > 10.0) {
+                if (v > 10.0f) {
                     if (health->health > 0) {
                         SoundComponent* sound = SoundComponent_get(components, i);
                         if (sound) {
@@ -48,6 +48,13 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
                     damage(components, i, get_position(components, i), v_n, 100);
                 }
             }
+
+            // SoundComponent* sound = SoundComponent_get(components, i);
+            // if (sound) {
+            //     if (physics->speed > 5.0f) {
+            //         add_sound(components, i, sound->hit_sound, 0.5f, 1.0f);
+            //     }
+            // }
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
@@ -72,7 +79,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
         physics->acceleration = zeros();
         
         physics->speed = norm(physics->velocity);
-        if (physics->speed < 0.1) {
+        if (physics->speed < 0.1f) {
             physics->velocity = zeros();
             physics->speed = 0.0;
         } else if (physics->speed > physics->max_speed) {

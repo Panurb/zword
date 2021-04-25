@@ -238,6 +238,9 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
         player->controller.buttons_released[i] = false;
     }
 
+    player->crosshair = sfCircleShape_create();
+    sfCircleShape_setOutlineThickness(player->crosshair, 1.0f);
+
     components->player.array[entity] = player;
     components->player.order[components->player.size] = entity;
     components->player.size++;
@@ -487,7 +490,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity) 
     waypoint->g_score = INFINITY;
     waypoint->f_score = INFINITY;
     waypoint->neighbors = List_create();
-    waypoint->range = 12.0;
+    waypoint->range = 15.0f;
 
     components->waypoint[entity] = waypoint;
 
@@ -718,20 +721,22 @@ void ComponentData_clear(ComponentData* components) {
 
 
 sfVector2f get_position(ComponentData* components, int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     sfVector2f position = components->coordinate[entity]->position;
 
-    int parent = components->coordinate[entity]->parent;
+    int parent = coord->parent;
     if (parent != -1) {
-        position = sum(get_position(components, parent), rotate(position, components->coordinate[parent]->angle));
+        position = sum(get_position(components, parent), rotate(position, get_angle(components, parent)));
     }
     return position;
 }
 
 
 float get_angle(ComponentData* components, int entity) {
-    float angle = components->coordinate[entity]->angle;
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    float angle = coord->angle;
 
-    int parent = components->coordinate[entity]->parent;
+    int parent = coord->parent;
     if (parent != -1) {
         angle += get_angle(components, parent);
     }
