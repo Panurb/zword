@@ -34,6 +34,23 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
 }
 
 
+void create_big_boy(ComponentData* components, sfVector2f pos) {
+    int i = create_entity(components);
+
+    float angle = rand_angle();
+    
+    CoordinateComponent_add(components, i, pos, angle);
+    ImageComponent_add(components, i, "big_boy", 2.0f, 2.0f, 4);
+    ColliderComponent_add_circle(components, i, 0.9f, ENEMIES);
+    PhysicsComponent_add(components, i, 10.0f, 0.0, 0.15f, 5.0, 10.0)->max_speed = 12.0f;
+    EnemyComponent_add(components, i);
+    ParticleComponent_add_blood(components, i);
+    WaypointComponent_add(components, i);
+    HealthComponent_add(components, i, 500);
+    SoundComponent_add(components, i, "squish");
+}
+
+
 void update_enemies(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(components, i);
@@ -152,8 +169,10 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 
         EnemyComponent* enemy = EnemyComponent_get(components, j);
         if (enemy) {
-            enemy->target = player;
-            enemy->state = CHASE;
+            if (enemy->target == -1) {
+                enemy->target = player;
+                enemy->state = CHASE;
+            }
         }
     }
     List_delete(list);

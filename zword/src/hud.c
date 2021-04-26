@@ -153,6 +153,8 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
         switch (player->state) {
             case ON_FOOT:
                 break;
+            case PLAYER_PICK_UP:
+                break;
             case SHOOT:
                 break;
             case RELOAD:
@@ -169,6 +171,8 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                     draw_slice(window, components, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
                 }
 
+                break;
+            case PLAYER_PASSENGER:
                 break;
             case MENU:
             case MENU_DROP:

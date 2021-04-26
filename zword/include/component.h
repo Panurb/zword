@@ -243,6 +243,9 @@ typedef struct {
     float zoom;
     sfShader* shaders[10];
     sfFont* fonts[1];
+    Matrix2f matrix;
+    Matrix2f inv_matrix;
+    sfView* view;
 } CameraComponent;
 
 typedef struct {

@@ -88,6 +88,8 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
         update_controller(components, window, camera, i);
         Controller controller = player->controller;
 
+        WeaponComponent* weapon = WeaponComponent_get(components, player->inventory[player->item]);
+
         switch (player->state) {
             case ON_FOOT:
                 if (controller.buttons_down[BUTTON_LT]) {
@@ -102,10 +104,20 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                     player->state = SHOOT;
                 }
 
-                if (controller.buttons_pressed[BUTTON_X]) {
-                    WeaponComponent* weapon = WeaponComponent_get(components, player->inventory[player->item]);
-                    if (weapon) {
+                if (weapon) {
+                    if (controller.buttons_pressed[BUTTON_X]) {
                         player->state = RELOAD;
+                    }
+
+                    if (controller.buttons_pressed[BUTTON_Y]) {
+                        ItemComponent* item = ItemComponent_get(components, player->inventory[player->item]);
+                        for (int j = 0; j < item->size; j++) {
+                            int k = item->attachments[j];
+                            LightComponent* light = LightComponent_get(components, k);
+                            if (light) {
+                                light->enabled = !light->enabled;
+                            }
+                        }
                     }
                 }
 
@@ -336,11 +348,13 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 if (light) {
                     light->enabled = false;
                 }
-
-                ItemComponent* itco = ItemComponent_get(components, item);
+                
                 if (weapon) {
                     weapon->reloading = false;
-                } else if (itco) {
+                }
+                
+                ItemComponent* itco = ItemComponent_get(components, item);
+                if (itco) {
                     for (int j = 0; j < itco->size; j++) {
                         LightComponent* a = LightComponent_get(components, itco->attachments[j]);
                         if (a) {
@@ -354,10 +368,17 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 int new_item = player->inventory[player->item];
                 if (new_item != item) {
                     if (item != -1) {
-                        ImageComponent_get(components, item)->alpha = 0.0;
+                        ImageComponent_get(components, item)->alpha = 0.0f;
                     }
                     if (new_item != -1) {
-                        ImageComponent_get(components, new_item)->alpha = 1.0;
+                        itco = ItemComponent_get(components, new_item);
+                        ImageComponent_get(components, new_item)->alpha = 1.0f;
+                        for (int j = 0; j < itco->size; j++) {
+                            int k = itco->attachments[j];
+                            if (k != -1) {
+                                ImageComponent_get(components, k)->alpha = 0.0f;
+                            }
+                        }
                     }
                 }
 

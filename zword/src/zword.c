@@ -35,6 +35,7 @@ int main() {
     sfContextSettings settings = sfContext_getSettings(context);
     settings.antialiasingLevel = 8;
     sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
+    // sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfFullscreen, &settings);
     sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
     sfRenderWindow_setMouseCursorVisible(window, false);
     // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);

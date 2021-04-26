@@ -22,6 +22,8 @@ static int COLLISION_MATRIX[12][12] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
                                         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };    // FLOORS
 
 
+bool inside_collider(ComponentData* components, int i, sfVector2f point);
+
 void get_corners(ComponentData* component, int i, sfVector2f* corners) ;
 
 sfVector2f half_width(ComponentData* component, int i);

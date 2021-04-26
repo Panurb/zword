@@ -11,7 +11,7 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     ItemComponent_add(components, i, 0);
-    LightComponent_add(components, i, 7.0, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
+    LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
 }
 

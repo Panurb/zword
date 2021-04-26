@@ -29,15 +29,24 @@ Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVecto
         sfVector2f corners[4];
         get_corners(components, i, corners);
 
+        int n = 0;
         for (int k = 0; k < 4; k++) {
             sfVector2f dir = diff(corners[(k + 1) % 4], corners[k]);
             float t = cross(diff(corners[k], start), dir) / cross(velocity, dir);
             float u = cross(diff(start, corners[k]), velocity) / cross(dir, velocity);
 
-            if (t >= 0.0 && t < hit.time && u >= 0.0 && u <= 1.0) {
-                hit.time = t;
-                hit.normal = perp(dir);
+            if (t >= 0.0 && u >= 0.0 && u <= 1.0) {
+                n++;
+                if (t < hit.time) {
+                    hit.time = t;
+                    hit.normal = perp(dir);
+                }
             }
+        }
+
+        if (n < 2) {
+            hit.time = range;
+            hit.normal = perp(velocity);
         }
     } else {
         // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection

@@ -549,6 +549,9 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
 
     camera->fonts[0] = sfFont_createFromFile("data/Helvetica.ttf");
 
+    camera->matrix = (Matrix2f) { 0.0f, 0.0f, 0.0f, 0.0f };
+    camera->inv_matrix = (Matrix2f) { 0.0f, 0.0f, 0.0f, 0.0f };
+
     components->camera[entity] = camera;
     return camera;
 }

@@ -19,6 +19,24 @@
 #include "particle.h"
 
 
+bool inside_collider(ComponentData* components, int i, sfVector2f point) {
+    // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
+    ColliderComponent* col = components->collider[i];
+    if (col->type == RECTANGLE) {
+        sfVector2f corners[4];
+        get_corners(components, i, corners);
+        sfVector2f am = diff(point, corners[0]);
+        sfVector2f ab = diff(corners[1], corners[0]);
+        sfVector2f ad = diff(corners[3], corners[0]);
+        if (0.0f < dot(am, ab) && dot(am, ab) < dot(ab, ab) && 
+            0.0f < dot(am, ad) && dot(am, ad) < dot(ad, ad)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 void get_corners(ComponentData* component, int i, sfVector2f* corners) {
     CoordinateComponent* coord = component->coordinate[i];
 
