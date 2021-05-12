@@ -15,14 +15,13 @@
 #include "particle.h"
 #include "sound.h"
 #include "collider.h"
+#include "animation.h"
 
 
 void create_enemy(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-
-    float angle = rand_angle();
     
-    CoordinateComponent_add(components, i, pos, angle);
+    CoordinateComponent_add(components, i, pos, rand_angle());
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4)->shine = 0.5;
     ColliderComponent_add_circle(components, i, 0.5, ENEMIES);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 6.0;
@@ -36,11 +35,10 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
 
 void create_big_boy(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-
-    float angle = rand_angle();
     
-    CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, "big_boy", 2.0f, 2.0f, 4);
+    CoordinateComponent_add(components, i, pos, rand_angle());
+    ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, 4);
+    AnimationComponent_add(components, i);
     ColliderComponent_add_circle(components, i, 0.9f, ENEMIES);
     PhysicsComponent_add(components, i, 10.0f, 0.0, 0.15f, 5.0, 10.0)->max_speed = 12.0f;
     EnemyComponent_add(components, i);
@@ -64,6 +62,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
             image->width = 2.0;
             image->texture_changed = true;
             change_layer(components, i, 2);
+            stop_animation(components, i);
             enemy->state = DEAD;
         }
 

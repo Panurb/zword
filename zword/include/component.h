@@ -279,6 +279,13 @@ typedef struct {
 } AmmoComponent;
 
 typedef struct {
+    int frames;
+    int current_frame;
+    float timer;
+    float framerate;
+} AnimationComponent;
+
+typedef struct {
     int size;
     void* array[MAX_ENTITIES];
     int order[MAX_ENTITIES];
@@ -303,6 +310,7 @@ typedef struct {
     RoadComponent* road[MAX_ENTITIES];
     SoundComponent* sound[MAX_ENTITIES];
     AmmoComponent* ammo[MAX_ENTITIES];
+    AnimationComponent* animation[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -375,6 +383,10 @@ void SoundComponent_remove(ComponentData* components, int entity);
 AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType type);
 AmmoComponent* AmmoComponent_get(ComponentData* components, int entity);
 void AmmoComponent_remove(ComponentData* components, int entity);
+
+AnimationComponent* AnimationComponent_add(ComponentData* components, int entity);
+AnimationComponent* AnimationComponent_get(ComponentData* components, int entity);
+void AnimationComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

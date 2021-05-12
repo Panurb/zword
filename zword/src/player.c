@@ -342,6 +342,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 alert_enemies(components, grid, i, 10.0f);
 
                 break;
+            case PLAYER_PASSENGER:
+                break;
             case MENU:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
                 

@@ -356,15 +356,39 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 }
 
 
-void test(ComponentData* components) {
-    for (int i = 0; i < 20; i ++) {
-        for (int j = 0; j < 20; j++) {
-            int k = create_entity(components);
+void test(ComponentData* components, ColliderGrid* grid) {
+    Permutation perm;
+    init_perlin(perm);
 
-            sfVector2f pos = { i, j };
+    int w = 512;
+    int h = 512;
 
-            CoordinateComponent_add(components, k, pos, 0.0);
-            WaypointComponent_add(components, k);
-        }
+    sfTexture* noise_texture = sfTexture_create(w, h);
+
+    // sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
+    // create_noise(pixels, w, h, zeros(), get_color(0.0, 0.0, 0.0, 0.3), perm);
+    // sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
+    // sfTexture_setRepeated(noise_texture, true);
+    // free(pixels);
+
+    sfVector2f position = zeros();
+    create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+
+    init_grid(components, grid);
+
+    create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
+
+    sfVector2f start = zeros();
+    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
+    create_car(components, start);
+    for (int i = 0; i < 2; i++) {
+        create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+        create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
+        create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
+        create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+        create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+        create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+        create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+        create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
     }
 }

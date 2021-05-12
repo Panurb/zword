@@ -662,6 +662,34 @@ void AmmoComponent_remove(ComponentData* components, int entity) {
 }
 
 
+AnimationComponent* AnimationComponent_add(ComponentData* components, int entity) {
+    AnimationComponent* anim = malloc(sizeof(AnimationComponent));
+    // ImageComponent* image = ImageComponent_get(components, entity);
+    anim->frames = 2;
+    anim->current_frame = 0;
+    anim->framerate = 10.0f;
+    anim->timer = 0.0f;
+
+    components->animation[entity] = anim;
+    return anim;
+}
+
+
+AnimationComponent* AnimationComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->animation[entity];
+}
+
+
+void AnimationComponent_remove(ComponentData* components, int entity) {
+    AnimationComponent* anim = AnimationComponent_get(components, entity);
+    if (anim) {
+        free(anim);
+        components->animation[entity] = NULL;
+    }
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -708,6 +736,7 @@ void destroy_entity(ComponentData* components, int entity) {
     if (SoundComponent_get(components, entity))
         SoundComponent_remove(components, entity);
     AmmoComponent_remove(components, entity);
+    AnimationComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

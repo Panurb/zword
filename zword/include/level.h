@@ -11,3 +11,5 @@
 
 
 void create_level(ComponentData* component, ColliderGrid* grid, int seed);
+
+void test(ComponentData* components, ColliderGrid* grid);

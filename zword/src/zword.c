@@ -27,6 +27,7 @@
 #include "road.h"
 #include "sound.h"
 #include "hud.h"
+#include "animation.h"
 
 
 int main() {
@@ -70,7 +71,8 @@ int main() {
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);
-    create_level(components, grid, seed);
+    // create_level(components, grid, seed);
+    test(components, grid);
     init_grid(components, grid);
     init_waypoints(components, grid);
 
@@ -130,6 +132,8 @@ int main() {
                 update_camera(components, camera, time_step);
 
                 draw_lights(components, grid, light_texture, camera, ambient_light);
+
+                animate(components, time_step);
 
                 steps++;
             }
