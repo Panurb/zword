@@ -15,6 +15,7 @@
 
 
 static const char* IMAGES[] = {
+    "altar_tile",
     "ammo_pistol",
     "ammo_rifle",
     "ammo_shotgun",

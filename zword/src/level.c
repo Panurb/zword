@@ -49,12 +49,11 @@ void create_wood_wall(ComponentData* components, sfVector2f pos, float length, f
 }
 
 
-void create_stone_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
+void create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
     int i = create_entity(components);
-
     CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, length, 1.0f, WALLS);
-    ImageComponent_add(components, i, "stone_tile", length, 1.0f, 2);
+    ColliderComponent_add_rectangle(components, i, width, height, WALLS);
+    ImageComponent_add(components, i, filename, width, height, 2);
     ParticleComponent_add_dirt(components, i);
 }
 
@@ -132,59 +131,71 @@ void create_bench(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
+void create_decal(ComponentData* components, sfVector2f pos, Filename filename) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, pos, rand_angle());
+    ImageComponent* image = ImageComponent_add(components, i, filename, 2.0f, 2.0f, 3);
+}
+
+
 void create_church(ComponentData* components, sfVector2f pos) {
     float angle = randf(0.0, 2 * M_PI);
 
-    sfVector2f w = polar_to_cartesian(10.0f, angle);
-    sfVector2f h = polar_to_cartesian(5.0f, angle + 0.5f * M_PI);
+    sfVector2f w = polar_to_cartesian(1.0f, angle);
+    sfVector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
 
     create_floor(components, pos, 30.0f, 10.0f, angle, "tiles_tile");
-    create_floor(components, sum(pos, mult(0.5f, w)), 10.0f, 20.0f, angle, "tiles_tile");
+    create_floor(components, sum(pos, mult(5.0f, w)), 10.0f, 20.0f, angle, "tiles_tile");
 
     // Back wall
-    create_stone_wall(components, sum(pos, mult(1.45f, w)), 8.0f, angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, mult(14.5f, w)), angle + 0.5f * M_PI, 8.0f, 1.0f, "stone_tile");
 
     // Altar
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, sum(pos, mult(1.1f, w)), angle);
-    ColliderComponent_add_rectangle(components, i, 3.0f, 5.0f, WALLS);
-    ImageComponent_add(components, i, "stone_tile", 3.0f, 5.0f, 2);
-    ParticleComponent_add_dirt(components, i);
-
-    i = create_entity(components);
-    CoordinateComponent_add(components, i, sum(pos, mult(1.1f, w)), rand_angle());
-    ImageComponent_add(components, i, "blood", 1.0f, 1.0f, 3);
+    create_wall(components, sum(pos, mult(12.5f, w)), angle, 3.0f, 8.0f, "altar_tile");
+    create_light(components, sum(pos, sum(mult(12.5f, w), mult(-3.0f, h))));
+    create_light(components, sum(pos, sum(mult(12.5f, w), mult(3.0f, h))));
+    create_decal(components, sum(pos, mult(12.5f, w)), "blood_large");
 
     for (int j = 0; j < 2; j++) {
         for (int i = 0; i < 7; i++) {
-            create_bench(components, sum(pos, sum(mult((i - 5.75f) * 0.2f, w), mult(0.5f, h))), angle);
+            create_bench(components, sum(pos, sum(mult((i - 5.75f) * 2.0f, w), mult(2.5f, h))), angle);
         }
 
         // Entrance
-        create_stone_wall(components, sum(pos, sum(mult(-1.45f, w), mult(0.5f, h))), 3.0f, angle + 0.5f * M_PI);
-        create_stone_wall(components, sum(pos, sum(mult(-1.3f, w), mult(0.7f, h))), 2.0f, angle);
-        create_light(components, sum(pos, sum(mult(-1.3f, w), mult(0.7f, h))));
+        create_wall(components, sum(pos, sum(mult(-14.5f, w), mult(2.5f, h))), angle + 0.5f * M_PI, 3.0f, 1.0f, "stone_tile");
+        create_wall(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))), angle, 2.0f, 1.0f, "altar_tile");
+        create_light(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))));
 
         // Side wall entrance
-        create_stone_wall(components, sum(pos, sum(mult(-0.6f, w), mult(0.9f, h))), 18.0f, angle);
+        create_wall(components, sum(pos, sum(mult(-6.0f, w), mult(4.5f, h))), angle, 18.0f, 1.0f, "stone_tile");
 
         // Side wall back
-        create_stone_wall(components, sum(pos, sum(mult(1.1f, w), mult(0.9f, h))), 8.0f, angle);
+        create_wall(components, sum(pos, sum(mult(11.0f, w), mult(4.5f, h))), angle, 8.0f, 1.0f, "stone_tile");
         
         // Side thingies
-        create_stone_wall(components, sum(pos, sum(mult(0.5f, w), mult(1.9f, h))), 10.0f, angle);
-        create_stone_wall(components, sum(pos, sum(mult(0.05f, w), mult(1.4f, h))), 4.0f, angle + 0.5f * M_PI);
-        create_stone_wall(components, sum(pos, sum(mult(0.95f, w), mult(1.4f, h))), 4.0f, angle + 0.5f * M_PI);
+        create_wall(components, sum(pos, sum(mult(5.0f, w), mult(9.5f, h))), angle, 10.0f, 1.0f, "stone_tile");
+        create_wall(components, sum(pos, sum(mult(0.5f, w), mult(7.0f, h))), angle + 0.5f * M_PI, 4.0f, 1.0f, "stone_tile");
+        create_wall(components, sum(pos, sum(mult(9.5f, w), mult(7.0f, h))), angle + 0.5f * M_PI, 4.0f, 1.0f, "stone_tile");
+        create_wall(components, sum(pos, sum(mult(5.0f, w), mult(8.5f, h))), angle, 2.0f, 1.0f, "altar_tile");
+        create_light(components, sum(pos, sum(mult(5.0f, w), mult(8.5f, h))));
+        create_waypoint(components, sum(pos, sum(mult(5.0f, w), mult(5.0f, h))));
 
-        create_item(components, sum(pos, sum(mult(0.5f, w), mult(1.3f, h))));
+        // Outside
+        create_waypoint(components, sum(pos, sum(mult(-16.0f, w), mult(6.0f, h))));
+        create_waypoint(components, sum(pos, sum(mult(-8.0f, w), mult(6.0f, h))));
+        create_waypoint(components, sum(pos, sum(mult(-1.0f, w), mult(11.0f, h))));
+        create_waypoint(components, sum(pos, sum(mult(11.0f, w), mult(11.0f, h))));
+        create_waypoint(components, sum(pos, sum(mult(16.0f, w), mult(6.0f, h))));
 
-        create_stone_wall(components, sum(pos, sum(mult(0.5f, w), mult(1.7f, h))), 2.0f, angle);
-        create_light(components, sum(pos, sum(mult(0.5f, w), mult(1.7f, h))));
-
-        create_light(components, sum(pos, sum(mult(1.1f, w), mult(0.3f, h))));
+        create_item(components, sum(pos, sum(mult(5.0f, w), mult(6.5f, h))));
 
         h = mult(-1.0f, h);
     }
+
+    create_waypoint(components, sum(pos, mult(-16.0f, w)));
+    create_waypoint(components, sum(pos, mult(-12.0f, w)));
+    create_waypoint(components, sum(pos, mult(2.0f, w)));
+    create_waypoint(components, sum(pos, mult(8.0f, w)));
 }
 
 
@@ -445,19 +456,11 @@ void test(ComponentData* components, ColliderGrid* grid) {
 
     init_grid(components, grid);
 
-    // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
-
     sfVector2f start = zeros();
-    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
     // create_car(components, start);
     create_church(components, zeros());
 
-    // create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
-    // create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
-    // create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
-    // create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-    // create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
-    // create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
-    // create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
-    // create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
+    create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
+
+    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
 }
