@@ -300,38 +300,25 @@ void create_house(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_shed(ComponentData* components, sfVector2f pos) {
+void create_toilet(ComponentData* components, sfVector2f pos) {
     float angle = randf(0.0, 2 * M_PI);
 
-    sfVector2f w = polar_to_cartesian(3.0, angle);
+    sfVector2f w = polar_to_cartesian(1.0f, angle);
     sfVector2f h = perp(w);
 
-    create_floor(components, pos, 6.0, 6.0, angle, "board_tile");
+    create_floor(components, pos, 3.0f, 3.0f, angle, "board_tile");
 
-    create_wood_wall(components, sum(pos, w), 5.5, angle + 0.5 * M_PI);
-    create_wood_wall(components, diff(pos, w), 5.5, angle + 0.5 * M_PI);
-    create_wood_wall(components, diff(pos, h), 6.5, angle);
+    create_wall(components, sum(pos, mult(-1.25f, w)), angle + 0.5 * M_PI, 2.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, mult(1.25f, h)), angle, 3.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, mult(-1.25f, h)), angle, 3.0f, 0.5f, "wood_tile");
 
-    create_wood_wall(components, sum(pos, sum(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
-    create_wood_wall(components, sum(pos, diff(h, mult(2.0 / 3.0, w))), 2.5, angle + M_PI);
+    create_wall(components, sum(pos, mult(-0.5f, w)), angle, 1.0f, 2.0f, "toilet");
 
-    create_enemy(components, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
-    create_enemy(components, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
-    create_enemy(components, sum(pos, polar_to_cartesian(2.0, randf(0.0, 2 * M_PI))));
-
-    create_fire(components, sum(pos, mult(0.01, h)));
-
-    create_waypoint(components, sum(pos, mult(0.75, h)));
-    create_waypoint(components, sum(pos, mult(1.5, h)));
-    create_waypoint(components, sum(pos, mult(1.5, sum(w, h))));
-    create_waypoint(components, sum(pos, mult(1.5, diff(w, h))));
-    create_waypoint(components, sum(pos, mult(-1.5, sum(w, h))));
-    create_waypoint(components, sum(pos, mult(-1.5, diff(w, h))));
-
-    create_gas(components, pos);
-
-    // create_roof(component, diff(pos, mult(0.665, h)), 8.0, 4.0, angle);
-    // create_roof(component, sum(pos, mult(0.665, h)), 8.0, 4.0, angle + M_PI);
+    create_waypoint(components, sum(pos, lin_comb(2.5f, w, 0.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(2.5f, w, 2.5f, h)));
+    create_waypoint(components, sum(pos, lin_comb(2.5f, w, -2.5f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-2.5f, w, 2.5f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-2.5f, w, -2.5f, h)));
 }
 
 
@@ -519,7 +506,7 @@ void test(ComponentData* components, ColliderGrid* grid) {
     sfVector2f start = zeros();
     // create_car(components, start);
     // create_church(components, zeros());
-    create_barn(components, zeros());
+    create_toilet(components, zeros());
 
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 

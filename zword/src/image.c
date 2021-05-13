@@ -50,6 +50,7 @@ static const char* IMAGES[] = {
     "shotgun",
     "stone_tile",
     "tiles_tile",
+    "toilet",
     "tree",
     "uranium",
     "wood_tile",
