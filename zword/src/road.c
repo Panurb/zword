@@ -109,7 +109,7 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 
 void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
     sfVector2f r = mult(10.0, normalized(diff(end, start)));
-    int current = create_road_curves(components, sum(start, r), diff(end, r), perm, 2.0, 4.0, "road");
+    int current = create_road_curves(components, start, diff(end, r), perm, 2.0, 4.0, "road");
     create_road_segments(components, current, ROADS);
 }
 

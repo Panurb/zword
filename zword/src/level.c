@@ -390,12 +390,54 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
         for (int j = -5; j < 6; j++) {
             sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
 
-            if ((1.0 - forestation) < perlin(0.1 * r.x, 0.1 * r.y, 0.0, p, -1)) {
+            if ((1.0 - forestation) < perlin(0.03 * r.x, 0.03 * r.y, 0.0, p, -1)) {
                 if (randf(0.0, 1.0) < 0.05) {
                     create_rock(components, grid, r, randf(0.75, 2.0));
                 } else {
                     create_tree(components, grid, r, randf(1.0, 1.5));
                 }
+            }
+        }
+    }
+}
+
+
+void create_village(int chunks[LEVEL_WIDTH][LEVEL_HEIGHT]) {
+    int k = randi(1, LEVEL_WIDTH - 2);
+    int l = randi(1, LEVEL_WIDTH - 2);
+    for (int i = k - 1; i <= k + 1; i++) {
+        for (int j = l - 1; j <= l + 1; j++) {
+            if (i == k && j == l) {
+                chunks[i][j] = 1;
+            } else {
+                if (randi(0, 1) == 0) {
+                    chunks[i][j] = 2;
+                }
+            }
+        }
+    }
+}
+
+
+void create_farm(int chunks[LEVEL_WIDTH][LEVEL_HEIGHT]) {
+    bool barn = false;
+
+    int k = randi(1, LEVEL_WIDTH - 2);
+    int l = randi(1, LEVEL_WIDTH - 2);
+
+    chunks[k][l] = 2;
+
+    while (true) {
+        int i = randi(k - 1, k + 1);
+        int j = randi(l - 1, l + 1);
+
+        if (chunks[i][j] == 0) {
+            if (barn) {
+                chunks[i][j] = 4;
+                break;
+            } else {
+                chunks[i][j] = 3;
+                barn = true;
             }
         }
     }
@@ -419,73 +461,104 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     sfTexture_setRepeated(noise_texture, true);
     free(pixels);
 
-    int width = floor(LEVEL_WIDTH / 2.0);
-    int height = floor(LEVEL_HEIGHT / 2.0);
+    int chunks[LEVEL_WIDTH][LEVEL_HEIGHT] = { 0 };
+    
+    create_village(chunks);
 
-    sfVector2f start = { -(width + 0.5) * CHUNK_WIDTH, -height * CHUNK_HEIGHT };
-    sfVector2f end = { (width + 0.5) * CHUNK_WIDTH, -height * CHUNK_HEIGHT };
-    create_river(components, start, end, perm);
+    for (int i = 0; i < 3; i++) {
+        create_farm(chunks);
+    }
 
-    sfVector2f prev_house = zeros();
+    sfVector2f start = zeros();
 
-    for (int i = -width; i <= width; i++) {
-        for (int j = -height; j <= height; j++) {
-            sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
-            create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+    for (int i = 0; i < LEVEL_WIDTH; i++) {
+        for (int j = 0; j < LEVEL_HEIGHT; j++) {
+            sfVector2f pos = { CHUNK_WIDTH * i - 0.5f * LEVEL_WIDTH * CHUNK_WIDTH, CHUNK_HEIGHT * j - 0.5f * LEVEL_HEIGHT * CHUNK_HEIGHT };
+            create_ground(components, pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
-            if (abs(i) == width || abs(j) == height) continue;
-            if (i == 0 && j == 0) continue;
-
-            float f = randf(0.0, 0.75);
-            if (f < 0.1) {
-                create_house(components, position);
-                create_road(components, prev_house, position, perm);
-                prev_house = position;
+            switch (chunks[i][j]) {
+                case 1:
+                    create_church(components, pos);
+                    create_road(components, start, pos, perm);
+                    break;
+                case 2:
+                    create_house(components, pos);
+                    break;
+                case 3:
+                    create_barn(components, pos);
+                    break;
+                case 4:
+                    create_toilet(components, pos);
+                    break;
+                
+                default:
+                    break;
             }
         }
     }
 
     init_grid(components, grid);
 
-    for (int i = -width; i <= width; i++) {
-        for (int j = -height; j <= height; j++) {
-            if (i == 0 && j == 0) continue;
-            
-            sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
+    float f = 0.5f;
+    for (int i = 0; i < LEVEL_WIDTH; i++) {
+        for (int j = 0; j < LEVEL_HEIGHT; j++) {
+            sfVector2f pos = { CHUNK_WIDTH * i - 0.5f * LEVEL_WIDTH * CHUNK_WIDTH, CHUNK_HEIGHT * j - 0.5f * LEVEL_HEIGHT * CHUNK_HEIGHT };
 
-            float f = randf(0.0, 0.75);
-            create_forest(components, grid, position, perm, f);
+            switch (chunks[i][j]) {
+                case 1:
+                    f = 0.1f;
+                    break;
+                case 2:
+                    f = 0.1f;
+                    break;
+                case 3:
+                    f = 0.2f;
+                    break;
+                case 4:
+                    f = 0.3f;
+                    break;
+                default:
+                    f = 0.5f;
+                    break;
+            }
+
+            create_forest(components, grid, pos, perm, f);
 
             for (int i = 0; i < 4; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                // create_enemy(components, sum(position, r));
-                create_big_boy(components, sum(position, r));
-            }
-
-            for (int i = 0; i < 2; i++) {
-                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                create_uranium(components, grid, sum(position, r));
+                // create_enemy(components, sum(pos, r));
             }
         }
     }
 
+    // for (int i = -width; i <= width; i++) {
+    //     for (int j = -height; j <= height; j++) {
+    //         if (i == 0 && j == 0) continue;
+            
+    //         sfVector2f position = { CHUNK_WIDTH * i, CHUNK_HEIGHT * j };
+
+    //         float f = randf(0.0, 0.75);
+    //         // create_forest(components, grid, position, perm, f);
+
+    //         // for (int i = 0; i < 4; i++) {
+    //         //     sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+    //         //     create_enemy(components, sum(position, r));
+    //         //     // create_big_boy(components, sum(position, r));
+    //         // }
+
+    //         // for (int i = 0; i < 2; i++) {
+    //         //     sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+    //         //     create_uranium(components, grid, sum(position, r));
+    //         // }
+    //     }
+    // }
+
     resize_roads(components);
 
-    start = zeros();
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
     // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
     create_car(components, start);
-    for (int i = 0; i < 2; i++) {
-        create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
-        create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
-        create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
-        create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-        create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
-        create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
-        create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
-        create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
-    }
 }
 
 
@@ -511,4 +584,15 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
+
+    for (int i = 0; i < 2; i++) {
+        create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+        create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
+        create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
+        create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+        create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+        create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+        create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+        create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
+    }
 }

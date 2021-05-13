@@ -57,6 +57,8 @@ sfVector2f lin_comb(float a, sfVector2f v, float b, sfVector2f u);
 
 float randf(float min, float max);
 
+int randi(int low, int upp);
+
 float rand_angle();
 
 sfVector2f rand_vector();

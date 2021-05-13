@@ -118,6 +118,10 @@ float randf(float low, float upp) {
     return low + scale * (upp - low);
 }
 
+int randi(int low, int upp) {
+    return rand() % (upp + 1 - low) + low;
+}
+
 float rand_angle() {
     return randf(0.0, 2 * M_PI);
 }

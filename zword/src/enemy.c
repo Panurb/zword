@@ -62,7 +62,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
             image->width = 2.0;
             image->texture_changed = true;
             change_layer(components, i, 2);
-            stop_animation(components, i);
+            if (AnimationComponent_get(components, i)) {
+                stop_animation(components, i);
+            }
             enemy->state = DEAD;
         }
 

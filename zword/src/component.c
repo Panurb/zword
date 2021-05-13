@@ -107,7 +107,7 @@ void ImageComponent_remove(ComponentData* components, int entity) {
         components->image.array[entity] = NULL;
 
         int i = find(entity, components->image.order, components->image.size);
-        while (i < components->image.size - 1) {
+        while (i < components->image.size - 2) {
             components->image.order[i] = components->image.order[i + 1];
             i++;
         }
