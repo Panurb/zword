@@ -49,6 +49,16 @@ void create_wood_wall(ComponentData* components, sfVector2f pos, float length, f
 }
 
 
+void create_stone_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, pos, angle);
+    ColliderComponent_add_rectangle(components, i, length, 1.0f, WALLS);
+    ImageComponent_add(components, i, "stone_tile", length, 1.0f, 2);
+    ParticleComponent_add_dirt(components, i);
+}
+
+
 void create_fire(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
 
@@ -72,11 +82,11 @@ void create_light(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle) {
+void create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle, Filename filename) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, "board_tile", width, height, 1);
+    ImageComponent_add(components, i, filename, width, height, 1);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
 }
 
@@ -113,13 +123,78 @@ void create_item(ComponentData* components, sfVector2f position) {
 }
 
 
+void create_bench(ComponentData* components, sfVector2f position, float angle) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, angle);
+    ImageComponent_add(components, i, "bench", 1.0f, 3.0f, 3);
+    ColliderComponent_add_rectangle(components, i, 0.8f, 2.8f, WALLS);
+}
+
+
+void create_church(ComponentData* components, sfVector2f pos) {
+    float angle = randf(0.0, 2 * M_PI);
+
+    sfVector2f w = polar_to_cartesian(10.0f, angle);
+    sfVector2f h = polar_to_cartesian(5.0f, angle + 0.5f * M_PI);
+
+    create_floor(components, pos, 30.0f, 10.0f, angle, "tiles_tile");
+    create_floor(components, sum(pos, mult(0.5f, w)), 10.0f, 20.0f, angle, "tiles_tile");
+
+    // Back wall
+    create_stone_wall(components, sum(pos, mult(1.45f, w)), 8.0f, angle + 0.5f * M_PI);
+
+    // Altar
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, sum(pos, mult(1.1f, w)), angle);
+    ColliderComponent_add_rectangle(components, i, 3.0f, 5.0f, WALLS);
+    ImageComponent_add(components, i, "stone_tile", 3.0f, 5.0f, 2);
+    ParticleComponent_add_dirt(components, i);
+
+    i = create_entity(components);
+    CoordinateComponent_add(components, i, sum(pos, mult(1.1f, w)), rand_angle());
+    ImageComponent_add(components, i, "blood", 1.0f, 1.0f, 3);
+
+    for (int j = 0; j < 2; j++) {
+        for (int i = 0; i < 7; i++) {
+            create_bench(components, sum(pos, sum(mult((i - 5.75f) * 0.2f, w), mult(0.5f, h))), angle);
+        }
+
+        // Entrance
+        create_stone_wall(components, sum(pos, sum(mult(-1.45f, w), mult(0.5f, h))), 3.0f, angle + 0.5f * M_PI);
+        create_stone_wall(components, sum(pos, sum(mult(-1.3f, w), mult(0.7f, h))), 2.0f, angle);
+        create_light(components, sum(pos, sum(mult(-1.3f, w), mult(0.7f, h))));
+
+        // Side wall entrance
+        create_stone_wall(components, sum(pos, sum(mult(-0.6f, w), mult(0.9f, h))), 18.0f, angle);
+
+        // Side wall back
+        create_stone_wall(components, sum(pos, sum(mult(1.1f, w), mult(0.9f, h))), 8.0f, angle);
+        
+        // Side thingies
+        create_stone_wall(components, sum(pos, sum(mult(0.5f, w), mult(1.9f, h))), 10.0f, angle);
+        create_stone_wall(components, sum(pos, sum(mult(0.05f, w), mult(1.4f, h))), 4.0f, angle + 0.5f * M_PI);
+        create_stone_wall(components, sum(pos, sum(mult(0.95f, w), mult(1.4f, h))), 4.0f, angle + 0.5f * M_PI);
+
+        create_item(components, sum(pos, sum(mult(0.5f, w), mult(1.3f, h))));
+
+        create_stone_wall(components, sum(pos, sum(mult(0.5f, w), mult(1.7f, h))), 2.0f, angle);
+        create_light(components, sum(pos, sum(mult(0.5f, w), mult(1.7f, h))));
+
+        create_light(components, sum(pos, sum(mult(1.1f, w), mult(0.3f, h))));
+
+        h = mult(-1.0f, h);
+    }
+}
+
+
 void create_house(ComponentData* components, sfVector2f pos) {
     float angle = randf(0.0, 2 * M_PI);
 
     sfVector2f w = polar_to_cartesian(5.0, angle);
     sfVector2f h = perp(w);
 
-    create_floor(components, pos, 10.0, 10.0, angle);
+    create_floor(components, pos, 10.0, 10.0, angle, "board_tile");
 
     create_brick_wall(components, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
     create_brick_wall(components, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
@@ -160,7 +235,7 @@ void create_shed(ComponentData* components, sfVector2f pos) {
     sfVector2f w = polar_to_cartesian(3.0, angle);
     sfVector2f h = perp(w);
 
-    create_floor(components, pos, 6.0, 6.0, angle);
+    create_floor(components, pos, 6.0, 6.0, angle, "board_tile");
 
     create_wood_wall(components, sum(pos, w), 5.5, angle + 0.5 * M_PI);
     create_wood_wall(components, diff(pos, w), 5.5, angle + 0.5 * M_PI);
@@ -365,30 +440,24 @@ void test(ComponentData* components, ColliderGrid* grid) {
 
     sfTexture* noise_texture = sfTexture_create(w, h);
 
-    // sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
-    // create_noise(pixels, w, h, zeros(), get_color(0.0, 0.0, 0.0, 0.3), perm);
-    // sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
-    // sfTexture_setRepeated(noise_texture, true);
-    // free(pixels);
-
     sfVector2f position = zeros();
     create_ground(components, position, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
     init_grid(components, grid);
 
-    create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
+    // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 
     sfVector2f start = zeros();
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
-    create_car(components, start);
-    for (int i = 0; i < 2; i++) {
-        create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
-        create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
-        create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
-        create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-        create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
-        create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
-        create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
-        create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
-    }
+    // create_car(components, start);
+    create_church(components, zeros());
+
+    // create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+    // create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
+    // create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
+    // create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+    // create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+    // create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+    // create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+    // create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
 }

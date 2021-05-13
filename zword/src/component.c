@@ -99,17 +99,20 @@ ImageComponent* ImageComponent_get(ComponentData* components, int entity) {
 
 
 void ImageComponent_remove(ComponentData* components, int entity) {
-    sfSprite_destroy(ImageComponent_get(components, entity)->sprite);
+    ImageComponent* image = ImageComponent_get(components, entity);
+    if (image) {
+        sfSprite_destroy(image->sprite);
 
-    free(ImageComponent_get(components, entity));
-    components->image.array[entity] = NULL;
+        free(image);
+        components->image.array[entity] = NULL;
 
-    int i = find(entity, components->image.order, components->image.size);
-    while (i < components->image.size - 2) {
-        components->image.order[i] = components->image.order[i + 1];
-        i++;
+        int i = find(entity, components->image.order, components->image.size);
+        while (i < components->image.size - 1) {
+            components->image.order[i] = components->image.order[i + 1];
+            i++;
+        }
+        components->image.size--;
     }
-    components->image.size--;
 }
 
 
@@ -703,10 +706,11 @@ int create_entity(ComponentData* components) {
 
 
 void destroy_entity(ComponentData* components, int entity) {
+    if (entity == -1) return;
+
     if (CoordinateComponent_get(components, entity))
         CoordinateComponent_remove(components, entity);
-    if (ImageComponent_get(components, entity))
-        ImageComponent_remove(components, entity);
+    ImageComponent_remove(components, entity);
     if (PhysicsComponent_get(components, entity))
         PhysicsComponent_remove(components, entity);
     if (ColliderComponent_get(components, entity))

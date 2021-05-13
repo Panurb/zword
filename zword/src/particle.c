@@ -27,7 +27,7 @@ void ParticleComponent_add_dirt(ComponentData* components, int entity) {
 
 void ParticleComponent_add_fire(ComponentData* components, int entity, float size) {
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
-    LightComponent_add(components, entity, 10.0f * size, 2.0 * M_PI, orange, 2.0f * size, 10.0)->flicker = 0.2;
+    LightComponent_add(components, entity, 30.0f * size, 2.0 * M_PI, orange, 2.0f * size, 10.0)->flicker = 0.2;
     float angle = 0.5f * M_PI - get_angle(components, entity);
     ParticleComponent* particle = ParticleComponent_add(components, entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, orange);
     particle->loop = true;
