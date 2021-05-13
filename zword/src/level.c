@@ -131,15 +131,24 @@ void create_bench(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-void create_decal(ComponentData* components, sfVector2f pos, Filename filename) {
+void create_hay_bale(ComponentData* components, sfVector2f position, float angle) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, angle);
+    ImageComponent_add(components, i, "hay_bale", 3.0f, 2.0f, 3);
+    ColliderComponent_add_rectangle(components, i, 2.8f, 1.5f, WALLS);
+}
+
+
+void create_decal(ComponentData* components, sfVector2f pos, float width, float height, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent* image = ImageComponent_add(components, i, filename, 2.0f, 2.0f, 3);
+    ImageComponent* image = ImageComponent_add(components, i, filename, width, height, 2);
 }
 
 
 void create_church(ComponentData* components, sfVector2f pos) {
-    float angle = randf(0.0, 2 * M_PI);
+    float angle = rand_angle();
 
     sfVector2f w = polar_to_cartesian(1.0f, angle);
     sfVector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
@@ -154,7 +163,7 @@ void create_church(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, mult(12.5f, w)), angle, 3.0f, 8.0f, "altar_tile");
     create_light(components, sum(pos, sum(mult(12.5f, w), mult(-3.0f, h))));
     create_light(components, sum(pos, sum(mult(12.5f, w), mult(3.0f, h))));
-    create_decal(components, sum(pos, mult(12.5f, w)), "blood_large");
+    create_decal(components, sum(pos, mult(12.5f, w)), 2.0f, 2.0f, "blood_large");
 
     for (int j = 0; j < 2; j++) {
         for (int i = 0; i < 7; i++) {
@@ -199,8 +208,59 @@ void create_church(ComponentData* components, sfVector2f pos) {
 }
 
 
+void create_barn(ComponentData* components, sfVector2f pos) {
+    float angle = rand_angle();
+
+    sfVector2f w = polar_to_cartesian(1.0f, angle);
+    sfVector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
+
+    create_floor(components, pos, 25.0f, 14.0f, angle, "board_tile");
+
+    // Back wall
+    create_wall(components, sum(pos, mult(12.0f, w)), angle + 0.5f * M_PI, 14.0f, 1.0f, "wood_tile");
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 3; j++) {
+            sfVector2f r = sum(mult(3.0f * i - 4.5f, h), mult(6.5f + 2.0f * j, w));
+            create_hay_bale(components, sum(pos, r), angle + 0.5f * M_PI + randf(-0.1f, 0.1f));
+        }
+    }
+
+    for (int i = 0; i < 2; i++) {
+        // Entrance
+        create_wall(components, sum(pos, sum(mult(-12.0f, w), mult(4.5f, h))), angle + 0.5f * M_PI, 5.0f, 1.0f, "wood_tile");
+
+        // Side
+        create_wall(components, sum(pos, mult(6.5f, h)), angle, 23.0f, 1.0f, "wood_tile");
+
+        // Middle pile
+        create_hay_bale(components, sum(pos, sum(mult(-4.0f, w), mult(1.0f, h))), angle + randf(-0.1f, 0.1f));
+        create_hay_bale(components, sum(pos, sum(mult(-1.0f, w), mult(1.0f, h))), angle + randf(-0.1f, 0.1f));
+        create_waypoint(components, sum(pos, lin_comb(-6.5f, w, 3.0f, h)));
+        create_waypoint(components, sum(pos, lin_comb(1.5f, w, 3.0f, h)));
+        create_light(components, sum(pos, lin_comb(-1.0f, w, 1.0f, h)));
+        create_light(components, sum(pos, lin_comb(-4.0f, w, 1.0f, h)));
+
+        create_item(components, sum(pos, lin_comb(4.0f, w, 4.0f, h)));
+
+        // Outside
+        create_waypoint(components, sum(pos, lin_comb(-13.5f, w, 8.0f, h)));
+        create_waypoint(components, sum(pos, lin_comb(0.0f, w, 8.0f, h)));
+        create_waypoint(components, sum(pos, lin_comb(13.5f, w, 8.0f, h)));
+
+        h = mult(-1.0f, h);
+    }
+
+    create_waypoint(components, sum(pos, mult(-11.0f, w)));
+    create_waypoint(components, sum(pos, mult(-13.5f, w)));
+    create_waypoint(components, sum(pos, mult(13.5f, w)));
+
+    create_item(components, sum(pos, mult(4.0f, w)));
+}
+
+
 void create_house(ComponentData* components, sfVector2f pos) {
-    float angle = randf(0.0, 2 * M_PI);
+    float angle = rand_angle();
 
     sfVector2f w = polar_to_cartesian(5.0, angle);
     sfVector2f h = perp(w);
@@ -458,9 +518,10 @@ void test(ComponentData* components, ColliderGrid* grid) {
 
     sfVector2f start = zeros();
     // create_car(components, start);
-    create_church(components, zeros());
+    // create_church(components, zeros());
+    create_barn(components, zeros());
 
-    create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
+    // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
 }

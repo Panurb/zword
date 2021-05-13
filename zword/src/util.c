@@ -109,6 +109,10 @@ sfVector2f proj(sfVector2f a, sfVector2f b) {
     return mult(dot(a, b_norm), b_norm);
 }
 
+sfVector2f lin_comb(float a, sfVector2f v, float b, sfVector2f u) {
+    return sum(mult(a, v), mult(b, u));
+}
+
 float randf(float low, float upp) {
     float scale = rand() / (float) RAND_MAX;
     return low + scale * (upp - low);

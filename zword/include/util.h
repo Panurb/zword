@@ -53,6 +53,8 @@ sfVector2f mult(float c, sfVector2f v);
 
 sfVector2f proj(sfVector2f a, sfVector2f b);
 
+sfVector2f lin_comb(float a, sfVector2f v, float b, sfVector2f u);
+
 float randf(float min, float max);
 
 float rand_angle();

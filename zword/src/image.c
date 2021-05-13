@@ -34,6 +34,8 @@ static const char* IMAGES[] = {
     "flashlight",
     "gas",
     "grass_tile",
+    "hay",
+    "hay_bale",
     "pistol",
     "player",
     "player_dead",
@@ -89,8 +91,10 @@ void set_texture(ImageComponent* image, TextureArray textures) {
     
     if (i != -1) {
         sfSprite_setTexture(image->sprite, textures[i], sfTrue);
-        sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
-        sfSprite_setTextureRect(image->sprite, rect);
+        if (image->width != 0.0f) {
+            sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
+            sfSprite_setTextureRect(image->sprite, rect);
+        }
     }
 }
 
