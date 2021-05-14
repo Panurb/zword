@@ -59,8 +59,11 @@ CoordinateComponent* CoordinateComponent_get(ComponentData* components, int enti
 
 
 void CoordinateComponent_remove(ComponentData* components, int entity) {
-    free(CoordinateComponent_get(components, entity));
-    components->coordinate[entity] = NULL;
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    if (coord) {
+        free(coord);
+        components->coordinate[entity] = NULL;
+    }
 }
 
 
@@ -136,8 +139,11 @@ PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity) {
 
 
 void PhysicsComponent_remove(ComponentData* components, int entity) {
-    free(PhysicsComponent_get(components, entity));
-    components->physics[entity] = NULL;
+    PhysicsComponent* phys = PhysicsComponent_get(components, entity);
+    if (phys) {
+        free(phys);
+        components->physics[entity] = NULL;
+    }
 }
 
 
@@ -180,8 +186,11 @@ ColliderComponent* ColliderComponent_get(ComponentData* components, int entity) 
 
 
 void ColliderComponent_remove(ComponentData* components, int entity) {
-    free(ColliderComponent_get(components, entity));
-    components->collider[entity] = NULL;
+    ColliderComponent* col = ColliderComponent_get(components, entity);
+    if (col) {
+        free(col);
+        components->collider[entity] = NULL;
+    }
 }
 
 
@@ -247,12 +256,13 @@ PlayerComponent* PlayerComponent_get(ComponentData* components, int entity) {
 
 void PlayerComponent_remove(ComponentData* components, int entity) {
     PlayerComponent* player = PlayerComponent_get(components, entity);
-    sfConvexShape_destroy(player->shape);
-    sfRectangleShape_destroy(player->line);
-    free(player);
-    components->player.array[entity] = NULL;
-    List_remove(components->player.order, entity);
-    // TODO something
+    if (player) {
+        sfConvexShape_destroy(player->shape);
+        sfRectangleShape_destroy(player->line);
+        free(player);
+        components->player.array[entity] = NULL;
+        List_remove(components->player.order, entity);
+    }
 }
 
 
@@ -290,10 +300,12 @@ LightComponent* LightComponent_get(ComponentData* components, int entity) {
 
 void LightComponent_remove(ComponentData* components, int entity) {
     LightComponent* light = LightComponent_get(components, entity);
-    sfVertexArray_destroy(light->verts);
-    sfCircleShape_destroy(light->shine);
-    free(light);
-    components->light[entity] = NULL;
+    if (light) {
+        sfVertexArray_destroy(light->verts);
+        sfCircleShape_destroy(light->shine);
+        free(light);
+        components->light[entity] = NULL;
+    }
 }
 
 
@@ -320,9 +332,11 @@ EnemyComponent* EnemyComponent_get(ComponentData* components, int entity) {
 
 void EnemyComponent_remove(ComponentData* components, int entity) {
     EnemyComponent* enemy = EnemyComponent_get(components, entity);
-    List_delete(enemy->path);
-    free(enemy);
-    components->enemy[entity] = NULL;
+    if (enemy) {
+        List_delete(enemy->path);
+        free(enemy);
+        components->enemy[entity] = NULL;
+    }
 }
 
 
@@ -367,9 +381,11 @@ ParticleComponent* ParticleComponent_get(ComponentData* components, int entity) 
 
 void ParticleComponent_remove(ComponentData* components, int entity) {
     ParticleComponent* particle = ParticleComponent_get(components, entity);
-    sfCircleShape_destroy(particle->shape);
-    free(particle);
-    components->particle[entity] = NULL;
+    if (particle) {
+        sfCircleShape_destroy(particle->shape);
+        free(particle);
+        components->particle[entity] = NULL;
+    }
 }
 
 
@@ -403,8 +419,11 @@ VehicleComponent* VehicleComponent_get(ComponentData* components, int entity) {
 
 
 void VehicleComponent_remove(ComponentData* components, int entity) {
-    free(VehicleComponent_get(components, entity));
-    components->vehicle[entity] = NULL;
+    VehicleComponent* vehicle = VehicleComponent_get(components, entity);
+    if (vehicle) {
+        free(vehicle);
+        components->vehicle[entity] = NULL;
+    }
 }
 
 
@@ -445,8 +464,11 @@ WeaponComponent* WeaponComponent_get(ComponentData* components, int entity) {
 
 
 void WeaponComponent_remove(ComponentData* components, int entity) {
-    free(WeaponComponent_get(components, entity));
-    components->weapon[entity] = NULL;
+    WeaponComponent* weapon = WeaponComponent_get(components, entity);
+    if (weapon) {
+        free(weapon);
+        components->weapon[entity] = NULL;
+    }
 }
 
 
@@ -470,8 +492,11 @@ ItemComponent* ItemComponent_get(ComponentData* components, int entity) {
 
 
 void ItemComponent_remove(ComponentData* components, int entity) {
-    free(ItemComponent_get(components, entity));
-    components->item[entity] = NULL;
+    ItemComponent* item = ItemComponent_get(components, entity);
+    if (item) {
+        free(item);
+        components->item[entity] = NULL;
+    }
 }
 
 
@@ -497,13 +522,15 @@ WaypointComponent* WaypointComponent_get(ComponentData* components, int entity) 
 
 void WaypointComponent_remove(ComponentData* components, int entity) {
     WaypointComponent* waypoint = WaypointComponent_get(components, entity);
-    for (ListNode* current = waypoint->neighbors->head; current; current = current->next) {
-        int n = current->value;
-        List_remove(WaypointComponent_get(components, n)->neighbors, entity);
+    if (waypoint) {
+        for (ListNode* current = waypoint->neighbors->head; current; current = current->next) {
+            int n = current->value;
+            List_remove(WaypointComponent_get(components, n)->neighbors, entity);
+        }
+        List_delete(waypoint->neighbors);
+        free(waypoint);
+        components->waypoint[entity] = NULL;
     }
-    List_delete(waypoint->neighbors);
-    free(WaypointComponent_get(components, entity));
-    components->waypoint[entity] = NULL;
 }
 
 
@@ -524,8 +551,11 @@ HealthComponent* HealthComponent_get(ComponentData* components, int entity) {
 
 
 void HealthComponent_remove(ComponentData* components, int entity) {
-    free(HealthComponent_get(components, entity));
-    components->health[entity] = NULL;
+    HealthComponent* health = HealthComponent_get(components, entity);
+    if (health) {
+        free(health);
+        components->health[entity] = NULL;
+    }
 }
 
 
@@ -555,8 +585,11 @@ CameraComponent* CameraComponent_get(ComponentData* components, int entity) {
 
 
 void CameraComponent_remove(ComponentData* components, int entity) {
-    free(CameraComponent_get(components, entity));
-    components->camera[entity] = NULL;
+    CameraComponent* camera = CameraComponent_get(components, entity);
+    if (camera) {
+        free(camera);
+        components->camera[entity] = NULL;
+    }
 }
 
 
@@ -585,9 +618,11 @@ RoadComponent* RoadComponent_get(ComponentData* components, int entity) {
 
 void RoadComponent_remove(ComponentData* components, int entity) {
     RoadComponent* road = RoadComponent_get(components, entity);
-    sfConvexShape_destroy(road->shape);
-    free(road);
-    components->road[entity] = NULL;
+    if (road) {
+        sfConvexShape_destroy(road->shape);
+        free(road);
+        components->road[entity] = NULL;
+    }
 }
 
 
@@ -610,8 +645,11 @@ SoundComponent* SoundComponent_get(ComponentData* components, int entity) {
 
 
 void SoundComponent_remove(ComponentData* components, int entity) {
-    free(SoundComponent_get(components, entity));
-    components->sound[entity] = NULL;
+    SoundComponent* sound = SoundComponent_get(components, entity);
+    if (sound) {
+        free(sound);
+        components->sound[entity] = NULL;
+    }
 }
 
 
@@ -696,37 +734,22 @@ int create_entity(ComponentData* components) {
 void destroy_entity(ComponentData* components, int entity) {
     if (entity == -1) return;
 
-    if (CoordinateComponent_get(components, entity))
-        CoordinateComponent_remove(components, entity);
+    CoordinateComponent_remove(components, entity);
     ImageComponent_remove(components, entity);
-    if (PhysicsComponent_get(components, entity))
-        PhysicsComponent_remove(components, entity);
-    if (ColliderComponent_get(components, entity))
-        ColliderComponent_remove(components, entity);
-    if (PlayerComponent_get(components, entity))
-        PlayerComponent_remove(components, entity);
-    if (LightComponent_get(components, entity))
-        LightComponent_remove(components, entity);
-    if (EnemyComponent_get(components, entity))
-        EnemyComponent_remove(components, entity);
-    if (ParticleComponent_get(components, entity))
-        ParticleComponent_remove(components, entity);
-    if (VehicleComponent_get(components, entity))
-        VehicleComponent_remove(components, entity);
-    if (WeaponComponent_get(components, entity))
-        WeaponComponent_remove(components, entity);
-    if (ItemComponent_get(components, entity))
-        ItemComponent_remove(components, entity);
-    if (WaypointComponent_get(components, entity))
-        WaypointComponent_remove(components, entity);
-    if (HealthComponent_get(components, entity))
-        HealthComponent_remove(components, entity);
-    if (CameraComponent_get(components, entity))
-        CameraComponent_remove(components, entity);
-    if (RoadComponent_get(components, entity))
-        RoadComponent_remove(components, entity);
-    if (SoundComponent_get(components, entity))
-        SoundComponent_remove(components, entity);
+    PhysicsComponent_remove(components, entity);
+    ColliderComponent_remove(components, entity);
+    PlayerComponent_remove(components, entity);
+    LightComponent_remove(components, entity);
+    EnemyComponent_remove(components, entity);
+    ParticleComponent_remove(components, entity);
+    VehicleComponent_remove(components, entity);
+    WeaponComponent_remove(components, entity);
+    ItemComponent_remove(components, entity);
+    WaypointComponent_remove(components, entity);
+    HealthComponent_remove(components, entity);
+    CameraComponent_remove(components, entity);
+    RoadComponent_remove(components, entity);
+    SoundComponent_remove(components, entity);
     AmmoComponent_remove(components, entity);
     AnimationComponent_remove(components, entity);
 

@@ -83,7 +83,7 @@ sfTexture** load_textures() {
 
 
 int texture_index(Filename filename) {
-    return binary_search_filename(filename, IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
+    return binary_search_filename(filename, (char**) IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
 }
 
 

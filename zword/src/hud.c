@@ -134,7 +134,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
 
         sfVector2f pos;
         if (player->controller.joystick == -1) {
-            pos = screen_to_world(components, camera, sfMouse_getPosition(window));
+            pos = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
         } else {
             pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(components, i));
             pos = sum(position, pos);

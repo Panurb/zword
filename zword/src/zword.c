@@ -104,6 +104,17 @@ int main() {
                         init_grid(components, grid);
                         init_waypoints(components, grid);
                         sfClock_restart(clock);
+                    }  else if (event.key.code == sfKeyF6) {
+                        seed = time(NULL);
+
+                        ColliderGrid_clear(grid);
+                        ComponentData_clear(components);
+
+                        camera = create_camera(components, mode);
+                        create_level(components, grid, seed);
+                        init_grid(components, grid);
+                        init_waypoints(components, grid);
+                        sfClock_restart(clock);
                     }
                     break;
                 default:

@@ -16,7 +16,7 @@ sfVector2f perlin_grad(sfVector2f position, Permutation perm) {
 }
 
 
-int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm, float curviness, float width, Filename filename) {
+int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f end, float curviness, float width, Filename filename) {
     int n = dist(start, end) / 5.0;
 
     sfVector2f position = end;
@@ -28,7 +28,7 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
     for (int i = 0; i < n; i++) {
         current = create_entity(components);
 
-        sfVector2f grad = perlin_grad(position, perm);
+        sfVector2f grad = rand_vector();
         sfVector2f pos = diff(position, mult(curviness, grad));
 
         CoordinateComponent_add(components, current, pos, 0.0);
@@ -107,15 +107,15 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 }
 
 
-void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
+void create_road(ComponentData* components, sfVector2f start, sfVector2f end) {
     sfVector2f r = mult(10.0, normalized(diff(end, start)));
-    int current = create_road_curves(components, start, diff(end, r), perm, 2.0, 4.0, "road");
+    int current = create_road_curves(components, start, diff(end, r), 2.0, 4.0, "road");
     create_road_segments(components, current, GROUP_ROADS);
 }
 
 
-void create_river(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
-    int current = create_road_curves(components, start, end, perm, 1.0, 8.0, "river");
+void create_river(ComponentData* components, sfVector2f start, sfVector2f end) {
+    int current = create_road_curves(components, start, end, 1.0, 8.0, "river");
     create_road_segments(components, current, GROUP_RIVERS);
 }
 

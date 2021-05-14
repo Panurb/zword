@@ -98,22 +98,36 @@ void create_roof(ComponentData* component, sfVector2f pos, float width, float he
 }
 
 
-void create_item(ComponentData* components, sfVector2f position) {
-    switch (rand() % 10) {
+void create_item(ComponentData* components, sfVector2f position, int tier) {
+    switch (tier) {
         case 0:
-            create_pistol(components, position);
+            if (randi(0, 1) == 0) {
+                create_flashlight(components, position);
+            } else {
+                create_gas(components, position);
+            }
             break;
         case 1:
-            create_assault_rifle(components, position);
+            if (randi(0, 1) == 0) {
+                create_axe(components, position);
+            } else {
+                create_pistol(components, position);
+                for (int i = 0; i < randi(0, 3); i++) {
+                    create_ammo(components, sum(position, rand_vector()), AMMO_PISTOL);
+                }
+            }
             break;
         case 2:
             create_shotgun(components, position);
+            for (int i = 0; i < randi(0, 3); i++) {
+                    create_ammo(components, sum(position, rand_vector()), AMMO_SHOTGUN);
+            }
             break;
         case 3:
-            create_gas(components, position);
-            break;
-        case 4:
-            create_flashlight(components, position);
+            create_assault_rifle(components, position);
+            for (int i = 0; i < randi(0, 3); i++) {
+                create_ammo(components, sum(position, rand_vector()), AMMO_RIFLE);
+            }
             break;
         default:
             create_ammo(components, position, rand() % 3 + 1);
@@ -196,7 +210,7 @@ void create_church(ComponentData* components, sfVector2f pos) {
         create_waypoint(components, sum(pos, sum(mult(11.0f, w), mult(11.0f, h))));
         create_waypoint(components, sum(pos, sum(mult(16.0f, w), mult(6.0f, h))));
 
-        create_item(components, sum(pos, sum(mult(5.0f, w), mult(6.5f, h))));
+        create_item(components, sum(pos, sum(mult(5.0f, w), mult(6.5f, h))), 3);
 
         h = mult(-1.0f, h);
     }
@@ -241,7 +255,7 @@ void create_barn(ComponentData* components, sfVector2f pos) {
         create_light(components, sum(pos, lin_comb(-1.0f, w, 1.0f, h)));
         create_light(components, sum(pos, lin_comb(-4.0f, w, 1.0f, h)));
 
-        create_item(components, sum(pos, lin_comb(4.0f, w, 4.0f, h)));
+        create_item(components, sum(pos, lin_comb(4.0f, w, 4.0f, h)), 2);
 
         // Outside
         create_waypoint(components, sum(pos, lin_comb(-13.5f, w, 8.0f, h)));
@@ -255,17 +269,17 @@ void create_barn(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, mult(-13.5f, w)));
     create_waypoint(components, sum(pos, mult(13.5f, w)));
 
-    create_item(components, sum(pos, mult(4.0f, w)));
+    create_item(components, sum(pos, mult(4.0f, w)), 2);
 }
 
 
 void create_house(ComponentData* components, sfVector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(5.0, angle);
+    sfVector2f w = polar_to_cartesian(5.0f, angle);
     sfVector2f h = perp(w);
 
-    create_floor(components, pos, 10.0, 10.0, angle, "board_tile");
+    create_floor(components, pos, 10.0f, 10.0f, angle, "board_tile");
 
     create_brick_wall(components, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
     create_brick_wall(components, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
@@ -294,9 +308,9 @@ void create_house(ComponentData* components, sfVector2f pos) {
 
     create_light(components, sum(pos, mult(0.8f, diff(w, h))));
 
-    create_item(components, sum(pos, mult(0.5f, diff(w, h))));
-    create_item(components, diff(pos, mult(0.5f, diff(w, h))));
-    create_item(components, diff(pos, mult(0.5f, sum(w, h))));
+    create_item(components, sum(pos, mult(0.5f, diff(w, h))), 1);
+    create_item(components, diff(pos, mult(0.5f, diff(w, h))), 1);
+    create_item(components, diff(pos, mult(0.5f, sum(w, h))), 1);
 }
 
 
@@ -319,6 +333,8 @@ void create_toilet(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, lin_comb(2.5f, w, -2.5f, h)));
     create_waypoint(components, sum(pos, lin_comb(-2.5f, w, 2.5f, h)));
     create_waypoint(components, sum(pos, lin_comb(-2.5f, w, -2.5f, h)));
+
+    create_item(components, pos, 0);
 }
 
 
@@ -479,7 +495,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
             switch (chunks[i][j]) {
                 case 1:
                     create_church(components, pos);
-                    create_road(components, start, pos, perm);
+                    create_road(components, start, pos);
                     break;
                 case 2:
                     create_house(components, pos);

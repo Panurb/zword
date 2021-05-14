@@ -39,6 +39,7 @@ void List_remove(List* list, int value) {
                 prev->next = current->next;
             }
             free(current);
+            list->size--;
             break;
         }
         prev = current;
