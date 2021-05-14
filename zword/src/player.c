@@ -30,7 +30,7 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     CoordinateComponent_add(components, i, pos, 0.0);
     ImageComponent_add(components, i, "player", 1.0, 1.0, 5);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.0, 10.0, 0.0)->max_speed = 5.0;
-    ColliderComponent_add_circle(components, i, 0.5, PLAYERS);
+    ColliderComponent_add_circle(components, i, 0.5, GROUP_PLAYERS);
     PlayerComponent* player = PlayerComponent_add(components, i, joystick);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i)->range = 12.0;
@@ -121,12 +121,12 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                     }
                 }
 
-                if (controller.buttons_pressed[BUTTON_A]) {
-                    enter_vehicle(components, i);
-                }
-
                 if (controller.buttons_down[BUTTON_LB]) {
                     player->state = PLAYER_AMMO_MENU;
+                }
+
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    enter_vehicle(components, i);
                 }
 
                 VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
@@ -427,7 +427,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             case PLAYER_DEAD:;
                 ColliderComponent* col = ColliderComponent_get(components, i);
                 if (col) {
-                    col->group = ITEMS;
+                    col->group = GROUP_ITEMS;
                     if (phys->speed == 0.0) {
                         clear_grid(components, grid, i);
                         ColliderComponent_remove(components, i);

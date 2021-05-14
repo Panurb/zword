@@ -44,8 +44,8 @@ int main() {
     bool focus = true;
     sfJoystick_update();
     
-    sfTexture* textures = load_textures();
-    sfSoundBuffer* sounds = load_sounds();
+    sfTexture** textures = load_textures();
+    sfSoundBuffer** sounds = load_sounds();
 
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
@@ -71,8 +71,8 @@ int main() {
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);
-    // create_level(components, grid, seed);
-    test(components, grid);
+    create_level(components, grid, seed);
+    // test(components, grid);
     init_grid(components, grid);
     init_waypoints(components, grid);
 

@@ -298,8 +298,8 @@ void update_camera(ComponentData* components, int camera, float time_step) {
     sfVector2f pos = zeros();
 
     int n = 0;
-    for (int k = 0; k < components->player.size; k++) {
-        int i = components->player.order[k];
+    for (ListNode* node = components->player.order->head; node; node = node->next) {
+        int i = node->value;
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (player->state != PLAYER_DEAD) {
             n += 1;

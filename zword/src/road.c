@@ -110,13 +110,13 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 void create_road(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
     sfVector2f r = mult(10.0, normalized(diff(end, start)));
     int current = create_road_curves(components, start, diff(end, r), perm, 2.0, 4.0, "road");
-    create_road_segments(components, current, ROADS);
+    create_road_segments(components, current, GROUP_ROADS);
 }
 
 
 void create_river(ComponentData* components, sfVector2f start, sfVector2f end, Permutation perm) {
     int current = create_road_curves(components, start, end, perm, 1.0, 8.0, "river");
-    create_road_segments(components, current, RIVERS);
+    create_road_segments(components, current, GROUP_RIVERS);
 }
 
 
@@ -167,7 +167,7 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
 void resize_roads(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         ColliderComponent* col = ColliderComponent_get(components, i);
-        if (col && col->group == ROADS) {
+        if (col && col->group == GROUP_ROADS) {
             col->height = 1.0;
         }
     }

@@ -101,8 +101,8 @@ void set_texture(ImageComponent* image, TextureArray textures) {
 
 
 void draw(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
-    for (int j = 0; j < components->image.size; j++) {
-        int i = components->image.order[j];
+    for (ListNode* node = components->image.order->head; node; node = node->next) {
+        int i = node->value;
 
         ImageComponent* image = ImageComponent_get(components, i);
 
@@ -134,8 +134,8 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
 
 
 void draw_outlines(ComponentData* components, sfRenderWindow* window, int camera) {
-    for (int j = 0; j < components->image.size; j++) {
-        int i = components->image.order[j];
+    for (ListNode* node = components->image.order->head; node; node = node->next) {
+        int i = node->value;
         ImageComponent* image = ImageComponent_get(components, i);
         if (image->layer == 7) break;
 
@@ -155,8 +155,8 @@ void draw_outlines(ComponentData* components, sfRenderWindow* window, int camera
 
 
 void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
-    for (int j = 0; j < components->image.size; j++) {
-        int i = components->image.order[j];
+    for (ListNode* node = components->image.order->head; node; node = node->next) {
+        int i = node->value;
 
         ImageComponent* image = ImageComponent_get(components, i);
 
@@ -175,25 +175,20 @@ void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, T
 
 
 void change_layer(ComponentData* components, int entity, int layer) {
-    ImageComponent* image = ImageComponent_get(components, entity);
+    List_remove(components->image.order, entity);
 
-    if (layer < image->layer) {
-        int i = find(entity, components->image.order, components->image.size) - 1;
-        while (i >= 0 && ImageComponent_get(components, components->image.order[i])->layer > layer) {
-            components->image.order[i + 1] = components->image.order[i];
-            i--;
-        }
-        components->image.order[i + 1] = entity;
+    if (components->image.order->size == 0 || ImageComponent_get(components, components->image.order->head->value)->layer > layer) {
+        List_add(components->image.order, entity);
     } else {
-        int i = find(entity, components->image.order, components->image.size) + 1;
-        while (i < components->image.size && ImageComponent_get(components, components->image.order[i])->layer < layer) {
-            components->image.order[i - 1] = components->image.order[i];
-            i++;
+        for (ListNode* node = components->image.order->head; node; node = node->next) {
+            if (!node->next || ImageComponent_get(components, node->next->value)->layer > layer) {
+                List_insert(components->image.order, node, entity);
+                break;
+            }
         }
-        components->image.order[i - 1] = entity;
     }
 
-    image->layer = layer;
+    ImageComponent_get(components, entity)->layer = layer;
 }
 
 

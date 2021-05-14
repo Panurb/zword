@@ -18,8 +18,8 @@ ComponentData* ComponentData_create() {
     ComponentData* components = malloc(sizeof(ComponentData));
     components->entities = 0;
 
-    components->image.size = 0;
-    components->player.size = 0;
+    components->image.order = List_create();
+    components->player.order = List_create();
 
     for (int i = 0; i < MAX_ENTITIES; i++) {
         components->image.array[i] = NULL;
@@ -79,14 +79,7 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     
     components->image.array[entity] = image;
 
-    int i = components->image.size - 1;
-    while (i >= 0 && ImageComponent_get(components, components->image.order[i])->layer > layer) {
-        components->image.order[i + 1] = components->image.order[i];
-        i--;
-    }
-    components->image.order[i + 1] = entity;
-
-    components->image.size++;
+    change_layer(components, entity, image->layer);
 
     return image;
 }
@@ -106,12 +99,7 @@ void ImageComponent_remove(ComponentData* components, int entity) {
         free(image);
         components->image.array[entity] = NULL;
 
-        int i = find(entity, components->image.order, components->image.size);
-        while (i < components->image.size - 2) {
-            components->image.order[i] = components->image.order[i + 1];
-            i++;
-        }
-        components->image.size--;
+        List_remove(components->image.order, entity);
     }
 }
 
@@ -245,8 +233,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     sfCircleShape_setOutlineThickness(player->crosshair, 1.0f);
 
     components->player.array[entity] = player;
-    components->player.order[components->player.size] = entity;
-    components->player.size++;
+    List_add(components->player.order, entity);
 
     return player;
 }
@@ -264,7 +251,8 @@ void PlayerComponent_remove(ComponentData* components, int entity) {
     sfRectangleShape_destroy(player->line);
     free(player);
     components->player.array[entity] = NULL;
-    // TODO
+    List_remove(components->player.order, entity);
+    // TODO something
 }
 
 

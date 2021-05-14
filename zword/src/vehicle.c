@@ -12,7 +12,7 @@ void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
-    ColliderComponent_add_rectangle(components, i, 5.0, 2.8, VEHICLES);
+    ColliderComponent_add_rectangle(components, i, 5.0, 2.8, GROUP_VEHICLES);
     PhysicsComponent* phys = PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0);
     phys->max_angular_speed = 2.5;
     phys->drag_sideways = 50.0;
@@ -33,7 +33,7 @@ void create_car(ComponentData* components, sfVector2f pos) {
 
 
 bool enter_vehicle(ComponentData* components, int i) {
-    CoordinateComponent* coord = components->coordinate[i];
+    CoordinateComponent* coord = CoordinateComponent_get(components, i);
 
     for (int j = 0; j < components->entities; j++) {
         VehicleComponent* vehicle = components->vehicle[j];
@@ -54,8 +54,9 @@ bool enter_vehicle(ComponentData* components, int i) {
         if (min_d < 3.0) {
             PlayerComponent* player = PlayerComponent_get(components, i);
             int item = player->inventory[player->item];
-            if (components->light[item]) {
-                components->light[item]->enabled = false;
+            LightComponent* light = LightComponent_get(components, item);
+            if (light) {
+                light->enabled = false;
             }
 
             player->vehicle = j;

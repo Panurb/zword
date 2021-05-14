@@ -23,7 +23,7 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     
     CoordinateComponent_add(components, i, pos, rand_angle());
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4)->shine = 0.5;
-    ColliderComponent_add_circle(components, i, 0.5, ENEMIES);
+    ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
     PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 6.0;
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
@@ -39,7 +39,7 @@ void create_big_boy(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, i, pos, rand_angle());
     ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, 4);
     AnimationComponent_add(components, i);
-    ColliderComponent_add_circle(components, i, 0.9f, ENEMIES);
+    ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
     PhysicsComponent_add(components, i, 10.0f, 0.0, 0.15f, 5.0, 10.0)->max_speed = 12.0f;
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
@@ -70,8 +70,8 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
         switch (enemy->state) {
             case IDLE:
-                for (int k = 0; k < components->player.size; k++) {
-                    int j = components->player.order[k];
+                for (ListNode* node = components->player.order->head; node; node = node->next) {
+                    int j = node->value;
                     PlayerComponent* player = PlayerComponent_get(components, j);
                     if (player->state == PLAYER_DEAD) continue;
 
@@ -80,7 +80,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     float angle = acosf(dot(normalized(r), s));
 
                     if (norm(r) < enemy->vision_range && angle < 0.5f * enemy->fov) {
-                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, BULLETS);
+                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, GROUP_BULLETS);
                         if (info.object == j) {
                             enemy->target = j;
                             enemy->state = CHASE;

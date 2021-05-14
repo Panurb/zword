@@ -90,7 +90,7 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
         return 0.0;
     }
 
-    HitInfo info = raycast(component, grid, a, v, 1.1f * d, i, BULLETS);
+    HitInfo info = raycast(component, grid, a, v, 1.1f * d, i, GROUP_BULLETS);
 
     if (info.object == j || info.object == -1) {
         return d;

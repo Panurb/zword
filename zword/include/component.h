@@ -57,16 +57,16 @@ typedef enum {
 } ColliderType;
 
 typedef enum {
-    WALLS,
-    ITEMS,
-    PLAYERS,
-    ENEMIES,
-    VEHICLES,
-    TREES,
-    ROADS,
-    RIVERS,
-    BULLETS,
-    LIGHTS,
+    GROUP_WALLS,
+    GROUP_ITEMS,
+    GROUP_PLAYERS,
+    GROUP_ENEMIES,
+    GROUP_VEHICLES,
+    GROUP_TREES,
+    GROUP_ROADS,
+    GROUP_RIVERS,
+    GROUP_BULLETS,
+    GROUP_LIGHTS,
     GROUP_CORPSES,
     GROUP_FLOORS
 } ColliderGroup;
@@ -286,9 +286,8 @@ typedef struct {
 } AnimationComponent;
 
 typedef struct {
-    int size;
     void* array[MAX_ENTITIES];
-    int order[MAX_ENTITIES];
+    List* order;
 } OrderedArray;
 
 typedef struct {

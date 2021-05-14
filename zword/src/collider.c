@@ -210,7 +210,8 @@ sfVector2f overlap(ComponentData* component, int i, int j) {
 }
 
 
-bool collides_with(ComponentData* components, ColliderGrid* grid, int i, ColliderGroup group) {
+bool collides_with(ComponentData* components, ColliderGrid* grid, int i) {
+    ColliderGroup group = ColliderComponent_get(components, i)->group;
     Bounds bounds = get_bounds(components, grid, i);
 
     for (int j = bounds.left; j <= bounds.right; j++) {
@@ -222,13 +223,13 @@ bool collides_with(ComponentData* components, ColliderGrid* grid, int i, Collide
 
                 ColliderComponent* collider = ColliderComponent_get(components, n);
 
-                if (collider->group != group) {
+                if (!COLLISION_MATRIX[group][collider->group]) {
                     continue;
                 }
 
                 sfVector2f ol = overlap(components, i, n);
 
-                if (ol.x != 0.0 || ol.y != 0.0) {
+                if (non_zero(ol)) {
                     return true;
                 }
             }

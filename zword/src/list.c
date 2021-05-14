@@ -20,6 +20,15 @@ void List_add(List* list, int value) {
 }
 
 
+void List_insert(List* list, ListNode* node, int value) {
+    ListNode* new = malloc(sizeof(List));
+    new->value = value;
+    new->next = node->next;
+    node->next = new;
+    list->size++;
+}
+
+
 void List_remove(List* list, int value) {
     ListNode* prev = NULL;
     for (ListNode* current = list->head; current; current = current->next) {

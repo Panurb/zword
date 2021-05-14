@@ -76,7 +76,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 for (int i = 0; i < weapon->shots; i++) {
                     float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
                     sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, parent, BULLETS);
+                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, parent, GROUP_BULLETS);
 
                     float d = dist(info.position, pos);
                     if (d < min_dist) {
@@ -103,7 +103,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     if (ignore == -1) {
                         ignore = parent;
                     }
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, ignore, BULLETS);
+                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, ignore, GROUP_BULLETS);
 
                     int dmg = weapon->damage;
                     if (dot(info.normal, dir) < -0.99f) {
@@ -170,7 +170,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
@@ -185,7 +185,7 @@ void create_shotgun(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     ImageComponent_add(components, i, "shotgun", 2.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     WeaponComponent_add(components, i, 10.0f, 10, 10, 0.1f * M_PI, 2, 0.25f, 15.0f, 1.5f, AMMO_SHOTGUN, "shotgun");
@@ -200,7 +200,7 @@ void create_assault_rifle(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 1.0f, 0.5f, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.0f, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, 3);
     PhysicsComponent_add(components, i, 0.5f, 0.0f, 0.5f, 10.0f, 2.5f);
     WeaponComponent_add(components, i, 10.0f, 40, 1, 0.0f, 30, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
@@ -215,7 +215,7 @@ void create_axe(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 1.5, 0.5, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.5, 0.5, GROUP_ITEMS);
     ImageComponent_add(components, i, "axe", 2.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
     WeaponComponent_add(components, i, 2.0f, 50, 7, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.5f, AMMO_MELEE, "axe");
@@ -238,7 +238,7 @@ int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 0.5f, 0.5f, ITEMS);
+    ColliderComponent_add_rectangle(components, i, 0.5f, 0.5f, GROUP_ITEMS);
     switch (type) {
         case AMMO_PISTOL:
             ImageComponent_add(components, i, "ammo_pistol", 1.0, 1.0, 3);
