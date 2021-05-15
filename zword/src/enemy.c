@@ -59,7 +59,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
         if (enemy->state != DEAD && components->health[i]->health <= 0) {
             strcpy(image->filename, "zombie_dead");
-            image->width = 2.0;
+            image->width = 2.0f;
             image->texture_changed = true;
             change_layer(components, i, 2);
             if (AnimationComponent_get(components, i)) {
@@ -131,10 +131,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     }
                 }
 
-                // FIXME
-                if (WaypointComponent_get(components, i)) {
-                    WaypointComponent_remove(components, i);
-                }
+                WaypointComponent_remove(components, i);
 
                 break;
         }

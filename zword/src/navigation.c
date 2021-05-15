@@ -14,6 +14,16 @@
 #define INFINITY 10000.0
 
 
+int create_waypoint(ComponentData* components, sfVector2f pos) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, pos, 0.0);
+    WaypointComponent_add(components, i);
+    ColliderComponent_add_circle(components, i, 2.0f, GROUP_WAYPOINTS);
+
+    return i;
+}
+
+
 void reconstruct_path(ComponentData* components, int current, List* path) {
     while(current != -1) {
         List_add(path, current);
@@ -87,81 +97,40 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
     float d = norm(v);
 
     if (d > component->waypoint[i]->range) {
-        return 0.0;
+        return 0.0f;
     }
 
-    HitInfo info = raycast(component, grid, a, v, 1.1f * d, i, GROUP_BULLETS);
+    HitInfo info = raycast(component, grid, a, v, 1.0f * d, i, GROUP_RAYS);
 
-    if (info.object == j || info.object == -1) {
+    if (info.object == j) {
         return d;
     }
 
-    return 0.0;
-}
-
-
-void init_waypoints(ComponentData* components, ColliderGrid* grid) {
-    for (int i = 0; i < components->entities; i++) {
-        WaypointComponent* waypoint = WaypointComponent_get(components, i);
-        if (!waypoint) continue;
-
-        for (int j = i + 1; j < components->entities; j++) {
-            WaypointComponent* neighbor = WaypointComponent_get(components, j);
-            if (!neighbor) continue;
-
-            float d = connection_distance(components, grid, i, j);
-            if (d > 0.0f) {
-                List_add(waypoint->neighbors, j);
-                List_add(neighbor->neighbors, i);
-            }
-        }
-    }
-}
-
-
-void clear_waypoints(ComponentData* components) {
-    for (int i = 0; i < components->entities; i++) {
-        WaypointComponent* waypoint = WaypointComponent_get(components, i);
-        if (!waypoint) continue;
-
-        if (PhysicsComponent_get(components, i)) {
-            List_clear(waypoint->neighbors);
-        } else {
-            ListNode* current = waypoint->neighbors->head;
-            while (current) {
-                int n = current->value;
-                if (PhysicsComponent_get(components, n)) {
-                    List_remove(waypoint->neighbors, n);
-                    current = waypoint->neighbors->head;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
+    return 0.0f;
 }
 
 
 void update_waypoints(ComponentData* components, ColliderGrid* grid) {
-    clear_waypoints(components);
+    static int id = 0;
+    id = (id + 1) % 20;
 
     for (int i = 0; i < components->entities; i++) {
         WaypointComponent* waypoint = WaypointComponent_get(components, i);
         if (!waypoint) continue;
+        if (i % 20 != id) continue;
+
+        List_clear(waypoint->neighbors);
 
         List* list = get_entities(components, grid, get_position(components, i), waypoint->range);
-        for (ListNode* current = list->head; current != NULL; current = current->next) {
-            int n = current->value;
+        for (ListNode* node = list->head; node; node = node->next) {
+            int n = node->value;
             if (n == i) continue;
-            if (!PhysicsComponent_get(components, n)) continue;
 
-            WaypointComponent* neighbor = WaypointComponent_get(components, n);
-            if (!neighbor) continue;
+            if (!WaypointComponent_get(components, n)) continue;
 
             float d = connection_distance(components, grid, i, n);
             if (d > 0.0f) {
                 List_add(waypoint->neighbors, n);
-                List_add(neighbor->neighbors, i);
             }
         }
         List_delete(list);
@@ -173,7 +142,7 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
     sfCircleShape* shape = sfCircleShape_create();
     sfRectangleShape* line = sfRectangleShape_create();
 
-    float radius = 0.2 * CameraComponent_get(components, camera)->zoom;
+    float radius = 0.2f * CameraComponent_get(components, camera)->zoom;
     sfCircleShape_setOrigin(shape, (sfVector2f) { radius, radius });
     sfCircleShape_setRadius(shape, radius);
 
@@ -186,11 +155,11 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
 
         sfRenderWindow_drawCircleShape(window, shape, NULL);
 
-        for (ListNode* current = waypoint->neighbors->head; current != NULL; current = current->next) {
-            int k = current->value;
+        for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
+            int k = node->value;
             sfColor color = sfWhite;
             color.a = 64;
-            draw_line(window, components, camera, line, pos, get_position(components, k), 0.02, color);
+            draw_line(window, components, camera, line, pos, get_position(components, k), 0.02f, color);
         }
     }
 

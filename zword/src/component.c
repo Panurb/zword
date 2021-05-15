@@ -523,9 +523,12 @@ WaypointComponent* WaypointComponent_get(ComponentData* components, int entity) 
 void WaypointComponent_remove(ComponentData* components, int entity) {
     WaypointComponent* waypoint = WaypointComponent_get(components, entity);
     if (waypoint) {
-        for (ListNode* current = waypoint->neighbors->head; current; current = current->next) {
-            int n = current->value;
-            List_remove(WaypointComponent_get(components, n)->neighbors, entity);
+        for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
+            int n = node->value;
+            WaypointComponent* neighbor = WaypointComponent_get(components, n);
+            if (neighbor) {
+                List_remove(neighbor->neighbors, entity);
+            }
         }
         List_delete(waypoint->neighbors);
         free(waypoint);

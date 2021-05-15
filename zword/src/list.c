@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "list.h"
 
@@ -62,4 +63,14 @@ void List_clear(List* list) {
 void List_delete(List* list) {
     List_clear(list);
     free(list);
+}
+
+
+bool List_find(List* list, int value) {
+    for (ListNode* current = list->head; current; current = current->next) {
+        if (current->value = value) {
+            return true;
+        }
+    }
+    return false;
 }

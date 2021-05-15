@@ -62,7 +62,6 @@ int main() {
     sfClock* clock = sfClock_create();
     float time_step = 1.0f / 60.0f;
     float elapsed_time = 0.0f;
-    int steps = 0;
 
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
@@ -74,7 +73,6 @@ int main() {
     create_level(components, grid, seed);
     // test(components, grid);
     init_grid(components, grid);
-    init_waypoints(components, grid);
 
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
@@ -102,7 +100,6 @@ int main() {
                         camera = create_camera(components, mode);
                         create_level(components, grid, seed);
                         init_grid(components, grid);
-                        init_waypoints(components, grid);
                         sfClock_restart(clock);
                     }  else if (event.key.code == sfKeyF6) {
                         seed = time(NULL);
@@ -113,7 +110,6 @@ int main() {
                         camera = create_camera(components, mode);
                         create_level(components, grid, seed);
                         init_grid(components, grid);
-                        init_waypoints(components, grid);
                         sfClock_restart(clock);
                     }
                     break;
@@ -130,9 +126,7 @@ int main() {
 
                 update(components, time_step, grid);
                 collide(components, grid);
-                if (steps % 10 == 0) {
-                    update_waypoints(components, grid);
-                }
+                update_waypoints(components, grid);
 
                 update_players(components, grid, time_step);
                 update_weapons(components, time_step);
@@ -145,14 +139,12 @@ int main() {
                 draw_lights(components, grid, light_texture, camera, ambient_light);
 
                 animate(components, time_step);
-
-                steps++;
             }
 
             elapsed_time += delta_time;
         }
 
-        sfRenderWindow_clear(window, sfColor_fromRGB(100, 100, 100));
+        sfRenderWindow_clear(window, sfBlack);
 
         draw(components, window, camera, textures);
         sfRenderWindow_drawSprite(window, light_sprite, &state);
@@ -161,7 +153,7 @@ int main() {
         draw_hud(components, window, camera);
 
         // debug_draw(components, window, camera);
-        // draw_waypoints(components, window, camera);
+        draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
         // draw_occupied_tiles(components, grid, window, camera);

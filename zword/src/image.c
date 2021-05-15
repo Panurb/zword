@@ -34,7 +34,6 @@ static const char* IMAGES[] = {
     "flashlight",
     "gas",
     "grass_tile",
-    "hay",
     "hay_bale",
     "pistol",
     "player",

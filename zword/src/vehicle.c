@@ -6,11 +6,11 @@
 #include "particle.h"
 #include "image.h"
 #include "sound.h"
+#include "navigation.h"
 
 
 void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-
     CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, GROUP_VEHICLES);
     PhysicsComponent* phys = PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0);
@@ -22,13 +22,25 @@ void create_car(ComponentData* components, sfVector2f pos) {
     ParticleComponent_add_sparks(components, i);
     SoundComponent_add(components, i, "metal");
 
-    i = create_entity(components);
-    CoordinateComponent_add(components, i, (sfVector2f) { 2.8, 1.0 }, 0.0)->parent = i - 1;
-    LightComponent_add(components, i, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) { 2.8, 1.0 }, 0.0)->parent = i;
+    LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
 
-    i = create_entity(components);
-    CoordinateComponent_add(components, i, (sfVector2f) { 2.8, -1.0 }, 0.0)->parent = i - 2;
-    LightComponent_add(components, i, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) { 2.8, -1.0 }, 0.0)->parent = i;
+    LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+
+    j = create_waypoint(components, (sfVector2f) { 3.5f, 2.0f });
+    CoordinateComponent_get(components, j)->parent = i;
+
+    j = create_waypoint(components, (sfVector2f) { 3.5f, -2.0f });
+    CoordinateComponent_get(components, j)->parent = i;
+
+    j = create_waypoint(components, (sfVector2f) { -3.5f, 2.0f });
+    CoordinateComponent_get(components, j)->parent = i;
+
+    j = create_waypoint(components, (sfVector2f) { -3.5f, -2.0f });
+    CoordinateComponent_get(components, j)->parent = i;
 }
 
 

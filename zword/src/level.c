@@ -21,14 +21,6 @@
 #include "sound.h"
 
 
-void create_waypoint(ComponentData* components, sfVector2f pos) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, 0.0);
-    WaypointComponent_add(components, i);
-}
-
-
 void create_brick_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
     int i = create_entity(components);
 
@@ -542,7 +534,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
             create_forest(components, grid, pos, perm, f);
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 1; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
                 create_enemy(components, sum(pos, r));
             }

@@ -68,7 +68,9 @@ typedef enum {
     GROUP_BULLETS,
     GROUP_LIGHTS,
     GROUP_CORPSES,
-    GROUP_FLOORS
+    GROUP_FLOORS,
+    GROUP_WAYPOINTS,
+    GROUP_RAYS
 } ColliderGroup;
 
 typedef struct {

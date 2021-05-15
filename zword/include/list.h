@@ -21,3 +21,5 @@ void List_remove(List* list, int value);
 void List_clear(List* list);
 
 void List_delete(List* list);
+
+bool List_find(List* list, int value);

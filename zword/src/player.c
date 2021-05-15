@@ -33,7 +33,7 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     ColliderComponent_add_circle(components, i, 0.5, GROUP_PLAYERS);
     PlayerComponent* player = PlayerComponent_add(components, i, joystick);
     ParticleComponent_add_blood(components, i);
-    WaypointComponent_add(components, i)->range = 12.0;
+    WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100);
     SoundComponent_add(components, i, "squish");
 
