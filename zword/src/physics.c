@@ -20,7 +20,7 @@ void apply_force(ComponentData* components, int entity, sfVector2f force) {
 }
 
 
-void update(ComponentData* components, float delta_time, ColliderGrid* collision_grid) {
+void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
         PhysicsComponent* physics = components->physics[i];
         if (!physics) continue;
@@ -60,9 +60,15 @@ void update(ComponentData* components, float delta_time, ColliderGrid* collision
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
 
         if (ColliderComponent_get(components, i) && non_zero(delta_pos)) {
-            clear_grid(components, collision_grid, i);
+            clear_grid(components, grid, i);
+            for (ListNode* node = coord->children->head; node; node = node->next) {
+                clear_grid(components, grid, node->value);
+            }
             coord->position = sum(coord->position, delta_pos);
-            update_grid(components, collision_grid, i);
+            update_grid(components, grid, i);
+            for (ListNode* node = coord->children->head; node; node = node->next) {
+                update_grid(components, grid, node->value);
+            }
         } else {
             coord->position = sum(coord->position, delta_pos);
         }

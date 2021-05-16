@@ -45,6 +45,7 @@ CoordinateComponent* CoordinateComponent_add(ComponentData* components, int enti
     coord->position = pos;
     coord->angle = angle;
     coord->parent = -1;
+    coord->children = List_create();
 
     components->coordinate[entity] = coord;
 
@@ -61,6 +62,7 @@ CoordinateComponent* CoordinateComponent_get(ComponentData* components, int enti
 void CoordinateComponent_remove(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     if (coord) {
+        List_delete(coord->children);
         free(coord);
         components->coordinate[entity] = NULL;
     }

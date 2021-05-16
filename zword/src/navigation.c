@@ -112,12 +112,12 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
 
 void update_waypoints(ComponentData* components, ColliderGrid* grid) {
     static int id = 0;
-    id = (id + 1) % 20;
+    id = (id + 1) % 10;
 
     for (int i = 0; i < components->entities; i++) {
         WaypointComponent* waypoint = WaypointComponent_get(components, i);
         if (!waypoint) continue;
-        if (i % 20 != id) continue;
+        if (i % 10 != id) continue;
 
         List_clear(waypoint->neighbors);
 

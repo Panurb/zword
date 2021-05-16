@@ -15,6 +15,7 @@ typedef struct {
     sfVector2f position;
     float angle;
     int parent;
+    List* children;
 } CoordinateComponent;
 
 typedef struct {

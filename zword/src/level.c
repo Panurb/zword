@@ -551,6 +551,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     resize_roads(components);
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
+    create_axe(components, start);
     // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }
