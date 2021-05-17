@@ -26,7 +26,7 @@ void create_brick_wall(ComponentData* components, sfVector2f pos, float length, 
 
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, length, 0.75, GROUP_WALLS);
-    ImageComponent_add(components, i, "brick_tile", length, 0.75, 2);
+    ImageComponent_add(components, i, "brick_tile", length, 0.75, LAYER_WALLS);
     ParticleComponent_add_dirt(components, i);
 }
 
@@ -36,7 +36,7 @@ void create_wood_wall(ComponentData* components, sfVector2f pos, float length, f
 
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, length, 0.5, GROUP_WALLS);
-    ImageComponent_add(components, i, "wood_tile", length, 0.5, 2);
+    ImageComponent_add(components, i, "wood_tile", length, 0.5, LAYER_WALLS);
     ParticleComponent_add_dirt(components, i);
 }
 
@@ -45,7 +45,7 @@ void create_wall(ComponentData* components, sfVector2f pos, float angle, float w
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
-    ImageComponent_add(components, i, filename, width, height, 2);
+    ImageComponent_add(components, i, filename, width, height, LAYER_WALLS);
     ParticleComponent_add_dirt(components, i);
 }
 
@@ -60,7 +60,7 @@ void create_fire(ComponentData* components, sfVector2f pos) {
     particle->loop = true;
     particle->enabled = true;
     ColliderComponent_add_circle(components, i, 0.35, GROUP_WALLS);
-    ImageComponent_add(components, i, "fire", 1.0, 1.0, 5);
+    ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_PARTICLES);
 }
 
 
@@ -69,7 +69,7 @@ void create_light(ComponentData* components, sfVector2f pos) {
 
     CoordinateComponent_add(components, i, pos, rand_angle());
     ParticleComponent_add_fire(components, i, 0.25f);
-    ImageComponent_add(components, i, "candle", 1.0f, 1.0f, 3);
+    ImageComponent_add(components, i, "candle", 1.0f, 1.0f, LAYER_ITEMS);
 }
 
 
@@ -77,7 +77,7 @@ void create_floor(ComponentData* components, sfVector2f pos, float width, float 
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, filename, width, height, 1);
+    ImageComponent_add(components, i, filename, width, height, LAYER_FLOOR);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
 }
 
@@ -86,7 +86,7 @@ void create_roof(ComponentData* component, sfVector2f pos, float width, float he
     int i = create_entity(component);
 
     CoordinateComponent_add(component, i, pos, angle);
-    ImageComponent_add(component, i, "roof_tile", width, height, 6);
+    ImageComponent_add(component, i, "roof_tile", width, height, LAYER_ROOFS);
 }
 
 
@@ -132,7 +132,7 @@ void create_bench(ComponentData* components, sfVector2f position, float angle) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "bench", 1.0f, 3.0f, 3);
+    ImageComponent_add(components, i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 0.8f, 2.8f, GROUP_WALLS);
 }
 
@@ -141,7 +141,7 @@ void create_hay_bale(ComponentData* components, sfVector2f position, float angle
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "hay_bale", 3.0f, 2.0f, 3);
+    ImageComponent_add(components, i, "hay_bale", 3.0f, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 2.8f, 1.5f, GROUP_WALLS);
 }
 
@@ -149,7 +149,7 @@ void create_hay_bale(ComponentData* components, sfVector2f position, float angle
 void create_decal(ComponentData* components, sfVector2f pos, float width, float height, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, filename, width, height, 2);
+    ImageComponent_add(components, i, filename, width, height, LAYER_DECALS);
 }
 
 
@@ -169,7 +169,9 @@ void create_church(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, mult(12.5f, w)), angle, 3.0f, 8.0f, "altar_tile");
     create_light(components, sum(pos, sum(mult(12.5f, w), mult(-3.0f, h))));
     create_light(components, sum(pos, sum(mult(12.5f, w), mult(3.0f, h))));
-    create_decal(components, sum(pos, mult(12.5f, w)), 2.0f, 2.0f, "blood_large");
+    int k = create_entity(components);
+    CoordinateComponent_add(components, k, sum(pos, mult(12.5f, w)), rand_angle());
+    ImageComponent_add(components, k, "blood_large", 2.0f, 2.0f, LAYER_ITEMS);
 
     for (int j = 0; j < 2; j++) {
         for (int i = 0; i < 7; i++) {
@@ -344,9 +346,10 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 }
 
 
-void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
+void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, rand_angle());
+    CoordinateComponent_add(components, i, position, rand_angle());    
+    float size = randf(1.0f, 1.5f);
     ColliderComponent_add_circle(components, i, size, GROUP_TREES);
 
     if (collides_with(components, grid, i)) {
@@ -354,13 +357,14 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
         return;
     }
 
-    ImageComponent_add(components, i, "tree", 3.0, 3.0, 6)->scale = (sfVector2f) { size, size };
+    ImageComponent_add(components, i, "tree", 3.0, 3.0, LAYER_TREES)->scale = (sfVector2f) { size, size };
 }
 
 
-void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position, float size) {
+void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
+    float size = randf(0.75f, 2.0f);
     ColliderComponent_add_circle(components, i, 1.4 * size, GROUP_TREES);
 
     if (collides_with(components, grid, i)) {
@@ -368,7 +372,27 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
         return;
     }
 
-    ImageComponent_add(components, i, "rock", 3.0, 3.0, 2)->scale = (sfVector2f) { size, size };
+    ImageComponent_add(components, i, "rock", 3.0, 3.0, LAYER_DECALS)->scale = (sfVector2f) { size, size };
+}
+
+
+void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation) {
+    int n = 10;
+    float m = n - 1;
+    for (int i = 1; i < n; i++) {
+        for (int j = 1; j < n; j++) {
+            sfVector2f r = { (i - n / 2) * CHUNK_WIDTH / m, (j - n / 2) * CHUNK_HEIGHT / m };
+            r = sum(sum(position, r), rand_vector());
+
+            if ((1.0f - forestation) < perlin(0.03f * r.x, 0.03f * r.y, 0.0, p, -1)) {
+                if (randf(0.0f, 1.0f) < 0.05f) {
+                    create_rock(components, grid, r);
+                } else {
+                    create_tree(components, grid, r);
+                }
+            }
+        }
+    }
 }
 
 
@@ -383,30 +407,13 @@ void create_uranium(ComponentData* components, ColliderGrid* grid, sfVector2f po
         return;
     }
 
-    ImageComponent_add(components, i, "uranium", r, r, 2);
+    ImageComponent_add(components, i, "uranium", r, r, LAYER_DECALS);
     LightComponent_add(components, i, randf(3.0, 5.0), 2.0 * M_PI, get_color(0.5, 1.0, 0.0, 1.0), 0.5, 1.0)->flicker = 0.25;
     SoundComponent_add(components, i, "");
     ParticleComponent* particle = ParticleComponent_add(components, i, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, 
                                                         get_color(0.5, 1.0, 0.0, 1.0), get_color(0.5, 1.0, 0.0, 1.0));
     particle->enabled = true;
     particle->loop = true;
-}
-
-
-void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation) {
-    for (int i = -5; i < 6; i++) {
-        for (int j = -5; j < 6; j++) {
-            sfVector2f r = { position.x + i * 3.0 + randf(-1.0, 1.0), position.y + j * 3.0 + randf(-1.0, 1.0) };
-
-            if ((1.0 - forestation) < perlin(0.03 * r.x, 0.03 * r.y, 0.0, p, -1)) {
-                if (randf(0.0, 1.0) < 0.05) {
-                    create_rock(components, grid, r, randf(0.75, 2.0));
-                } else {
-                    create_tree(components, grid, r, randf(1.0, 1.5));
-                }
-            }
-        }
-    }
 }
 
 
@@ -541,7 +548,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
             for (int i = 0; i < 2; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                create_uranium(components, grid, sum(pos, r));
+                // create_uranium(components, grid, sum(pos, r));
             }
         }
     }

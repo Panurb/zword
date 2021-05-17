@@ -17,6 +17,7 @@
 #include "raycast.h"
 #include "sound.h"
 #include "particle.h"
+#include "image.h"
 
 
 bool inside_collider(ComponentData* components, int i, sfVector2f point) {
@@ -341,43 +342,5 @@ void debug_draw(ComponentData* components, sfRenderWindow* window, int camera) {
             sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
             draw_rectangle(window, components, camera, NULL, get_position(components, i), col->width, col->height, get_angle(components, i), color);
         }
-    }
-}
-
-
-void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f dir, int dmg) {
-    HealthComponent* health = components->health[entity];
-    if (health) {
-        health->health = max(0, health->health - dmg);
-
-        int j = create_entity(components);
-        CoordinateComponent_add(components, j, get_position(components, entity), rand_angle());
-
-        if (dmg < 50) {
-            ImageComponent_add(components, j, "blood", 1.0f, 1.0f, 1);
-        } else {
-            ImageComponent_add(components, j, "blood_large", 2.0f, 2.0f, 1);
-        }
-    }
-
-    EnemyComponent* enemy = components->enemy[entity];
-    if (enemy) {
-        CoordinateComponent_get(components, entity)->angle = polar_angle(mult(-1.0, dir));
-    }
-    
-    PhysicsComponent* physics = PhysicsComponent_get(components, entity);
-    if (physics) {
-        apply_force(components, entity, mult(250.0f, dir));
-    }
-
-    ParticleComponent* particle = ParticleComponent_get(components, entity);
-    if (particle) {
-        particle->origin = diff(pos, get_position(components, entity));
-        add_particles(components, entity, particle->rate / 50.0f * dmg);
-    }
-
-    SoundComponent* scomp = SoundComponent_get(components, entity);
-    if (scomp && scomp->hit_sound[0] != '\0') {
-        add_sound(components, entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "component.h"
+#include "grid.h"
 
 
 void create_flashlight(ComponentData* components, sfVector2f position);

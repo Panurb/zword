@@ -105,7 +105,7 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
 
         ImageComponent* image = ImageComponent_get(components, i);
 
-        if (image->layer == 7) break;
+        if (image->layer == LAYER_ROOFS) break;
 
         sfVector2f pos = get_position(components, i);
 
@@ -126,8 +126,10 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
             sfSprite_setColor(image->sprite, get_color(1.0, 1.0, 1.0, image->alpha));
             draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
         }
+    }
 
-        draw_particles(components, window, camera, i);
+    for (ListNode* node = components->image.order->head; node; node = node->next) {
+        draw_particles(components, window, camera, node->value);
     }
 }
 
@@ -136,7 +138,7 @@ void draw_outlines(ComponentData* components, sfRenderWindow* window, int camera
     for (ListNode* node = components->image.order->head; node; node = node->next) {
         int i = node->value;
         ImageComponent* image = ImageComponent_get(components, i);
-        if (image->layer == 7) break;
+        if (image->layer == LAYER_ROOFS) break;
 
         sfVector2f pos = get_position(components, i);
 
@@ -159,21 +161,29 @@ void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, T
 
         ImageComponent* image = ImageComponent_get(components, i);
 
-        if (image->layer < 7) continue;
+        if (image->layer < LAYER_ROOFS) continue;
 
         if (image->texture_changed) {
             set_texture(image, textures);
             image->texture_changed = false;
         }
 
-        if (image->alpha > 0.0) {
+        if (image->alpha > 0.0f) {
             draw_sprite(window, components, camera, image->sprite, get_position(components, i), get_angle(components, i), image->scale, 0);
         }
     }
 }
 
 
-void change_layer(ComponentData* components, int entity, int layer) {
+void change_texture(ComponentData* components, int entity, Filename filename) {
+    ImageComponent* image = ImageComponent_get(components, entity);
+    image->width = 2.0f;
+    strcpy(image->filename, filename);
+    image->texture_changed = true;
+}
+
+
+void change_layer(ComponentData* components, int entity, Layer layer) {
     List_remove(components->image.order, entity);
 
     if (components->image.order->size == 0 || ImageComponent_get(components, components->image.order->head->value)->layer > layer) {

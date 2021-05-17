@@ -22,13 +22,13 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, "zombie", 1.0, 1.0, 4)->shine = 0.5;
+    ImageComponent_add(components, i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
-    PhysicsComponent_add(components, i, 1.0, 0.0, 0.5, 5.0, 10.0)->max_speed = 6.0;
+    PhysicsComponent_add(components, i, 1.0f)->max_speed = 6.0;
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 100);
+    HealthComponent_add(components, i, 100, "zombie_dead");
     SoundComponent_add(components, i, "squish");
 }
 
@@ -37,14 +37,14 @@ void create_big_boy(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, 4);
+    ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
     AnimationComponent_add(components, i);
     ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
-    PhysicsComponent_add(components, i, 10.0f, 0.0, 0.15f, 5.0, 10.0)->max_speed = 12.0f;
+    PhysicsComponent_add(components, i, 10.0f)->max_speed = 12.0f;
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 500);
+    HealthComponent_add(components, i, 500, "big_boy_dead");
     SoundComponent_add(components, i, "squish");
 }
 
@@ -55,21 +55,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
         if (!enemy) continue;
 
         PhysicsComponent* phys = PhysicsComponent_get(components, i);
-        ImageComponent* image = ImageComponent_get(components, i);
-
-        if (enemy->state != DEAD && components->health[i]->health <= 0) {
-            strcpy(image->filename, "zombie_dead");
-            image->width = 2.0f;
-            image->texture_changed = true;
-            change_layer(components, i, 2);
-            if (AnimationComponent_get(components, i)) {
-                stop_animation(components, i);
-            }
-            enemy->state = DEAD;
-        }
 
         switch (enemy->state) {
-            case IDLE:
+            case ENEMY_IDLE:
                 for (ListNode* node = components->player.order->head; node; node = node->next) {
                     int j = node->value;
                     PlayerComponent* player = PlayerComponent_get(components, j);
@@ -83,16 +71,16 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                         HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, GROUP_BULLETS);
                         if (info.object == j) {
                             enemy->target = j;
-                            enemy->state = CHASE;
+                            enemy->state = ENEMY_CHASE;
                             break;
                         }
                     }
                 }
 
                 break;
-            case INVESTIGATE:
+            case ENEMY_INVESTIGATE:
                 break;
-            case CHASE:
+            case ENEMY_CHASE:
                 a_star(components, i, enemy->target, enemy->path);
 
                 sfVector2f r;
@@ -117,11 +105,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
                 if (PlayerComponent_get(components, enemy->target)->state == PLAYER_DEAD) {
                     enemy->target = -1;
-                    enemy->state = IDLE;
+                    enemy->state = ENEMY_IDLE;
                 }
 
                 break;
-            case DEAD:;
+            case ENEMY_DEAD:;
                 ColliderComponent* col = ColliderComponent_get(components, i);
                 if (col) {
                     col->group = GROUP_CORPSES;
@@ -131,7 +119,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     }
                 }
 
-                WaypointComponent_remove(components, i);
+                // WaypointComponent_remove(components, i);
 
                 break;
         }
@@ -169,7 +157,7 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
         if (enemy) {
             if (enemy->target == -1) {
                 enemy->target = player;
-                enemy->state = CHASE;
+                enemy->state = ENEMY_CHASE;
             }
         }
     }

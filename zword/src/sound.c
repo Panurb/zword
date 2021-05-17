@@ -43,7 +43,7 @@ sfSoundBuffer** load_sounds() {
 
 
 int sound_index(Filename filename) {
-    return binary_search_filename(filename, SOUNDS, sizeof(SOUNDS) / sizeof(SOUNDS[0]));
+    return binary_search_filename(filename, (char**) SOUNDS, sizeof(SOUNDS) / sizeof(SOUNDS[0]));
 }
 
 

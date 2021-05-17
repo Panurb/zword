@@ -19,4 +19,4 @@ typedef enum {
     BUTTON_RT
 } ControllerButton;
 
-void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i);
+void input(ComponentData* components, sfRenderWindow* window, int camera);

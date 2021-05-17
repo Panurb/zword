@@ -6,6 +6,8 @@
 #include "util.h"
 #include "component.h"
 #include "camera.h"
+#include "vehicle.h"
+#include "item.h"
 
 
 void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i) {
@@ -106,6 +108,144 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
             player->controller.buttons_pressed[b] = (down && !player->controller.buttons_down[b]);
             player->controller.buttons_released[b] = (!down && player->controller.buttons_down[b]);
             player->controller.buttons_down[b] = down;
+        }
+    }
+}
+
+
+void input(ComponentData* components, sfRenderWindow* window, int camera) {
+    sfJoystick_update();
+
+    for (int i = 0; i < components->entities; i++) {
+        PlayerComponent* player = PlayerComponent_get(components, i);
+        if (!player) continue;
+
+        update_controller(components, window, camera, i);
+        Controller controller = player->controller;
+
+        WeaponComponent* weapon = WeaponComponent_get(components, player->inventory[player->item]);
+
+        switch (player->state) {
+            case ON_FOOT:
+                if (controller.buttons_down[BUTTON_LT]) {
+                    player->state = MENU;
+                }
+
+                if (controller.buttons_pressed[BUTTON_RB]) {
+                    player->state = PLAYER_PICK_UP;
+                }
+
+                if (controller.buttons_pressed[BUTTON_RT]) {
+                    player->state = SHOOT;
+                }
+
+                if (weapon) {
+                    if (controller.buttons_pressed[BUTTON_X]) {
+                        player->state = RELOAD;
+                    }
+
+                    if (controller.buttons_pressed[BUTTON_Y]) {
+                        ItemComponent* item = ItemComponent_get(components, player->inventory[player->item]);
+                        for (int j = 0; j < item->size; j++) {
+                            int k = item->attachments[j];
+                            LightComponent* light = LightComponent_get(components, k);
+                            if (light) {
+                                light->enabled = !light->enabled;
+                            }
+                        }
+                    }
+                }
+
+                if (controller.buttons_down[BUTTON_LB]) {
+                    player->state = PLAYER_AMMO_MENU;
+                }
+
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    enter_vehicle(components, i);
+                }
+
+                VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
+                if (vehicle) {
+                    if (vehicle->riders[0] == i) {
+                        player->state = DRIVE;
+                    } else {
+                        player->state = PLAYER_PASSENGER;
+                    }
+                }
+
+                break;
+            case PLAYER_PICK_UP:
+                break;
+            case SHOOT:
+                if (!controller.buttons_down[BUTTON_RT]) {
+                    player->state = ON_FOOT;
+                }
+
+                break;
+            case RELOAD:
+                if (controller.buttons_down[BUTTON_LT]) {
+                    player->state = MENU;
+                }
+
+                break;
+            case DRIVE:
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    exit_vehicle(components, i);
+                    player->state = ON_FOOT;
+                }
+
+                break;
+            case PLAYER_PASSENGER:
+                if (controller.buttons_down[BUTTON_LT]) {
+                    player->state = MENU;
+                }
+
+                if (controller.buttons_pressed[BUTTON_RT]) {
+                    player->state = SHOOT;
+                }
+
+                if (controller.buttons_pressed[BUTTON_A]) {
+                    exit_vehicle(components, i);
+                    player->state = ON_FOOT;
+                }
+
+                break;
+            case MENU:
+                if (controller.buttons_pressed[BUTTON_RT]) {
+                    player->state = MENU_GRAB;
+                }
+
+                if (!controller.buttons_down[BUTTON_LT]) {
+                    player->state = ON_FOOT;
+                }
+
+                if (controller.buttons_pressed[BUTTON_RB]) {
+                    drop_item(components, i);
+                }
+
+                break;
+            case MENU_GRAB:
+                if (controller.buttons_released[BUTTON_RT]) {
+                    player->state = MENU_DROP;
+                }
+
+                break;
+            case MENU_DROP:
+                if (controller.buttons_down[BUTTON_LT]) {
+                    player->state = MENU;
+                } else {
+                    player->state = ON_FOOT;
+                }
+
+                break;
+            case PLAYER_AMMO_MENU:
+                if (!controller.buttons_down[BUTTON_LB]) {
+                    player->state = ON_FOOT;
+                }
+
+                break;
+            case PLAYER_DEAD:
+                break;
         }
     }
 }

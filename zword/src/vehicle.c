@@ -13,12 +13,14 @@ void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     CoordinateComponent* coord = CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
     ColliderComponent_add_rectangle(components, i, 5.0, 2.8, GROUP_VEHICLES);
-    PhysicsComponent* phys = PhysicsComponent_add(components, i, 10.0, 0.0, 0.0, 10.0, 20.0);
+    PhysicsComponent* phys = PhysicsComponent_add(components, i, 10.0f);
+    phys->bounce = 0.0f;
+    phys->angular_drag = 20.0f;
     phys->max_angular_speed = 2.5;
     phys->drag_sideways = 50.0;
     VehicleComponent_add(components, i, 100.0);
     // WaypointComponent_add(components, i);
-    ImageComponent_add(components, i, "car", 6.0, 3.0, 4);
+    ImageComponent_add(components, i, "car", 6.0f, 3.0f, LAYER_VEHICLES);
     ParticleComponent_add_sparks(components, i);
     SoundComponent_add(components, i, "metal");
 

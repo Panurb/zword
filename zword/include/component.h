@@ -18,6 +18,23 @@ typedef struct {
     List* children;
 } CoordinateComponent;
 
+typedef enum {
+    LAYER_GROUND,
+    LAYER_ROADS,
+    LAYER_FLOOR,
+    LAYER_DECALS,
+    LAYER_WALLS,
+    LAYER_CORPSES,
+    LAYER_ITEMS,
+    LAYER_VEHICLES,
+    LAYER_ENEMIES,
+    LAYER_PLAYERS,
+    LAYER_WEAPONS,
+    LAYER_TREES,
+    LAYER_PARTICLES,
+    LAYER_ROOFS
+} Layer;
+
 typedef struct {
     bool texture_changed;
     float outline;
@@ -26,7 +43,7 @@ typedef struct {
     float height;
     sfSprite* sprite;
     float shine;
-    int layer;
+    Layer layer;
     sfVector2f scale;
     float alpha;
 } ImageComponent;
@@ -145,10 +162,10 @@ typedef struct {
 } LightComponent;
 
 typedef enum {
-    IDLE,
-    INVESTIGATE,
-    CHASE,
-    DEAD
+    ENEMY_IDLE,
+    ENEMY_INVESTIGATE,
+    ENEMY_CHASE,
+    ENEMY_DEAD
 } EnemyState;
 
 typedef struct {
@@ -239,6 +256,7 @@ typedef struct {
 
 typedef struct {
     int health;
+    Filename filename_dead;
 } HealthComponent;
 
 typedef struct {
@@ -321,11 +339,11 @@ CoordinateComponent* CoordinateComponent_add(ComponentData* components, int enti
 CoordinateComponent* CoordinateComponent_get(ComponentData* components, int entity);
 void CoordinateComponent_remove(ComponentData* components, int entity);
 
-ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer);
+ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, Layer layer);
 ImageComponent* ImageComponent_get(ComponentData* components, int entity);
 void ImageComponent_remove(ComponentData* components, int entity);
 
-PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass, float friction, float bounce, float drag, float angular_drag);
+PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass);
 PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity);
 void PhysicsComponent_remove(ComponentData* components, int entity);
 
@@ -366,7 +384,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity);
 WaypointComponent* WaypointComponent_get(ComponentData* components, int entity);
 void WaypointComponent_remove(ComponentData* components, int entity);
 
-HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health);
+HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename filename_dead);
 HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
 

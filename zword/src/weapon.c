@@ -87,7 +87,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
                 int dmg = weapon->damage;
                 EnemyComponent* enemy = EnemyComponent_get(components, min_info.object);
-                if (enemy && enemy->state == IDLE) {
+                if (enemy && enemy->state == ENEMY_IDLE) {
                     dmg *= 2;
                 }
                 damage(components, min_info.object, min_info.position, normalized(diff(min_info.position, pos)), dmg);
@@ -172,7 +172,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
     ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 1);
@@ -187,7 +187,7 @@ void create_shotgun(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     ImageComponent_add(components, i, "shotgun", 2.0, 1.0, 3);
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 10, 10, 0.1f * M_PI, 2, 0.25f, 15.0f, 1.5f, AMMO_SHOTGUN, "shotgun");
     ParticleComponent_add(components, i, 0.0, 0.0, 0.05f, 0.05f, 100.0f, 1, sfWhite, sfWhite)->speed_spread = 0.0;
     ItemComponent_add(components, i, 0);
@@ -202,7 +202,7 @@ void create_assault_rifle(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0f, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, 3);
-    PhysicsComponent_add(components, i, 0.5f, 0.0f, 0.5f, 10.0f, 2.5f);
+    PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 40, 1, 0.0f, 30, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
     ParticleComponent_add(components, i, 0.0f, 0.0f, 0.125f, 0.125f, 100.0f, 1, sfWhite, sfWhite)->speed_spread = 0.0f;
     ItemComponent_add(components, i, 1);
@@ -217,7 +217,7 @@ void create_axe(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.5, 0.5, GROUP_ITEMS);
     ImageComponent_add(components, i, "axe", 2.0, 1.0, 3);
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 2.0f, 50, 7, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.5f, AMMO_MELEE, "axe");
     ItemComponent_add(components, i, 0);
     SoundComponent_add(components, i, "metal");
@@ -227,7 +227,7 @@ void create_axe(ComponentData* components, sfVector2f position) {
 void create_lasersight(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     ItemComponent_add(components, i, 0);
     LightComponent_add(components, i, 20.0, 0.01, sfRed, 1.0, 10.0)->enabled = false;
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
@@ -253,7 +253,7 @@ int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
             break;
     }
     AmmoComponent_add(components, i, type);
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     ItemComponent_add(components, i, 0);
     SoundComponent_add(components, i, "metal");
     return i;

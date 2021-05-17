@@ -62,6 +62,9 @@ CoordinateComponent* CoordinateComponent_get(ComponentData* components, int enti
 void CoordinateComponent_remove(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     if (coord) {
+        for (ListNode* node = coord->children->head; node; node = node->next) {
+            CoordinateComponent_get(components, node->value)->parent = -1;
+        }
         List_delete(coord->children);
         free(coord);
         components->coordinate[entity] = NULL;
@@ -69,7 +72,7 @@ void CoordinateComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, int layer) {
+ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, Layer layer) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
     image->texture_changed = true;
     image->outline = 0.0;
@@ -109,23 +112,23 @@ void ImageComponent_remove(ComponentData* components, int entity) {
 }
 
 
-PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass, float friction, float bounce, float drag, float angular_drag) {
+PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass) {
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = zeros();
     phys->acceleration = zeros();
     phys->collision.collided = false;
     phys->collision.overlap = zeros();
     phys->collision.velocity = zeros();
-    phys->angular_velocity = 0.0;
-    phys->angular_acceleration = 0.0;
+    phys->angular_velocity = 0.0f;
+    phys->angular_acceleration = 0.0f;
     phys->mass = mass;
-    phys->friction = friction;
-    phys->bounce = bounce;
-    phys->drag = drag;
-    phys->drag_sideways = drag;
+    phys->friction = 0.0f;
+    phys->bounce = 0.5f;
+    phys->drag = 10.0f;
+    phys->drag_sideways = 10.0f;
     phys->speed = 0.0;
     phys->max_speed = 20.0;
-    phys->angular_drag = angular_drag;
+    phys->angular_drag = 10.0f;
     phys->max_angular_speed = 20.0 * M_PI;
 
     components->physics[entity] = phys;
@@ -313,7 +316,7 @@ void LightComponent_remove(ComponentData* components, int entity) {
 
 EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     EnemyComponent* enemy = malloc(sizeof(EnemyComponent));
-    enemy->state = IDLE;
+    enemy->state = ENEMY_IDLE;
     enemy->acceleration = 15.0;
     enemy->target = -1;
     enemy->path = List_create();
@@ -539,9 +542,10 @@ void WaypointComponent_remove(ComponentData* components, int entity) {
 }
 
 
-HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health) {
+HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename filename_dead) {
     HealthComponent* comp = malloc(sizeof(HealthComponent));
     comp->health = health;
+    strcpy(comp->filename_dead, filename_dead);
 
     components->health[entity] = comp;
 

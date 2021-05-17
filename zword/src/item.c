@@ -9,7 +9,7 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
 
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 10.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     ItemComponent_add(components, i, 0);
     LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
@@ -21,7 +21,7 @@ void create_gas(ComponentData* components, sfVector2f position) {
 
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
-    PhysicsComponent_add(components, i, 0.5, 0.0, 0.5, 1.0, 2.5);
+    PhysicsComponent_add(components, i, 0.5f);
     ItemComponent_add(components, i, 0);
     ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
 }

@@ -28,7 +28,9 @@ void draw_outlines(ComponentData* component, sfRenderWindow* window,  int camera
 
 void draw_roofs(ComponentData* component, sfRenderWindow* window, int camera, TextureArray textures);
 
-void change_layer(ComponentData* components, int entity, int layer);
+void change_texture(ComponentData* components, int entity, Filename filename);
+
+void change_layer(ComponentData* components, int entity, Layer layer);
 
 void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);
 
