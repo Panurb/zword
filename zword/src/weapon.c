@@ -76,7 +76,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 for (int i = 0; i < weapon->shots; i++) {
                     float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
                     sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, parent, GROUP_BULLETS);
+                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
                     float d = dist(info.position, pos);
                     if (d < min_dist) {
@@ -103,7 +103,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     if (ignore == -1) {
                         ignore = parent;
                     }
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, ignore, GROUP_BULLETS);
+                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
                     int dmg = weapon->damage;
                     if (dot(info.normal, dir) < -0.99f) {

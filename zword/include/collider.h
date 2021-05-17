@@ -30,7 +30,7 @@ static const int COLLISION_MATRIX[14][14] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                               { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // CORPSES
                                               { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // FLOORS
                                               { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },     // WAYPOINTS
-                                              { 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0 } };   // RAYS
+                                              { 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };   // RAYS
 
 
 bool inside_collider(ComponentData* components, int i, sfVector2f point);

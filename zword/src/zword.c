@@ -126,7 +126,7 @@ int main() {
 
                 update(components, time_step, grid);
                 collide(components, grid);
-                update_waypoints(components, grid);
+                update_waypoints(components, grid, camera);
 
                 update_players(components, grid, time_step);
                 update_weapons(components, time_step);
@@ -153,7 +153,7 @@ int main() {
         draw_hud(components, window, camera);
 
         // debug_draw(components, window, camera);
-        draw_waypoints(components, window, camera);
+        // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
         // draw_occupied_tiles(components, grid, window, camera);

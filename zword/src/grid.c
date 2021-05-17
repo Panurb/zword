@@ -70,15 +70,15 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
 
     for (int i = max(0, x - r); i <= min(grid->columns - 1, x + r); i++) {
         for (int j = max(0, y - r); j <= min(grid->rows - 1, y + r); j++) {
-            for (ListNode* current = grid->array[i][j]->head; current != NULL; current = current->next) {
-                int n = current->value;
-                if (n == -1) continue;
-                if (dist(origin, get_position(components, n)) > radius) continue;
+            for (ListNode* node = grid->array[i][j]->head; node; node = node->next) {
+                int n = node->value;
 
                 ColliderComponent* col = ColliderComponent_get(components, n);
                 if (col->last_collision == id) continue;
 
-                List_add(list, n);
+                if (dist(origin, get_position(components, n)) <= radius) {
+                    List_add(list, n);
+                }
 
                 col->last_collision = id;
             }

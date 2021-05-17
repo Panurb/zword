@@ -68,7 +68,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     float angle = acosf(dot(normalized(r), s));
 
                     if (norm(r) < enemy->vision_range && angle < 0.5f * enemy->fov) {
-                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, i, GROUP_BULLETS);
+                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, GROUP_BULLETS);
                         if (info.object == j) {
                             enemy->target = j;
                             enemy->state = ENEMY_CHASE;
@@ -115,11 +115,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     col->group = GROUP_CORPSES;
                     if (phys->speed == 0.0f) {
                         clear_grid(components, grid, i);
-                        ColliderComponent_remove(components, i);
+                        // ColliderComponent_remove(components, i);
                     }
                 }
 
-                // WaypointComponent_remove(components, i);
+                WaypointComponent_remove(components, i);
 
                 break;
         }

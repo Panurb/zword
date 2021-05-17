@@ -56,6 +56,8 @@ void die(ComponentData* components, int entity) {
                 ammo->size -= size;
             }
         }
+
+        player->state = PLAYER_DEAD;
     }
 }
 

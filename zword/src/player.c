@@ -265,7 +265,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     col->group = GROUP_ITEMS;
                     if (phys->speed == 0.0) {
                         clear_grid(components, grid, i);
-                        ColliderComponent_remove(components, i);
+                        // ColliderComponent_remove(components, i);
                     }
                 }
 

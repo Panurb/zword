@@ -511,7 +511,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity) 
     waypoint->g_score = INFINITY;
     waypoint->f_score = INFINITY;
     waypoint->neighbors = List_create();
-    waypoint->range = 15.0f;
+    waypoint->range = 16.0f;
 
     components->waypoint[entity] = waypoint;
 
