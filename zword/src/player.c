@@ -97,7 +97,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         WeaponComponent* weapon = WeaponComponent_get(components, item);
         LightComponent* light = LightComponent_get(components, item);
 
-        if (player->state != PLAYER_DEAD && player->state != DRIVE) {
+        if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
             phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
             if (non_zero(right_stick)) {
                 coord->angle = polar_angle(right_stick);
@@ -108,7 +108,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         }
         
         switch (player->state) {
-            case ON_FOOT:;
+            case PLAYER_ON_FOOT:;
                 sfVector2f pos = get_position(components, i);
 
                 if (player->target != -1) {
@@ -140,34 +140,34 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
             case PLAYER_PICK_UP:
                 pick_up_item(components, grid, i);
-                player->state = ON_FOOT;
+                player->state = PLAYER_ON_FOOT;
                 break;
-            case SHOOT:
+            case PLAYER_SHOOT:
                 if (weapon) {
                     shoot(components, grid, item);
 
                     if (weapon->reloading) {
-                        player->state = RELOAD;
+                        player->state = PLAYER_RELOAD;
                     } else if (!weapon->automatic) {
-                        player->state = ON_FOOT;
+                        player->state = PLAYER_ON_FOOT;
                     }
                 } else if (light) {
                     light->enabled = !light->enabled;
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;
-            case RELOAD:
+            case PLAYER_RELOAD:
                 if (weapon) {
                     reload(components, item);
 
                     if (!weapon->reloading) {
-                        player->state = ON_FOOT;
+                        player->state = PLAYER_ON_FOOT;
                     }
                 }
 
                 break;
-            case DRIVE:
+            case PLAYER_DRIVE:
                 if (player->controller.joystick == -1) {
                     drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x), time_step);
                 } else {
@@ -180,7 +180,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
             case PLAYER_PASSENGER:
                 break;
-            case MENU:
+            case PLAYER_MENU:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
                 
                 if (light) {
@@ -221,7 +221,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 }
 
                 break;
-            case MENU_GRAB:
+            case PLAYER_MENU_GRAB:
                 if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
                     if (atch == -1) {
                         player->grabbed_item = item;
@@ -231,7 +231,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 }
 
                 break;
-            case MENU_DROP:
+            case PLAYER_MENU_DROP:
                 if (player->grabbed_item != -1) {
                     if (player->inventory[slot] == -1) {
                         replace(player->grabbed_item, -1, player->inventory, player->inventory_size);

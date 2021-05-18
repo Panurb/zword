@@ -151,20 +151,20 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
         }
 
         switch (player->state) {
-            case ON_FOOT:
+            case PLAYER_ON_FOOT:
                 break;
             case PLAYER_PICK_UP:
                 break;
-            case SHOOT:
+            case PLAYER_SHOOT:
                 break;
-            case RELOAD:
+            case PLAYER_RELOAD:
                 sfConvexShape_setFillColor(player->shape, sfWhite);
                 int akimbo = get_akimbo(components, item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
                 draw_slice(window, components, camera, NULL, 50, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
 
                 break;
-            case DRIVE:
+            case PLAYER_DRIVE:
                 ;
                 VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
                 if (vehicle) {
@@ -174,9 +174,9 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 break;
             case PLAYER_PASSENGER:
                 break;
-            case MENU:
-            case MENU_DROP:
-            case MENU_GRAB:
+            case PLAYER_MENU:
+            case PLAYER_MENU_DROP:
+            case PLAYER_MENU_GRAB:
                 for (int j = 0; j < player->inventory_size; j++) {
                     float offset = 0.0;
                     float alpha = 0.5;

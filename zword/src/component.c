@@ -210,7 +210,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
         player->inventory[i] = -1;
     }
     player->grabbed_item = -1;
-    player->state = ON_FOOT;
+    player->state = PLAYER_ON_FOOT;
     player->ammo_size = 4;
     for (int i = 0; i < player->ammo_size; i++) {
         player->ammo[i] = -1;
@@ -745,6 +745,15 @@ int create_entity(ComponentData* components) {
 void add_child(ComponentData* components, int parent, int child) {
     CoordinateComponent_get(components, child)->parent = parent;
     List_add(CoordinateComponent_get(components, parent)->children, child);
+}
+
+
+void remove_children(ComponentData* components, int parent) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, parent);
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        CoordinateComponent_get(components, node->value)->parent = -1;
+    }
+    List_clear(coord->children);
 }
 
 

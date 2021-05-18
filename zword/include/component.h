@@ -103,14 +103,14 @@ typedef struct {
 } ColliderComponent;
 
 typedef enum {
-    ON_FOOT,
-    SHOOT,
-    RELOAD,
-    DRIVE,
+    PLAYER_ON_FOOT,
+    PLAYER_SHOOT,
+    PLAYER_RELOAD,
+    PLAYER_DRIVE,
     PLAYER_PASSENGER,
-    MENU,
-    MENU_GRAB,
-    MENU_DROP,
+    PLAYER_MENU,
+    PLAYER_MENU_GRAB,
+    PLAYER_MENU_DROP,
     PLAYER_AMMO_MENU,
     PLAYER_DEAD,
     PLAYER_PICK_UP
@@ -414,6 +414,7 @@ void AnimationComponent_remove(ComponentData* components, int entity);
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
 void add_child(ComponentData* components, int parent, int child);
+void remove_children(ComponentData* components, int parent);
 
 void ComponentData_clear(ComponentData* components);
 

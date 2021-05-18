@@ -61,7 +61,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             coord->position = (sfVector2f) { 0.75, 0.0 };
             coord->angle = 0.0f;
             ColliderComponent_get(components, player->target)->enabled = false;
-            change_layer(components, player->target, 6);
+            change_layer(components, player->target, LAYER_WEAPONS);
             ImageComponent_get(components, player->target)->outline = 0.0f;
 
             if (player->item != i) {

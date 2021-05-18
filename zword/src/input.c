@@ -126,9 +126,9 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
         WeaponComponent* weapon = WeaponComponent_get(components, player->inventory[player->item]);
 
         switch (player->state) {
-            case ON_FOOT:
+            case PLAYER_ON_FOOT:
                 if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = MENU;
+                    player->state = PLAYER_MENU;
                 }
 
                 if (controller.buttons_pressed[BUTTON_RB]) {
@@ -136,12 +136,12 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_RT]) {
-                    player->state = SHOOT;
+                    player->state = PLAYER_SHOOT;
                 }
 
                 if (weapon) {
                     if (controller.buttons_pressed[BUTTON_X]) {
-                        player->state = RELOAD;
+                        player->state = PLAYER_RELOAD;
                     }
 
                     if (controller.buttons_pressed[BUTTON_Y]) {
@@ -167,7 +167,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
                 if (vehicle) {
                     if (vehicle->riders[0] == i) {
-                        player->state = DRIVE;
+                        player->state = PLAYER_DRIVE;
                     } else {
                         player->state = PLAYER_PASSENGER;
                     }
@@ -176,47 +176,47 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 break;
             case PLAYER_PICK_UP:
                 break;
-            case SHOOT:
+            case PLAYER_SHOOT:
                 if (!controller.buttons_down[BUTTON_RT]) {
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;
-            case RELOAD:
+            case PLAYER_RELOAD:
                 if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = MENU;
+                    player->state = PLAYER_MENU;
                 }
 
                 break;
-            case DRIVE:
+            case PLAYER_DRIVE:
                 if (controller.buttons_pressed[BUTTON_A]) {
                     exit_vehicle(components, i);
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;
             case PLAYER_PASSENGER:
                 if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = MENU;
+                    player->state = PLAYER_MENU;
                 }
 
                 if (controller.buttons_pressed[BUTTON_RT]) {
-                    player->state = SHOOT;
+                    player->state = PLAYER_SHOOT;
                 }
 
                 if (controller.buttons_pressed[BUTTON_A]) {
                     exit_vehicle(components, i);
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;
-            case MENU:
+            case PLAYER_MENU:
                 if (controller.buttons_pressed[BUTTON_RT]) {
-                    player->state = MENU_GRAB;
+                    player->state = PLAYER_MENU_GRAB;
                 }
 
                 if (!controller.buttons_down[BUTTON_LT]) {
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 if (controller.buttons_pressed[BUTTON_RB]) {
@@ -224,23 +224,23 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 break;
-            case MENU_GRAB:
+            case PLAYER_MENU_GRAB:
                 if (controller.buttons_released[BUTTON_RT]) {
-                    player->state = MENU_DROP;
+                    player->state = PLAYER_MENU_DROP;
                 }
 
                 break;
-            case MENU_DROP:
+            case PLAYER_MENU_DROP:
                 if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = MENU;
+                    player->state = PLAYER_MENU;
                 } else {
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;
             case PLAYER_AMMO_MENU:
                 if (!controller.buttons_down[BUTTON_LB]) {
-                    player->state = ON_FOOT;
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;

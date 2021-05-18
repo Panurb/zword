@@ -23,14 +23,15 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
     for (ListNode* node = coord->children->head; node; node = node->next) {
         int i = node->value;
         CoordinateComponent* co = CoordinateComponent_get(components, i);
-        co->parent = -1;
-        float angle = get_angle(components, entity);
-        co->position = sum(get_position(components, entity), rotate(co->position, angle));
-        co->angle += angle;
         ImageComponent_get(components, i)->alpha = 1.0f;
-        apply_force(components, i, mult(250.0f, rand_vector()));
+
+        co->position = get_position(components, i);
+        co->angle = get_angle(components, i);
+
+        apply_force(components, i, mult(250.0f, normalized(diff(co->position, get_position(components, entity)))));
         PhysicsComponent_get(components, i)->angular_velocity = randf(-5.0f, 5.0f);
     }
+    remove_children(components, entity);
 
     if (AnimationComponent_get(components, entity)) {
         stop_animation(components, entity);
@@ -63,8 +64,8 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
 
         player->state = PLAYER_DEAD;
     } else {
-        PhysicsComponent_get(components, entity)->angular_velocity = randf(-5.0f, 5.0f);
-        ColliderComponent_get(components, entity)->group = GROUP_DEBRIS;
+        clear_grid(components, grid, entity);
+        ColliderComponent_remove(components, entity);
     }
 
     if (SoundComponent_get(components, entity) && health->die_sound[0] != '\0') {
