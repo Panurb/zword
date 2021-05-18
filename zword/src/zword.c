@@ -66,12 +66,12 @@ int main() {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
 
-    float ambient_light = 0.4f;
+    float ambient_light = 0.7f;
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);
-    create_level(components, grid, seed);
-    // test(components, grid);
+    // create_level(components, grid, seed);
+    test(components, grid);
     init_grid(components, grid);
 
     while (sfRenderWindow_isOpen(window)) {

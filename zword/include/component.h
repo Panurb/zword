@@ -88,7 +88,8 @@ typedef enum {
     GROUP_CORPSES,
     GROUP_FLOORS,
     GROUP_WAYPOINTS,
-    GROUP_RAYS
+    GROUP_RAYS,
+    GROUP_DEBRIS
 } ColliderGroup;
 
 typedef struct {
@@ -193,8 +194,8 @@ typedef struct {
     float time[100];
     float start_size;
     float end_size;
-    sfColor start_color;
-    sfColor end_color;
+    sfColor outer_color;
+    sfColor inner_color;
     sfCircleShape* shape;
     float rate;
     float timer;
@@ -256,7 +257,9 @@ typedef struct {
 
 typedef struct {
     int health;
-    Filename filename_dead;
+    Filename dead_image;
+    Filename decal;
+    Filename die_sound;
 } HealthComponent;
 
 typedef struct {
@@ -364,7 +367,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity);
 EnemyComponent* EnemyComponent_get(ComponentData* components, int entity);
 void EnemyComponent_remove(ComponentData* components, int entity);
 
-ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float max_size, float min_size, float speed, float rate, sfColor color, sfColor inner_color);
+ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float max_size, float min_size, float speed, float rate, sfColor outer_color, sfColor inner_color);
 ParticleComponent* ParticleComponent_get(ComponentData* components, int entity);
 void ParticleComponent_remove(ComponentData* components, int entity);
 
@@ -384,7 +387,7 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity);
 WaypointComponent* WaypointComponent_get(ComponentData* components, int entity);
 void WaypointComponent_remove(ComponentData* components, int entity);
 
-HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename filename_dead);
+HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename dead_image, Filename decal, Filename die_sound);
 HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
 
@@ -410,6 +413,7 @@ void AnimationComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
+void add_child(ComponentData* components, int parent, int child);
 
 void ComponentData_clear(ComponentData* components);
 

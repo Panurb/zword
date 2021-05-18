@@ -16,6 +16,7 @@
 #include "sound.h"
 #include "collider.h"
 #include "animation.h"
+#include "health.h"
 
 
 void create_enemy(ComponentData* components, sfVector2f pos) {
@@ -28,7 +29,7 @@ void create_enemy(ComponentData* components, sfVector2f pos) {
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 100, "zombie_dead");
+    HealthComponent_add(components, i, 100, "zombie_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
 }
 
@@ -44,7 +45,7 @@ void create_big_boy(ComponentData* components, sfVector2f pos) {
     EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 500, "big_boy_dead");
+    HealthComponent_add(components, i, 500, "big_boy_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
 }
 
@@ -99,7 +100,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 components->coordinate[i]->angle = polar_angle(r);
 
                 if (dist(get_position(components, enemy->target), get_position(components, i)) < 1.0) {
-                    damage(components, enemy->target, get_position(components, enemy->target), r, 50);
+                    damage(components, grid, enemy->target, get_position(components, enemy->target), r, 50);
                     ParticleComponent_get(components, enemy->target)->enabled = true;
                 }
 

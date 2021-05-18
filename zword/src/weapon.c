@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "collider.h"
 #include "particle.h"
+#include "health.h"
 
 
 int get_akimbo(ComponentData* components, int entity) {
@@ -90,7 +91,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 if (enemy && enemy->state == ENEMY_IDLE) {
                     dmg *= 2;
                 }
-                damage(components, min_info.object, min_info.position, normalized(diff(min_info.position, pos)), dmg);
+                damage(components, grid, min_info.object, min_info.position, normalized(diff(min_info.position, pos)), dmg);
             } else {
                 ParticleComponent* particle = ParticleComponent_get(components, entity);
                 for (int i = 0; i < weapon->shots; i++) {
@@ -109,7 +110,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     if (dot(info.normal, dir) < -0.99f) {
                         dmg *= 4;
                     }
-                    damage(components, info.object, info.position, dir, dmg);
+                    damage(components, grid, info.object, info.position, dir, dmg);
 
                     particle->angle = angle;
                     if (info.object) {
@@ -174,7 +175,7 @@ void create_pistol(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
-    ParticleComponent_add(components, i, 0.0, 0.0, 0.1, 0.1, 100.0, 1, sfWhite, sfWhite)->speed_spread = 0.0;
+    ParticleComponent_add_bullet(components, i, 0.15f);
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 2.0, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 10.0f)->enabled = false;
@@ -189,7 +190,7 @@ void create_shotgun(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "shotgun", 2.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 10, 10, 0.1f * M_PI, 2, 0.25f, 15.0f, 1.5f, AMMO_SHOTGUN, "shotgun");
-    ParticleComponent_add(components, i, 0.0, 0.0, 0.05f, 0.05f, 100.0f, 1, sfWhite, sfWhite)->speed_spread = 0.0;
+    ParticleComponent_add_bullet(components, i, 0.1f);
     ItemComponent_add(components, i, 0);
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 3.0f, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0f)->enabled = false;
@@ -204,7 +205,7 @@ void create_assault_rifle(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, 3);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 40, 1, 0.0f, 30, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
-    ParticleComponent_add(components, i, 0.0f, 0.0f, 0.125f, 0.125f, 100.0f, 1, sfWhite, sfWhite)->speed_spread = 0.0f;
+    ParticleComponent_add_bullet(components, i, 0.15f);
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 4.0f, 2.0f * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 10.0f)->enabled = false;

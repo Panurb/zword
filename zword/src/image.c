@@ -22,6 +22,8 @@ static const char* IMAGES[] = {
     "assault_rifle",
     "axe",
     "bench",
+    "bench_debris",
+    "bench_destroyed",
     "big_boy",
     "big_boy_dead",
     "blood",
@@ -48,6 +50,8 @@ static const char* IMAGES[] = {
     "roof_tile",
     "shotgun",
     "stone_tile",
+    "table",
+    "table_destroyed",
     "tiles_tile",
     "toilet",
     "tree",
@@ -180,6 +184,9 @@ void change_texture(ComponentData* components, int entity, Filename filename) {
     image->width = 2.0f;
     strcpy(image->filename, filename);
     image->texture_changed = true;
+    if (filename[0] == '\0') {
+        image->alpha = 0.0f;
+    }
 }
 
 

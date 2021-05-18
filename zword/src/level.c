@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "level.h"
 #include "image.h"
@@ -21,32 +22,19 @@
 #include "sound.h"
 
 
-void create_brick_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, length, 0.75, GROUP_WALLS);
-    ImageComponent_add(components, i, "brick_tile", length, 0.75, LAYER_WALLS);
-    ParticleComponent_add_dirt(components, i);
-}
-
-
-void create_wood_wall(ComponentData* components, sfVector2f pos, float length, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, length, 0.5, GROUP_WALLS);
-    ImageComponent_add(components, i, "wood_tile", length, 0.5, LAYER_WALLS);
-    ParticleComponent_add_dirt(components, i);
-}
-
-
 void create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
     ImageComponent_add(components, i, filename, width, height, LAYER_WALLS);
-    ParticleComponent_add_dirt(components, i);
+
+    if (strcmp(filename, "wood_tile") == 0) {
+        ParticleComponent_add_splinter(components, i);
+        SoundComponent_add(components, i, "wood_hit");
+    } else {
+        ParticleComponent_add_rock(components, i);
+        SoundComponent_add(components, i, "stone_hit");
+    }
 }
 
 
@@ -134,6 +122,37 @@ void create_bench(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(components, i, position, angle);
     ImageComponent_add(components, i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 0.8f, 2.8f, GROUP_WALLS);
+    ParticleComponent_add_splinter(components, i);
+    HealthComponent_add(components, i, 200, "bench_destroyed", "", "wood_destroy");
+    PhysicsComponent_add(components, i, 2.0f);
+    SoundComponent_add(components, i, "wood_hit");
+
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, -1.0f}, 0.0f);
+    ImageComponent_add(components, j, "bench_debris", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
+    ColliderComponent_add_rectangle(components, j, 0.8f, 1.2f, GROUP_DEBRIS);
+    PhysicsComponent_add(components, j, 1.0f);
+    add_child(components, i, j);
+}
+
+
+void create_table(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ImageComponent_add(components, i, "table", 3.0f, 3.0f, LAYER_ITEMS);
+    ColliderComponent_add_circle(components, i, 1.4f, GROUP_WALLS);
+    ParticleComponent_add_splinter(components, i);
+    HealthComponent_add(components, i, 200, "table_destroyed", "", "wood_destroy");
+    PhysicsComponent_add(components, i, 2.0f);
+    SoundComponent_add(components, i, "wood_hit");
+
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, 0.0f}, M_PI);
+    ImageComponent_add(components, j, "table_destroyed", 3.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
+    ColliderComponent_add_rectangle(components, j, 0.8f, 2.8f, GROUP_DEBRIS);
+    PhysicsComponent_add(components, j, 1.0f);
+    add_child(components, i, j);
 }
 
 
@@ -143,6 +162,7 @@ void create_hay_bale(ComponentData* components, sfVector2f position, float angle
     CoordinateComponent_add(components, i, position, angle);
     ImageComponent_add(components, i, "hay_bale", 3.0f, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 2.8f, 1.5f, GROUP_WALLS);
+    ParticleComponent_add_splinter(components, i);
 }
 
 
@@ -270,41 +290,50 @@ void create_barn(ComponentData* components, sfVector2f pos) {
 void create_house(ComponentData* components, sfVector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(5.0f, angle);
+    sfVector2f w = polar_to_cartesian(1.0f, angle);
     sfVector2f h = perp(w);
 
-    create_floor(components, pos, 10.0f, 10.0f, angle, "board_tile");
+    create_floor(components, pos, 16.0f, 16.0f, angle, "board_tile");
 
-    create_brick_wall(components, sum(pos, sum(w, mult(0.55, h))), 3.75, angle + 0.5 * M_PI);
-    create_brick_wall(components, sum(pos, sum(w, mult(-0.55, h))), 3.75, angle + 0.5 * M_PI);
+    // Outside walls
+    create_wall(components, sum(pos, mult(-7.5f, w)), angle + 0.5 * M_PI, 16.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, mult(7.5f, h)), angle, 14.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, mult(-7.5f, h)), angle, 14.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(7.5f, w, 4.5f, h)), angle + 0.5 * M_PI, 7.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(7.5f, w, -4.5f, h)), angle + 0.5 * M_PI, 7.0f, 1.0f, "brick_tile");
 
-    create_brick_wall(components, diff(pos, w), 9.25, angle + 0.5 * M_PI);
-    create_brick_wall(components, diff(pos, h), 10.75, angle);
-    create_brick_wall(components, sum(pos, h), 10.75, angle);
+    create_waypoint(components, sum(pos, lin_comb(9.0f, w, 9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(9.0f, w, -9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-9.0f, w, 9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-9.0f, w, -9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-9.0f, w, 0.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(0.0f, w, 9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(0.0f, w, -9.0f, h)));
 
-    create_wood_wall(components, sum(pos, mult(-0.28, h)), 6.5, angle + 0.5 * M_PI);
-    create_wood_wall(components, sum(pos, mult(0.78, h)), 1.5, angle + 0.5 * M_PI);
+    // Toilet
+    create_floor(components, sum(pos, lin_comb(-5.5f, w, 4.5f, h)), 5.0f, 6.0f, angle, "altar_tile");
+    create_wall(components, sum(pos, lin_comb(-6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, lin_comb(-2.75f, w, 4.5f, h)), angle + 0.5f * M_PI, 5.0f, 0.5f, "wood_tile");
 
-    create_wood_wall(components, sum(pos, mult(-0.78, w)), 1.5, angle);
-    create_wood_wall(components, sum(pos, mult(-0.2, w)), 1.5, angle);
+    create_wall(components, sum(pos, lin_comb(0.0f, w, 1.75f, h)), angle, 8.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, lin_comb(6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
 
-    create_waypoint(components, sum(pos, mult(0.75, w)));
-    create_waypoint(components, sum(pos, mult(1.5, w)));
+    create_wall(components, sum(pos, lin_comb(0.0f, w, -1.75f, h)), angle, 4.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, lin_comb(-5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, lin_comb(5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, lin_comb(0.0, w, -4.5f, h)), angle + 0.5f * M_PI, 5.0f, 0.5f, "wood_tile");
 
-    create_waypoint(components, sum(pos, mult(1.5, sum(w, h))));
-    create_waypoint(components, sum(pos, mult(1.5, diff(w, h))));
-    create_waypoint(components, sum(pos, mult(-1.5, sum(w, h))));
-    create_waypoint(components, sum(pos, mult(-1.5, diff(w, h))));
+    create_table(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
 
-    create_waypoint(components, sum(pos, mult(0.5, sum(w, h))));
-    create_waypoint(components, diff(pos, mult(0.5, sum(w, h))));
-    create_waypoint(components, diff(pos, mult(0.5, diff(w, h))));
-
-    create_light(components, sum(pos, mult(0.8f, diff(w, h))));
-
-    create_item(components, sum(pos, mult(0.5f, diff(w, h))), 1);
-    create_item(components, diff(pos, mult(0.5f, diff(w, h))), 1);
-    create_item(components, diff(pos, mult(0.5f, sum(w, h))), 1);
+    create_waypoint(components, sum(pos, mult(9.0f, w)));
+    create_waypoint(components, sum(pos, mult(5.0f, w)));
+    create_waypoint(components, sum(pos, lin_comb(5.0f, w, 3.0f, h)));
+    create_waypoint(components, sum(pos, mult(3.0f, w)));
+    create_waypoint(components, sum(pos, lin_comb(3.0f, w, -3.0f, h)));
+    create_waypoint(components, sum(pos, mult(-3.0f, w)));
+    create_waypoint(components, sum(pos, lin_comb(-3.0f, w, -3.0f, h)));
+    create_waypoint(components, sum(pos, mult(-5.0f, w)));
+    create_waypoint(components, sum(pos, lin_comb(-5.0f, w, 3.0f, h)));
 }
 
 
@@ -548,7 +577,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
             for (int i = 0; i < 2; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                // create_uranium(components, grid, sum(pos, r));
+                create_uranium(components, grid, sum(pos, r));
             }
         }
     }
@@ -558,7 +587,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     resize_roads(components);
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
-    create_axe(components, start);
+    create_axe(components, sum(start, (sfVector2f) { 2.0, -5.0 }));
     // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }
@@ -581,7 +610,8 @@ void test(ComponentData* components, ColliderGrid* grid) {
     sfVector2f start = zeros();
     // create_car(components, start);
     // create_church(components, zeros());
-    create_toilet(components, zeros());
+    // create_toilet(components, zeros());
+    create_house(components, zeros());
 
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 

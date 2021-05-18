@@ -15,7 +15,7 @@ void main()
     float al = texture2D(texture, vec2(v_texCoords.x - offset, v_texCoords.y)).a;
     float ar = texture2D(texture, vec2(v_texCoords.x + offset, v_texCoords.y)).a;
 
-    if (au == 1.0 || ad == 1.0 || al == 1.0 || ar == 1.0)
+    if (au > 0 || ad > 0 || al > 0 || ar > 0)
       gl_FragColor = vec4(1.0, 1.0, 1.0, 1);
     else
       gl_FragColor = col;

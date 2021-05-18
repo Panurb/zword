@@ -1,8 +1,7 @@
 #pragma once
 
 #include "component.h"
+#include "grid.h"
 
 
-void die(ComponentData* components, int entity);
-
-void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f dir, int dmg);
+void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f pos, sfVector2f dir, int dmg);

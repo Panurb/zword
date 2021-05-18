@@ -346,7 +346,7 @@ void EnemyComponent_remove(ComponentData* components, int entity) {
 
 
 ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float max_size, 
-                                         float min_size, float speed, float rate, sfColor start_color, sfColor end_color) {
+                                         float min_size, float speed, float rate, sfColor outer_color, sfColor inner_color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
     particle->enabled = false;
     particle->loop = false;
@@ -368,8 +368,8 @@ ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, 
     particle->shape = sfCircleShape_create();
     particle->rate = rate;
     particle->timer = 0.0;
-    particle->start_color = start_color;
-    particle->end_color = end_color;
+    particle->outer_color = outer_color;
+    particle->inner_color = inner_color;
     particle->origin = zeros();
 
     components->particle[entity] = particle;
@@ -542,10 +542,12 @@ void WaypointComponent_remove(ComponentData* components, int entity) {
 }
 
 
-HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename filename_dead) {
+HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename dead_image, Filename decal, Filename die_sound) {
     HealthComponent* comp = malloc(sizeof(HealthComponent));
     comp->health = health;
-    strcpy(comp->filename_dead, filename_dead);
+    strcpy(comp->dead_image, dead_image);
+    strcpy(comp->decal, decal);
+    strcpy(comp->die_sound, die_sound);
 
     components->health[entity] = comp;
 
@@ -737,6 +739,12 @@ int create_entity(ComponentData* components) {
 
     components->entities++;
     return components->entities - 1;
+}
+
+
+void add_child(ComponentData* components, int parent, int child) {
+    CoordinateComponent_get(components, child)->parent = parent;
+    List_add(CoordinateComponent_get(components, parent)->children, child);
 }
 
 

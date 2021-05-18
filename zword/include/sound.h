@@ -10,6 +10,10 @@
 // https://freesound.org/people/cookies+policy/sounds/555926/
 // https://freesound.org/people/ninebilly/sounds/520934/
 // https://freesound.org/people/FilmmakersManual/sounds/522284/
+// https://freesound.org/people/kwahmah_02/sounds/251365/
+// https://freesound.org/people/Bertsz/sounds/500901/
+// https://freesound.org/people/CamoMano/sounds/431019/
+// https://freesound.org/people/aerror/sounds/350750/
 
 #define MAX_SOUNDS 256
 

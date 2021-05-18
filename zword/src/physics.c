@@ -10,6 +10,7 @@
 #include "grid.h"
 #include "enemy.h"
 #include "sound.h"
+#include "health.h"
 
 
 void apply_force(ComponentData* components, int entity, sfVector2f force) {
@@ -45,7 +46,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
                             add_sound(components, i, sound->hit_sound, 1.0, 0.8);
                         }
                     }
-                    damage(components, i, get_position(components, i), v_n, 100);
+                    damage(components, grid, i, get_position(components, i), v_n, 100);
                 }
             }
 

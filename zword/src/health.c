@@ -14,17 +14,22 @@
 #include "weapon.h"
 
 
-void die(ComponentData* components, int entity) {
+void die(ComponentData* components, ColliderGrid* grid, int entity) {
     HealthComponent* health = components->health[entity];
-    change_texture(components, entity, health->filename_dead);
+    change_texture(components, entity, health->dead_image);
     change_layer(components, entity, LAYER_CORPSES);
 
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
         int i = node->value;
-        CoordinateComponent_get(components, i)->parent = -1;
+        CoordinateComponent* co = CoordinateComponent_get(components, i);
+        co->parent = -1;
+        float angle = get_angle(components, entity);
+        co->position = sum(get_position(components, entity), rotate(co->position, angle));
+        co->angle += angle;
         ImageComponent_get(components, i)->alpha = 1.0f;
-        apply_force(components, i, mult(100.0f, rand_vector()));
+        apply_force(components, i, mult(250.0f, rand_vector()));
+        PhysicsComponent_get(components, i)->angular_velocity = randf(-5.0f, 5.0f);
     }
 
     if (AnimationComponent_get(components, entity)) {
@@ -32,12 +37,11 @@ void die(ComponentData* components, int entity) {
     }
 
     EnemyComponent* enemy = EnemyComponent_get(components, entity);
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+
     if (enemy) {
         enemy->state = ENEMY_DEAD;
-    }
-
-    PlayerComponent* player = PlayerComponent_get(components, entity);
-    if (player) {
+    } else if (player) {
         for (int j = 0; j < player->inventory_size; j++) {
             if (player->inventory[j] != -1) {
                 coord->angle = rand_angle();
@@ -58,25 +62,34 @@ void die(ComponentData* components, int entity) {
         }
 
         player->state = PLAYER_DEAD;
+    } else {
+        PhysicsComponent_get(components, entity)->angular_velocity = randf(-5.0f, 5.0f);
+        ColliderComponent_get(components, entity)->group = GROUP_DEBRIS;
+    }
+
+    if (SoundComponent_get(components, entity) && health->die_sound[0] != '\0') {
+        add_sound(components, entity, health->die_sound, 1.0f, randf(0.9f, 1.1f));
     }
 }
 
 
-void damage(ComponentData* components, int entity, sfVector2f pos, sfVector2f dir, int dmg) {
+void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f pos, sfVector2f dir, int dmg) {
     HealthComponent* health = components->health[entity];
     if (health) {
         int prev_health = health->health;
         health->health = max(0, health->health - dmg);
 
-        sfVector2f pos = sum(get_position(components, entity), rand_vector());
-        if (dmg < 50) {
-            create_decal(components, pos, 1.0f, 1.0f, "blood");
-        } else {
-            create_decal(components, pos, 2.0f, 2.0f, "blood_large");
+        if (health->decal[0] != '\0') {
+            sfVector2f pos = sum(get_position(components, entity), rand_vector());
+            if (dmg < 50) {
+                create_decal(components, pos, 1.0f, 1.0f, "blood");
+            } else {
+                create_decal(components, pos, 2.0f, 2.0f, "blood_large");
+            }
         }
 
         if (prev_health > 0 && health->health == 0) {
-            die(components, entity);
+            die(components, grid, entity);
         }
     }
 

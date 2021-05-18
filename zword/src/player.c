@@ -22,6 +22,7 @@
 #include "input.h"
 #include "particle.h"
 #include "enemy.h"
+#include "health.h"
 
 
 void create_player(ComponentData* components, sfVector2f pos, int joystick) {
@@ -36,7 +37,7 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     PlayerComponent* player = PlayerComponent_add(components, i, joystick);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 100, "player_dead");
+    HealthComponent_add(components, i, 100, "player_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
 
     for (AmmoType type = AMMO_PISTOL; type <= AMMO_SHOTGUN; type++) {
