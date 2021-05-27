@@ -14,26 +14,26 @@
 #include "image.h"
 
 
-void update_lights(ComponentData* component, float delta_time) {
-    for (int i = 0; i < component->entities; i++) {
-        LightComponent* light = component->light[i];
+void update_lights(ComponentData* components, float delta_time) {
+    for (int i = 0; i < components->entities; i++) {
+        LightComponent* light = components->light[i];
 
         if (!light) continue;
 
-        if (component->coordinate[i]->parent != -1) {
-            VehicleComponent* vehicle = component->vehicle[component->coordinate[i]->parent];
+        if (components->coordinate[i]->parent != -1) {
+            VehicleComponent* vehicle = components->vehicle[components->coordinate[i]->parent];
             if (vehicle) {
                 light->enabled = (vehicle->riders[0] != -1);
             }
         }
 
         if (light->enabled) {
-            light->brightness = fmin(light->max_brightness, light->brightness + light->speed * delta_time);
+            light->brightness = fminf(light->max_brightness, light->brightness + light->speed * delta_time);
         } else {
-            light->brightness = fmax(0.0, light->brightness - light->speed * delta_time);
+            light->brightness = fmaxf(0.0, light->brightness - light->speed * delta_time);
         }
 
-        light->time = fmod(light->time + delta_time, 400.0 * M_PI);
+        light->time = fmodf(light->time + delta_time, 400.0f * M_PI);
     }
 }
 
@@ -71,7 +71,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
 
         sfVector2f start = get_position(components, i);
 
-        if (!on_screen(components, camera, start, light->range, light->range)) {
+        if (!on_screen(components, camera, start, 2.0f * light->range, 2.0f * light->range)) {
             continue;
         }
 

@@ -271,12 +271,12 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
                     sfVector2f ol = overlap(components, i, n);
 
-                    if (ol.x == 0.0 && ol.y == 0.0) continue;
+                    if (!non_zero(ol)) continue;
 
                     sfVector2f dv = physics->velocity;
                     sfVector2f no = normalized(ol);
 
-                    float m = 1.0;
+                    float m = 1.0f;
 
                     PhysicsComponent* other = PhysicsComponent_get(components, n);
                     if (other) {
@@ -284,7 +284,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                         m = other->mass / (physics->mass + other->mass);
                     }
 
-                    sfVector2f new_vel = diff(physics->velocity, mult(2 * m * dot(dv, no), no));
+                    sfVector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
 
                     switch (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group]) {
                         case 1:
@@ -331,7 +331,7 @@ void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRender
 }
 
 
-void debug_draw(ComponentData* components, sfRenderWindow* window, int camera) {
+void draw_colliders(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         ColliderComponent* col = components->collider[i];
         if (!col) continue;

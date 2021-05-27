@@ -19,7 +19,6 @@ typedef struct {
 } Bounds;
 
 typedef struct {
-    // Swap x and y?
     List* array[LEVEL_WIDTH * CHUNK_WIDTH][LEVEL_HEIGHT * CHUNK_HEIGHT];
     int columns;
     int rows;

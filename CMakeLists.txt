@@ -13,6 +13,7 @@ set(SOURCES
     zword/src/camera.c
     zword/src/collider.c
     zword/src/component.c
+    zword/src/door.c
     zword/src/enemy.c
     zword/src/grid.c
     zword/src/health.c

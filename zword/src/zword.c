@@ -28,6 +28,7 @@
 #include "sound.h"
 #include "hud.h"
 #include "animation.h"
+#include "door.h"
 
 
 int main() {
@@ -70,8 +71,8 @@ int main() {
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);
-    create_level(components, grid, seed);
-    // test(components, grid);
+    // create_level(components, grid, seed);
+    test(components, grid);
     init_grid(components, grid);
 
     while (sfRenderWindow_isOpen(window)) {
@@ -127,12 +128,13 @@ int main() {
                 update(components, time_step, grid);
                 collide(components, grid);
                 update_waypoints(components, grid, camera);
+                update_doors(components);
 
                 update_players(components, grid, time_step);
                 update_weapons(components, time_step);
                 update_enemies(components, grid);
 
-                update_particles(components, time_step);
+                update_particles(components, camera, time_step);
                 update_lights(components, time_step);
                 update_camera(components, camera, time_step);
 
@@ -152,7 +154,7 @@ int main() {
         draw_outlines(components, window, camera);
         draw_hud(components, window, camera);
 
-        // debug_draw(components, window, camera);
+        // draw_colliders(components, window, camera);
         // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);

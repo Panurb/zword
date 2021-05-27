@@ -70,11 +70,12 @@ void create_floor(ComponentData* components, sfVector2f pos, float width, float 
 }
 
 
-void create_roof(ComponentData* component, sfVector2f pos, float width, float height, float angle) {
-    int i = create_entity(component);
+void create_roof(ComponentData* components, sfVector2f pos, float width, float height, float angle) {
+    int i = create_entity(components);
 
-    CoordinateComponent_add(component, i, pos, angle);
-    ImageComponent_add(component, i, "roof_tile", width, height, LAYER_ROOFS);
+    CoordinateComponent_add(components, i, pos, angle);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
+    ImageComponent_add(components, i, "roof_tile", width, height, LAYER_ROOFS);
 }
 
 
@@ -168,14 +169,16 @@ void create_table(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_door(ComponentData* components, sfVector2f position, float angle) {
+void create_door(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "door", 1.0f, 2.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 0.3f, 2.0f, GROUP_WALLS);
+    CoordinateComponent_add(components, i, pos, angle);
+    ImageComponent_add(components, i, "door", 2.0f, 1.0f, LAYER_ITEMS);
+    ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
     ParticleComponent_add_splinter(components, i);
     HealthComponent_add(components, i, 200, "", "", "wood_destroy");
     SoundComponent_add(components, i, "wood_hit");
+    DoorComponent_add(components, i, sum(pos, polar_to_cartesian(-1.0f, angle)));
+    PhysicsComponent_add(components, i, 1.0f);
 }
 
 
@@ -317,6 +320,8 @@ void create_house(ComponentData* components, sfVector2f pos) {
     sfVector2f h = perp(w);
 
     create_floor(components, pos, 16.0f, 16.0f, angle, "board_tile");
+    // create_roof(components, sum(pos, mult(4.0f, h)), 16.0f, 8.0f, angle);
+    // create_roof(components, sum(pos, mult(-4.0f, h)), 16.0f, 8.0f, angle + M_PI);
 
     // Outside walls
     create_wall(components, sum(pos, mult(-7.5f, w)), angle + 0.5 * M_PI, 16.0f, 1.0f, "brick_tile");
@@ -333,7 +338,7 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, lin_comb(0.0f, w, 9.0f, h)));
     create_waypoint(components, sum(pos, lin_comb(0.0f, w, -9.0f, h)));
 
-    create_door(components, sum(pos, mult(7.5f, w)), angle);
+    create_door(components, sum(pos, mult(7.5f, w)), angle + 0.5f * M_PI);
 
     // Toilet
     create_floor(components, sum(pos, lin_comb(-5.5f, w, 4.5f, h)), 5.0f, 6.0f, angle, "altar_tile");
@@ -637,8 +642,8 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_car(components, start);
     // create_church(components, zeros());
     // create_toilet(components, zeros());
-    // create_house(components, zeros());
-    create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
+    create_house(components, zeros());
+    // create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
 
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 

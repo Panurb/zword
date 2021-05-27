@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include "particle.h"
 #include "component.h"
 #include "util.h"
 #include "camera.h"
@@ -78,22 +79,26 @@ void add_particles(ComponentData* components, int entity, int n) {
 }
 
 
-void update_particles(ComponentData* component, float delta_time) {
-    for (int i = 0; i < component->entities; i++) {
-        if (!component->particle[i]) continue;
+void update_particles(ComponentData* components, int camera, float delta_time) {
+    for (int i = 0; i < components->entities; i++) {
+        ParticleComponent* part = ParticleComponent_get(components, i);
+        if (!part) continue;
 
-        ParticleComponent* part = component->particle[i];
+        float w = 2.0f * part->max_time * part->speed;
+        if (!on_screen(components, camera, get_position(components, i), w, w)) {
+            continue;
+        }
 
         if (part->enabled) {
             if (part->loop) {
                 while (part->timer <= 0.0) {
-                    add_particles(component, i, 1);
+                    add_particles(components, i, 1);
                     part->timer += 1.0 / part->rate;
                 }
 
                 part->timer -= delta_time;
             } else {
-                add_particles(component, i, part->rate);
+                add_particles(components, i, part->rate);
                 part->enabled = false;
             }
         }

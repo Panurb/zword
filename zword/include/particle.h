@@ -19,6 +19,6 @@ void ParticleComponent_add_fire(ComponentData* components, int entity, float siz
 
 void add_particles(ComponentData* components, int entity, int n);
 
-void update_particles(ComponentData* components, float delta_time);
+void update_particles(ComponentData* components, int camera, float delta_time);
 
 void draw_particles(ComponentData* components, sfRenderWindow* window, int camera, int entity);

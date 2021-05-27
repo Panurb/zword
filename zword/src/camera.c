@@ -315,11 +315,11 @@ void update_camera(ComponentData* components, int camera, float time_step) {
 
 
 bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height) {
-    sfVector2f pos = CoordinateComponent_get(components, camera)->position;
+    sfVector2f pos = get_position(components, camera);
     CameraComponent* cam = CameraComponent_get(components, camera);
 
-    if (fabs(position.x - pos.x) < width + 0.5 * cam->resolution.x / cam->zoom) {
-        if (fabs(position.y - pos.y) < height + 0.5 * cam->resolution.y / cam->zoom) {
+    if (fabsf(position.x - pos.x) < 0.5f * (width + cam->resolution.x / cam->zoom)) {
+        if (fabsf(position.y - pos.y) < 0.5f * (height + cam->resolution.y / cam->zoom)) {
             return true;
         }
     }

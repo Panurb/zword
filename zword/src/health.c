@@ -115,3 +115,27 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         add_sound(components, entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
     }
 }
+
+
+void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f vel) {
+    HealthComponent* health = components->health[entity];
+    float v = norm(vel);
+    if (health) {
+        if (v > 10.0f) {
+            if (health->health > 0) {
+                SoundComponent* sound = SoundComponent_get(components, entity);
+                if (sound) {
+                    add_sound(components, entity, sound->hit_sound, 1.0, 0.8);
+                }
+            }
+            damage(components, grid, entity, get_position(components, entity), vel, 100);
+        }
+    }
+
+    SoundComponent* sound = SoundComponent_get(components, entity);
+    if (sound) {
+        if (v > 5.0f) {
+            add_sound(components, entity, sound->hit_sound, 0.5f, 1.0f);
+        }
+    }
+}

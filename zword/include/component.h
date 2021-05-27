@@ -89,7 +89,8 @@ typedef enum {
     GROUP_FLOORS,
     GROUP_WAYPOINTS,
     GROUP_RAYS,
-    GROUP_DEBRIS
+    GROUP_DEBRIS,
+    GROUP_DOORS
 } ColliderGroup;
 
 typedef struct {
@@ -310,6 +311,12 @@ typedef struct {
 } AnimationComponent;
 
 typedef struct {
+    bool locked;
+    sfVector2f anchor;
+    sfVector2f direction;
+} DoorComponent;
+
+typedef struct {
     void* array[MAX_ENTITIES];
     List* order;
 } OrderedArray;
@@ -334,6 +341,7 @@ typedef struct {
     SoundComponent* sound[MAX_ENTITIES];
     AmmoComponent* ammo[MAX_ENTITIES];
     AnimationComponent* animation[MAX_ENTITIES];
+    DoorComponent* door[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -410,6 +418,10 @@ void AmmoComponent_remove(ComponentData* components, int entity);
 AnimationComponent* AnimationComponent_add(ComponentData* components, int entity);
 AnimationComponent* AnimationComponent_get(ComponentData* components, int entity);
 void AnimationComponent_remove(ComponentData* components, int entity);
+
+DoorComponent* DoorComponent_add(ComponentData* components, int entity, sfVector2f anchor);
+DoorComponent* DoorComponent_get(ComponentData* components, int entity);
+void DoorComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

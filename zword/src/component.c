@@ -35,6 +35,7 @@ ComponentData* ComponentData_create() {
         components->item[i] = NULL;
         components->waypoint[i] = NULL;
         components->health[i] = NULL;
+        components->door[i] = NULL;
     }
     return components;
 }
@@ -730,6 +731,32 @@ void AnimationComponent_remove(ComponentData* components, int entity) {
 }
 
 
+DoorComponent* DoorComponent_add(ComponentData* components, int entity, sfVector2f anchor) {
+    DoorComponent* door = malloc(sizeof(DoorComponent));
+    door->locked = true;
+    door->anchor = anchor;
+    door->direction = diff(get_position(components, entity), anchor);
+
+    components->door[entity] = door;
+    return door;
+}
+
+
+DoorComponent* DoorComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->door[entity];
+}
+
+
+void DoorComponent_remove(ComponentData* components, int entity) {
+    DoorComponent* door = DoorComponent_get(components, entity);
+    if (door) {
+        free(door);
+        components->door[entity] = NULL;
+    }
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -778,6 +805,7 @@ void destroy_entity(ComponentData* components, int entity) {
     SoundComponent_remove(components, entity);
     AmmoComponent_remove(components, entity);
     AnimationComponent_remove(components, entity);
+    DoorComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;
