@@ -94,16 +94,10 @@ int main() {
                 case sfEvtKeyPressed:
                     if (event.key.code == sfKeyEscape) {
                         sfRenderWindow_close(window);
-                    } else if (event.key.code == sfKeyF5) {
-                        ColliderGrid_clear(grid);
-                        ComponentData_clear(components);
-
-                        camera = create_camera(components, mode);
-                        create_level(components, grid, seed);
-                        init_grid(components, grid);
-                        sfClock_restart(clock);
-                    }  else if (event.key.code == sfKeyF6) {
-                        seed = time(NULL);
+                    } else if (event.key.code == sfKeyF5 || event.key.code == sfKeyF6) {
+                        if (event.key.code == sfKeyF6) {
+                            seed = time(NULL);
+                        }
 
                         ColliderGrid_clear(grid);
                         ComponentData_clear(components);
@@ -128,7 +122,7 @@ int main() {
                 update(components, time_step, grid);
                 collide(components, grid);
                 update_waypoints(components, grid, camera);
-                update_doors(components);
+                update_doors(components, grid);
 
                 update_players(components, grid, time_step);
                 update_weapons(components, time_step);

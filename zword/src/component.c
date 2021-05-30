@@ -318,11 +318,16 @@ void LightComponent_remove(ComponentData* components, int entity) {
 EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     EnemyComponent* enemy = malloc(sizeof(EnemyComponent));
     enemy->state = ENEMY_IDLE;
-    enemy->acceleration = 15.0;
+    enemy->acceleration = 15.0f;
     enemy->target = -1;
     enemy->path = List_create();
     enemy->fov = 0.5f * M_PI;
-    enemy->vision_range = 15.0;
+    enemy->vision_range = 15.0f;
+    enemy->idle_speed = 1.0f;
+    enemy->walk_speed = 4.0f;
+    enemy->run_speed = 6.0f;
+    enemy->weapon = -1;
+    enemy->desired_angle = rand_angle();
 
     components->enemy[entity] = enemy;
 
@@ -733,7 +738,7 @@ void AnimationComponent_remove(ComponentData* components, int entity) {
 
 DoorComponent* DoorComponent_add(ComponentData* components, int entity, sfVector2f anchor) {
     DoorComponent* door = malloc(sizeof(DoorComponent));
-    door->locked = true;
+    door->locked = false;
     door->anchor = anchor;
     door->direction = diff(get_position(components, entity), anchor);
 

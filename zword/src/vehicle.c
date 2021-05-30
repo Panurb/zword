@@ -19,34 +19,30 @@ void create_car(ComponentData* components, sfVector2f pos) {
     phys->max_angular_speed = 2.5;
     phys->drag_sideways = 50.0;
     VehicleComponent_add(components, i, 100.0);
-    // WaypointComponent_add(components, i);
     ImageComponent_add(components, i, "car", 6.0f, 3.0f, LAYER_VEHICLES);
     ParticleComponent_add_sparks(components, i);
     SoundComponent_add(components, i, "metal");
 
     int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) { 2.8, 1.0 }, 0.0)->parent = i;
+    CoordinateComponent_add(components, j, (sfVector2f) { 2.8, 1.0 }, 0.0);
     LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    add_child(components, i, j);
 
     j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) { 2.8, -1.0 }, 0.0)->parent = i;
     LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
 
     j = create_waypoint(components, (sfVector2f) { 3.5f, 2.0f });
-    CoordinateComponent_get(components, j)->parent = i;
-    List_add(coord->children, j);
+    add_child(components, i, j);
 
     j = create_waypoint(components, (sfVector2f) { 3.5f, -2.0f });
-    CoordinateComponent_get(components, j)->parent = i;
-    List_add(coord->children, j);
+    add_child(components, i, j);
 
     j = create_waypoint(components, (sfVector2f) { -3.5f, 2.0f });
-    CoordinateComponent_get(components, j)->parent = i;
-    List_add(coord->children, j);
+    add_child(components, i, j);
 
     j = create_waypoint(components, (sfVector2f) { -3.5f, -2.0f });
-    CoordinateComponent_get(components, j)->parent = i;
-    List_add(coord->children, j);
+    add_child(components, i, j);
 }
 
 

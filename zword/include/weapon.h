@@ -12,14 +12,16 @@ void reload(ComponentData* component, int i);
 
 void update_weapons(ComponentData* components, float time_step);
 
-void create_pistol(ComponentData* component, sfVector2f position);
+int create_pistol(ComponentData* component, sfVector2f position);
 
-void create_shotgun(ComponentData* components, sfVector2f position);
+int create_shotgun(ComponentData* components, sfVector2f position);
 
-void create_assault_rifle(ComponentData* components, sfVector2f position);
+int create_rifle(ComponentData* components, sfVector2f position);
 
-void create_axe(ComponentData* component, sfVector2f position);
+int create_assault_rifle(ComponentData* components, sfVector2f position);
 
-void create_lasersight(ComponentData* component, sfVector2f pos);
+int create_axe(ComponentData* component, sfVector2f position);
+
+int create_lasersight(ComponentData* component, sfVector2f pos);
 
 int create_ammo(ComponentData* components, sfVector2f position, AmmoType type);

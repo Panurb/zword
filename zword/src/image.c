@@ -33,6 +33,8 @@ static const char* IMAGES[] = {
     "candle",
     "car",
     "door",
+    "farmer",
+    "farmer_dead",
     "fire",
     "flashlight",
     "gas",

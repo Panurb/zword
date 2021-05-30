@@ -17,20 +17,53 @@
 #include "collider.h"
 #include "animation.h"
 #include "health.h"
+#include "weapon.h"
 
 
-void create_enemy(ComponentData* components, sfVector2f pos) {
+void create_zombie(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
-    PhysicsComponent_add(components, i, 1.0f)->max_speed = 6.0;
-    EnemyComponent_add(components, i);
+    PhysicsComponent_add(components, i, 1.0f);
+    EnemyComponent* enemy = EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100, "zombie_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
+
+    sfVector2f r = { 0.5f, 0.0f };
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, r, 0.0f);
+    WeaponComponent_add(components, j, 0.5f, 25, 7, 0.35f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
+    add_child(components, i, j);
+    enemy->weapon = j;
+}
+
+
+void create_farmer(ComponentData* components, sfVector2f pos) {
+    int i = create_entity(components);
+    
+    CoordinateComponent_add(components, i, pos, rand_angle());
+    ImageComponent_add(components, i, "farmer", 1.0, 1.0, LAYER_ENEMIES);
+    ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+    PhysicsComponent_add(components, i, 1.0f);
+    EnemyComponent* enemy = EnemyComponent_add(components, i);
+    enemy->walk_speed = 3.0f;
+    enemy->run_speed = 3.0f;
+    enemy->fov = 0.25f * M_PI;
+    ParticleComponent_add_blood(components, i);
+    WaypointComponent_add(components, i);
+    HealthComponent_add(components, i, 100, "farmer_dead", "blood", "");
+    SoundComponent_add(components, i, "squish");
+    LightComponent_add(components, i, 15.0f, 0.25f * M_PI, sfWhite, 0.5f, 10.0f);
+
+    sfVector2f r = { 0.75f, 0.0f };
+    int j = create_rifle(components, r);
+    CoordinateComponent_get(components, j)->angle = 0.0f;
+    add_child(components, i, j);
+    enemy->weapon = j;
 }
 
 
@@ -50,38 +83,62 @@ void create_big_boy(ComponentData* components, sfVector2f pos) {
 }
 
 
+void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
+    EnemyComponent* enemy = EnemyComponent_get(components, entity);
+    float min_dist = enemy->vision_range;
+    for (ListNode* node = components->player.order->head; node; node = node->next) {
+        int j = node->value;
+        PlayerComponent* player = PlayerComponent_get(components, j);
+        if (player->state == PLAYER_DEAD) continue;
+
+        sfVector2f r = diff(get_position(components, j), get_position(components, entity));
+        sfVector2f s = polar_to_cartesian(1.0f, get_angle(components, entity));
+        float angle = fabs(signed_angle(r, s));
+
+        float d = norm(r);
+        if (d < enemy->vision_range && d < min_dist && angle < 0.5f * enemy->fov) {
+            HitInfo info = raycast(components, grid, get_position(components, entity), r, enemy->vision_range, GROUP_BULLETS);
+            if (info.object == j) {
+                enemy->target = j;
+                enemy->state = ENEMY_CHASE;
+                min_dist = d;
+            }
+        }
+    }
+}
+
+
 void update_enemies(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(components, i);
         if (!enemy) continue;
 
+        CoordinateComponent* coord = CoordinateComponent_get(components, i);
         PhysicsComponent* phys = PhysicsComponent_get(components, i);
+        WeaponComponent* weapon = WeaponComponent_get(components, enemy->weapon);
+
+        if (enemy->state != ENEMY_DEAD) {
+            update_vision(components, grid, i);
+            float delta_angle = mod(enemy->desired_angle + M_PI - coord->angle, 2.0f * M_PI) - M_PI;
+            phys->angular_velocity = 5.0f * delta_angle;
+        }
 
         switch (enemy->state) {
-            case ENEMY_IDLE:
-                for (ListNode* node = components->player.order->head; node; node = node->next) {
-                    int j = node->value;
-                    PlayerComponent* player = PlayerComponent_get(components, j);
-                    if (player->state == PLAYER_DEAD) continue;
+            case ENEMY_IDLE: {
+                sfVector2f r = polar_to_cartesian(1.0f, get_angle(components, i));
+                HitInfo info = raycast(components, grid, get_position(components, i), r, 2.0f, GROUP_ENEMIES);
+                if (info.object != -1) {
+                    enemy->desired_angle = mod(polar_angle(info.normal) + randf(-0.5f, 0.5f) * M_PI, 2.0f * M_PI);
+                }
 
-                    sfVector2f r = diff(get_position(components, j), get_position(components, i));
-                    sfVector2f s = polar_to_cartesian(1.0f, get_angle(components, i));
-                    float angle = acosf(dot(normalized(r), s));
-
-                    if (norm(r) < enemy->vision_range && angle < 0.5f * enemy->fov) {
-                        HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, GROUP_BULLETS);
-                        if (info.object == j) {
-                            enemy->target = j;
-                            enemy->state = ENEMY_CHASE;
-                            break;
-                        }
-                    }
+                if (phys->speed < enemy->idle_speed) {
+                    enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);
+                    sfVector2f a = polar_to_cartesian(enemy->acceleration, coord->angle);
+                    phys->acceleration = sum(phys->acceleration, a);
                 }
 
                 break;
-            case ENEMY_INVESTIGATE:
-                break;
-            case ENEMY_CHASE:
+            } case ENEMY_INVESTIGATE: {
                 a_star(components, i, enemy->target, enemy->path);
 
                 sfVector2f r;
@@ -91,17 +148,40 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                     r = diff(get_position(components, enemy->target), get_position(components, i));
                 }
 
-                float d = norm(r);
-
-                if (d > 1.0) {
-                    phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration / d, r));
+                if (phys->speed < enemy->walk_speed) {
+                    phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(r)));
                 }
 
-                components->coordinate[i]->angle = polar_angle(r);
+                enemy->desired_angle = polar_angle(r);
 
-                if (dist(get_position(components, enemy->target), get_position(components, i)) < 1.0) {
-                    damage(components, grid, enemy->target, get_position(components, enemy->target), r, 50);
-                    ParticleComponent_get(components, enemy->target)->enabled = true;
+                break;
+            } case ENEMY_CHASE: {
+                sfVector2f r = diff(get_position(components, enemy->target), get_position(components, i));
+                HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, GROUP_BULLETS);
+                if (info.object != enemy->target) {
+                    a_star(components, i, enemy->target, enemy->path);
+                    if (enemy->path->size > 1) {
+                        r = diff(get_position(components, enemy->path->head->next->value), get_position(components, i));
+                    } else {
+                        r = zeros();
+                    }
+                }
+
+                enemy->desired_angle = polar_angle(r);
+
+                float d = norm(r);
+                if (d > 2.0f * enemy->vision_range) {
+                    enemy->state = ENEMY_IDLE;
+                    break;
+                }
+
+                info = raycast(components, grid, get_position(components, i), r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
+                if (info.object == enemy->target) {
+                    shoot(components, grid, enemy->weapon);
+                } else {
+                    if (phys->speed < enemy->run_speed) {
+                        phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration / d, r));
+                    }
                 }
 
                 if (PlayerComponent_get(components, enemy->target)->state == PLAYER_DEAD) {
@@ -110,7 +190,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 }
 
                 break;
-            case ENEMY_DEAD:;
+            } case ENEMY_DEAD: {
                 ColliderComponent* col = ColliderComponent_get(components, i);
                 if (col) {
                     col->group = GROUP_CORPSES;
@@ -123,6 +203,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 WaypointComponent_remove(components, i);
 
                 break;
+            }
         }
     }
 }
@@ -140,10 +221,6 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
                 draw_line(window, components, camera, NULL, start, end, 0.05, sfRed);
             }
         }
-
-        // if (enemy->path[1] != -1) {
-        //     draw_circle(window, components, camera, NULL, get_position(components, enemy->path[1]), 0.1, sfGreen);
-        // }
     }
 }
 
@@ -155,11 +232,9 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
         if (j == -1) break;
 
         EnemyComponent* enemy = EnemyComponent_get(components, j);
-        if (enemy) {
-            if (enemy->target == -1) {
-                enemy->target = player;
-                enemy->state = ENEMY_CHASE;
-            }
+        if (enemy && enemy->state != ENEMY_DEAD && enemy->state != ENEMY_CHASE) {
+            enemy->target = player;
+            enemy->state = ENEMY_INVESTIGATE;
         }
     }
     List_delete(list);

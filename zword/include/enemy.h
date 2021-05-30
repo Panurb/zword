@@ -10,7 +10,9 @@
 
 void update_enemies(ComponentData* component, ColliderGrid* grid);
 
-void create_enemy(ComponentData* component, sfVector2f pos);
+void create_zombie(ComponentData* component, sfVector2f pos);
+
+void create_farmer(ComponentData* component, sfVector2f pos);
 
 void create_big_boy(ComponentData* components, sfVector2f pos);
 

@@ -67,7 +67,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
             physics->speed = physics->max_speed;
         }
 
-        coord->angle += delta_time * physics->angular_velocity;
+        coord->angle = mod(coord->angle + delta_time * physics->angular_velocity, 2.0f * M_PI);
 
         physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
         physics->angular_velocity += delta_time * physics->angular_acceleration;

@@ -177,6 +177,11 @@ typedef struct {
     List* path;
     float fov;
     float vision_range;
+    float idle_speed;
+    float walk_speed;
+    float run_speed;
+    int weapon;
+    float desired_angle;
 } EnemyComponent;
 
 typedef struct {

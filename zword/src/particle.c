@@ -84,7 +84,7 @@ void update_particles(ComponentData* components, int camera, float delta_time) {
         ParticleComponent* part = ParticleComponent_get(components, i);
         if (!part) continue;
 
-        float w = 2.0f * part->max_time * part->speed;
+        float w = 2.5f * part->max_time * part->speed;
         if (!on_screen(components, camera, get_position(components, i), w, w)) {
             continue;
         }

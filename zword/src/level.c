@@ -175,7 +175,7 @@ void create_door(ComponentData* components, sfVector2f pos, float angle) {
     ImageComponent_add(components, i, "door", 2.0f, 1.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
     ParticleComponent_add_splinter(components, i);
-    HealthComponent_add(components, i, 200, "", "", "wood_destroy");
+    // HealthComponent_add(components, i, 200, "", "", "wood_destroy");
     SoundComponent_add(components, i, "wood_hit");
     DoorComponent_add(components, i, sum(pos, polar_to_cartesian(-1.0f, angle)));
     PhysicsComponent_add(components, i, 1.0f);
@@ -601,9 +601,13 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
             create_forest(components, grid, pos, perm, f);
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 2; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                create_enemy(components, sum(pos, r));
+                if (randf(0.0f, 1.0f) < 0.5f) {
+                    create_farmer(components, sum(pos, r));
+                } else {
+                    create_zombie(components, sum(pos, r));
+                }
             }
 
             for (int i = 0; i < 2; i++) {
