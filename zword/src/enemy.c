@@ -67,6 +67,34 @@ void create_farmer(ComponentData* components, sfVector2f pos) {
 }
 
 
+void create_priest(ComponentData* components, sfVector2f pos) {
+    int i = create_entity(components);
+    
+    CoordinateComponent_add(components, i, pos, rand_angle());
+    ImageComponent_add(components, i, "priest", 1.0, 1.0, LAYER_ENEMIES);
+    ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+    PhysicsComponent_add(components, i, 1.0f);
+    EnemyComponent* enemy = EnemyComponent_add(components, i);
+    enemy->idle_speed = 0.0f;
+    enemy->walk_speed = 2.0f;
+    enemy->run_speed = 2.0f;
+    enemy->fov = 2.0f * M_PI;
+    enemy->vision_range = 15.0f;
+    ParticleComponent_add_blood(components, i);
+    WaypointComponent_add(components, i);
+    HealthComponent_add(components, i, 200, "farmer_dead", "blood", "");
+    SoundComponent_add(components, i, "squish");
+    LightComponent_add(components, i, 2.0f, 2.0f * M_PI, get_color(0.5f, 1.0f, 0.0f, 1.0f), 0.5f, 1.0f)->flicker = 0.25f;
+
+    sfVector2f r = { 0.5f, 0.0f };
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, r, 0.0f);
+    WeaponComponent_add(components, j, 0.25f, 20, 5, 0.25f * M_PI, -1, 0.0f, 15.0f, 0.0f, AMMO_ENERGY, "axe");
+    add_child(components, i, j);
+    enemy->weapon = j;
+}
+
+
 void create_big_boy(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     

@@ -117,7 +117,7 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     PhysicsComponent* phys = malloc(sizeof(PhysicsComponent));
     phys->velocity = zeros();
     phys->acceleration = zeros();
-    phys->collision.collided = false;
+    phys->collision.entities = List_create();
     phys->collision.overlap = zeros();
     phys->collision.velocity = zeros();
     phys->angular_velocity = 0.0f;
@@ -147,6 +147,7 @@ PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity) {
 void PhysicsComponent_remove(ComponentData* components, int entity) {
     PhysicsComponent* phys = PhysicsComponent_get(components, entity);
     if (phys) {
+        List_delete(phys->collision.entities);
         free(phys);
         components->physics[entity] = NULL;
     }

@@ -208,6 +208,9 @@ void create_church(ComponentData* components, sfVector2f pos) {
     create_floor(components, pos, 30.0f, 10.0f, angle, "tiles_tile");
     create_floor(components, sum(pos, mult(5.0f, w)), 10.0f, 20.0f, angle, "tiles_tile");
 
+    create_door(components, sum(pos, lin_comb(-14.5f, w, 1.0f, h)), angle - 0.5f * M_PI);
+    create_door(components, sum(pos, lin_comb(-14.5f, w, -1.0f, h)), angle + 0.5f * M_PI);
+
     // Back wall
     create_wall(components, sum(pos, mult(14.5f, w)), angle + 0.5f * M_PI, 8.0f, 1.0f, "stone_tile");
 
@@ -219,13 +222,21 @@ void create_church(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, k, sum(pos, mult(12.5f, w)), rand_angle());
     ImageComponent_add(components, k, "blood_large", 2.0f, 2.0f, LAYER_ITEMS);
 
+    if (randf(0.0f, 1.0f) < 0.25f) {
+        create_priest(components, sum(pos, lin_comb(10.0f, w, 2.5f, h)));
+        create_priest(components, sum(pos, lin_comb(10.0f, w, -2.5f, h)));
+    } else {
+        create_priest(components, sum(pos, mult(10.0f, w)));
+    }
+    
+
     for (int j = 0; j < 2; j++) {
         for (int i = 0; i < 7; i++) {
             create_bench(components, sum(pos, sum(mult((i - 5.75f) * 2.0f, w), mult(2.5f, h))), angle);
         }
 
         // Entrance
-        create_wall(components, sum(pos, sum(mult(-14.5f, w), mult(2.5f, h))), angle + 0.5f * M_PI, 3.0f, 1.0f, "stone_tile");
+        create_wall(components, sum(pos, sum(mult(-14.5f, w), mult(3.0f, h))), angle + 0.5f * M_PI, 2.0f, 1.0f, "stone_tile");
         create_wall(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))), angle, 2.0f, 1.0f, "altar_tile");
         create_light(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))));
 
@@ -605,8 +616,10 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
                 if (randf(0.0f, 1.0f) < 0.5f) {
                     create_farmer(components, sum(pos, r));
-                } else {
+                } else if (randf(0.0f, 1.0f) < 0.5f) {
                     create_zombie(components, sum(pos, r));
+                } else {
+                    create_priest(components, sum(pos, r));
                 }
             }
 
@@ -646,8 +659,9 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_car(components, start);
     // create_church(components, zeros());
     // create_toilet(components, zeros());
-    create_house(components, zeros());
+    create_church(components, zeros());
     // create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
+    // create_priest(components, zeros());
 
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 

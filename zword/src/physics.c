@@ -29,7 +29,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
         CoordinateComponent* coord = components->coordinate[i];
         if (coord->parent != -1) continue;
 
-        if (physics->collision.collided) {
+        if (physics->collision.entities->size > 0) {
             physics->velocity = physics->collision.velocity;
 
             sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
@@ -81,11 +81,11 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
         }
 
         // move up?
-        if (physics->collision.collided) {
+        if (physics->collision.entities->size > 0) {
             physics->angular_velocity = 0.0f;
         }
         
-        physics->collision.collided = false;
+        List_clear(physics->collision.entities);
         physics->collision.overlap = zeros();
         physics->collision.velocity = zeros();
     }

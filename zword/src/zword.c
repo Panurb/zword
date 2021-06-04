@@ -127,6 +127,7 @@ int main() {
                 update_players(components, grid, time_step);
                 update_weapons(components, time_step);
                 update_enemies(components, grid);
+                update_energy(components, grid);
 
                 update_particles(components, camera, time_step);
                 update_lights(components, time_step);

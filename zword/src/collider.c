@@ -18,6 +18,7 @@
 #include "sound.h"
 #include "particle.h"
 #include "image.h"
+#include "health.h"
 
 
 bool inside_collider(ComponentData* components, int i, sfVector2f point) {
@@ -287,18 +288,19 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                     sfVector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
 
                     switch (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group]) {
+                        case 0:
+                            break;
                         case 1:
                             physics->collision.velocity = sum(physics->collision.velocity, new_vel);
                             physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
-                            physics->collision.collided = true;
+                            List_add(physics->collision.entities, n);
                             break;
                         case 2:
                             apply_force(components, i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
                             break;
                         case 3:
                             VehicleComponent_get(components, i)->on_road = true;
-                            break;
-                        default:
+                            List_add(physics->collision.entities, n);
                             break;
                     }
                 }

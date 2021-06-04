@@ -52,7 +52,7 @@ typedef struct {
     sfVector2f velocity;
     sfVector2f acceleration;
     struct {
-        bool collided;
+        List* entities;
         sfVector2f overlap;
         sfVector2f velocity;
     } collision;
@@ -90,7 +90,8 @@ typedef enum {
     GROUP_WAYPOINTS,
     GROUP_RAYS,
     GROUP_DEBRIS,
-    GROUP_DOORS
+    GROUP_DOORS,
+    GROUP_ENERGY
 } ColliderGroup;
 
 typedef struct {
@@ -224,7 +225,8 @@ typedef enum {
     AMMO_MELEE,
     AMMO_PISTOL,
     AMMO_RIFLE,
-    AMMO_SHOTGUN
+    AMMO_SHOTGUN,
+    AMMO_ENERGY
 } AmmoType;
 
 typedef struct {

@@ -57,6 +57,37 @@ void reload(ComponentData* components, int i) {
 }
 
 
+void create_energy(ComponentData* components, sfVector2f position, sfVector2f velocity) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ImageComponent_add(components, i, "energy", 1.0f, 1.0f, LAYER_PARTICLES);
+    PhysicsComponent* phys = PhysicsComponent_add(components, i, 0.0f);
+    phys->velocity = velocity;
+    phys->drag = 0.0f;
+    phys->drag_sideways = 0.0f;
+    ColliderComponent_add_circle(components, i, 0.25f, GROUP_ENERGY);
+}
+
+
+void update_energy(ComponentData* components, ColliderGrid* grid) {
+    for (int i = 0; i < components->entities; i++) {
+        ColliderComponent* col = ColliderComponent_get(components, i);
+        if (!col) continue;
+        if (col->group == GROUP_ENERGY) {
+            PhysicsComponent* phys = PhysicsComponent_get(components, i);
+            for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
+                int j = node->value;
+                damage(components, grid, j, get_position(components, i), zeros(), 20);
+            }
+            if (phys->collision.entities->size > 0) {
+                clear_grid(components, grid, i);
+                destroy_entity(components, i);
+            }
+        }
+    }
+}
+
+
 void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
     WeaponComponent* weapon = components->weapon[entity];
     int parent = CoordinateComponent_get(components, entity)->parent;
@@ -72,60 +103,73 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
             sfVector2f pos = get_position(components, parent);
 
-            if (weapon->ammo_type == AMMO_MELEE) {
-                HitInfo min_info;
-                float min_dist = INFINITY;
-                for (int i = 0; i < weapon->shots; i++) {
-                    float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
-                    sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+            switch (weapon->ammo_type) {
+                case AMMO_MELEE: {
+                    HitInfo min_info;
+                    float min_dist = INFINITY;
+                    for (int i = 0; i < weapon->shots; i++) {
+                        float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
+                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
+                        HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
-                    float d = dist(info.position, pos);
-                    if (d < min_dist) {
-                        min_info = info;
-                        min_dist = d;
+                        float d = dist(info.position, pos);
+                        if (d < min_dist) {
+                            min_info = info;
+                            min_dist = d;
+                        }
                     }
-                }
-
-                int dmg = weapon->damage;
-                EnemyComponent* enemy = EnemyComponent_get(components, min_info.object);
-                if (enemy && enemy->state == ENEMY_IDLE) {
-                    dmg = 100;
-                }
-                damage(components, grid, min_info.object, min_info.position, normalized(diff(min_info.position, pos)), dmg);
-            } else {
-                ParticleComponent* particle = ParticleComponent_get(components, entity);
-                for (int i = 0; i < weapon->shots; i++) {
-                    float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-                    if (weapon->spread > 0.0f) {
-                        angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
-                    }
-                    sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
                     int dmg = weapon->damage;
-                    if (dot(info.normal, dir) < -0.99f) {
-                        dmg *= 4;
+                    EnemyComponent* enemy = EnemyComponent_get(components, min_info.object);
+                    if (enemy && enemy->state == ENEMY_IDLE) {
+                        dmg = 100;
                     }
-                    damage(components, grid, info.object, info.position, dir, dmg);
-
-                    particle->angle = angle;
-                    if (info.object) {
-                        particle->max_time = 0.9f * dist(pos, info.position) / particle->speed;
-                    } else {
-                        particle->max_time = weapon->range / particle->speed;
+                    damage(components, grid, min_info.object, min_info.position, normalized(diff(min_info.position, pos)), dmg);
+                    break;
+                } case AMMO_ENERGY: {
+                    for (int i = 0; i < weapon->shots; i++) {
+                        float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
+                        if (weapon->spread > 0.0f) {
+                            angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+                        }
+                        sfVector2f vel = polar_to_cartesian(7.0f, get_angle(components, parent) + angle);
+                        create_energy(components, get_position(components, entity), vel);
                     }
-                    add_particles(components, entity, 1);
-                }
+                    break;
+                } default: {
+                    ParticleComponent* particle = ParticleComponent_get(components, entity);
+                    for (int i = 0; i < weapon->shots; i++) {
+                        float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
+                        if (weapon->spread > 0.0f) {
+                            angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+                        }
+                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
+                        HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
-                weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-                if (PlayerComponent_get(components, parent)) {
-                    alert_enemies(components, grid, parent, weapon->sound_range);
-                }
+                        int dmg = weapon->damage;
+                        if (dot(info.normal, dir) < -0.99f) {
+                            dmg *= 2;
+                        }
+                        damage(components, grid, info.object, info.position, dir, dmg);
 
-                LightComponent* light = LightComponent_get(components, entity);
-                if (light) {
-                    light->brightness = light->max_brightness;
+                        particle->angle = angle;
+                        if (info.object) {
+                            particle->max_time = 0.9f * dist(pos, info.position) / particle->speed;
+                        } else {
+                            particle->max_time = weapon->range / particle->speed;
+                        }
+                        add_particles(components, entity, 1);
+                    }
+
+                    weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
+                    if (PlayerComponent_get(components, parent)) {
+                        alert_enemies(components, grid, parent, weapon->sound_range);
+                    }
+
+                    LightComponent* light = LightComponent_get(components, entity);
+                    if (light) {
+                        light->brightness = light->max_brightness;
+                    }
                 }
             }
 
