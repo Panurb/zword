@@ -8,7 +8,7 @@
 #include "camera.h"
 
 
-void update_enemies(ComponentData* component, ColliderGrid* grid);
+void update_enemies(ComponentData* component, ColliderGrid* grid, float time_step);
 
 void create_zombie(ComponentData* component, sfVector2f pos);
 

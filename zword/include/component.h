@@ -168,6 +168,7 @@ typedef enum {
     ENEMY_IDLE,
     ENEMY_INVESTIGATE,
     ENEMY_CHASE,
+    ENEMY_ATTACK,
     ENEMY_DEAD
 } EnemyState;
 
@@ -183,6 +184,8 @@ typedef struct {
     float run_speed;
     int weapon;
     float desired_angle;
+    float attack_delay;
+    float attack_timer;
 } EnemyComponent;
 
 typedef struct {

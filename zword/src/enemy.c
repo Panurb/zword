@@ -124,7 +124,7 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
         float angle = fabs(signed_angle(r, s));
 
         float d = norm(r);
-        if (d < enemy->vision_range && d < min_dist && angle < 0.5f * enemy->fov) {
+        if (d < min_dist && angle < 0.5f * enemy->fov) {
             HitInfo info = raycast(components, grid, get_position(components, entity), r, enemy->vision_range, GROUP_BULLETS);
             if (info.object == j) {
                 enemy->target = j;
@@ -136,7 +136,7 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
 }
 
 
-void update_enemies(ComponentData* components, ColliderGrid* grid) {
+void update_enemies(ComponentData* components, ColliderGrid* grid, float time_step) {
     for (int i = 0; i < components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(components, i);
         if (!enemy) continue;
@@ -144,8 +144,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         PhysicsComponent* phys = PhysicsComponent_get(components, i);
         WeaponComponent* weapon = WeaponComponent_get(components, enemy->weapon);
+        sfVector2f pos = get_position(components, i);
 
-        if (enemy->state != ENEMY_DEAD) {
+        if (enemy->state != ENEMY_ATTACK && enemy->state != ENEMY_DEAD) {
             update_vision(components, grid, i);
             float delta_angle = mod(enemy->desired_angle + M_PI - coord->angle, 2.0f * M_PI) - M_PI;
             phys->angular_velocity = 5.0f * delta_angle;
@@ -156,7 +157,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
                 sfVector2f r = polar_to_cartesian(1.0f, get_angle(components, i));
                 HitInfo info = raycast(components, grid, get_position(components, i), r, 2.0f, GROUP_ENEMIES);
                 if (info.object != -1) {
-                    enemy->desired_angle = mod(polar_angle(info.normal) + randf(-0.5f, 0.5f) * M_PI, 2.0f * M_PI);
+                    enemy->desired_angle = mod(enemy->desired_angle - 0.1f * sign(signed_angle(info.normal, r)), 2.0f * M_PI);
                 }
 
                 if (phys->speed < enemy->idle_speed) {
@@ -184,37 +185,48 @@ void update_enemies(ComponentData* components, ColliderGrid* grid) {
 
                 break;
             } case ENEMY_CHASE: {
-                sfVector2f r = diff(get_position(components, enemy->target), get_position(components, i));
-                HitInfo info = raycast(components, grid, get_position(components, i), r, enemy->vision_range, GROUP_BULLETS);
+                sfVector2f r = diff(get_position(components, enemy->target), pos);
+                float d = norm(r);
+                sfVector2f v = r;
+
+                HitInfo info = raycast(components, grid, pos, r, d, GROUP_BULLETS);
                 if (info.object != enemy->target) {
                     a_star(components, i, enemy->target, enemy->path);
                     if (enemy->path->size > 1) {
-                        r = diff(get_position(components, enemy->path->head->next->value), get_position(components, i));
-                    } else {
-                        r = zeros();
+                        v = diff(get_position(components, enemy->path->head->next->value), pos);
                     }
                 }
 
-                enemy->desired_angle = polar_angle(r);
+                enemy->desired_angle = polar_angle(v);
 
-                float d = norm(r);
                 if (d > 2.0f * enemy->vision_range) {
                     enemy->state = ENEMY_IDLE;
                     break;
                 }
 
-                info = raycast(components, grid, get_position(components, i), r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
+                r = polar_to_cartesian(1.0f, get_angle(components, i));
+                info = raycast(components, grid, pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
                 if (info.object == enemy->target) {
-                    shoot(components, grid, enemy->weapon);
+                    enemy->state = ENEMY_ATTACK;
                 } else {
                     if (phys->speed < enemy->run_speed) {
-                        phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration / d, r));
+                        phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(v)));
                     }
                 }
 
                 if (PlayerComponent_get(components, enemy->target)->state == PLAYER_DEAD) {
                     enemy->target = -1;
                     enemy->state = ENEMY_IDLE;
+                }
+
+                break;
+            } case ENEMY_ATTACK: {
+                if (enemy->attack_timer <= 0.0f) {
+                    shoot(components, grid, enemy->weapon);
+                    enemy->state = ENEMY_CHASE;
+                    enemy->attack_timer = enemy->attack_delay;
+                } else {
+                    enemy->attack_timer -= time_step;
                 }
 
                 break;

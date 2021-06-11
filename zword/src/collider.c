@@ -300,7 +300,6 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                             break;
                         case 3:
                             VehicleComponent_get(components, i)->on_road = true;
-                            List_add(physics->collision.entities, n);
                             break;
                     }
                 }

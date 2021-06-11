@@ -73,11 +73,16 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
     static int id = MAX_ENTITIES;
     id = (id < 2 * MAX_ENTITIES) ? id + 1 : MAX_ENTITIES;
 
-    velocity = normalized(velocity);
+    float v = norm(velocity);
+    velocity = mult(1.0f / v, velocity);
 
     HitInfo info;
     info.object = -1;
     info.normal = perp(velocity);
+
+    if (v == 0.0f) {
+        return info;
+    }
 
     int x = floorf((start.x + 0.5 * grid->width) / grid->tile_width);
     int y = floorf((start.y + 0.5 * grid->height) / grid->tile_height);
