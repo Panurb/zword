@@ -20,6 +20,7 @@
 #include "grid.h"
 #include "collider.h"
 #include "sound.h"
+#include "door.h"
 
 
 void create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
@@ -166,19 +167,6 @@ void create_table(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS);
     PhysicsComponent_add(components, j, 1.0f);
     add_child(components, i, j);
-}
-
-
-void create_door(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, "door", 2.0f, 1.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
-    ParticleComponent_add_splinter(components, i);
-    // HealthComponent_add(components, i, 200, "", "", "wood_destroy");
-    SoundComponent_add(components, i, "wood_hit");
-    DoorComponent_add(components, i, sum(pos, polar_to_cartesian(-1.0f, angle)));
-    PhysicsComponent_add(components, i, 1.0f);
 }
 
 
@@ -448,7 +436,7 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
 
 
 void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation) {
-    int n = 10;
+    int n = 8;
     float m = n - 1;
     for (int i = 1; i < n; i++) {
         for (int j = 1; j < n; j++) {
@@ -618,15 +606,17 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
                     create_farmer(components, sum(pos, r));
                 } else if (randf(0.0f, 1.0f) < 0.5f) {
                     create_zombie(components, sum(pos, r));
+                } else if (randf(0.0f, 1.0f) < 0.5f) {
+                    create_big_boy(components, sum(pos, r));
                 } else {
                     create_priest(components, sum(pos, r));
                 }
             }
 
-            for (int i = 0; i < 2; i++) {
-                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                create_uranium(components, grid, sum(pos, r));
-            }
+            // for (int i = 0; i < 2; i++) {
+            //     sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+            //     create_uranium(components, grid, sum(pos, r));
+            // }
         }
     }
 
@@ -659,11 +649,11 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_car(components, start);
     // create_church(components, zeros());
     // create_toilet(components, zeros());
-    create_church(components, zeros());
+    // create_church(components, zeros());
     // create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
     // create_priest(components, zeros());
 
-    // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
+    create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
 

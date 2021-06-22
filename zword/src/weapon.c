@@ -66,6 +66,9 @@ void create_energy(ComponentData* components, sfVector2f position, sfVector2f ve
     phys->drag = 0.0f;
     phys->drag_sideways = 0.0f;
     ColliderComponent_add_circle(components, i, 0.25f, GROUP_ENERGY);
+    LightComponent_add(components, i, 8.0f, 2.0f * M_PI, get_color(0.5f, 1.0f, 0.0f, 1.0f), 0.5f, 2.5f)->enabled = false;
+    ParticleComponent_add_energy(components, i);
+    SoundComponent_add(components, i, "");
 }
 
 
@@ -75,13 +78,21 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
         if (!col) continue;
         if (col->group == GROUP_ENERGY) {
             PhysicsComponent* phys = PhysicsComponent_get(components, i);
+            LightComponent* light = LightComponent_get(components, i);
+
             for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
                 int j = node->value;
                 damage(components, grid, j, get_position(components, i), zeros(), 20);
             }
+            
             if (phys->collision.entities->size > 0) {
+                light->brightness = 0.5f;
+                add_particles(components, i, 10);
                 clear_grid(components, grid, i);
-                destroy_entity(components, i);
+                ColliderComponent_remove(components, i);
+                ImageComponent_get(components, i)->alpha = 0.0f;
+                add_sound(components, i, "energy", 0.5f, randf(1.2f, 1.5f));
+                // destroy_entity(components, i);
             }
         }
     }
@@ -133,7 +144,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                             angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                         }
                         sfVector2f vel = polar_to_cartesian(7.0f, get_angle(components, parent) + angle);
-                        create_energy(components, get_position(components, entity), vel);
+                        create_energy(components, sum(get_position(components, entity), mult(1.0f / 14.0f, vel)), vel);
                     }
                     break;
                 } default: {

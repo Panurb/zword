@@ -89,7 +89,8 @@ void create_priest(ComponentData* components, sfVector2f pos) {
     sfVector2f r = { 0.5f, 0.0f };
     int j = create_entity(components);
     CoordinateComponent_add(components, j, r, 0.0f);
-    WeaponComponent_add(components, j, 0.25f, 20, 5, 0.25f * M_PI, -1, 0.0f, 15.0f, 0.0f, AMMO_ENERGY, "axe");
+    WeaponComponent_add(components, j, 0.25f, 20, 5, 0.25f * M_PI, -1, 0.0f, 15.0f, 0.0f, AMMO_ENERGY, "energy");
+    SoundComponent_add(components, j, "");
     add_child(components, i, j);
     enemy->weapon = j;
 }
@@ -102,12 +103,23 @@ void create_big_boy(ComponentData* components, sfVector2f pos) {
     ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
     AnimationComponent_add(components, i);
     ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
-    PhysicsComponent_add(components, i, 10.0f)->max_speed = 12.0f;
-    EnemyComponent_add(components, i);
+    PhysicsComponent* physics = PhysicsComponent_add(components, i, 10.0f);
+    physics->drag_sideways = 20.0f;
+    EnemyComponent* enemy = EnemyComponent_add(components, i);
+    enemy->idle_speed = 0.0f;
+    enemy->walk_speed = 4.0f;
+    enemy->run_speed = 8.0f;
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 500, "big_boy_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
+
+    sfVector2f r = { 0.5f, 0.0f };
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, r, 0.0f);
+    WeaponComponent_add(components, j, 0.5f, 100, 7, 0.5f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
+    add_child(components, i, j);
+    enemy->weapon = j;
 }
 
 
@@ -150,6 +162,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
             update_vision(components, grid, i);
             float delta_angle = mod(enemy->desired_angle + M_PI - coord->angle, 2.0f * M_PI) - M_PI;
             phys->angular_velocity = 5.0f * delta_angle;
+
+            AnimationComponent* animation = AnimationComponent_get(components, i);
+            if (animation) {
+                animation->framerate = phys->speed;
+            }
         }
 
         switch (enemy->state) {
@@ -161,7 +178,11 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 }
 
                 if (phys->speed < enemy->idle_speed) {
-                    enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);
+                    if (phys->speed < 0.5f) {
+                        enemy->desired_angle = mod(enemy->desired_angle + M_PI, 2.0f * M_PI);
+                    } else {
+                        enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);
+                    }
                     sfVector2f a = polar_to_cartesian(enemy->acceleration, coord->angle);
                     phys->acceleration = sum(phys->acceleration, a);
                 }
@@ -207,6 +228,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 r = polar_to_cartesian(1.0f, get_angle(components, i));
                 info = raycast(components, grid, pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
                 if (info.object == enemy->target) {
+                    enemy->attack_timer = enemy->attack_delay;
                     enemy->state = ENEMY_ATTACK;
                 } else {
                     if (phys->speed < enemy->run_speed) {
@@ -224,7 +246,6 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 if (enemy->attack_timer <= 0.0f) {
                     shoot(components, grid, enemy->weapon);
                     enemy->state = ENEMY_CHASE;
-                    enemy->attack_timer = enemy->attack_delay;
                 } else {
                     enemy->attack_timer -= time_step;
                 }

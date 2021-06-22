@@ -100,7 +100,7 @@ void set_texture(ImageComponent* image, TextureArray textures) {
     
     if (i != -1) {
         sfSprite_setTexture(image->sprite, textures[i], sfTrue);
-        if (image->width != 0.0f) {
+        if (image->width != 0.0f && image->height != 0.0f) {
             sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
             sfSprite_setTextureRect(image->sprite, rect);
         }
@@ -184,10 +184,11 @@ void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, T
 }
 
 
-void change_texture(ComponentData* components, int entity, Filename filename) {
+void change_texture(ComponentData* components, int entity, Filename filename, float width, float height) {
     ImageComponent* image = ImageComponent_get(components, entity);
-    image->width = 2.0f;
     strcpy(image->filename, filename);
+    image->width = width;
+    image->height = height;
     image->texture_changed = true;
     if (filename[0] == '\0') {
         image->alpha = 0.0f;

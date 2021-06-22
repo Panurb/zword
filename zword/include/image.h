@@ -28,7 +28,7 @@ void draw_outlines(ComponentData* component, sfRenderWindow* window,  int camera
 
 void draw_roofs(ComponentData* component, sfRenderWindow* window, int camera, TextureArray textures);
 
-void change_texture(ComponentData* components, int entity, Filename filename);
+void change_texture(ComponentData* components, int entity, Filename filename, float width, float height);
 
 void change_layer(ComponentData* components, int entity, Layer layer);
 

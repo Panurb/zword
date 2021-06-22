@@ -16,12 +16,13 @@
 
 void die(ComponentData* components, ColliderGrid* grid, int entity) {
     HealthComponent* health = components->health[entity];
-    change_texture(components, entity, health->dead_image);
-    change_layer(components, entity, LAYER_CORPSES);
 
     if (AnimationComponent_get(components, entity)) {
         stop_animation(components, entity);
     }
+
+    change_texture(components, entity, health->dead_image, 0.0f, 0.0f);
+    change_layer(components, entity, LAYER_CORPSES);
 
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     EnemyComponent* enemy = EnemyComponent_get(components, entity);
@@ -96,10 +97,10 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         }
     }
 
-    EnemyComponent* enemy = components->enemy[entity];
-    if (enemy) {
-        CoordinateComponent_get(components, entity)->angle = polar_angle(mult(-1.0, dir));
-    }
+    // EnemyComponent* enemy = components->enemy[entity];
+    // if (enemy) {
+    //     CoordinateComponent_get(components, entity)->angle = polar_angle(mult(-1.0, dir));
+    // }
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);
     if (physics) {

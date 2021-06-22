@@ -62,6 +62,12 @@ void ParticleComponent_add_fire(ComponentData* components, int entity, float siz
 }
 
 
+void ParticleComponent_add_energy(ComponentData* components, int entity) {
+    sfColor green = get_color(0.5f, 1.0f, 0.0f, 1.0f);
+    ParticleComponent_add(components, entity, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, green, green);
+}
+
+
 void add_particles(ComponentData* components, int entity, int n) {
     ParticleComponent* part = ParticleComponent_get(components, entity);
 

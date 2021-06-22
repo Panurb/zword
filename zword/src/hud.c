@@ -26,17 +26,19 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
 
     int i = player->inventory[slot];
     if (i != -1) {
-        ItemComponent* item = components->item[i];
+        ItemComponent* item = ItemComponent_get(components, i);
 
         sfSprite* sprite = ImageComponent_get(components, i)->sprite;
 
         sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
+        float angle = (slot - 1) * 0.5f * M_PI;
 
         if (i == player->grabbed_item) {
-            r = mult(2.5, player->controller.right_stick);
+            r = mult(2.5f, player->controller.right_stick);
+            angle = polar_angle(r) - 0.5f * M_PI;
         }
 
-        draw_sprite(window, components, camera, sprite, sum(pos, r), (slot - 1) * 0.5f * M_PI, ones(), 0);
+        draw_sprite(window, components, camera, sprite, sum(pos, r), angle, ones(), 0);
     }
 }
 
@@ -150,6 +152,8 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             draw_circle(window, components, camera, player->crosshair, pos, 0.1f, sfWhite);
         }
 
+        VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
+
         switch (player->state) {
             case PLAYER_ON_FOOT:
                 break;
@@ -165,8 +169,6 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
 
                 break;
             case PLAYER_DRIVE:
-                ;
-                VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
                 if (vehicle) {
                     draw_slice(window, components, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
                 }

@@ -17,6 +17,8 @@ static const char* SOUNDS[] = {
     "axe",
     "car",
     "car_door",
+    "door",
+    "energy",
     "geiger",
     "metal",
     "pistol",
@@ -102,10 +104,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
         SoundComponent* scomp = SoundComponent_get(components, i);
         if (!scomp) continue;
 
-        sfVector2f r = diff(get_position(components, i), get_position(components, camera));
-        if (norm(r) < 4.0) {
-            r = zeros();
-        }
+        float dist = norm(diff(get_position(components, i), get_position(components, camera)));
 
         for (int j = 0; j < scomp->size; j++) {
             SoundEvent* event = scomp->events[j];
@@ -124,8 +123,14 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
 
             sfSound* channel = channels[chan];
 
-            // sfSound_setPosition(channel, (sfVector3f) { r.x, 0.0, r.y });
-            sfSound_setVolume(channel, event->volume * 100.0);
+            float vol = event->volume;
+            CameraComponent* cam = CameraComponent_get(components, camera);
+            float radius = cam->resolution.x / cam->zoom;
+            if (dist > radius) {
+                vol = expf(-(dist - radius));
+            }
+
+            sfSound_setVolume(channel, vol * 100.0f);
             sfSound_setPitch(channel, event->pitch);
 
             if (event->channel != -1) {

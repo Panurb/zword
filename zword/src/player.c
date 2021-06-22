@@ -94,6 +94,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         int atch = get_attachment(components, i);
 
         int item = player->inventory[player->item];
+        ItemComponent* itco = ItemComponent_get(components, item);
         WeaponComponent* weapon = WeaponComponent_get(components, item);
         LightComponent* light = LightComponent_get(components, item);
 
@@ -137,6 +138,19 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     ImageComponent_get(components, player->target)->outline = 0.05f;
                 }
 
+                if (!weapon && light) {
+                    light->enabled = true;
+                }
+
+                if (itco) {
+                    for (int j = 0; j < itco->size; j++) {
+                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        if (a) {
+                            a->enabled = true;
+                        }
+                    }
+                }
+
                 break;
             case PLAYER_PICK_UP:
                 pick_up_item(components, grid, i);
@@ -151,9 +165,6 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     } else if (!weapon->automatic) {
                         player->state = PLAYER_ON_FOOT;
                     }
-                } else if (light) {
-                    light->enabled = !light->enabled;
-                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;
@@ -179,6 +190,19 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             case PLAYER_PASSENGER:
+                if (!weapon && light) {
+                    light->enabled = true;
+                }
+
+                if (itco) {
+                    for (int j = 0; j < itco->size; j++) {
+                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        if (a) {
+                            a->enabled = true;
+                        }
+                    }
+                }
+
                 break;
             case PLAYER_MENU:
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
@@ -190,8 +214,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 if (weapon) {
                     weapon->reloading = false;
                 }
-                
-                ItemComponent* itco = ItemComponent_get(components, item);
+
                 if (itco) {
                     for (int j = 0; j < itco->size; j++) {
                         LightComponent* a = LightComponent_get(components, itco->attachments[j]);
@@ -204,6 +227,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 player->item = get_slot(components, i, player->inventory_size);
 
                 int new_item = player->inventory[player->item];
+
                 if (new_item != item) {
                     if (item != -1) {
                         ImageComponent_get(components, item)->alpha = 0.0f;

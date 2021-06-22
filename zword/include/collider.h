@@ -33,7 +33,7 @@ static const int COLLISION_MATRIX[17][17] = { { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                               { 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // RAYS
                                               { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // DEBRIS
                                               { 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // DOORS
-                                              { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };   // ENERGY
+                                              { 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } };   // ENERGY
 
 
 bool inside_collider(ComponentData* components, int i, sfVector2f point);

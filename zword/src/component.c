@@ -44,7 +44,7 @@ ComponentData* ComponentData_create() {
 CoordinateComponent* CoordinateComponent_add(ComponentData* components, int entity, sfVector2f pos, float angle) {
     CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
     coord->position = pos;
-    coord->angle = angle;
+    coord->angle = mod(angle, 2.0f * M_PI);
     coord->parent = -1;
     coord->children = List_create();
 

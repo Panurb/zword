@@ -14,6 +14,8 @@
 // https://freesound.org/people/Bertsz/sounds/500901/
 // https://freesound.org/people/CamoMano/sounds/431019/
 // https://freesound.org/people/aerror/sounds/350750/
+// https://freesound.org/people/JarredGibb/sounds/219499/
+// https://freesound.org/people/MCOcontentcreation/sounds/258289/
 
 #define MAX_SOUNDS 256
 

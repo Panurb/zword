@@ -10,6 +10,8 @@ void animate(ComponentData* components, float time_step) {
         AnimationComponent* animation = AnimationComponent_get(components, i);
         if (!animation) continue;
 
+        if (animation->framerate == 0.0f) continue;
+
         animation->timer += time_step;
         float frame_time = 1.0f / animation->framerate;
         if (animation->timer > frame_time) {
@@ -32,4 +34,5 @@ void stop_animation(ComponentData* components, int entity) {
     AnimationComponent* animation = AnimationComponent_get(components, entity);
     animation->current_frame = 0;
     animation->framerate = 0.0f;
+    animation->timer = 0.0f;
 }
