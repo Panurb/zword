@@ -124,7 +124,7 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     phys->angular_acceleration = 0.0f;
     phys->mass = mass;
     phys->friction = 0.0f;
-    phys->bounce = 0.0f;
+    phys->bounce = 0.5f;
     phys->drag = 10.0f;
     phys->drag_sideways = 10.0f;
     phys->speed = 0.0;
@@ -420,7 +420,7 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
     vehicle->fuel = max_fuel;
     vehicle->acceleration = 20.0;
     vehicle->max_speed = 10.0;
-    vehicle->turning = 50.0;
+    vehicle->turning = 5.0f;
     vehicle->size = 4;
     for (int i = 0; i < vehicle->size; i++) {
         vehicle->riders[i] = -1;

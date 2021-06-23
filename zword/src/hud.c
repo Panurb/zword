@@ -169,9 +169,9 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
 
                 break;
             case PLAYER_DRIVE:
-                if (vehicle) {
-                    draw_slice(window, components, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
-                }
+                // if (vehicle) {
+                //     draw_slice(window, components, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
+                // }
 
                 break;
             case PLAYER_PASSENGER:

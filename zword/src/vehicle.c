@@ -149,7 +149,7 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering, 
 
     phys->angular_acceleration = -sign(gas + 0.1) * phys->speed * vehicle->turning * steering;
 
-    vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
+    // vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
 
     vehicle->on_road = false;
 
