@@ -38,11 +38,11 @@ static const int COLLISION_MATRIX[17][17] = { { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 bool inside_collider(ComponentData* components, int i, sfVector2f point);
 
-void get_corners(ComponentData* component, int i, sfVector2f* corners) ;
+void get_corners(ComponentData* components, int i, sfVector2f* corners) ;
 
-sfVector2f half_width(ComponentData* component, int i);
+sfVector2f half_width(ComponentData* components, int i);
 
-sfVector2f half_height(ComponentData* component, int i);
+sfVector2f half_height(ComponentData* components, int i);
 
 float axis_half_width(ComponentData* component, int i, sfVector2f axis);
 

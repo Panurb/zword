@@ -409,7 +409,7 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());    
     float size = randf(1.0f, 1.5f);
-    ColliderComponent_add_circle(components, i, size, GROUP_TREES);
+    ColliderComponent_add_circle(components, i, 1.25f * size, GROUP_TREES);
 
     if (collides_with(components, grid, i)) {
         destroy_entity(components, i);

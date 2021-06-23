@@ -97,10 +97,10 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         }
     }
 
-    // EnemyComponent* enemy = components->enemy[entity];
-    // if (enemy) {
-    //     CoordinateComponent_get(components, entity)->angle = polar_angle(mult(-1.0, dir));
-    // }
+    EnemyComponent* enemy = components->enemy[entity];
+    if (enemy) {
+        enemy->desired_angle = polar_angle(mult(-1.0f, dir));
+    }
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);
     if (physics) {

@@ -58,6 +58,10 @@ int main() {
     sfSprite* light_sprite = sfSprite_create();
     sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), sfTrue);
 
+    sfRenderTexture* shadow_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
+    sfSprite* shadow_sprite = sfSprite_create();
+    sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), sfTrue);
+
     FpsCounter* fps = FpsCounter_create();
 
     sfClock* clock = sfClock_create();
@@ -67,7 +71,7 @@ int main() {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
 
-    float ambient_light = 0.4f;
+    float ambient_light = 0.5f;
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);
@@ -143,8 +147,13 @@ int main() {
 
         sfRenderWindow_clear(window, sfBlack);
 
+        draw_ground(components, window, camera, textures);
+        draw_shadows(components, shadow_texture, camera);
+        sfRenderWindow_drawSprite(window, shadow_sprite, &state);
         draw(components, window, camera, textures);
+
         sfRenderWindow_drawSprite(window, light_sprite, &state);
+
         draw_roofs(components, window, camera, textures);
         draw_outlines(components, window, camera);
         draw_hud(components, window, camera);

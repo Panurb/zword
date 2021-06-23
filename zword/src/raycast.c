@@ -23,7 +23,7 @@ Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVecto
 
     if (!col->enabled) return hit;
 
-    if (col->type == RECTANGLE) {
+    if (col->type == COLLIDER_RECTANGLE) {
         // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 
         sfVector2f corners[4];

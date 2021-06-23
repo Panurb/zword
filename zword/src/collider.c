@@ -24,7 +24,7 @@
 bool inside_collider(ComponentData* components, int i, sfVector2f point) {
     // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
     ColliderComponent* col = components->collider[i];
-    if (col->type == RECTANGLE) {
+    if (col->type == COLLIDER_RECTANGLE) {
         sfVector2f corners[4];
         get_corners(components, i, corners);
         sfVector2f am = diff(point, corners[0]);
@@ -39,33 +39,33 @@ bool inside_collider(ComponentData* components, int i, sfVector2f point) {
 }
 
 
-void get_corners(ComponentData* component, int i, sfVector2f* corners) {
-    CoordinateComponent* coord = component->coordinate[i];
+void get_corners(ComponentData* components, int i, sfVector2f* corners) {
+    sfVector2f pos = get_position(components, i);
 
-    sfVector2f hw = half_width(component, i);
-    sfVector2f hh = half_height(component, i);
+    sfVector2f hw = half_width(components, i);
+    sfVector2f hh = half_height(components, i);
 
-    corners[0] = sum(coord->position, sum(hw, hh));
+    corners[0] = sum(pos, sum(hw, hh));
     corners[1] = diff(corners[0], mult(2, hh));
     corners[2] = diff(corners[1], mult(2, hw));
     corners[3] = sum(corners[2], mult(2, hh));
 }
 
 
-sfVector2f half_width(ComponentData* component, int i) {
-    return polar_to_cartesian(0.5 * component->collider[i]->width, component->coordinate[i]->angle);
+sfVector2f half_width(ComponentData* components, int i) {
+    return polar_to_cartesian(0.5 * components->collider[i]->width, get_angle(components, i));
 }
 
 
-sfVector2f half_height(ComponentData* component, int i) {
-    return polar_to_cartesian(0.5 * component->collider[i]->height, component->coordinate[i]->angle + 0.5 * M_PI);
+sfVector2f half_height(ComponentData* components, int i) {
+    return polar_to_cartesian(0.5 * components->collider[i]->height, get_angle(components, i) + 0.5 * M_PI);
 }
 
 
 float axis_half_width(ComponentData* component, int i, sfVector2f axis) {
     ColliderComponent* col = component->collider[i];
 
-    if (col->type == RECTANGLE) {
+    if (col->type == COLLIDER_RECTANGLE) {
         sfVector2f hw = half_width(component, i);
         sfVector2f hh = half_height(component, i);
         return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
@@ -194,14 +194,14 @@ sfVector2f overlap(ComponentData* component, int i, int j) {
         return ol;
     }
 
-    if (a->type == CIRCLE) {
-        if (b->type == CIRCLE) {
+    if (a->type == COLLIDER_CIRCLE) {
+        if (b->type == COLLIDER_CIRCLE) {
             ol = overlap_circle_circle(component, i, j);
         } else {
             ol = overlap_circle_rectangle(component, i, j);
         }
     } else {
-        if (b->type == CIRCLE) {
+        if (b->type == COLLIDER_CIRCLE) {
             ol = overlap_rectangle_circle(component, i, j);
         } else {
             ol = overlap_rectangle_rectangle(component, i, j);
@@ -337,7 +337,7 @@ void draw_colliders(ComponentData* components, sfRenderWindow* window, int camer
         ColliderComponent* col = components->collider[i];
         if (!col) continue;
 
-        if (col->type == CIRCLE) {
+        if (col->type == COLLIDER_CIRCLE) {
             draw_circle(window, components, camera, NULL, get_position(components, i), col->radius, get_color(1.0, 0.0, 1.0, 0.25));
         } else {
             sfColor color = get_color(0.0, 1.0, 1.0, 0.25);

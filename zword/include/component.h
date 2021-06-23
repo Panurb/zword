@@ -23,6 +23,7 @@ typedef enum {
     LAYER_ROADS,
     LAYER_FLOOR,
     LAYER_DECALS,
+    LAYER_SHADOWS,
     LAYER_WALLS,
     LAYER_CORPSES,
     LAYER_ITEMS,
@@ -70,8 +71,8 @@ typedef struct {
 } PhysicsComponent;
 
 typedef enum {
-    CIRCLE,
-    RECTANGLE
+    COLLIDER_CIRCLE,
+    COLLIDER_RECTANGLE
 } ColliderType;
 
 typedef enum {
@@ -102,6 +103,8 @@ typedef struct {
     float radius;
     float width;
     float height;
+    sfVertexArray* verts;
+    int verts_size;
 } ColliderComponent;
 
 typedef enum {

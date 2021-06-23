@@ -124,7 +124,7 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     phys->angular_acceleration = 0.0f;
     phys->mass = mass;
     phys->friction = 0.0f;
-    phys->bounce = 0.5f;
+    phys->bounce = 0.0f;
     phys->drag = 10.0f;
     phys->drag_sideways = 10.0f;
     phys->speed = 0.0;
@@ -157,12 +157,17 @@ void PhysicsComponent_remove(ComponentData* components, int entity) {
 ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group) {
     ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
-    col->type = CIRCLE;
+    col->type = COLLIDER_CIRCLE;
     col->group = group;
     col->last_collision = -1;
     col->radius = radius;
     col->width = 2 * radius;
     col->height = 2 * radius;
+
+    col->verts_size = 21;
+    col->verts = sfVertexArray_create();
+    sfVertexArray_setPrimitiveType(col->verts, sfTriangleFan);
+    sfVertexArray_resize(col->verts, col->verts_size);
 
     components->collider[entity] = col;
 
@@ -173,12 +178,17 @@ ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int e
 ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, int entity, float width, float height, ColliderGroup group) {
     ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
-    col->type = RECTANGLE;
+    col->type = COLLIDER_RECTANGLE;
     col->group = group;
     col->last_collision = -1;
     col->radius = sqrtf(width * width + height * height);
     col->width = width;
     col->height = height;
+
+    col->verts_size = 6;
+    col->verts = sfVertexArray_create();
+    sfVertexArray_setPrimitiveType(col->verts, sfTriangleFan);
+    sfVertexArray_resize(col->verts, col->verts_size);
 
     components->collider[entity] = col;
 
@@ -713,7 +723,6 @@ void AmmoComponent_remove(ComponentData* components, int entity) {
 
 AnimationComponent* AnimationComponent_add(ComponentData* components, int entity) {
     AnimationComponent* anim = malloc(sizeof(AnimationComponent));
-    // ImageComponent* image = ImageComponent_get(components, entity);
     anim->frames = 2;
     anim->current_frame = 0;
     anim->framerate = 10.0f;

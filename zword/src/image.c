@@ -108,24 +108,52 @@ void set_texture(ImageComponent* image, TextureArray textures) {
 }
 
 
-void draw(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
+void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
     for (ListNode* node = components->image.order->head; node; node = node->next) {
         int i = node->value;
 
         ImageComponent* image = ImageComponent_get(components, i);
 
-        if (image->layer == LAYER_ROOFS) break;
+        if (image->layer > LAYER_DECALS) break;
 
         sfVector2f pos = get_position(components, i);
-
-        // FIXME
-        draw_road(components, window, camera, textures, i);
 
         float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
         if (!on_screen(components, camera, pos, r, r)) {
             continue;
         }
 
+        draw_road(components, window, camera, textures, i);
+
+        if (image->texture_changed) {
+            set_texture(image, textures);
+            image->texture_changed = false;
+        }
+
+        if (image->alpha > 0.0f) {
+            sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
+            draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
+        }
+    }
+}
+
+
+void draw(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
+    for (ListNode* node = components->image.order->head; node; node = node->next) {
+        int i = node->value;
+
+        ImageComponent* image = ImageComponent_get(components, i);
+
+        if (image->layer <= LAYER_DECALS) continue;
+        if (image->layer == LAYER_ROOFS) break;
+
+        sfVector2f pos = get_position(components, i);
+
+        float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
+        if (!on_screen(components, camera, pos, r, r)) {
+            continue;
+        }
+        
         if (image->texture_changed) {
             set_texture(image, textures);
             image->texture_changed = false;

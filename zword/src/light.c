@@ -61,12 +61,85 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, i
 }
 
 
+void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camera) {
+    sfRenderTexture_clear(texture, sfWhite);
+    sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
+
+    for (int i = 0; i < components->entities; i++) {
+        ColliderComponent* collider = ColliderComponent_get(components, i);
+        if (!collider) continue;
+
+        ImageComponent* image = ImageComponent_get(components, i);
+        if (!image || image->alpha == 0.0f || image->layer <= LAYER_DECALS) continue;
+
+        sfVector2f start = get_position(components, i);
+
+        float radius = collider->radius;
+        if (!on_screen(components, camera, start, 2.0f * radius, 2.0f * radius)) {
+            continue;
+        }
+
+        float brightness = 0.5f;
+
+        switch (collider->type) {
+            case COLLIDER_CIRCLE: {
+                sfVertex* v = sfVertexArray_getVertex(collider->verts, 0);
+                v->position = world_to_texture(components, camera, start);
+                sfColor color = sfBlack;
+                color.a = 255 * brightness;
+                v->color = color;
+
+                sfVector2f velocity = polar_to_cartesian(1.5f * radius, 0.0f);
+
+                float delta_angle = 2.0f * M_PI / (collider->verts_size - 2);
+                Matrix2f rot = rotation_matrix(delta_angle);
+
+                color.a = 0;
+                for (int j = 1; j < collider->verts_size; j++) {
+                    sfVector2f end = sum(start, velocity);
+
+                    v = sfVertexArray_getVertex(collider->verts, j);
+                    v->position = world_to_texture(components, camera, end);
+                    v->color = color;
+
+                    velocity = matrix_mult(rot, velocity);
+                }
+                break;
+            } case COLLIDER_RECTANGLE: {
+                sfVertex* v = sfVertexArray_getVertex(collider->verts, 0);
+                v->position = world_to_texture(components, camera, start);
+                sfColor color = sfBlack;
+                color.a = 255 * brightness;
+                v->color = color;
+
+                sfVector2f corners[4];
+                get_corners(components, i, corners);
+
+                color.a = 0;
+                for (int j = 0; j < 5; j++) {
+                    sfVector2f corner = corners[j % 4];
+                    sfVector2f end = sum(corner, polar_to_cartesian(fminf(0.1f * radius, 1.0f), get_angle(components, i) + (0.25f - j * 0.5f) * M_PI));
+
+                    v = sfVertexArray_getVertex(collider->verts, j + 1);
+                    v->position = world_to_texture(components, camera, end);
+                    v->color = color;
+                }
+
+                break;
+            }
+        }
+
+        sfRenderTexture_drawVertexArray(texture, collider->verts, &state);
+    }
+}
+
+
 void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture* texture, int camera, float ambient_light) {
-    sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0));
+    sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0f));
     sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
 
     for (int i = 0; i < components->entities; i++) {
-        LightComponent* light = components->light[i];
+        LightComponent* light = LightComponent_get(components, i);
         if (!light) continue;
 
         sfVector2f start = get_position(components, i);

@@ -5,6 +5,7 @@
 #include "util.h"
 #include "grid.h"
 #include "sound.h"
+#include "particle.h"
 
 
 void create_door(ComponentData* components, sfVector2f pos, float angle) {
@@ -37,7 +38,6 @@ void update_doors(ComponentData* components, ColliderGrid* grid) {
         } else {
             col->group = GROUP_DOORS;
 
-            float old_angle = coord->angle;
             sfVector2f r = diff(get_position(components, i), door->anchor);
             coord->angle = polar_angle(r);
 
@@ -50,12 +50,7 @@ void update_doors(ComponentData* components, ColliderGrid* grid) {
             coord->position = sum(door->anchor, polar_to_cartesian(1.0f, coord->angle));
             update_grid(components, grid, i);
 
-            // float delta_angle = fabsf(mod(fabsf(old_angle - coord->angle), 2.0f * M_PI));
-            // printf("%f\n", coord->angle);
-            // if (delta_angle > 3.0f) {
-            //     add_sound(components, i, "door", 0.5f, randf(0.9f, 1.1f));
-            // }
-            if (phys->speed > 0.0f) {
+            if (phys->speed > 0.25f) {
                 loop_sound(components, i, "door", 0.5f, 1.0f);
             } else {
                 stop_loop(components, i);
