@@ -105,6 +105,7 @@ int main() {
 
                         ColliderGrid_clear(grid);
                         ComponentData_clear(components);
+                        clear_sounds(channels);
 
                         camera = create_camera(components, mode);
                         create_level(components, grid, seed);
@@ -137,6 +138,7 @@ int main() {
                 update_lights(components, time_step);
                 update_camera(components, camera, time_step);
 
+                draw_shadows(components, shadow_texture, camera);
                 draw_lights(components, grid, light_texture, camera, ambient_light);
 
                 animate(components, time_step);
@@ -148,17 +150,15 @@ int main() {
         sfRenderWindow_clear(window, sfBlack);
 
         draw_ground(components, window, camera, textures);
-        draw_shadows(components, shadow_texture, camera);
         sfRenderWindow_drawSprite(window, shadow_sprite, &state);
         draw(components, window, camera, textures);
-
         sfRenderWindow_drawSprite(window, light_sprite, &state);
 
         draw_roofs(components, window, camera, textures);
         draw_outlines(components, window, camera);
         draw_hud(components, window, camera);
 
-        // draw_colliders(components, window, camera);
+        draw_colliders(components, window, camera);
         // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);

@@ -36,6 +36,7 @@ ComponentData* ComponentData_create() {
         components->waypoint[i] = NULL;
         components->health[i] = NULL;
         components->door[i] = NULL;
+        components->joint[i] = NULL;
     }
     return components;
 }
@@ -415,20 +416,21 @@ void ParticleComponent_remove(ComponentData* components, int entity) {
 
 VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, float max_fuel) {
     VehicleComponent* vehicle = malloc(sizeof(VehicleComponent));
+    vehicle->rear = -1;
     vehicle->on_road = false;
     vehicle->max_fuel = max_fuel;
     vehicle->fuel = max_fuel;
-    vehicle->acceleration = 20.0;
+    vehicle->acceleration = 30.0f;
     vehicle->max_speed = 10.0;
-    vehicle->turning = 5.0f;
+    vehicle->turning = 0.25f * M_PI;
     vehicle->size = 4;
     for (int i = 0; i < vehicle->size; i++) {
         vehicle->riders[i] = -1;
     }
-    vehicle->seats[0] = (sfVector2f) { 0.0, 0.75 };
-    vehicle->seats[1] = (sfVector2f) { 0.0, -0.75 };
-    vehicle->seats[2] = (sfVector2f) { -1.5, 0.75 };
-    vehicle->seats[3] = (sfVector2f) { -1.5, -0.75 };
+    vehicle->seats[0] = (sfVector2f) { -1.5, 0.75 };
+    vehicle->seats[1] = (sfVector2f) { -1.5, -0.75 };
+    vehicle->seats[2] = (sfVector2f) { -3.0, 0.75 };
+    vehicle->seats[3] = (sfVector2f) { -3.0, -0.75 };
 
     components->vehicle[entity] = vehicle;
 
@@ -774,6 +776,33 @@ void DoorComponent_remove(ComponentData* components, int entity) {
 }
 
 
+JointComponent* JointComponent_add(ComponentData* components, int entity, int parent, float min_length, float max_length, float strength) {
+    JointComponent* joint = malloc(sizeof(JointComponent));
+    joint->parent = parent;
+    joint->min_length = min_length;
+    joint->max_length = max_length;
+    joint->strength = strength;
+
+    components->joint[entity] = joint;
+    return joint;
+}
+
+
+JointComponent* JointComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->joint[entity];
+}
+
+
+void JointComponent_remove(ComponentData* components, int entity) {
+    JointComponent* joint = JointComponent_get(components, entity);
+    if (joint) {
+        free(joint);
+        components->joint[entity] = NULL;
+    }
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -823,6 +852,7 @@ void destroy_entity(ComponentData* components, int entity) {
     AmmoComponent_remove(components, entity);
     AnimationComponent_remove(components, entity);
     DoorComponent_remove(components, entity);
+    JointComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

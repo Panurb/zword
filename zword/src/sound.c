@@ -157,3 +157,10 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
         }
     }
 }
+
+
+void clear_sounds(sfSound* channels[MAX_SOUNDS]) {
+    for (int i = 0; i < MAX_SOUNDS; i++) {
+        sfSound_stop(channels[i]);
+    }
+}

@@ -29,6 +29,8 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
         CoordinateComponent* coord = components->coordinate[i];
         if (coord->parent != -1) continue;
 
+        JointComponent* joint = JointComponent_get(components, i);
+
         if (physics->collision.entities->size > 0) {
             physics->velocity = physics->collision.velocity;
 
@@ -52,9 +54,30 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
         sfVector2f v_hat = normalized(physics->velocity);
         sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
         sfVector2f v_sideways = diff(v_hat, v_forward);
-        sfVector2f a = sum(mult(physics->drag, v_forward), mult(physics->drag_sideways, v_sideways));
+        sfVector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
 
-        physics->acceleration = diff(physics->acceleration, a);
+        if (joint) {
+            sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
+            float d = norm(r);
+            if (d > joint->max_length) {
+                sfVector2f f = mult(d - joint->max_length, normalized(r));
+                if (joint->strength == INFINITY) {
+                    coord->position = sum(coord->position, f);
+                } else {
+                    a = sum(a, mult(joint->strength / physics->mass, f));
+                }
+            } else if (d < joint->min_length) {
+                sfVector2f f = mult(d - joint->min_length, normalized(r));
+                if (joint->strength == INFINITY) {
+                    coord->position = sum(coord->position, f);
+                } else {
+                    a = sum(a, mult(joint->strength / physics->mass, f));
+                }
+            }
+            coord->angle = polar_angle(r);
+        }
+
+        physics->acceleration = sum(physics->acceleration, a);
         physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
         physics->acceleration = zeros();
         
@@ -67,7 +90,9 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
             physics->speed = physics->max_speed;
         }
 
-        coord->angle = mod(coord->angle + delta_time * physics->angular_velocity, 2.0f * M_PI);
+        if (!joint) {
+            coord->angle = mod(coord->angle + delta_time * physics->angular_velocity, 2.0f * M_PI);
+        }
 
         physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
         physics->angular_velocity += delta_time * physics->angular_acceleration;

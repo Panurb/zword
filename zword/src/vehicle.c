@@ -11,38 +11,32 @@
 
 void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-    CoordinateComponent* coord = CoordinateComponent_add(components, i, pos, 0.5 * M_PI);
-    ColliderComponent_add_rectangle(components, i, 5.0, 2.8, GROUP_VEHICLES);
-    PhysicsComponent* phys = PhysicsComponent_add(components, i, 10.0f);
-    phys->bounce = 0.0f;
-    phys->angular_drag = 20.0f;
-    phys->max_angular_speed = 2.5;
-    phys->drag_sideways = 50.0;
-    VehicleComponent_add(components, i, 100.0);
-    ImageComponent_add(components, i, "car", 6.0f, 3.0f, LAYER_VEHICLES);
-    ParticleComponent_add_sparks(components, i);
+    CoordinateComponent_add(components, i, pos, 0.0f);
+    ColliderComponent_add_circle(components, i, 1.0f, GROUP_VEHICLES);
+    PhysicsComponent_add(components, i, 10.0f);
+    VehicleComponent* vehicle = VehicleComponent_add(components, i, 100.0f);
     SoundComponent_add(components, i, "metal");
 
     int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) { 2.8, 1.0 }, 0.0);
+    CoordinateComponent_add(components, j, (sfVector2f) {-3.0f, 0.0f }, 0.0f);
+    ColliderComponent_add_circle(components, j, 1.0f, GROUP_VEHICLES);
+    PhysicsComponent_add(components, j, 10.0f);
+    JointComponent_add(components, j, i, 3.0f, 3.0f, INFINITY);
+    vehicle->rear = j;
+
+    j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) {-1.5f, 0.0f }, 0.0f);
+    ImageComponent_add(components, j, "car", 6.0f, 3.0f, LAYER_VEHICLES);
+    add_child(components, i, j);
+
+    j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) { 1.3f, 1.0 }, 0.0);
     LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(components, i, j);
 
     j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) { 2.8, -1.0 }, 0.0)->parent = i;
+    CoordinateComponent_add(components, j, (sfVector2f) { 1.3f, -1.0 }, 0.0)->parent = i;
     LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
-
-    j = create_waypoint(components, (sfVector2f) { 3.5f, 2.0f });
-    add_child(components, i, j);
-
-    j = create_waypoint(components, (sfVector2f) { 3.5f, -2.0f });
-    add_child(components, i, j);
-
-    j = create_waypoint(components, (sfVector2f) { -3.5f, 2.0f });
-    add_child(components, i, j);
-
-    j = create_waypoint(components, (sfVector2f) { -3.5f, -2.0f });
-    add_child(components, i, j);
 }
 
 
@@ -122,36 +116,33 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering, 
     PlayerComponent* player = PlayerComponent_get(components, p);
     int i = player->vehicle;
 
-    VehicleComponent* vehicle = components->vehicle[i];
+    VehicleComponent* vehicle = VehicleComponent_get(components, i);
 
-    if (p != vehicle->riders[0]) return;
+    CoordinateComponent* coord = CoordinateComponent_get(components, i);
+    PhysicsComponent* phys = PhysicsComponent_get(components, i);
 
-    if (vehicle->fuel == 0.0) {
-        stop_loop(components, i);
-        return;
-    }
+    coord->angle = polar_angle(diff(get_position(components, i), get_position(components, vehicle->rear)));
+    sfVector2f an = polar_to_cartesian(vehicle->acceleration * gas, coord->angle);
 
-    PhysicsComponent* phys = components->physics[i];
+    float speed = dot(phys->velocity, polar_to_cartesian(1.0f, coord->angle));
+    float angle = coord->angle - sign(vehicle->turning) * 0.5f * M_PI;
+    sfVector2f at = polar_to_cartesian(5.0f * speed * steering * vehicle->turning, angle);
 
-    sfVector2f r = polar_to_cartesian(1.0, components->coordinate[i]->angle);
-    sfVector2f at = mult(vehicle->acceleration * gas, r);
-    phys->acceleration = sum(phys->acceleration, at);   
+    phys->acceleration = sum(an, at);
 
     if (vehicle->on_road) {
         if (phys->speed > vehicle->max_speed) {
             phys->acceleration = zeros();
         }
     } else {
-        if (phys->speed > 0.5 * vehicle->max_speed) {
+        if (phys->speed > 0.5f * vehicle->max_speed) {
             phys->acceleration = zeros();
         }
     }
 
-    phys->angular_acceleration = -sign(gas + 0.1) * phys->speed * vehicle->turning * steering;
+    // phys->velocity = polar_to_cartesian(phys->speed, angle);
 
-    // vehicle->fuel = fmax(0.0, vehicle->fuel - 0.1 * phys->speed * time_step);
-
-    vehicle->on_road = false;
+    vehicle->on_road = true;
 
     SoundComponent* scomp = SoundComponent_get(components, i);
     for (int j = 0; j < scomp->size; j++) {

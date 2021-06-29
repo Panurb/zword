@@ -299,7 +299,9 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                             apply_force(components, i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
                             break;
                         case 3:
-                            VehicleComponent_get(components, i)->on_road = true;
+                            if (VehicleComponent_get(components, i)) {
+                                VehicleComponent_get(components, i)->on_road = true;
+                            }
                             break;
                     }
                 }
@@ -337,8 +339,10 @@ void draw_colliders(ComponentData* components, sfRenderWindow* window, int camer
         ColliderComponent* col = components->collider[i];
         if (!col) continue;
 
+        sfVector2f pos = get_position(components, i);
         if (col->type == COLLIDER_CIRCLE) {
-            draw_circle(window, components, camera, NULL, get_position(components, i), col->radius, get_color(1.0, 0.0, 1.0, 0.25));
+            draw_circle(window, components, camera, NULL, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
+            draw_line(window, components, camera, NULL, pos, sum(pos, half_width(components, i)), 0.05f, sfWhite);
         } else {
             sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
             draw_rectangle(window, components, camera, NULL, get_position(components, i), col->width, col->height, get_angle(components, i), color);

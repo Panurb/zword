@@ -216,6 +216,7 @@ typedef struct {
 } ParticleComponent;
 
 typedef struct {
+    int rear;
     bool on_road;
     float fuel;
     float max_fuel;
@@ -330,6 +331,13 @@ typedef struct {
 } DoorComponent;
 
 typedef struct {
+    int parent;
+    float min_length;
+    float max_length;
+    float strength;
+} JointComponent;
+
+typedef struct {
     void* array[MAX_ENTITIES];
     List* order;
 } OrderedArray;
@@ -355,6 +363,7 @@ typedef struct {
     AmmoComponent* ammo[MAX_ENTITIES];
     AnimationComponent* animation[MAX_ENTITIES];
     DoorComponent* door[MAX_ENTITIES];
+    JointComponent* joint[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -435,6 +444,10 @@ void AnimationComponent_remove(ComponentData* components, int entity);
 DoorComponent* DoorComponent_add(ComponentData* components, int entity, sfVector2f anchor);
 DoorComponent* DoorComponent_get(ComponentData* components, int entity);
 void DoorComponent_remove(ComponentData* components, int entity);
+
+JointComponent* JointComponent_add(ComponentData* components, int entity, int parent, float min_length, float max_length, float strength);
+JointComponent* JointComponent_get(ComponentData* components, int entity);
+void JointComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
