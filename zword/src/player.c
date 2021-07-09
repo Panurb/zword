@@ -25,6 +25,32 @@
 #include "health.h"
 
 
+int create_rope(ComponentData* components, sfVector2f start, sfVector2f end, int n) {
+    sfVector2f r = diff(end, start);
+    float seg_len = norm(r) / n;
+    r = normalized(r);
+
+    int root = -1;
+    int current = -1;
+    int prev = -1;
+    for (int i = 0; i < n; i++) {
+        int current = create_entity(components);
+        sfVector2f pos = sum(start, mult(i * seg_len, r));
+        CoordinateComponent_add(components, current, pos, 0.0f);
+        PhysicsComponent_add(components, current, 0.2f);
+        JointComponent_add(components, current, prev, 0.0f, seg_len, INFINITY);
+        ColliderComponent_add_circle(components, current, 0.25f, GROUP_DOORS);
+        ImageComponent_add(components, current, "rope", 0.0f, 0.0f, LAYER_ITEMS);
+        if (prev == -1) {
+            root = current;
+        }
+        prev = current;
+    }
+
+    return root;
+}
+
+
 void create_player(ComponentData* components, sfVector2f pos, int joystick) {
     int i = create_entity(components);
 
@@ -47,6 +73,9 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
         ImageComponent_get(components, j)->alpha = 0.0f;
         AmmoComponent_get(components, j)->size = 0;
     }
+
+    int j = create_rope(components, sum(pos, rand_vector()), sum(pos, mult(10.0f, rand_vector())), 20);
+    JointComponent_get(components, j)->parent = i;
 }
 
 
@@ -81,7 +110,7 @@ int get_attachment(ComponentData* components, int i) {
 }
 
 
-void update_players(ComponentData* components, ColliderGrid* grid, float time_step) {
+void update_players(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
@@ -180,10 +209,10 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
             case PLAYER_DRIVE:
                 if (player->controller.joystick == -1) {
-                    drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x), time_step);
+                    drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x));
                 } else {
                     float gas = player->controller.right_trigger - player->controller.left_trigger;
-                    drive_vehicle(components, i, gas, left_stick.x, time_step);
+                    drive_vehicle(components, i, gas, left_stick.x);
                 }
 
                 alert_enemies(components, grid, i, 10.0f);

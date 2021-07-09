@@ -53,6 +53,7 @@ static const char* IMAGES[] = {
     "road_tile",
     "rock",
     "roof_tile",
+    "rope",
     "shotgun",
     "stone_tile",
     "table",

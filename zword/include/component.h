@@ -335,6 +335,7 @@ typedef struct {
     float min_length;
     float max_length;
     float strength;
+    float max_angle;
 } JointComponent;
 
 typedef struct {

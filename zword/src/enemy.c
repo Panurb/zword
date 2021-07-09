@@ -171,14 +171,14 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
         switch (enemy->state) {
             case ENEMY_IDLE: {
-                sfVector2f r = polar_to_cartesian(1.0f, get_angle(components, i));
+                sfVector2f r = polar_to_cartesian(1.0f, enemy->desired_angle);
                 HitInfo info = raycast(components, grid, get_position(components, i), r, 2.0f, GROUP_ENEMIES);
                 if (info.object != -1) {
                     enemy->desired_angle = mod(enemy->desired_angle - 0.1f * sign(signed_angle(info.normal, r)), 2.0f * M_PI);
                 }
 
                 if (phys->speed < enemy->idle_speed) {
-                    if (phys->speed < 0.5f) {
+                    if (phys->speed < 0.25f) {
                         enemy->desired_angle = mod(enemy->desired_angle + M_PI, 2.0f * M_PI);
                     } else {
                         enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);

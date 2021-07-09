@@ -782,6 +782,7 @@ JointComponent* JointComponent_add(ComponentData* components, int entity, int pa
     joint->min_length = min_length;
     joint->max_length = max_length;
     joint->strength = strength;
+    joint->max_angle = M_PI;
 
     components->joint[entity] = joint;
     return joint;

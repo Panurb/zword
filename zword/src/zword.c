@@ -129,7 +129,7 @@ int main() {
                 update_waypoints(components, grid, camera);
                 update_doors(components, grid);
 
-                update_players(components, grid, time_step);
+                update_players(components, grid);
                 update_weapons(components, time_step);
                 update_enemies(components, grid, time_step);
                 update_energy(components, grid);
@@ -158,7 +158,7 @@ int main() {
         draw_outlines(components, window, camera);
         draw_hud(components, window, camera);
 
-        draw_colliders(components, window, camera);
+        // draw_colliders(components, window, camera);
         // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);

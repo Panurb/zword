@@ -30,13 +30,14 @@ void create_car(ComponentData* components, sfVector2f pos) {
     add_child(components, i, j);
 
     j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) { 1.3f, 1.0 }, 0.0);
+    CoordinateComponent_add(components, j, (sfVector2f) { 1.3f, 1.0f }, 0.0f);
     LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(components, i, j);
 
     j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) { 1.3f, -1.0 }, 0.0)->parent = i;
+    CoordinateComponent_add(components, j, (sfVector2f) { 1.3f, -1.0f }, 0.0f);
     LightComponent_add(components, j, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    add_child(components, i, j);
 }
 
 
@@ -112,7 +113,7 @@ void exit_vehicle(ComponentData* components, int i) {
 }
 
 
-void drive_vehicle(ComponentData* components, int p, float gas, float steering, float time_step) {
+void drive_vehicle(ComponentData* components, int p, float gas, float steering) {
     PlayerComponent* player = PlayerComponent_get(components, p);
     int i = player->vehicle;
 

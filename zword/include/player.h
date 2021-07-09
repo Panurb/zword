@@ -13,6 +13,6 @@ int get_slot(ComponentData* components, int i, int size);
 
 int get_attachment(ComponentData* components, int i);
 
-void update_players(ComponentData* components, ColliderGrid* grid, float time_step);
+void update_players(ComponentData* components, ColliderGrid* grid);
 
 void draw_players(ComponentData* components, sfRenderWindow* window, int camera);

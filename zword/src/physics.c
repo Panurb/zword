@@ -23,10 +23,10 @@ void apply_force(ComponentData* components, int entity, sfVector2f force) {
 
 void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        PhysicsComponent* physics = components->physics[i];
+        PhysicsComponent* physics = PhysicsComponent_get(components, i);
         if (!physics) continue;
 
-        CoordinateComponent* coord = components->coordinate[i];
+        CoordinateComponent* coord = CoordinateComponent_get(components, i);
         if (coord->parent != -1) continue;
 
         JointComponent* joint = JointComponent_get(components, i);
@@ -43,14 +43,6 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
 
-        if (ColliderComponent_get(components, i) && non_zero(delta_pos)) {
-            clear_grid(components, grid, i);
-            coord->position = sum(coord->position, delta_pos);
-            update_grid(components, grid, i);
-        } else {
-            coord->position = sum(coord->position, delta_pos);
-        }
-
         sfVector2f v_hat = normalized(physics->velocity);
         sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
         sfVector2f v_sideways = diff(v_hat, v_forward);
@@ -59,22 +51,38 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
         if (joint) {
             sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
             float d = norm(r);
+
             if (d > joint->max_length) {
                 sfVector2f f = mult(d - joint->max_length, normalized(r));
                 if (joint->strength == INFINITY) {
-                    coord->position = sum(coord->position, f);
+                    delta_pos = sum(delta_pos, f);
                 } else {
                     a = sum(a, mult(joint->strength / physics->mass, f));
                 }
             } else if (d < joint->min_length) {
                 sfVector2f f = mult(d - joint->min_length, normalized(r));
                 if (joint->strength == INFINITY) {
-                    coord->position = sum(coord->position, f);
+                    delta_pos = sum(delta_pos, f);
                 } else {
                     a = sum(a, mult(joint->strength / physics->mass, f));
                 }
             }
+
             coord->angle = polar_angle(r);
+
+            float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(components, joint->parent)));
+            if (fabsf(angle) > joint->max_angle) {
+                r = polar_to_cartesian(d, get_angle(components, joint->parent) - sign(angle) * joint->max_angle);
+                delta_pos = sum(delta_pos, diff(diff(get_position(components, joint->parent), r), coord->position));
+            }
+        }
+
+        if (ColliderComponent_get(components, i) && non_zero(delta_pos)) {
+            clear_grid(components, grid, i);
+            coord->position = sum(coord->position, delta_pos);
+            update_grid(components, grid, i);
+        } else {
+            coord->position = sum(coord->position, delta_pos);
         }
 
         physics->acceleration = sum(physics->acceleration, a);
