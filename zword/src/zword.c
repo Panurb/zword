@@ -127,7 +127,7 @@ int main() {
                 update(components, time_step, grid);
                 collide(components, grid);
                 update_waypoints(components, grid, camera);
-                update_doors(components, grid);
+                update_doors(components);
 
                 update_players(components, grid);
                 update_weapons(components, time_step);

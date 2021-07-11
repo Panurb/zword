@@ -6,7 +6,7 @@
 
 typedef struct {
     sfVector2f position;
-    int object;
+    int entity;
     sfVector2f normal;
 } HitInfo;
 

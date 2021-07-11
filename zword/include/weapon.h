@@ -24,6 +24,8 @@ int create_assault_rifle(ComponentData* components, sfVector2f position);
 
 int create_axe(ComponentData* component, sfVector2f position);
 
+int create_rope_gun(ComponentData* components, sfVector2f position);
+
 int create_lasersight(ComponentData* component, sfVector2f pos);
 
 int create_ammo(ComponentData* components, sfVector2f position, AmmoType type);

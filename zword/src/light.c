@@ -39,7 +39,7 @@ void update_lights(ComponentData* components, float delta_time) {
 
 
 void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, int entity, HitInfo info, sfVector2f velocity) {
-    ImageComponent* image = ImageComponent_get(components, info.object);
+    ImageComponent* image = ImageComponent_get(components, info.entity);
     if (!image) return;
 
     LightComponent* light = components->light[entity];
@@ -118,7 +118,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                 color.a = 0;
                 for (int j = 0; j < 5; j++) {
                     sfVector2f corner = corners[j % 4];
-                    sfVector2f end = sum(corner, polar_to_cartesian(fminf(0.1f * radius, 1.0f), get_angle(components, i) + (0.25f - j * 0.5f) * M_PI));
+                    sfVector2f end = sum(corner, polar_to_cartesian(fminf(0.5f * radius, 1.0f), get_angle(components, i) + (0.25f - j * 0.5f) * M_PI));
 
                     v = sfVertexArray_getVertex(collider->verts, j + 1);
                     v->position = world_to_texture(components, camera, end);

@@ -82,7 +82,7 @@ void create_priest(ComponentData* components, sfVector2f pos) {
     enemy->vision_range = 15.0f;
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 200, "farmer_dead", "blood", "");
+    HealthComponent_add(components, i, 200, "priest_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
     LightComponent_add(components, i, 2.0f, 2.0f * M_PI, get_color(0.5f, 1.0f, 0.0f, 1.0f), 0.5f, 1.0f)->flicker = 0.25f;
 
@@ -138,7 +138,7 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
         float d = norm(r);
         if (d < min_dist && angle < 0.5f * enemy->fov) {
             HitInfo info = raycast(components, grid, get_position(components, entity), r, enemy->vision_range, GROUP_BULLETS);
-            if (info.object == j) {
+            if (info.entity == j) {
                 enemy->target = j;
                 enemy->state = ENEMY_CHASE;
                 min_dist = d;
@@ -173,12 +173,12 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
             case ENEMY_IDLE: {
                 sfVector2f r = polar_to_cartesian(1.0f, enemy->desired_angle);
                 HitInfo info = raycast(components, grid, get_position(components, i), r, 2.0f, GROUP_ENEMIES);
-                if (info.object != -1) {
+                if (info.entity != -1) {
                     enemy->desired_angle = mod(enemy->desired_angle - 0.1f * sign(signed_angle(info.normal, r)), 2.0f * M_PI);
                 }
 
                 if (phys->speed < enemy->idle_speed) {
-                    if (phys->speed < 0.25f) {
+                    if (phys->speed < 0.5f) {
                         enemy->desired_angle = mod(enemy->desired_angle + M_PI, 2.0f * M_PI);
                     } else {
                         enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);
@@ -211,7 +211,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 sfVector2f v = r;
 
                 HitInfo info = raycast(components, grid, pos, r, d, GROUP_BULLETS);
-                if (info.object != enemy->target) {
+                if (info.entity != enemy->target) {
                     a_star(components, i, enemy->target, enemy->path);
                     if (enemy->path->size > 1) {
                         v = diff(get_position(components, enemy->path->head->next->value), pos);
@@ -227,7 +227,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
                 r = polar_to_cartesian(1.0f, get_angle(components, i));
                 info = raycast(components, grid, pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
-                if (info.object == enemy->target) {
+                if (info.entity == enemy->target) {
                     enemy->attack_timer = enemy->attack_delay;
                     enemy->state = ENEMY_ATTACK;
                 } else {

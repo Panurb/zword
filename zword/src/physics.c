@@ -21,7 +21,7 @@ void apply_force(ComponentData* components, int entity, sfVector2f force) {
 }
 
 
-void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
+void update(ComponentData* components, float time_step, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
         PhysicsComponent* physics = PhysicsComponent_get(components, i);
         if (!physics) continue;
@@ -41,33 +41,25 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
             blunt_damage(components, grid, i, v_n);
         }
 
-        sfVector2f delta_pos = sum(physics->collision.overlap, mult(delta_time, physics->velocity));
+        sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
 
         sfVector2f v_hat = normalized(physics->velocity);
         sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
         sfVector2f v_sideways = diff(v_hat, v_forward);
         sfVector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
 
-        if (joint) {
+        if (joint && joint->parent != -1) {
             sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
             float d = norm(r);
 
+            sfVector2f f = zeros();
             if (d > joint->max_length) {
-                sfVector2f f = mult(d - joint->max_length, normalized(r));
-                if (joint->strength == INFINITY) {
-                    delta_pos = sum(delta_pos, f);
-                } else {
-                    a = sum(a, mult(joint->strength / physics->mass, f));
-                }
+                f = mult(d - joint->max_length, normalized(r));
             } else if (d < joint->min_length) {
-                sfVector2f f = mult(d - joint->min_length, normalized(r));
-                if (joint->strength == INFINITY) {
-                    delta_pos = sum(delta_pos, f);
-                } else {
-                    a = sum(a, mult(joint->strength / physics->mass, f));
-                }
+                f = mult(d - joint->min_length, normalized(r));
             }
-
+            delta_pos = sum(delta_pos, mult(joint->strength, f));
+            
             coord->angle = polar_angle(r);
 
             float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(components, joint->parent)));
@@ -86,7 +78,7 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
         }
 
         physics->acceleration = sum(physics->acceleration, a);
-        physics->velocity = sum(physics->velocity, mult(delta_time, physics->acceleration));
+        physics->velocity = sum(physics->velocity, mult(time_step, physics->acceleration));
         physics->acceleration = zeros();
         
         physics->speed = norm(physics->velocity);
@@ -98,12 +90,12 @@ void update(ComponentData* components, float delta_time, ColliderGrid* grid) {
             physics->speed = physics->max_speed;
         }
 
-        if (!joint) {
-            coord->angle = mod(coord->angle + delta_time * physics->angular_velocity, 2.0f * M_PI);
+        if (!joint || joint->parent == -1) {
+            coord->angle = mod(coord->angle + time_step * physics->angular_velocity, 2.0f * M_PI);
         }
 
         physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
-        physics->angular_velocity += delta_time * physics->angular_acceleration;
+        physics->angular_velocity += time_step * physics->angular_acceleration;
         physics->angular_acceleration = 0.0f;
 
         float angular_speed = fabs(physics->angular_velocity);

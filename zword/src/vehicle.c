@@ -15,13 +15,13 @@ void create_car(ComponentData* components, sfVector2f pos) {
     ColliderComponent_add_circle(components, i, 1.0f, GROUP_VEHICLES);
     PhysicsComponent_add(components, i, 10.0f);
     VehicleComponent* vehicle = VehicleComponent_add(components, i, 100.0f);
-    SoundComponent_add(components, i, "metal");
+    SoundComponent_add(components, i, "metal_hit");
 
     int j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) {-3.0f, 0.0f }, 0.0f);
     ColliderComponent_add_circle(components, j, 1.0f, GROUP_VEHICLES);
     PhysicsComponent_add(components, j, 10.0f);
-    JointComponent_add(components, j, i, 3.0f, 3.0f, INFINITY);
+    JointComponent_add(components, j, i, 3.0f, 3.0f, 1.0f);
     vehicle->rear = j;
 
     j = create_entity(components);
@@ -108,7 +108,9 @@ void exit_vehicle(ComponentData* components, int i) {
     vehicle->riders[k] = -1;
     components->collider[i]->enabled = true;
 
-    stop_loop(components, j);
+    if (k == 0) {
+        stop_loop(components, j);
+    }
     add_sound(components, j, "car_door", 0.75, 1.0);
 }
 

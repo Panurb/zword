@@ -77,7 +77,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
     velocity = mult(1.0f / v, velocity);
 
     HitInfo info;
-    info.object = -1;
+    info.entity = -1;
     info.normal = perp(velocity);
 
     if (v == 0.0f) {
@@ -112,7 +112,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
             Hit hit = ray_intersection(components, j, start, velocity, range);
             if (hit.time < t_min) {
                 t_min = hit.time;
-                info.object = j;
+                info.entity = j;
                 info.normal = hit.normal;
                 range = t_min;
             }

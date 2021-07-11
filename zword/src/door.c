@@ -19,17 +19,15 @@ void create_door(ComponentData* components, sfVector2f pos, float angle) {
     PhysicsComponent_add(components, i, 1.0f);
     int j = create_entity(components);
     CoordinateComponent_add(components, j, sum(pos, polar_to_cartesian(1.0f, angle + M_PI)), angle + M_PI);
-    JointComponent_add(components, i, j, 1.0f, 1.0f, INFINITY)->max_angle = 0.5f * M_PI;
+    JointComponent_add(components, i, j, 1.0f, 1.0f, 1.0f)->max_angle = 0.5f * M_PI;
 }
 
 
-void update_doors(ComponentData* components, ColliderGrid* grid) {
-    return;
+void update_doors(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         DoorComponent* door = DoorComponent_get(components, i);
         if (!door) continue;
 
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
         ColliderComponent* col = ColliderComponent_get(components, i);
         PhysicsComponent* phys = PhysicsComponent_get(components, i);
 

@@ -233,7 +233,8 @@ typedef enum {
     AMMO_PISTOL,
     AMMO_RIFLE,
     AMMO_SHOTGUN,
-    AMMO_ENERGY
+    AMMO_ENERGY,
+    AMMO_ROPE
 } AmmoType;
 
 typedef struct {
