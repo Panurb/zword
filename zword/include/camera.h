@@ -34,3 +34,5 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
 void update_camera(ComponentData* components, int camera, float time_step);
 
 bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height);
+
+void shake_camera(ComponentData* components, float speed);

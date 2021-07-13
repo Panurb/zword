@@ -224,6 +224,17 @@ void create_bed(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
+void create_lamp(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ImageComponent_add(components, i, "lamp", 1.0f, 1.0f, LAYER_ITEMS);
+    ParticleComponent_add_splinter(components, i);
+    SoundComponent_add(components, i, "wood_hit");
+    LightComponent_add(components, i, 10.0f, 2.0f * M_PI, sfWhite, 0.5f, 5.0f)->flicker = 0.1f;
+}
+
+
 void create_decal(ComponentData* components, sfVector2f pos, float width, float height, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
@@ -394,12 +405,14 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(0.0f, w, 1.75f, h)), angle, 8.0f, 0.5f, "wood_tile");
     create_wall(components, sum(pos, lin_comb(6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
     create_bed(components, sum(pos, lin_comb(-0.5f, w, 5.0f, h)), angle + 1.5f * M_PI);
+    create_lamp(components, sum(pos, lin_comb(6.5f, w, 6.5f, h)));
 
     // Living room
     create_wall(components, sum(pos, lin_comb(0.0f, w, -1.75f, h)), angle, 4.0f, 0.5f, "wood_tile");
     create_wall(components, sum(pos, lin_comb(-5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
-    create_bench(components, sum(pos, lin_comb(-3.5f, w, -5.5f, h)), angle + M_PI);
+    create_bench(components, sum(pos, lin_comb(-3.0f, w, -5.5f, h)), angle + M_PI);
     create_table(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
+    create_lamp(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
 
     // Kitchen
     create_wall(components, sum(pos, lin_comb(5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
@@ -438,6 +451,8 @@ void create_outhouse(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, lin_comb(2.5f, w, -2.5f, h)));
     create_waypoint(components, sum(pos, lin_comb(-2.5f, w, 2.5f, h)));
     create_waypoint(components, sum(pos, lin_comb(-2.5f, w, -2.5f, h)));
+
+    create_door(components, sum(pos, mult(1.25f, w)), angle + 0.5f * M_PI);
 
     create_item(components, pos, 0);
 }
@@ -700,9 +715,9 @@ void test(ComponentData* components, ColliderGrid* grid) {
     sfVector2f start = zeros();
     // create_car(components, start);
     // create_church(components, zeros());
-    // create_toilet(components, zeros());
+    create_outhouse(components, zeros());
     // create_church(components, zeros());
-    create_house(components, zeros());
+    // create_house(components, zeros());
     // create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
     // create_priest(components, zeros());
     // create_car(components, zeros());
@@ -713,14 +728,12 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 1);
 
-    // for (int i = 0; i < 2; i++) {
-    //     create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
-    //     create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
-    //     create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
-    //     create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
-    //     create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
-    //     create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
-    //     create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
-    //     create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
-    // }
+    create_axe(components, sum(start, (sfVector2f) { 5.0, -5.0 }));
+    create_pistol(components, sum(start, (sfVector2f) { 7.0, -6.0 }));
+    create_shotgun(components, sum(start, (sfVector2f) { 7.0, -5.0 }));
+    create_assault_rifle(components, sum(start, (sfVector2f) { 6.0, -5.0 }));
+    create_flashlight(components, sum(start, (sfVector2f) { 5.0, -6.0 }));
+    create_ammo(components, sum(start, (sfVector2f) { 4.0, -8.0 }), AMMO_PISTOL);
+    create_ammo(components, sum(start, (sfVector2f) { 5.0, -8.0 }), AMMO_RIFLE);
+    create_ammo(components, sum(start, (sfVector2f) { 6.0, -8.0 }), AMMO_SHOTGUN);
 }

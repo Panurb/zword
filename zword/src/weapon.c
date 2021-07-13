@@ -171,6 +171,9 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                         dmg = 100;
                     }
                     damage(components, grid, min_info.entity, min_info.position, normalized(diff(min_info.position, pos)), dmg);
+                    if (min_info.entity != -1) {
+                        shake_camera(components, 0.025f * weapon->damage);
+                    }
                     break;
                 } case AMMO_ENERGY: {
                     for (int i = 0; i < weapon->shots; i++) {
@@ -229,12 +232,14 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     if (light) {
                         light->brightness = light->max_brightness;
                     }
+
+                    shake_camera(components, 0.05f * weapon->shots * weapon->damage);
                 }
             }
 
             SoundComponent* sound = SoundComponent_get(components, entity);
             if (sound) {
-                add_sound(components, entity, weapon->sound, 1.0, 1.0);
+                add_sound(components, entity, weapon->sound, 1.0f, 1.0f);
             }
         }
     }

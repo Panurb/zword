@@ -42,6 +42,7 @@ static const char* IMAGES[] = {
     "gas",
     "grass_tile",
     "hay_bale",
+    "lamp",
     "outhouse",
     "pistol",
     "player",
@@ -109,6 +110,10 @@ void set_texture(ImageComponent* image, TextureArray textures) {
         if (image->width != 0.0f && image->height != 0.0f) {
             sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
             sfSprite_setTextureRect(image->sprite, rect);
+        } else {
+            sfFloatRect bounds = sfSprite_getLocalBounds(image->sprite);
+            image->width = bounds.width / PIXELS_PER_UNIT;
+            image->height = bounds.height / PIXELS_PER_UNIT;
         }
     }
 }
@@ -122,19 +127,20 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
 
         if (image->layer > LAYER_DECALS) break;
 
-        sfVector2f pos = get_position(components, i);
+        if (image->texture_changed) {
+            set_texture(image, textures);
+            image->texture_changed = false;
+        }
 
-        float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
+        sfVector2f pos = get_position(components, i);
+        float w = image->scale.x * image->width;
+        float h = image->scale.y * image->height;
+        float r = sqrtf(w * w + h * h);
         if (!on_screen(components, camera, pos, r, r)) {
             continue;
         }
 
         draw_road(components, window, camera, textures, i);
-
-        if (image->texture_changed) {
-            set_texture(image, textures);
-            image->texture_changed = false;
-        }
 
         if (image->alpha > 0.0f) {
             sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
@@ -153,20 +159,22 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
         if (image->layer <= LAYER_DECALS) continue;
         if (image->layer == LAYER_ROOFS) break;
 
-        sfVector2f pos = get_position(components, i);
 
-        float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
-        if (!on_screen(components, camera, pos, r, r)) {
-            continue;
-        }
-        
         if (image->texture_changed) {
             set_texture(image, textures);
             image->texture_changed = false;
         }
 
+        sfVector2f pos = get_position(components, i);
+        float w = image->scale.x * image->width;
+        float h = image->scale.y * image->height;
+        float r = sqrtf(w * w + h * h);
+        if (!on_screen(components, camera, pos, r, r)) {
+            continue;
+        }
+
         if (image->alpha > 0.0f) {
-            sfSprite_setColor(image->sprite, get_color(1.0, 1.0, 1.0, image->alpha));
+            sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
             draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
         }
     }

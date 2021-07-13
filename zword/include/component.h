@@ -286,6 +286,10 @@ typedef struct {
     Matrix2f matrix;
     Matrix2f inv_matrix;
     sfView* view;
+    struct {
+        sfVector2f position;
+        sfVector2f velocity;
+    } shake;
 } CameraComponent;
 
 typedef struct {

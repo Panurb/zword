@@ -605,6 +605,9 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
     camera->matrix = (Matrix2f) { 0.0f, 0.0f, 0.0f, 0.0f };
     camera->inv_matrix = (Matrix2f) { 0.0f, 0.0f, 0.0f, 0.0f };
 
+    camera->shake.position = zeros();
+    camera->shake.velocity = rand_vector();
+
     components->camera[entity] = camera;
     return camera;
 }

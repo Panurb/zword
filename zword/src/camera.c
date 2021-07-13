@@ -27,8 +27,8 @@ int create_camera(ComponentData* components, sfVideoMode mode) {
 
 
 sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) {
-    sfVector2f pos = get_position(components, camera);
     CameraComponent* cam = CameraComponent_get(components, camera);
+    sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
     b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
@@ -37,8 +37,8 @@ sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) 
 
 
 sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) {
-    sfVector2f pos = get_position(components, camera);
     CameraComponent* cam = CameraComponent_get(components, camera);
+    sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + pos.x;
     b.y = (0.5 * cam->resolution.y - a.y) / cam->zoom + pos.y;
@@ -47,8 +47,8 @@ sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) 
 
 
 sfVector2f world_to_texture(ComponentData* components, int camera, sfVector2f a) {
-    sfVector2f pos = get_position(components, camera);
     CameraComponent* cam = CameraComponent_get(components, camera);
+    sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
     b.y = (a.y - pos.y) * cam->zoom + 0.5 * cam->resolution.y;
@@ -311,6 +311,9 @@ void update_camera(ComponentData* components, int camera, float time_step) {
         coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
         cam->zoom += 10.0 * time_step * (25.0 * cam->resolution.y / 720.0 - cam->zoom);
     }
+
+    cam->shake.velocity = diff(cam->shake.velocity, lin_comb(5.0f, cam->shake.position, 0.1f, cam->shake.velocity));
+    cam->shake.position = sum(cam->shake.position, mult(time_step, cam->shake.velocity));
 }
 
 
@@ -324,4 +327,14 @@ bool on_screen(ComponentData* components, int camera, sfVector2f position, float
         }
     }
     return false;
+}
+
+
+void shake_camera(ComponentData* components, float speed) {
+    for (int i = 0; i < components->entities; i++) {
+        CameraComponent* cam = CameraComponent_get(components, i);
+        if (cam) {
+            cam->shake.velocity = sum(cam->shake.velocity, mult(speed, rand_vector()));
+        }
+    }
 }

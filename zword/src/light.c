@@ -74,7 +74,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
 
         sfVector2f start = get_position(components, i);
 
-        float radius = collider->radius;
+        float radius = 1.5f * collider->radius;
         if (!on_screen(components, camera, start, 2.0f * radius, 2.0f * radius)) {
             continue;
         }
@@ -89,7 +89,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                 color.a = 255 * brightness;
                 v->color = color;
 
-                sfVector2f velocity = polar_to_cartesian(1.5f * radius, 0.0f);
+                sfVector2f velocity = polar_to_cartesian(radius, 0.0f);
 
                 float delta_angle = 2.0f * M_PI / (collider->verts_size - 2);
                 Matrix2f rot = rotation_matrix(delta_angle);

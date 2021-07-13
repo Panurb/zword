@@ -175,14 +175,13 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 HitInfo info = raycast(components, grid, get_position(components, i), r, 2.0f, GROUP_ENEMIES);
                 if (info.entity != -1) {
                     enemy->desired_angle = mod(enemy->desired_angle - 0.1f * sign(signed_angle(info.normal, r)), 2.0f * M_PI);
+                    if (phys->speed < 0.5f) {
+                        enemy->desired_angle = mod(enemy->desired_angle + M_PI, 2.0f * M_PI);
+                    }
                 }
 
                 if (phys->speed < enemy->idle_speed) {
-                    if (phys->speed < 0.5f) {
-                        enemy->desired_angle = mod(enemy->desired_angle + M_PI, 2.0f * M_PI);
-                    } else {
-                        enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);
-                    }
+                    enemy->desired_angle = mod(enemy->desired_angle + randf(-0.05f, 0.05f), 2.0f * M_PI);
                     sfVector2f a = polar_to_cartesian(enemy->acceleration, coord->angle);
                     phys->acceleration = sum(phys->acceleration, a);
                 }
