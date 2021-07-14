@@ -158,7 +158,7 @@ int main() {
         draw_outlines(components, window, camera);
         draw_hud(components, window, camera);
 
-        // draw_colliders(components, window, camera);
+        draw_colliders(components, window, camera);
         // draw_waypoints(components, window, camera);
         // draw_enemies(components, window, camera);
         // draw_grid(grid, window, camera);
@@ -167,7 +167,7 @@ int main() {
 
         sfRenderWindow_display(window);
 
-        play_sounds(components, camera, sounds, channels);
+        // play_sounds(components, camera, sounds, channels);
     }
 
     sfRenderWindow_destroy(window);
