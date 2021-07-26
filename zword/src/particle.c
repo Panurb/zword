@@ -15,7 +15,7 @@ sfColor color_lerp(sfColor s, sfColor e, float t) {
 
 
 void ParticleComponent_add_bullet(ComponentData* components, int entity, float size) {
-    ParticleComponent_add(components, entity, 0.0f, 0.0f, size, size, 100.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite)->speed_spread = 0.0f;
+    ParticleComponent_add(components, entity, 0.0f, 0.0f, size, size, 200.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite)->speed_spread = 0.0f;
 }
 
 
@@ -90,7 +90,7 @@ void update_particles(ComponentData* components, int camera, float delta_time) {
         ParticleComponent* part = ParticleComponent_get(components, i);
         if (!part) continue;
 
-        float w = 2.5f * part->max_time * part->speed;
+        float w = 3.0f * part->max_time * part->speed;
         if (!on_screen(components, camera, get_position(components, i), w, w)) {
             continue;
         }
@@ -130,7 +130,7 @@ void draw_particles(ComponentData* components, sfRenderWindow* window, int camer
         float r = lerp(part->start_size, part->end_size, t);
         float angle = polar_angle(part->velocity[i]);
 
-        draw_ellipse(window, components, camera, part->shape, part->position[i], fmaxf(1.0f, 0.1f * norm(part->velocity[i])) * r, r, angle, color);
+        draw_ellipse(window, components, camera, part->shape, part->position[i], fmaxf(1.0f, 0.06f * norm(part->velocity[i])) * r, r, angle, color);
     }
 
     for (int i = part->particles - 1; i >= 0; i--) {

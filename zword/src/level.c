@@ -614,7 +614,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     for (int i = 0; i < LEVEL_WIDTH; i++) {
         for (int j = 0; j < LEVEL_HEIGHT; j++) {
-            sfVector2f pos = { CHUNK_WIDTH * i - 0.5f * LEVEL_WIDTH * CHUNK_WIDTH, CHUNK_HEIGHT * j - 0.5f * LEVEL_HEIGHT * CHUNK_HEIGHT };
+            sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
             create_ground(components, pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
 
             switch (chunks[i][j]) {
@@ -645,7 +645,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     float f = 0.5f;
     for (int i = 0; i < LEVEL_WIDTH; i++) {
         for (int j = 0; j < LEVEL_HEIGHT; j++) {
-            sfVector2f pos = { CHUNK_WIDTH * i - 0.5f * LEVEL_WIDTH * CHUNK_WIDTH, CHUNK_HEIGHT * j - 0.5f * LEVEL_HEIGHT * CHUNK_HEIGHT };
+            sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
 
             switch (chunks[i][j]) {
                 case 1:
@@ -691,6 +691,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     resize_roads(components);
 
+    create_rope_gun(components, start);
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
     create_axe(components, sum(start, (sfVector2f) { 2.0, -5.0 }));
     // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
@@ -722,7 +723,7 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_priest(components, zeros());
     // create_car(components, zeros());
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
-    // create_rope_gun(components, position);
+    create_rope_gun(components, position);
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
     // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);

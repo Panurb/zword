@@ -416,21 +416,20 @@ void ParticleComponent_remove(ComponentData* components, int entity) {
 
 VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, float max_fuel) {
     VehicleComponent* vehicle = malloc(sizeof(VehicleComponent));
-    vehicle->rear = -1;
     vehicle->on_road = false;
     vehicle->max_fuel = max_fuel;
     vehicle->fuel = max_fuel;
     vehicle->acceleration = 30.0f;
-    vehicle->max_speed = 10.0;
+    vehicle->max_speed = 10.0f;
     vehicle->turning = 0.25f * M_PI;
     vehicle->size = 4;
     for (int i = 0; i < vehicle->size; i++) {
         vehicle->riders[i] = -1;
     }
-    vehicle->seats[0] = (sfVector2f) { -1.5, 0.75 };
-    vehicle->seats[1] = (sfVector2f) { -1.5, -0.75 };
-    vehicle->seats[2] = (sfVector2f) { -3.0, 0.75 };
-    vehicle->seats[3] = (sfVector2f) { -3.0, -0.75 };
+    vehicle->seats[0] = (sfVector2f) { 1.5f, 0.75f };
+    vehicle->seats[1] = (sfVector2f) { 1.5f, -0.75f };
+    vehicle->seats[2] = (sfVector2f) { 0.0f, 0.75f };
+    vehicle->seats[3] = (sfVector2f) { 0.0f, -0.75f };
 
     components->vehicle[entity] = vehicle;
 

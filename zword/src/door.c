@@ -39,7 +39,7 @@ void update_doors(ComponentData* components) {
             col->group = GROUP_DOORS;
 
             if (phys->speed > 0.25f) {
-                loop_sound(components, i, "door", 0.5f, 1.0f);
+                loop_sound(components, i, "door", 0.3f, 1.0f);
             } else {
                 stop_loop(components, i);
             }

@@ -172,7 +172,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                     }
                     damage(components, grid, min_info.entity, min_info.position, normalized(diff(min_info.position, pos)), dmg);
                     if (min_info.entity != -1) {
-                        shake_camera(components, 0.025f * weapon->damage);
+                        shake_camera(components, 0.0125f * weapon->damage);
                     }
                     break;
                 } case AMMO_ENERGY: {
@@ -192,7 +192,11 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
                     int i = create_rope(components, info.position, get_position(components, parent));
 
-                    // int j = rope_root(components, i);
+                    int j = rope_root(components, i);
+                    JointComponent_get(components, j)->parent = info.entity;
+                    // CoordinateComponent* coord = CoordinateComponent_get(components, j);
+                    // coord->parent = j;
+                    // coord->
                     // PhysicsComponent_remove(components, j);
 
                     damage(components, grid, info.entity, info.position, dir, weapon->damage);
@@ -233,7 +237,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                         light->brightness = light->max_brightness;
                     }
 
-                    shake_camera(components, 0.05f * weapon->shots * weapon->damage);
+                    shake_camera(components, 0.025f * weapon->shots * weapon->damage);
                 }
             }
 

@@ -359,3 +359,4 @@ _deps
 CMakeSettings.json
 
 build/
+.VSCodeCounter/

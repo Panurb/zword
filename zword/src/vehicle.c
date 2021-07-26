@@ -12,17 +12,16 @@
 void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, 0.0f);
-    ColliderComponent_add_circle(components, i, 1.0f, GROUP_VEHICLES);
+    ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
     PhysicsComponent_add(components, i, 10.0f);
-    VehicleComponent* vehicle = VehicleComponent_add(components, i, 100.0f);
-    SoundComponent_add(components, i, "metal_hit");
 
     int j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) {-3.0f, 0.0f }, 0.0f);
-    ColliderComponent_add_circle(components, j, 1.0f, GROUP_VEHICLES);
+    ColliderComponent_add_rectangle(components, j, 3.0f, 3.0f, GROUP_VEHICLES);
     PhysicsComponent_add(components, j, 10.0f);
+    SoundComponent_add(components, j, "metal_hit");
+    VehicleComponent_add(components, j, 100.0f);
     JointComponent_add(components, j, i, 3.0f, 3.0f, 1.0f);
-    vehicle->rear = j;
 
     int k = create_entity(components);
     CoordinateComponent_add(components, k, (sfVector2f) {1.5f, 0.0f }, 0.0f);
@@ -30,12 +29,12 @@ void create_car(ComponentData* components, sfVector2f pos) {
     add_child(components, j, k);
 
     k = create_entity(components);
-    CoordinateComponent_add(components, k, (sfVector2f) { 10.3f, 1.0f }, 0.0f);
+    CoordinateComponent_add(components, k, (sfVector2f) { 3.8f, 1.0f }, 0.0f);
     LightComponent_add(components, k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(components, j, k);
 
     k = create_entity(components);
-    CoordinateComponent_add(components, k, (sfVector2f) { 10.3f, -1.0f }, 0.0f);
+    CoordinateComponent_add(components, k, (sfVector2f) { 3.8f, -1.0f }, 0.0f);
     LightComponent_add(components, k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(components, j, k);
 }
@@ -117,18 +116,19 @@ void exit_vehicle(ComponentData* components, int i) {
 
 void drive_vehicle(ComponentData* components, int p, float gas, float steering) {
     PlayerComponent* player = PlayerComponent_get(components, p);
-    int i = player->vehicle;
+    int i = JointComponent_get(components, player->vehicle)->parent;
 
-    VehicleComponent* vehicle = VehicleComponent_get(components, i);
+    VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
 
-    CoordinateComponent* coord = CoordinateComponent_get(components, i);
     PhysicsComponent* phys = PhysicsComponent_get(components, i);
 
-    phys->acceleration = polar_to_cartesian(vehicle->acceleration * gas, coord->angle);
+    float front_angle = get_angle(components, i);
+
+    phys->acceleration = polar_to_cartesian(vehicle->acceleration * gas, front_angle);
 
     float max_speed = (0.5f + 0.5f * vehicle->on_road) * vehicle->max_speed;
 
-    float vn = dot(phys->velocity, polar_to_cartesian(1.0f, coord->angle));
+    float vn = dot(phys->velocity, polar_to_cartesian(1.0f, front_angle));
     if (vn < 0.0f && phys->speed > 0.5f * vehicle->max_speed) {
         max_speed *= 0.5f;
     }
@@ -137,20 +137,21 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering) 
         phys->acceleration = zeros();
     }
 
-    phys->velocity = polar_to_cartesian(vn, coord->angle);
+    phys->velocity = polar_to_cartesian(vn, front_angle);
 
-    float angle = get_angle(components, vehicle->rear);
-    float delta_angle = mod(coord->angle - angle, 2.0f * M_PI);
-    if (delta_angle > M_PI) {
-        delta_angle -= 2.0f * M_PI;
-    }
+    float angle = get_angle(components, player->vehicle);
+    // float delta_angle = mod(front_angle - angle, 2.0f * M_PI);
+    float delta_angle = mod(front_angle - angle + M_PI, 2.0f * M_PI) - M_PI;
+    // if (delta_angle > M_PI) {
+    //     delta_angle -= 2.0f * M_PI;
+    // }
 
     phys->angular_velocity = 4.0f * vehicle->turning * sign(-vehicle->turning * steering - delta_angle);
 
 
-    vehicle->on_road = true;
+    vehicle->on_road = false;
 
-    SoundComponent* scomp = SoundComponent_get(components, i);
+    SoundComponent* scomp = SoundComponent_get(components, player->vehicle);
     for (int j = 0; j < scomp->size; j++) {
         SoundEvent* event = scomp->events[j];
         if (event && event->loop) {
