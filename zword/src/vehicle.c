@@ -11,7 +11,7 @@
 
 void create_car(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, 0.0f);
+    CoordinateComponent_add(components, i, pos, rand_angle());
     ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
     PhysicsComponent_add(components, i, 10.0f);
 

@@ -63,8 +63,9 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, i
 
 void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camera) {
     sfRenderTexture_clear(texture, sfWhite);
-    sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
+    if (CameraComponent_get(components, camera)->zoom < 10.0f) return;
 
+    sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
     for (int i = 0; i < components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(components, i);
         if (!collider) continue;
@@ -136,8 +137,9 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
 
 void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture* texture, int camera, float ambient_light) {
     sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0f));
-    sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
+    if (CameraComponent_get(components, camera)->zoom < 10.0f) return;
 
+    sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
     for (int i = 0; i < components->entities; i++) {
         LightComponent* light = LightComponent_get(components, i);
         if (!light) continue;

@@ -280,6 +280,7 @@ typedef struct {
 typedef struct {
     sfVector2i resolution;
     float zoom;
+    float zoom_target;
     sfShader* shaders[10];
     sfFont* fonts[1];
     Matrix2f matrix;

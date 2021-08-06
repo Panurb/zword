@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #include <SFML/Audio.h>
 #include <SFML/Graphics.h>
@@ -71,13 +72,15 @@ int main() {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
 
-    float ambient_light = 0.5f;
+    float ambient_light = 0.7f;
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);
     // create_level(components, grid, seed);
     test(components, grid);
     init_grid(components, grid);
+
+    CameraComponent* cam = CameraComponent_get(components, camera);
 
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
@@ -108,10 +111,14 @@ int main() {
                         clear_sounds(channels);
 
                         camera = create_camera(components, mode);
+                        cam = CameraComponent_get(components, camera);
                         create_level(components, grid, seed);
                         init_grid(components, grid);
                         sfClock_restart(clock);
                     }
+                    break;
+                case sfEvtMouseWheelScrolled:;
+                    cam->zoom_target = fmaxf(1.0f, cam->zoom_target + event.mouseWheelScroll.delta);
                     break;
                 default:
                     break;

@@ -20,12 +20,18 @@
 #include "weapon.h"
 
 
-void create_zombie(ComponentData* components, sfVector2f pos) {
+void create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+
+    if (collides_with(components, grid, i)) {
+        destroy_entity(components, i);
+        return;
+    }
+
+    ImageComponent_add(components, i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(components, i, 1.0f);
     EnemyComponent* enemy = EnemyComponent_add(components, i);
     ParticleComponent_add_blood(components, i);
@@ -42,12 +48,18 @@ void create_zombie(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_farmer(ComponentData* components, sfVector2f pos) {
+void create_farmer(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, "farmer", 1.0, 1.0, LAYER_ENEMIES);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+
+    if (collides_with(components, grid, i)) {
+        destroy_entity(components, i);
+        return;
+    }
+
+    ImageComponent_add(components, i, "farmer", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(components, i, 1.0f);
     EnemyComponent* enemy = EnemyComponent_add(components, i);
     enemy->walk_speed = 3.0f;
@@ -67,12 +79,18 @@ void create_farmer(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_priest(ComponentData* components, sfVector2f pos) {
+void create_priest(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, "priest", 1.0, 1.0, LAYER_ENEMIES);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+
+    if (collides_with(components, grid, i)) {
+        destroy_entity(components, i);
+        return;
+    }
+
+    ImageComponent_add(components, i, "priest", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(components, i, 1.0f);
     EnemyComponent* enemy = EnemyComponent_add(components, i);
     enemy->idle_speed = 0.0f;
@@ -96,13 +114,19 @@ void create_priest(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_big_boy(ComponentData* components, sfVector2f pos) {
+void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
+    ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
+
+    if (collides_with(components, grid, i)) {
+        destroy_entity(components, i);
+        return;
+    }
+
     ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
     AnimationComponent_add(components, i);
-    ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
     PhysicsComponent* physics = PhysicsComponent_add(components, i, 10.0f);
     physics->drag_sideways = 20.0f;
     EnemyComponent* enemy = EnemyComponent_add(components, i);

@@ -594,7 +594,8 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
     CameraComponent* camera = malloc(sizeof(CameraComponent));
 
     camera->resolution = resolution;
-    camera->zoom = 25.0 * camera->resolution.y / 720.0;
+    camera->zoom_target = 25.0f;
+    camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
 
     camera->shaders[0] = NULL;
     camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "outline.frag");
