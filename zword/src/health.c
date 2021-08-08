@@ -28,11 +28,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
     EnemyComponent* enemy = EnemyComponent_get(components, entity);
     PlayerComponent* player = PlayerComponent_get(components, entity);
 
-    if (enemy) {
-        enemy->state = ENEMY_DEAD;
-        List_clear(enemy->path);
-        LightComponent_remove(components, entity);
-    } else if (player) {
+    if (player) {
         for (int j = 0; j < player->inventory_size; j++) {
             if (player->inventory[j] != -1) {
                 coord->angle = rand_angle();
@@ -54,6 +50,16 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
 
         player->state = PLAYER_DEAD;
     } else {
+        if (enemy) {
+            enemy->state = ENEMY_DEAD;
+            List_clear(enemy->path);
+            LightComponent_remove(components, entity);
+            destroy_entity(components, enemy->weapon);
+            List_remove(coord->children, enemy->weapon);
+            enemy->weapon = -1;
+            // WaypointComponent_remove(components, entity);
+        }
+
         for (ListNode* node = coord->children->head; node; node = node->next) {
             int i = node->value;
             CoordinateComponent* co = CoordinateComponent_get(components, i);
@@ -62,13 +68,20 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             co->position = get_position(components, i);
             co->angle = get_angle(components, i);
 
-            apply_force(components, i, mult(250.0f, normalized(diff(co->position, get_position(components, entity)))));
+            sfVector2f r = normalized(diff(co->position, get_position(components, entity)));
+            if (!non_zero(r)) {
+                r = rand_vector();
+            }
+            apply_force(components, i, mult(250.0f, r));
             PhysicsComponent_get(components, i)->angular_velocity = randf(-5.0f, 5.0f);
+            ColliderComponent_get(components, i)->enabled = true;
         }
         remove_children(components, entity);
 
-        clear_grid(components, grid, entity);
-        ColliderComponent_remove(components, entity);
+        if (!enemy) {
+            clear_grid(components, grid, entity);
+            ColliderComponent_remove(components, entity);
+        }
     }
 
     if (SoundComponent_get(components, entity) && health->die_sound[0] != '\0') {
@@ -84,7 +97,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         health->health = max(0, health->health - dmg);
 
         if (health->decal[0] != '\0') {
-            sfVector2f pos = sum(get_position(components, entity), rand_vector());
+            sfVector2f pos = sum(get_position(components, entity), mult(0.5f, rand_vector()));
             if (dmg < 50) {
                 create_decal(components, pos, 1.0f, 1.0f, "blood");
             } else {

@@ -69,7 +69,8 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             }
         }
 
-        if (ColliderComponent_get(components, i) && non_zero(delta_pos)) {
+        ColliderComponent* col = ColliderComponent_get(components, i);
+        if (col && col->enabled && non_zero(delta_pos)) {
             clear_grid(components, grid, i);
             coord->position = sum(coord->position, delta_pos);
             update_grid(components, grid, i);

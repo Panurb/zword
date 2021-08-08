@@ -104,6 +104,8 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
             if (j == -1) continue;
 
             ColliderComponent* col = ColliderComponent_get(components, j);
+            // FIXME
+            if (!col) continue;
             if (col->last_collision == id) continue;
             if (COLLISION_MATRIX[group][col->group] == 0) continue;
 

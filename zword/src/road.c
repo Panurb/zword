@@ -108,8 +108,8 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 
 
 void create_road(ComponentData* components, sfVector2f start, sfVector2f end) {
-    sfVector2f r = mult(10.0, normalized(diff(end, start)));
-    int current = create_road_curves(components, start, diff(end, r), 2.0, 4.0, "road");
+    sfVector2f r = mult(10.0f, normalized(diff(end, start)));
+    int current = create_road_curves(components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
     create_road_segments(components, current, GROUP_ROADS);
 }
 

@@ -392,7 +392,7 @@ int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
-    ColliderComponent_add_rectangle(components, i, 0.5f, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(components, i, 0.25f, GROUP_ITEMS);
     switch (type) {
         case AMMO_PISTOL:
             ImageComponent_add(components, i, "ammo_pistol", 1.0, 1.0, LAYER_ITEMS);

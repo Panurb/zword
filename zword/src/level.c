@@ -296,8 +296,6 @@ void create_church(ComponentData* components, sfVector2f pos) {
         create_waypoint(components, sum(pos, sum(mult(11.0f, w), mult(11.0f, h))));
         create_waypoint(components, sum(pos, sum(mult(16.0f, w), mult(6.0f, h))));
 
-        create_item(components, sum(pos, sum(mult(5.0f, w), mult(6.5f, h))), 3);
-
         h = mult(-1.0f, h);
     }
 
@@ -305,6 +303,20 @@ void create_church(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, mult(-12.0f, w)));
     create_waypoint(components, sum(pos, mult(2.0f, w)));
     create_waypoint(components, sum(pos, mult(8.0f, w)));
+
+    int items = randi(1, 2);
+    int locations[2] = {0, 1};
+    permute(locations, 2);
+    for (int i = 0; i < items; i++) {
+        switch (locations[i]) {
+            case 0:
+                create_item(components, sum(pos, sum(mult(5.0f, w), mult(6.5f, h))), randi(2, 3));
+                break;
+            case 1:
+                create_item(components, sum(pos, sum(mult(5.0f, w), mult(-6.5f, h))), randi(2, 3));
+                break;
+        }
+    }
 }
 
 
@@ -341,8 +353,6 @@ void create_barn(ComponentData* components, sfVector2f pos) {
         create_light(components, sum(pos, lin_comb(-1.0f, w, 1.0f, h)));
         create_light(components, sum(pos, lin_comb(-4.0f, w, 1.0f, h)));
 
-        create_item(components, sum(pos, lin_comb(4.0f, w, 4.0f, h)), 2);
-
         // Outside
         create_waypoint(components, sum(pos, lin_comb(-13.5f, w, 8.0f, h)));
         create_waypoint(components, sum(pos, lin_comb(0.0f, w, 8.0f, h)));
@@ -355,7 +365,22 @@ void create_barn(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, mult(-13.5f, w)));
     create_waypoint(components, sum(pos, mult(13.5f, w)));
 
-    create_item(components, sum(pos, mult(4.0f, w)), 2);
+    int items = randi(1, 3);
+    int locations[3] = {0, 1, 2};
+    permute(locations, 3);
+    for (int i = 0; i < items; i++) {
+        switch (locations[i]) {
+            case 0:
+                create_item(components, sum(pos, lin_comb(4.0f, w, 4.0f, h)), i);
+                break;
+            case 1:
+                create_item(components, sum(pos, lin_comb(4.0f, w, -4.0f, h)), i);
+                break;
+            case 2:
+                create_item(components, sum(pos, mult(4.0f, w)), i);
+                break;
+        }
+    }
 }
 
 
@@ -392,18 +417,12 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(-1.75f, w, 4.5f, h)), angle + 0.5f * M_PI, 5.0f, 0.5f, "wood_tile");
     create_toilet(components, sum(pos, lin_comb(-6.0f, w, 6.0f, h)), angle + 1.5f * M_PI);
     create_sink(components, sum(pos, lin_comb(-3.5f, w, 6.0f, h)), angle + 1.5f * M_PI);
-    if (randf(0.0f, 1.0f) < 0.5f) {
-        create_item(components, sum(pos, lin_comb(-4.5f, w, 4.0f, h)), 1);
-    }
 
     // Bedroom
     create_wall(components, sum(pos, lin_comb(0.0f, w, 1.75f, h)), angle, 8.0f, 0.5f, "wood_tile");
     create_wall(components, sum(pos, lin_comb(6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
     create_bed(components, sum(pos, lin_comb(-0.5f, w, 5.0f, h)), angle + 1.5f * M_PI);
     create_lamp(components, sum(pos, lin_comb(6.5f, w, 6.5f, h)));
-    if (randf(0.0f, 1.0f) < 0.5f) {
-        create_item(components, sum(pos, lin_comb(3.0f, w, 5.0f, h)), 1);
-    }
 
     // Living room
     create_wall(components, sum(pos, lin_comb(0.0f, w, -1.75f, h)), angle, 4.0f, 0.5f, "wood_tile");
@@ -417,9 +436,6 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(0.0, w, -4.5f, h)), angle + 0.5f * M_PI, 5.0f, 0.5f, "wood_tile");
     create_stove(components, sum(pos, lin_comb(6.0f, w, -6.0f, h)), angle + M_PI);
     create_sink(components, sum(pos, lin_comb(6.0f, w, -3.5f, h)), angle + M_PI);
-    if (randf(0.0f, 1.0f) < 0.5f) {
-        create_item(components, sum(pos, lin_comb(3.0f, w, -4.5f, h)), 1);
-    }
 
     create_waypoint(components, sum(pos, mult(9.0f, w)));
     create_waypoint(components, sum(pos, mult(5.0f, w)));
@@ -430,6 +446,23 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, lin_comb(-3.0f, w, -3.0f, h)));
     create_waypoint(components, sum(pos, mult(-5.0f, w)));
     create_waypoint(components, sum(pos, lin_comb(-5.0f, w, 3.0f, h)));
+
+    int items = randi(1, 3);
+    int locations[3] = {0, 1, 2};
+    permute(locations, 3);
+    for (int i = 0; i < items; i++) {
+        switch (locations[i]) {
+            case 0:
+                create_item(components, sum(pos, lin_comb(-4.5f, w, 4.0f, h)), i);
+                break;
+            case 1:
+                create_item(components, sum(pos, lin_comb(3.0f, w, 5.0f, h)), i);
+                break;
+            case 2:
+                create_item(components, sum(pos, lin_comb(3.0f, w, -4.5f, h)), i);
+                break;
+        }
+    }
 }
 
 
@@ -469,7 +502,7 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
     ImageComponent* image = ImageComponent_add(components, i, "", 16.0, 16.0, LAYER_GROUND);
     image->scale = (sfVector2f) { 8.0, 8.0 };
     image->texture_changed = false;
-    image->alpha = 0.3f;
+    image->alpha = 1.0f;
     sfSprite_setTexture(image->sprite, noise_texture, false);
 }
 
@@ -629,7 +662,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     sfTexture* noise_texture = sfTexture_create(w, h);
 
     sfUint8* pixels = malloc(sizeof(sfUint8) * w * h * 4);
-    create_noise(pixels, w, h, zeros(), get_color(0.0, 0.0, 0.0, 1.0), perm);
+    create_noise(pixels, w, h, zeros(), get_color(0.0f, 0.0f, 0.0f, 0.3f), 0.0f, perm);
     sfTexture_updateFromPixels(noise_texture, pixels, w, h, 0, 0);
     sfTexture_setRepeated(noise_texture, true);
     free(pixels);
@@ -661,7 +694,6 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
             create_beach(components, pos, 0.5f * CHUNK_WIDTH, angle);
             pos = sum(pos, r);
         }
-        // pos = diff(pos, mult(0.5f, r));
         create_beach_corner(components, pos, angle + 0.5f * M_PI);
         angle += 0.5f * M_PI;
         r = rotate(r, 0.5f * M_PI);
@@ -672,35 +704,42 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     create_house(components, start);
 
     angle = rand_angle();
-    int n = 5;
-    int buildings[5] = {1, 2, 2, 2, 3};
+    int n = randi(5, 7);
+    int buildings[7] = {1, 2, 2, 2, 3, 1, 3};
     permute(buildings, n);
-    sfVector2f prev_pos = zeros();
     float rad = 0.5f * (LEVEL_WIDTH - 3) * CHUNK_WIDTH;
 
-    for (int i = 0; i < n; i++) {
-        sfVector2f pos = polar_to_cartesian(randf(0.75f, 1.0f) * rad, angle);
-        switch (buildings[i]) {
-            case 1:
-                create_church(components, pos);
-                break;
-            case 2:
-                create_house(components, pos);
-                break;
-            case 3:
-                create_barn(components, pos);
-                break;
-        }
+    sfVector2f prev_pos = zeros();
+    int i = 0;
+    while (i < n) {
+        int m = randi(1, n - i);
+        int k = randi(0, m - 1);
+        for (int j = 0; j < m; j++) {
+            pos = polar_to_cartesian(randf(0.75f, 1.0f) * rad, angle + i * 2.0f * M_PI / n);
 
-        if (rand() % 2 == 0) {
-            create_road(components, start, pos);
-        } else {
-            create_road(components, pos, prev_pos);
+            switch (buildings[i]) {
+                case 1:
+                    create_church(components, pos);
+                    break;
+                case 2:
+                    create_house(components, pos);
+                    break;
+                case 3:
+                    create_barn(components, pos);
+                    break;
+            }
+
+            if (non_zero(prev_pos)) {
+                create_road(components, pos, prev_pos);
+            }
+            if (j == k) {
+                create_road(components, pos, start);
+            }
+            prev_pos = pos;
+            i++;
         }
-        angle += 2.0f * M_PI / n;
-        prev_pos = pos;
+        prev_pos = zeros();
     }
-
 
     create_car(components, sum(start, mult(20.0f, rand_vector())));
 
@@ -737,7 +776,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     resize_roads(components);
 
-    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
+    create_player(components, start, -1);
     // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }
@@ -767,6 +806,7 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_priest(components, zeros());
     // create_car(components, zeros());
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
+    create_zombie(components, grid, zeros());
     create_rope_gun(components, position);
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);

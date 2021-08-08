@@ -45,6 +45,11 @@ void create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos
     WeaponComponent_add(components, j, 0.5f, 25, 7, 0.35f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
     add_child(components, i, j);
     enemy->weapon = j;
+
+    j = create_ammo(components, zeros(), 1);
+    ImageComponent_get(components, j)->alpha = 0.0f;
+    ColliderComponent_get(components, j)->enabled = false;
+    add_child(components, i, j);
 }
 
 
@@ -73,6 +78,7 @@ void create_farmer(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
     sfVector2f r = { 0.75f, 0.0f };
     int j = create_rifle(components, r);
+    ColliderComponent_remove(components, j);
     CoordinateComponent_get(components, j)->angle = 0.0f;
     add_child(components, i, j);
     enemy->weapon = j;

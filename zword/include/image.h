@@ -34,6 +34,6 @@ void change_texture(ComponentData* components, int entity, Filename filename, fl
 
 void change_layer(ComponentData* components, int entity, Layer layer);
 
-void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);
+void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, float sharpness, Permutation p);
 
 void create_noise_tileable(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);

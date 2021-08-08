@@ -34,21 +34,23 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
         return;
     }
 
+    clear_grid(components, grid, player->target);
+    
+    CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
+    ImageComponent* image = ImageComponent_get(components, player->target);
     AmmoComponent* ammo = AmmoComponent_get(components, player->target);
     if (ammo) {
         int i = player->ammo[ammo->type];
         if (i == -1) {
-            CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
             coord->parent = entity;
             coord->position = zeros();
             coord->angle = 0.0f;
             player->ammo[ammo->type] = player->target;
-            ImageComponent_get(components, player->target)->alpha = 0.0f;
-            ImageComponent_get(components, player->target)->outline = 0.0f;
+            image->alpha = 0.0f;
+            image->outline = 0.0f;
             ColliderComponent_get(components, player->target)->enabled = false;
         } else {
             AmmoComponent_get(components, i)->size += ammo->size;
-            clear_grid(components, grid, player->target);
             destroy_entity(components, player->target);
             player->target = -1;
         }
@@ -56,16 +58,14 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
         int i = find(-1, player->inventory, player->inventory_size);
         if (i != -1) {
             player->inventory[i] = player->target;
-            CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
             coord->parent = entity;
             coord->position = (sfVector2f) { 0.75, 0.0 };
             coord->angle = 0.0f;
             ColliderComponent_get(components, player->target)->enabled = false;
             change_layer(components, player->target, LAYER_WEAPONS);
-            ImageComponent_get(components, player->target)->outline = 0.0f;
-
+            image->outline = 0.0f;
             if (player->item != i) {
-                ImageComponent_get(components, player->target)->alpha = 0.0;
+                image->alpha = 0.0;
             }
         }
     }

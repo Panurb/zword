@@ -271,14 +271,16 @@ void color_pixel(sfUint8* pixels, int width, int x, int y, sfColor color, float 
 }
 
 
-void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p) {
+void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, float sharpness, Permutation p) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;
             float y = origin.y + 4.0 * (height - j) / (float) PIXELS_PER_UNIT;
             float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
 
-            // a = smoothstep(a, 0.5, 50.0);
+            if (sharpness != 0.0f) {
+                a = smoothstep(a, 0.5f, 100.0f * sharpness);
+            }
 
             color_pixel(pixels, width, i, j, color, a);
         }
