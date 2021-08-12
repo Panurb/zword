@@ -65,6 +65,7 @@ void create_energy(ComponentData* components, sfVector2f position, sfVector2f ve
     phys->velocity = velocity;
     phys->drag = 0.0f;
     phys->drag_sideways = 0.0f;
+    phys->lifetime = 5.0f;
     ColliderComponent_add_circle(components, i, 0.25f, GROUP_ENERGY);
     LightComponent_add(components, i, 8.0f, 2.0f * M_PI, get_color(0.5f, 1.0f, 0.0f, 1.0f), 0.5f, 2.5f)->enabled = false;
     ParticleComponent_add_energy(components, i);
@@ -89,10 +90,10 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
                 light->brightness = 0.5f;
                 add_particles(components, i, 10);
                 clear_grid(components, grid, i);
-                ColliderComponent_remove(components, i);
+                ColliderComponent_get(components, i)->enabled = false;
                 ImageComponent_get(components, i)->alpha = 0.0f;
                 add_sound(components, i, "energy", 0.5f, randf(1.2f, 1.5f));
-                // destroy_entity(components, i);
+                phys->lifetime = 1.0f;
             }
         }
     }

@@ -100,3 +100,5 @@ int binary_search_filename(Filename filename, char** array, int size);
 bool non_zero(sfVector2f v);
 
 float clamp(float val, float min_val, float max_val);
+
+float angle_diff(float a, float b);

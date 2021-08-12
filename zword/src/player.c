@@ -45,6 +45,7 @@ void create_player(ComponentData* components, sfVector2f pos, int joystick) {
         int j = create_ammo(components, zeros(), type);
         player->ammo[type] = j;
         CoordinateComponent_get(components, j)->parent = i;
+        ColliderComponent_remove(components, j);
         ImageComponent_get(components, j)->alpha = 0.0f;
         AmmoComponent_get(components, j)->size = 0;
     }
@@ -179,6 +180,8 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                 }
 
                 break;
+            case PLAYER_ENTER:
+                enter_vehicle(components, grid, i);
             case PLAYER_DRIVE:
                 if (player->controller.joystick == -1) {
                     drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x));

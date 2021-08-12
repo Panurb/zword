@@ -68,6 +68,7 @@ typedef struct {
     float max_speed;
     float angular_drag;
     float max_angular_speed;
+    float lifetime;
 } PhysicsComponent;
 
 typedef enum {
@@ -111,6 +112,7 @@ typedef enum {
     PLAYER_ON_FOOT,
     PLAYER_SHOOT,
     PLAYER_RELOAD,
+    PLAYER_ENTER,
     PLAYER_DRIVE,
     PLAYER_PASSENGER,
     PLAYER_MENU,

@@ -57,7 +57,12 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             destroy_entity(components, enemy->weapon);
             List_remove(coord->children, enemy->weapon);
             enemy->weapon = -1;
-            // WaypointComponent_remove(components, entity);
+            WaypointComponent_remove(components, entity);
+
+            if (randi(0, 1)) {
+                int j = create_ammo(components, zeros(), randi(1, 3));
+                add_child(components, entity, j);
+            }
         }
 
         for (ListNode* node = coord->children->head; node; node = node->next) {
@@ -72,7 +77,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             if (!non_zero(r)) {
                 r = rand_vector();
             }
-            apply_force(components, i, mult(250.0f, r));
+            apply_force(components, i, mult(150.0f, r));
             PhysicsComponent_get(components, i)->angular_velocity = randf(-5.0f, 5.0f);
             ColliderComponent_get(components, i)->enabled = true;
         }

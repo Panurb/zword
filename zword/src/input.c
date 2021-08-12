@@ -161,16 +161,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_A]) {
-                    enter_vehicle(components, i);
-                }
-
-                VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
-                if (vehicle) {
-                    if (vehicle->riders[0] == i) {
-                        player->state = PLAYER_DRIVE;
-                    } else {
-                        player->state = PLAYER_PASSENGER;
-                    }
+                    player->state = PLAYER_ENTER;
                 }
 
                 break;

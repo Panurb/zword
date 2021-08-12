@@ -803,11 +803,11 @@ void test(ComponentData* components, ColliderGrid* grid) {
     // create_church(components, zeros());
     // create_house(components, zeros());
     // create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
-    // create_priest(components, zeros());
+    // create_priest(components, grid, zeros());
     // create_car(components, zeros());
     // create_big_boy(components, (sfVector2f) { 5.0, 5.0 });
-    create_zombie(components, grid, zeros());
-    create_rope_gun(components, position);
+    // create_zombie(components, grid, zeros());
+    // create_rope_gun(components, position);
 
     create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
     // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);

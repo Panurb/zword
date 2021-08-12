@@ -40,7 +40,7 @@ void create_car(ComponentData* components, sfVector2f pos) {
 }
 
 
-bool enter_vehicle(ComponentData* components, int i) {
+bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
     CoordinateComponent* coord = CoordinateComponent_get(components, i);
 
     for (int j = 0; j < components->entities; j++) {
@@ -68,15 +68,19 @@ bool enter_vehicle(ComponentData* components, int i) {
             }
 
             player->vehicle = j;
+            clear_grid(components, grid, i);
             coord->position = vehicle->seats[closest];
             coord->angle = 0.0;
             coord->parent = j;
-            components->collider[i]->enabled = false;
+            ColliderComponent_get(components, i)->enabled = false;
 
             vehicle->riders[closest] = i;
 
             if (closest == 0) {
+                player->state = PLAYER_DRIVE;
                 loop_sound(components, j, "car", 0.5, 0.8);
+            } else {
+                player->state = PLAYER_PASSENGER;
             }
             add_sound(components, j, "car_door", 0.75, 1.0);
 
@@ -117,9 +121,7 @@ void exit_vehicle(ComponentData* components, int i) {
 void drive_vehicle(ComponentData* components, int p, float gas, float steering) {
     PlayerComponent* player = PlayerComponent_get(components, p);
     int i = JointComponent_get(components, player->vehicle)->parent;
-
     VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
-
     PhysicsComponent* phys = PhysicsComponent_get(components, i);
 
     float front_angle = get_angle(components, i);
@@ -140,14 +142,9 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering) 
     phys->velocity = polar_to_cartesian(vn, front_angle);
 
     float angle = get_angle(components, player->vehicle);
-    // float delta_angle = mod(front_angle - angle, 2.0f * M_PI);
-    float delta_angle = mod(front_angle - angle + M_PI, 2.0f * M_PI) - M_PI;
-    // if (delta_angle > M_PI) {
-    //     delta_angle -= 2.0f * M_PI;
-    // }
+    float delta_angle = angle_diff(front_angle, angle);
 
     phys->angular_velocity = 4.0f * vehicle->turning * sign(-vehicle->turning * steering - delta_angle);
-
 
     vehicle->on_road = false;
 

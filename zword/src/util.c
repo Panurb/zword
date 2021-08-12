@@ -242,3 +242,7 @@ bool non_zero(sfVector2f v) {
 float clamp(float val, float min_val, float max_val) {
     return fmaxf(fminf(val, max_val), min_val);
 }
+
+float angle_diff(float a, float b) {
+    return mod(a - b + M_PI, 2.0f * M_PI) - M_PI;
+}

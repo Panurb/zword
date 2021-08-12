@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "grid.h"
 #include "component.h"
@@ -100,12 +101,12 @@ void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
         }
     }
 
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    for (ListNode* node = coord->children->head; node; node = node->next) {
-        if (ColliderComponent_get(components, node->value)) {
-            update_grid(components, grid, node->value);
-        }
-    }
+    // CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    // for (ListNode* node = coord->children->head; node; node = node->next) {
+    //     if (ColliderComponent_get(components, node->value)) {
+    //         update_grid(components, grid, node->value);
+    //     }
+    // }
 }
 
 
@@ -127,12 +128,12 @@ void clear_grid(ComponentData* components, ColliderGrid* grid, int entity) {
         }
     }
 
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    for (ListNode* node = coord->children->head; node; node = node->next) {
-        if (ColliderComponent_get(components, node->value)) {
-            clear_grid(components, grid, node->value);
-        }
-    }
+    // CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    // for (ListNode* node = coord->children->head; node; node = node->next) {
+    //     if (ColliderComponent_get(components, node->value)) {
+    //         clear_grid(components, grid, node->value);
+    //     }
+    // }
 }
 
 
@@ -162,26 +163,28 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 
 
 void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
-    sfVector2f pos = CoordinateComponent_get(components, camera)->position;
-
-    sfColor color = get_color(1.0, 1.0, 1.0, 0.2);
-
-    int nx = ceil((cam->resolution.x / cam->zoom) / grid->tile_width) + 1;
-    float x = floor(pos.x - 0.5 * cam->resolution.x / cam->zoom);
-    for (int i = 0; i < nx; i++) {
-        sfVector2f start = { x + i * grid->tile_width, pos.y + 0.5 * cam->resolution.y / cam->zoom };
-        sfVector2f end = { x + i * grid->tile_width, pos.y - 0.5 * cam->resolution.y / cam->zoom };
-
-        draw_line(window, components, camera, NULL, start, end, 0.02, color);
+    sfRectangleShape* shape = sfRectangleShape_create();
+    sfText* text = sfText_create();
+    sfVector2f w = { 0.5f * grid->tile_width, 0.0f };
+    sfVector2f h = { 0.0f, 0.5f * grid->tile_height };
+    float linewidth = 0.01f;
+    sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
+    for (int i = 0; i < grid->width; i++) {
+        for (int j = 0; j < grid->height; j++) {
+            sfVector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
+            if (on_screen(components, camera, r, grid->tile_width, grid->tile_height)) {
+                draw_line(window, components, camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
+                draw_line(window, components, camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
+                draw_line(window, components, camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);
+                draw_line(window, components, camera, shape, diff(sum(r, w), h), sum(sum(r, w), h), linewidth, color);
+                if (grid->array[i][j]->size > 0) {
+                    char size[10];
+                    snprintf(size, 10, "%i", grid->array[i][j]->size);
+                    draw_text(window, components, camera, text, r, size);
+                }
+            }
+        }
     }
-
-    int ny = ceil((cam->resolution.y / cam->zoom) / grid->tile_height);    
-    float y = floor(pos.y - 0.5 * cam->resolution.y / cam->zoom);
-    for (int i = 0; i < ny; i++) {
-        sfVector2f start = { pos.x - 0.5 * cam->resolution.x / cam->zoom, y + i * grid->tile_height };
-        sfVector2f end = { pos.x + 0.5 * cam->resolution.x / cam->zoom, y + i * grid->tile_height };
-
-        draw_line(window, components, camera, NULL, start, end, 0.02, color);
-    }
+    sfRectangleShape_destroy(shape);
+    sfText_destroy(text);
 }

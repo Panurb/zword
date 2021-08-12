@@ -132,6 +132,7 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     phys->max_speed = 20.0;
     phys->angular_drag = 10.0f;
     phys->max_angular_speed = 20.0 * M_PI;
+    phys->lifetime = INFINITY;
 
     components->physics[entity] = phys;
 

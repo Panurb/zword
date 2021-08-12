@@ -26,6 +26,14 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         PhysicsComponent* physics = PhysicsComponent_get(components, i);
         if (!physics) continue;
 
+        physics->lifetime -= time_step;
+        if (physics->lifetime <= 0.0f) {
+            clear_grid(components, grid, i);
+            remove_children(components, i);
+            destroy_entity(components, i);
+            continue;
+        }
+
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         if (coord->parent != -1) continue;
 
@@ -42,11 +50,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
-
-        sfVector2f v_hat = normalized(physics->velocity);
-        sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
-        sfVector2f v_sideways = diff(v_hat, v_forward);
-        sfVector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
+        float delta_angle = time_step * physics->angular_velocity;
 
         if (joint && joint->parent != -1) {
             sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
@@ -60,7 +64,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             }
             delta_pos = sum(delta_pos, mult(joint->strength, f));
             
-            coord->angle = polar_angle(r);
+            delta_angle = angle_diff(polar_angle(r), coord->angle);
 
             float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(components, joint->parent)));
             if (fabsf(angle) > joint->max_angle) {
@@ -70,14 +74,20 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         }
 
         ColliderComponent* col = ColliderComponent_get(components, i);
-        if (col && col->enabled && non_zero(delta_pos)) {
+        bool moved = col && col->enabled && (non_zero(delta_pos) || delta_angle != 0.0f);
+        if (moved) {
             clear_grid(components, grid, i);
-            coord->position = sum(coord->position, delta_pos);
+        }
+        coord->position = sum(coord->position, delta_pos);
+        coord->angle = mod(coord->angle + delta_angle, 2.0f * M_PI);
+        if (moved) {
             update_grid(components, grid, i);
-        } else {
-            coord->position = sum(coord->position, delta_pos);
         }
 
+        sfVector2f v_hat = normalized(physics->velocity);
+        sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
+        sfVector2f v_sideways = diff(v_hat, v_forward);
+        sfVector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
         physics->acceleration = sum(physics->acceleration, a);
         physics->velocity = sum(physics->velocity, mult(time_step, physics->acceleration));
         physics->acceleration = zeros();
@@ -89,10 +99,6 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         } else if (physics->speed > physics->max_speed) {
             physics->velocity = mult(physics->max_speed / physics->speed, physics->velocity);
             physics->speed = physics->max_speed;
-        }
-
-        if (!joint || joint->parent == -1) {
-            coord->angle = mod(coord->angle + time_step * physics->angular_velocity, 2.0f * M_PI);
         }
 
         physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
