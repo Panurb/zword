@@ -9,14 +9,14 @@
 #include "navigation.h"
 
 
-void create_car(ComponentData* components, sfVector2f pos) {
+void create_car(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
     PhysicsComponent_add(components, i, 10.0f);
 
     int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {-3.0f, 0.0f }, 0.0f);
+    CoordinateComponent_add(components, j, sum(pos, polar_to_cartesian(-3.0f, angle)), 0.0f);
     ColliderComponent_add_rectangle(components, j, 3.0f, 3.0f, GROUP_VEHICLES);
     PhysicsComponent_add(components, j, 10.0f);
     SoundComponent_add(components, j, "metal_hit");
@@ -36,6 +36,18 @@ void create_car(ComponentData* components, sfVector2f pos) {
     k = create_entity(components);
     CoordinateComponent_add(components, k, (sfVector2f) { 3.8f, -1.0f }, 0.0f);
     LightComponent_add(components, k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    add_child(components, j, k);
+
+    k = create_waypoint(components, (sfVector2f) { 5.0f, 2.5f });
+    add_child(components, j, k);
+
+    k = create_waypoint(components, (sfVector2f) { 5.0f, -2.5f });
+    add_child(components, j, k);
+
+    k = create_waypoint(components, (sfVector2f) { -2.0f, 2.5f });
+    add_child(components, j, k);
+
+    k = create_waypoint(components, (sfVector2f) { -2.0f, -2.5f });
     add_child(components, j, k);
 }
 
@@ -120,8 +132,8 @@ void exit_vehicle(ComponentData* components, int i) {
 
 void drive_vehicle(ComponentData* components, int p, float gas, float steering) {
     PlayerComponent* player = PlayerComponent_get(components, p);
-    int i = JointComponent_get(components, player->vehicle)->parent;
     VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
+    int i = JointComponent_get(components, player->vehicle)->parent;
     PhysicsComponent* phys = PhysicsComponent_get(components, i);
 
     float front_angle = get_angle(components, i);

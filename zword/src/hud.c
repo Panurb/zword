@@ -141,15 +141,18 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(components, i));
             pos = sum(position, pos);
         }
-        if (weapon) {
-            float r = fmaxf(dist(pos, position) * tanf(0.5f * fmaxf(weapon->spread, weapon->recoil)), 0.1f);
-            if (weapon->ammo_type == AMMO_MELEE) {
-                r = 0.1f;
+
+        if (player->state != PLAYER_DEAD) {
+            if (weapon) {
+                float r = fmaxf(dist(pos, position) * tanf(0.5f * fmaxf(weapon->spread, weapon->recoil)), 0.1f);
+                if (weapon->ammo_type == AMMO_MELEE) {
+                    r = 0.1f;
+                }
+                sfColor color = (r == 0.1f) ? sfWhite : sfTransparent;
+                draw_circle(window, components, camera, player->crosshair, pos, r, color);
+            } else {
+                draw_circle(window, components, camera, player->crosshair, pos, 0.1f, sfWhite);
             }
-            sfColor color = (r == 0.1f) ? sfWhite : sfTransparent;
-            draw_circle(window, components, camera, player->crosshair, pos, r, color);
-        } else {
-            draw_circle(window, components, camera, player->crosshair, pos, 0.1f, sfWhite);
         }
 
         switch (player->state) {
@@ -165,6 +168,8 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
                 draw_slice(window, components, camera, NULL, 50, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
 
+                break;
+            case PLAYER_ENTER:
                 break;
             case PLAYER_DRIVE:
                 // VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);

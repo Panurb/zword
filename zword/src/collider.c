@@ -268,8 +268,6 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                     int n = current->value;
                     if (n == i) continue;
                     ColliderComponent* collider = ColliderComponent_get(components, n);
-                    // FIXME
-                    if (!collider) continue;
                     if (collider->last_collision == i) continue;
 
                     collider->last_collision = i;

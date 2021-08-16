@@ -179,6 +179,8 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 break;
+            case PLAYER_ENTER:
+                break;
             case PLAYER_DRIVE:
                 if (controller.buttons_pressed[BUTTON_A]) {
                     exit_vehicle(components, i);

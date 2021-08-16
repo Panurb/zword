@@ -10,7 +10,7 @@
 #define LEVEL_HEIGHT 13
 
 
-void create_decal(ComponentData* components, sfVector2f pos, float width, float height, Filename filename);
+void create_decal(ComponentData* components, sfVector2f pos, Filename filename);
 
 void create_level(ComponentData* component, ColliderGrid* grid, int seed);
 

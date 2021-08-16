@@ -894,5 +894,5 @@ float get_angle(ComponentData* components, int entity) {
         angle += get_angle(components, parent);
     }
 
-    return angle;
+    return mod(angle, 2.0f * M_PI);
 }

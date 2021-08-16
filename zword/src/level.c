@@ -124,21 +124,21 @@ void create_bench(ComponentData* components, sfVector2f position, float angle) {
     ImageComponent_add(components, i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 0.8f, 2.8f, GROUP_WALLS);
     ParticleComponent_add_splinter(components, i);
-    HealthComponent_add(components, i, 200, "", "", "wood_destroy");
+    HealthComponent_add(components, i, 100, "", "", "wood_destroy");
     PhysicsComponent_add(components, i, 2.0f);
     SoundComponent_add(components, i, "wood_hit");
 
     int j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) {0.0f, -1.0f}, 0.0f);
     ImageComponent_add(components, j, "bench_debris", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 0.8f, 1.2f, GROUP_DEBRIS);
+    ColliderComponent_add_rectangle(components, j, 0.8f, 1.2f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(components, j, 1.0f);
     add_child(components, i, j);
 
     j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) {0.0f, 0.5f}, 0.0f);
     ImageComponent_add(components, j, "bench_destroyed", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 0.8f, 1.4f, GROUP_DEBRIS);
+    ColliderComponent_add_rectangle(components, j, 0.8f, 1.4f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(components, j, 1.0f);
     add_child(components, i, j);
 }
@@ -150,21 +150,21 @@ void create_table(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "table", 3.0f, 3.0f, LAYER_ITEMS)->alpha = 1.0f;
     ColliderComponent_add_circle(components, i, 1.4f, GROUP_WALLS);
     ParticleComponent_add_splinter(components, i);
-    HealthComponent_add(components, i, 200, "", "", "wood_destroy");
+    HealthComponent_add(components, i, 100, "", "", "wood_destroy");
     PhysicsComponent_add(components, i, 2.0f);
     SoundComponent_add(components, i, "wood_hit");
 
     int j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) {-0.6f, 0.0f}, 0.0f);
     ImageComponent_add(components, j, "table_destroyed", 2.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS);
+    ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(components, j, 1.0f);
     add_child(components, i, j);
 
     j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) {0.6f, 0.0f}, M_PI);
     ImageComponent_add(components, j, "table_destroyed", 2.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS);
+    ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(components, j, 1.0f);
     add_child(components, i, j);
 }
@@ -235,10 +235,11 @@ void create_lamp(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_decal(ComponentData* components, sfVector2f pos, float width, float height, Filename filename) {
+void create_decal(ComponentData* components, sfVector2f pos, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
-    ImageComponent_add(components, i, filename, width, height, LAYER_DECALS);
+    ImageComponent_add(components, i, filename, 0.0f, 0.0f, LAYER_DECALS);
+    PhysicsComponent_add(components, i, 0.0f)->lifetime = 10.0f;
 }
 
 
@@ -467,7 +468,7 @@ void create_house(ComponentData* components, sfVector2f pos) {
 
 
 void create_outhouse(ComponentData* components, sfVector2f pos) {
-    float angle = randf(0.0, 2 * M_PI);
+    float angle = rand_angle();
 
     sfVector2f w = polar_to_cartesian(1.0f, angle);
     sfVector2f h = perp(w);
@@ -489,6 +490,28 @@ void create_outhouse(ComponentData* components, sfVector2f pos) {
     create_door(components, sum(pos, mult(1.25f, w)), angle + 0.5f * M_PI);
 
     create_item(components, pos, 0);
+}
+
+
+void create_garage(ComponentData* components, sfVector2f pos) {
+    float angle = rand_angle();
+
+    sfVector2f w = polar_to_cartesian(1.0f, angle);
+    sfVector2f h = perp(w);
+
+    create_floor(components, pos, 9.0f, 6.0f, angle, "board_tile");
+
+    create_wall(components, sum(pos, mult(-4.25f, w)), angle + 0.5 * M_PI, 6.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, mult(3.25f, h)), angle, 9.0f, 0.5f, "wood_tile");
+    create_wall(components, sum(pos, mult(-3.25f, h)), angle, 9.0f, 0.5f, "wood_tile");
+
+    create_waypoint(components, sum(pos, lin_comb(5.5f, w, 0.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(5.5f, w, 4.5f, h)));
+    create_waypoint(components, sum(pos, lin_comb(5.5f, w, -4.5f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-5.5f, w, 4.5f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-5.5f, w, -4.5f, h)));
+
+    create_car(components, sum(pos, w), angle);
 }
 
 
@@ -741,7 +764,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
         prev_pos = zeros();
     }
 
-    create_car(components, sum(start, mult(20.0f, rand_vector())));
+    create_garage(components, sum(start, mult(25.0f, rand_vector())));
 
     init_grid(components, grid);
 
@@ -776,8 +799,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     resize_roads(components);
 
-    create_player(components, start, -1);
-    // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
+    // create_player(components, start, -1);
+    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }
 
@@ -797,11 +820,12 @@ void test(ComponentData* components, ColliderGrid* grid) {
     init_grid(components, grid);
 
     sfVector2f start = zeros();
-    create_car(components, start);
+    // create_garage(components, start);
+    // create_car(components, start);
     // create_church(components, zeros());
     // create_outhouse(components, zeros());
     // create_church(components, zeros());
-    // create_house(components, zeros());
+    create_house(components, zeros());
     // create_bench(components, (sfVector2f) { 10.0f, 15.0f }, rand_angle());
     // create_priest(components, grid, zeros());
     // create_car(components, zeros());

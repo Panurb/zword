@@ -181,7 +181,10 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
 
                 break;
             case PLAYER_ENTER:
-                enter_vehicle(components, grid, i);
+                if (!enter_vehicle(components, grid, i)) {
+                    player->state = PLAYER_ON_FOOT;
+                }
+                break;
             case PLAYER_DRIVE:
                 if (player->controller.joystick == -1) {
                     drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x));

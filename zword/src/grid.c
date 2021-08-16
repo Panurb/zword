@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
+#include <stdio.h>
 
 #include "grid.h"
 #include "component.h"
@@ -75,8 +75,6 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
                 int n = node->value;
 
                 ColliderComponent* col = ColliderComponent_get(components, n);
-                // FIXME
-                if (!col) continue;
                 if (col->last_collision == id) continue;
 
                 if (dist(origin, get_position(components, n)) <= radius) {

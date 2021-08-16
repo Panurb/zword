@@ -104,9 +104,9 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         if (health->decal[0] != '\0') {
             sfVector2f pos = sum(get_position(components, entity), mult(0.5f, rand_vector()));
             if (dmg < 50) {
-                create_decal(components, pos, 1.0f, 1.0f, "blood");
+                create_decal(components, pos, "blood");
             } else {
-                create_decal(components, pos, 2.0f, 2.0f, "blood_large");
+                create_decal(components, pos, "blood_large");
             }
         }
 
