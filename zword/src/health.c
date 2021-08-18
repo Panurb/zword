@@ -49,6 +49,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         }
 
         player->state = PLAYER_DEAD;
+        WaypointComponent_remove(components, entity);
     } else {
         if (enemy) {
             enemy->state = ENEMY_DEAD;

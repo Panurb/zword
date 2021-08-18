@@ -149,6 +149,8 @@ int main() {
                 draw_lights(components, grid, light_texture, camera, ambient_light);
 
                 animate(components, time_step);
+
+                spawn_enemies(components, grid, camera);
             }
 
             elapsed_time += delta_time;

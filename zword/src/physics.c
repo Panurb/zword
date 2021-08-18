@@ -26,12 +26,21 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         PhysicsComponent* physics = PhysicsComponent_get(components, i);
         if (!physics) continue;
 
+        ColliderComponent* col = ColliderComponent_get(components, i);
+
         physics->lifetime -= time_step;
         if (physics->lifetime <= 0.0f) {
-            clear_grid(components, grid, i);
+            if (col) {
+                clear_grid(components, grid, i);
+            }
             remove_children(components, i);
             destroy_entity(components, i);
             continue;
+        } else if (physics->lifetime <= 1.0f) {
+            ImageComponent* image = ImageComponent_get(components, i);
+            if (image) {
+                image->alpha = physics->lifetime;
+            }
         }
 
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
@@ -44,7 +53,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
 
             sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
             sfVector2f v_t = diff(physics->velocity, v_n);
-            physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0 - physics->friction, v_t));
+            physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0f - physics->friction, v_t));
 
             blunt_damage(components, grid, i, v_n);
         }
@@ -73,7 +82,6 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             }
         }
 
-        ColliderComponent* col = ColliderComponent_get(components, i);
         bool moved = col && col->enabled && (non_zero(delta_pos) || delta_angle != 0.0f);
         if (moved) {
             clear_grid(components, grid, i);

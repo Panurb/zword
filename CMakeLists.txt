@@ -10,6 +10,7 @@ include_directories(zword/include)
 
 set(SOURCES
     zword/src/animation.c
+    zword/src/building.c
     zword/src/camera.c
     zword/src/collider.c
     zword/src/component.c

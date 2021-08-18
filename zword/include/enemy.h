@@ -10,7 +10,7 @@
 
 void update_enemies(ComponentData* component, ColliderGrid* grid, float time_step);
 
-void create_zombie(ComponentData* component, ColliderGrid* grid, sfVector2f pos);
+int create_zombie(ComponentData* component, ColliderGrid* grid, sfVector2f pos);
 
 void create_farmer(ComponentData* component, ColliderGrid* grid, sfVector2f pos);
 
@@ -21,3 +21,5 @@ void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f po
 void draw_enemies(ComponentData* component, sfRenderWindow* window, int camera);
 
 void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range);
+
+void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera);

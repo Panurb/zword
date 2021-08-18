@@ -91,7 +91,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
                 add_particles(components, i, 10);
                 clear_grid(components, grid, i);
                 ColliderComponent_get(components, i)->enabled = false;
-                ImageComponent_get(components, i)->alpha = 0.0f;
+                ImageComponent_remove(components, i);
                 add_sound(components, i, "energy", 0.5f, randf(1.2f, 1.5f));
                 phys->lifetime = 1.0f;
             }

@@ -20,7 +20,7 @@
 #include "weapon.h"
 
 
-void create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+int create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, rand_angle());
@@ -28,7 +28,7 @@ void create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
     if (collides_with(components, grid, i)) {
         destroy_entity(components, i);
-        return;
+        return -1;
     }
 
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
@@ -45,6 +45,8 @@ void create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos
     WeaponComponent_add(components, j, 0.5f, 25, 7, 0.35f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
     add_child(components, i, j);
     enemy->weapon = j;
+
+    return i;
 }
 
 
@@ -185,7 +187,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
         if (enemy->state != ENEMY_ATTACK && enemy->state != ENEMY_DEAD) {
             update_vision(components, grid, i);
-            float delta_angle = mod(enemy->desired_angle + M_PI - coord->angle, 2.0f * M_PI) - M_PI;
+            float delta_angle = angle_diff(enemy->desired_angle, coord->angle);
             phys->angular_velocity = 5.0f * delta_angle;
 
             AnimationComponent* animation = AnimationComponent_get(components, i);
@@ -281,11 +283,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                     col->group = GROUP_CORPSES;
                     if (phys->speed == 0.0f) {
                         clear_grid(components, grid, i);
-                        // ColliderComponent_remove(components, i);
+                        ColliderComponent_remove(components, i);
                     }
                 }
-
-                WaypointComponent_remove(components, i);
 
                 break;
             }
@@ -312,9 +312,8 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
 
 void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range) {
     List* list = get_entities(components, grid, get_position(components, player), range);
-    for (ListNode* current = list->head; current; current = current->next) {
-        int j = current->value;
-        if (j == -1) break;
+    for (ListNode* node = list->head; node; node = node->next) {
+        int j = node->value;
 
         EnemyComponent* enemy = EnemyComponent_get(components, j);
         if (enemy && enemy->state != ENEMY_DEAD && enemy->state != ENEMY_CHASE) {
@@ -323,4 +322,26 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
         }
     }
     List_delete(list);
+}
+
+
+void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera) {
+    int count = 0;
+    for (int i = 0; i < components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(components, i);
+        if (enemy && enemy->state != ENEMY_DEAD) {
+            count++;
+        }
+    }
+
+    float radius = 30.0f;
+    if (count < 10) {
+        int i = create_zombie(components, grid, sum(get_position(components, camera), mult(radius, rand_vector())));
+        int p = components->player.order->head->value;
+        if (i != -1) {
+            EnemyComponent* enemy = EnemyComponent_get(components, i);
+            enemy->target = p;
+            enemy->state = ENEMY_INVESTIGATE;
+        }
+    }
 }

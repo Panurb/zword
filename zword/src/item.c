@@ -27,6 +27,44 @@ void create_gas(ComponentData* components, sfVector2f position) {
 }
 
 
+void create_item(ComponentData* components, sfVector2f position, int tier) {
+    switch (tier) {
+        case 0:
+            if (randi(0, 1) == 0) {
+                create_flashlight(components, position);
+            } else {
+                create_gas(components, position);
+            }
+            break;
+        case 1:
+            if (randi(0, 1) == 0) {
+                create_axe(components, position);
+            } else {
+                create_pistol(components, position);
+                for (int i = 0; i < randi(1, 3); i++) {
+                    create_ammo(components, sum(position, rand_vector()), AMMO_PISTOL);
+                }
+            }
+            break;
+        case 2:
+            create_shotgun(components, position);
+            for (int i = 0; i < randi(1, 3); i++) {
+                    create_ammo(components, sum(position, rand_vector()), AMMO_SHOTGUN);
+            }
+            break;
+        case 3:
+            create_assault_rifle(components, position);
+            for (int i = 0; i < randi(1, 3); i++) {
+                create_ammo(components, sum(position, rand_vector()), AMMO_RIFLE);
+            }
+            break;
+        default:
+            create_ammo(components, position, rand() % 3 + 1);
+            break;
+    }
+}
+
+
 void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     PlayerComponent* player = PlayerComponent_get(components, entity);
 
