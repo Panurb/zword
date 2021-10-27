@@ -29,6 +29,21 @@ void create_wall(ComponentData* components, sfVector2f pos, float angle, float w
 }
 
 
+void create_fence(ComponentData* components, sfVector2f pos, float angle, float width, float height) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, pos, angle);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_RIVERS);
+    ImageComponent_add(components, i, "wood_tile", width, height, LAYER_WALLS);
+}
+
+
+void create_window(ComponentData* components, sfVector2f pos, float angle) {
+    create_fence(components, pos, angle, 1.0f, 4.0f);
+    create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle)));
+    create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle)));
+}
+
+
 void create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle, Filename filename) {
     int i = create_entity(components);
 
@@ -446,82 +461,83 @@ void create_garage(ComponentData* components, sfVector2f pos) {
 
 
 void create_mansion(ComponentData* components, sfVector2f pos) {
-    float angle = rand_angle();
+    float angle = 0.0f;
 
     sfVector2f w = polar_to_cartesian(1.0f, angle);
     sfVector2f h = perp(w);
 
-    create_floor(components, pos, 16.0f, 16.0f, angle, "board_tile");
-    // create_roof(components, sum(pos, mult(4.0f, h)), 16.0f, 8.0f, angle);
-    // create_roof(components, sum(pos, mult(-4.0f, h)), 16.0f, 8.0f, angle + M_PI);
+    create_floor(components, sum(pos, mult(14.0f, w)), 20.0f, 16.0f, angle, "board_tile");
+    create_floor(components, sum(pos, lin_comb(-4.0, w, -16.0f, h)), 40.0f, 16.0f, angle, "board_tile");
+    create_floor(components, sum(pos, lin_comb(-4.0, w, 16.0f, h)), 40.0f, 16.0f, angle, "board_tile");
 
-    // Outside walls
-    create_wall(components, sum(pos, mult(-7.5f, w)), angle + 0.5 * M_PI, 16.0f, 1.0f, "brick_tile");
-    create_wall(components, sum(pos, mult(7.5f, h)), angle, 14.0f, 1.0f, "brick_tile");
-    create_wall(components, sum(pos, mult(-7.5f, h)), angle, 14.0f, 1.0f, "brick_tile");
-    create_wall(components, sum(pos, lin_comb(7.5f, w, 4.5f, h)), angle + 0.5 * M_PI, 7.0f, 1.0f, "brick_tile");
-    create_wall(components, sum(pos, lin_comb(7.5f, w, -4.5f, h)), angle + 0.5 * M_PI, 7.0f, 1.0f, "brick_tile");
+    // Front walls
+    create_wall(components, sum(pos, lin_comb(15.5f, w, -21.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(15.5f, w, -16.0f, h)), angle);
+    create_wall(components, sum(pos, lin_comb(15.5f, w, -11.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
+    create_waypoint(components, sum(pos, lin_comb(17.0f, w, -25.0f, h)));
 
-    create_waypoint(components, sum(pos, lin_comb(9.0f, w, 9.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(9.0f, w, -9.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(-9.0f, w, 9.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(-9.0f, w, -9.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(-9.0f, w, 0.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(0.0f, w, 9.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(0.0f, w, -9.0f, h)));
+    create_wall(components, sum(pos, lin_comb(15.5f, w, 11.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(15.5f, w, 16.0f, h)), angle);
+    create_wall(components, sum(pos, lin_comb(15.5f, w, 21.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
+    create_waypoint(components, sum(pos, lin_comb(17.0f, w, 25.0f, h)));
 
-    create_door(components, sum(pos, mult(7.5f, w)), angle + 0.5f * M_PI);
+    // Alchove
+    create_wall(components, sum(pos, lin_comb(23.5f, w, -5.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(23.5f, w, 5.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(19.0f, w, -7.5, h)), angle, 8.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(19.0f, w, 7.5, h)), angle, 8.0f, 1.0f, "brick_tile");
+    create_door(components, sum(pos, lin_comb(23.5f, w, -1.0, h)), angle + 0.5f * M_PI);
+    create_door(components, sum(pos, lin_comb(23.5f, w, 1.0, h)), angle + 1.5f * M_PI);
+    create_waypoint(components, sum(pos, lin_comb(25.0f, w, 9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(25.0f, w, -9.0f, h)));
 
-    // Toilet
-    create_floor(components, sum(pos, lin_comb(-4.5f, w, 4.5f, h)), 6.0f, 6.0f, angle, "altar_tile");
-    create_wall(components, sum(pos, lin_comb(-6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
-    create_wall(components, sum(pos, lin_comb(-1.75f, w, 4.5f, h)), angle + 0.5f * M_PI, 5.0f, 0.5f, "wood_tile");
-    create_toilet(components, sum(pos, lin_comb(-6.0f, w, 6.0f, h)), angle + 1.5f * M_PI);
-    create_sink(components, sum(pos, lin_comb(-3.5f, w, 6.0f, h)), angle + 1.5f * M_PI);
+    // Right wall
+    create_wall(components, sum(pos, lin_comb(-20.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(-15.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, lin_comb(-9.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(-4.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, lin_comb(1.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(7.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, lin_comb(12.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
 
-    // Bedroom
-    create_wall(components, sum(pos, lin_comb(0.0f, w, 1.75f, h)), angle, 8.0f, 0.5f, "wood_tile");
-    create_wall(components, sum(pos, lin_comb(6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
-    create_bed(components, sum(pos, lin_comb(-0.5f, w, 5.0f, h)), angle + 1.5f * M_PI);
-    create_lamp(components, sum(pos, lin_comb(6.5f, w, 6.5f, h)));
+    // Left wall
+    create_wall(components, sum(pos, lin_comb(-20.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(-15.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, lin_comb(-9.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(-4.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, lin_comb(1.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    create_window(components, sum(pos, lin_comb(7.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
+    create_wall(components, sum(pos, lin_comb(12.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
+    
+    // Back walls
+    create_wall(components, sum(pos, lin_comb(-23.5f, w, -16.0f, h)), angle + 0.5f * M_PI, 16.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(-23.5f, w, 16.0f, h)), angle + 0.5f * M_PI, 16.0f, 1.0f, "brick_tile");
+    create_waypoint(components, sum(pos, lin_comb(-25.0f, w, 25.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-25.0f, w, 15.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-25.0f, w, -15.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-25.0f, w, -25.0f, h)));
 
-    // Living room
-    create_wall(components, sum(pos, lin_comb(0.0f, w, -1.75f, h)), angle, 4.0f, 0.5f, "wood_tile");
-    create_wall(components, sum(pos, lin_comb(-5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
-    create_bench(components, sum(pos, lin_comb(-3.0f, w, -5.5f, h)), angle + M_PI);
-    create_table(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
-    create_lamp(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
+    // Yard
+    create_wall(components, sum(pos, lin_comb(-22.0f, w, -7.5, h)), angle, 4.0f, 1.0f, "brick_tile");
+    create_door(components, sum(pos, lin_comb(-19.0f, w, -7.5, h)), angle);
+    create_wall(components, sum(pos, lin_comb(-6.5f, w, -7.5, h)), angle, 23.0f, 1.0f, "brick_tile");
+    create_waypoint(components, sum(pos, lin_comb(-10.0f, w, 0.0f, h)));
 
-    // Kitchen
-    create_wall(components, sum(pos, lin_comb(5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
-    create_wall(components, sum(pos, lin_comb(0.0, w, -4.5f, h)), angle + 0.5f * M_PI, 5.0f, 0.5f, "wood_tile");
-    create_stove(components, sum(pos, lin_comb(6.0f, w, -6.0f, h)), angle + M_PI);
-    create_sink(components, sum(pos, lin_comb(6.0f, w, -3.5f, h)), angle + M_PI);
+    create_wall(components, sum(pos, lin_comb(-22.0f, w, 7.5, h)), angle, 4.0f, 1.0f, "brick_tile");
+    create_door(components, sum(pos, lin_comb(-19.0f, w, 7.5, h)), angle);
+    create_wall(components, sum(pos, lin_comb(-6.5f, w, 7.5, h)), angle, 23.0f, 1.0f, "brick_tile");
 
-    create_waypoint(components, sum(pos, mult(9.0f, w)));
-    create_waypoint(components, sum(pos, mult(5.0f, w)));
-    create_waypoint(components, sum(pos, lin_comb(5.0f, w, 3.0f, h)));
-    create_waypoint(components, sum(pos, mult(3.0f, w)));
-    create_waypoint(components, sum(pos, lin_comb(3.0f, w, -3.0f, h)));
-    create_waypoint(components, sum(pos, mult(-3.0f, w)));
-    create_waypoint(components, sum(pos, lin_comb(-3.0f, w, -3.0f, h)));
-    create_waypoint(components, sum(pos, mult(-5.0f, w)));
-    create_waypoint(components, sum(pos, lin_comb(-5.0f, w, 3.0f, h)));
+    create_wall(components, sum(pos, lin_comb(4.5f, w, -4.5f, h)), angle + 0.5f * M_PI, 5.0f, 1.0f, "brick_tile");
+    create_waypoint(components, sum(pos, lin_comb(6.0f, w, 9.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(6.0f, w, -9.0f, h)));
+    create_window(components, sum(pos, lin_comb(4.5, w, 0.0f, h)), angle);
+    create_waypoint(components, sum(pos, lin_comb(15.0f, w, 0.0f, h)));
+    create_wall(components, sum(pos, lin_comb(4.5f, w, 4.5f, h)), angle + 0.5f * M_PI, 5.0f, 1.0f, "brick_tile");
 
-    int items = randi(1, 3);
-    int locations[3] = {0, 1, 2};
-    permute(locations, 3);
-    for (int i = 0; i < items; i++) {
-        switch (locations[i]) {
-            case 0:
-                create_item(components, sum(pos, lin_comb(-4.5f, w, 4.0f, h)), i);
-                break;
-            case 1:
-                create_item(components, sum(pos, lin_comb(3.0f, w, 5.0f, h)), i);
-                break;
-            case 2:
-                create_item(components, sum(pos, lin_comb(3.0f, w, -4.5f, h)), i);
-                break;
-        }
-    }
+    create_fence(components, sum(pos, lin_comb(-23.75f, w, 0.0f, h)), angle + 0.5f * M_PI, 14.0f, 0.5f);
+    create_waypoint(components, sum(pos, lin_comb(-25.25f, w, 0.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-22.25f, w, 0.0f, h)));
+
+    create_waypoint(components, sum(pos, lin_comb(-5.0f, w, 15.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-5.0f, w, -15.0f, h)));
 }

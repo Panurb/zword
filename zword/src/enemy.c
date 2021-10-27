@@ -326,6 +326,10 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 
 
 void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera) {
+    static int id = 0;
+    id = (id + 1) % 200;
+    if (id != 0) return;
+
     int count = 0;
     for (int i = 0; i < components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(components, i);
@@ -334,7 +338,7 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera) {
         }
     }
 
-    float radius = 30.0f;
+    float radius = 40.0f;
     if (count < 10) {
         int i = create_zombie(components, grid, sum(get_position(components, camera), mult(radius, rand_vector())));
         int p = components->player.order->head->value;

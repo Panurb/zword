@@ -150,7 +150,7 @@ int main() {
 
                 animate(components, time_step);
 
-                spawn_enemies(components, grid, camera);
+                // spawn_enemies(components, grid, camera);
             }
 
             elapsed_time += delta_time;

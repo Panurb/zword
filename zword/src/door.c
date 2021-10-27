@@ -6,6 +6,7 @@
 #include "grid.h"
 #include "sound.h"
 #include "particle.h"
+#include "navigation.h"
 
 
 void create_door(ComponentData* components, sfVector2f pos, float angle) {
@@ -20,6 +21,9 @@ void create_door(ComponentData* components, sfVector2f pos, float angle) {
     int j = create_entity(components);
     CoordinateComponent_add(components, j, sum(pos, polar_to_cartesian(1.0f, angle + M_PI)), angle + M_PI);
     JointComponent_add(components, i, j, 1.0f, 1.0f, 1.0f)->max_angle = 0.5f * M_PI;
+
+    create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle + 0.5f * M_PI)));
+    create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle + 0.5f * M_PI)));
 }
 
 

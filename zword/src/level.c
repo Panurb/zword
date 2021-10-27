@@ -171,8 +171,6 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     sfTexture_setRepeated(noise_texture, true);
     free(pixels);
 
-    int chunks[LEVEL_WIDTH][LEVEL_HEIGHT] = { 0 };
-
     for (int i = 0; i < LEVEL_WIDTH; i++) {
         for (int j = 0; j < LEVEL_HEIGHT; j++) {
             sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
@@ -274,8 +272,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     resize_roads(components);
 
-    // create_player(components, start, -1);
-    create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
+    create_player(components, start, -1);
+    // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }
 
@@ -303,9 +301,9 @@ void test(ComponentData* components, ColliderGrid* grid) {
     init_grid(components, grid);
 
     sfVector2f start = zeros();
-    create_house(components, zeros());
+    create_mansion(components, start);
 
-    create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), -1);
-    // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 0);
-    // create_player(components, sum(start, (sfVector2f) { 2.0, -5.0 }), 1);
+    create_player(components, start, -1);
+    // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
+    // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }
