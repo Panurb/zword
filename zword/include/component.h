@@ -445,7 +445,7 @@ AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType
 AmmoComponent* AmmoComponent_get(ComponentData* components, int entity);
 void AmmoComponent_remove(ComponentData* components, int entity);
 
-AnimationComponent* AnimationComponent_add(ComponentData* components, int entity);
+AnimationComponent* AnimationComponent_add(ComponentData* components, int entity, int frames);
 AnimationComponent* AnimationComponent_get(ComponentData* components, int entity);
 void AnimationComponent_remove(ComponentData* components, int entity);
 

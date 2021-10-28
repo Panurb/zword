@@ -129,7 +129,7 @@ void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f po
     }
 
     ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
-    AnimationComponent_add(components, i);
+    AnimationComponent_add(components, i, 2);
     PhysicsComponent* physics = PhysicsComponent_add(components, i, 10.0f);
     physics->drag_sideways = 20.0f;
     EnemyComponent* enemy = EnemyComponent_add(components, i);
@@ -147,6 +147,52 @@ void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f po
     WeaponComponent_add(components, j, 0.5f, 100, 7, 0.5f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
     add_child(components, i, j);
     enemy->weapon = j;
+}
+
+
+void create_boss(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+    int i = create_entity(components);
+    
+    CoordinateComponent_add(components, i, pos, rand_angle());
+    ColliderComponent_add_circle(components, i, 1.5f, GROUP_ENEMIES);
+
+    if (collides_with(components, grid, i)) {
+        destroy_entity(components, i);
+        return;
+    }
+
+    ImageComponent_add(components, i, "boss_head", 6.0f, 4.0f, LAYER_ENEMIES);
+    AnimationComponent_add(components, i, 1);
+    PhysicsComponent_add(components, i, 10.0f);
+    EnemyComponent* enemy = EnemyComponent_add(components, i);
+    enemy->idle_speed = 0.0f;
+    enemy->walk_speed = 2.0f;
+    enemy->run_speed = 4.0f;
+    ParticleComponent_add_blood(components, i);
+    WaypointComponent_add(components, i);
+    HealthComponent_add(components, i, 5000, "boss_dead", "blood", "stone_hit");
+    SoundComponent_add(components, i, "squish");
+
+    sfVector2f r = { 0.5f, 0.0f };
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, r, 0.0f);
+    WeaponComponent_add(components, j, 0.5f, 50, 7, 0.5f * M_PI, -1, 0.0f, 3.0f, 0.0f, AMMO_MELEE, "axe");
+    add_child(components, i, j);
+    enemy->weapon = j;
+
+    for (int k = 0; k < 5; k++) {
+        j = create_entity(components);
+        pos = sum(pos, mult(3.0f, rand_vector()));
+        CoordinateComponent_add(components, j, pos, rand_angle());
+        PhysicsComponent_add(components, j, 10.0f);
+        ColliderComponent_add_circle(components, j, 1.5f, GROUP_ENEMIES);
+        ImageComponent_add(components, j, "boss_body", 6.0f, 4.0f, LAYER_ENEMIES);
+        AnimationComponent_add(components, j, 4)->current_frame = 2 * (k % 2);
+        JointComponent_add(components, j, i, 3.0f, 3.0f, 1.0f);
+        ParticleComponent_add_sparks(components, j);
+        SoundComponent_add(components, j, "stone_hit");
+        i = j;
+    }
 }
 
 
@@ -190,10 +236,10 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
             float delta_angle = angle_diff(enemy->desired_angle, coord->angle);
             phys->angular_velocity = 5.0f * delta_angle;
 
-            AnimationComponent* animation = AnimationComponent_get(components, i);
-            if (animation) {
-                animation->framerate = phys->speed;
-            }
+            // AnimationComponent* animation = AnimationComponent_get(components, i);
+            // if (animation) {
+            //     animation->framerate = phys->speed;
+            // }
         }
 
         switch (enemy->state) {

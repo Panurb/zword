@@ -727,9 +727,9 @@ void AmmoComponent_remove(ComponentData* components, int entity) {
 }
 
 
-AnimationComponent* AnimationComponent_add(ComponentData* components, int entity) {
+AnimationComponent* AnimationComponent_add(ComponentData* components, int entity, int frames) {
     AnimationComponent* anim = malloc(sizeof(AnimationComponent));
-    anim->frames = 2;
+    anim->frames = frames;
     anim->current_frame = 0;
     anim->framerate = 10.0f;
     anim->timer = 0.0f;

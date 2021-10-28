@@ -10,6 +10,16 @@ void animate(ComponentData* components, float time_step) {
         AnimationComponent* animation = AnimationComponent_get(components, i);
         if (!animation) continue;
 
+        PhysicsComponent* physics = PhysicsComponent_get(components, i);
+        if (physics) {
+            animation->framerate = physics->speed;
+        }
+
+        JointComponent* joint = JointComponent_get(components, i);
+        if (joint) {
+            animation->framerate = AnimationComponent_get(components, joint->parent)->framerate;
+        }
+
         if (animation->framerate == 0.0f) continue;
 
         animation->timer += time_step;
