@@ -343,6 +343,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     enemy->desired_angle = rand_angle();
     enemy->attack_delay = 0.1f;
     enemy->attack_timer = enemy->attack_delay;
+    enemy->turn_speed = 5.0f;
 
     components->enemy[entity] = enemy;
 

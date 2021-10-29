@@ -150,42 +150,41 @@ void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f po
 }
 
 
-void create_boss(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+void create_boss(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
-    CoordinateComponent_add(components, i, pos, rand_angle());
-    ColliderComponent_add_circle(components, i, 1.5f, GROUP_ENEMIES);
-
-    if (collides_with(components, grid, i)) {
-        destroy_entity(components, i);
-        return;
-    }
-
+    CoordinateComponent_add(components, i, pos, angle);
+    ColliderComponent_add_circle(components, i, 1.0f, GROUP_ENEMIES);
     ImageComponent_add(components, i, "boss_head", 6.0f, 4.0f, LAYER_ENEMIES);
     AnimationComponent_add(components, i, 1);
-    PhysicsComponent_add(components, i, 10.0f);
+    PhysicsComponent_add(components, i, 100.0f);
     EnemyComponent* enemy = EnemyComponent_add(components, i);
+    enemy->fov = 2.0f * M_PI;
     enemy->idle_speed = 0.0f;
-    enemy->walk_speed = 2.0f;
-    enemy->run_speed = 4.0f;
+    enemy->walk_speed = 2.5f;
+    enemy->run_speed = 6.0f;
+    enemy->turn_speed = 2.5f;
+    enemy->attack_delay = 0.0f;
+    enemy->attack_timer = 0.0f;
     ParticleComponent_add_blood(components, i);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 5000, "boss_dead", "blood", "stone_hit");
     SoundComponent_add(components, i, "squish");
+    LightComponent_add(components, i, 5.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 1.0f);
 
     sfVector2f r = { 0.5f, 0.0f };
     int j = create_entity(components);
     CoordinateComponent_add(components, j, r, 0.0f);
-    WeaponComponent_add(components, j, 0.5f, 50, 7, 0.5f * M_PI, -1, 0.0f, 3.0f, 0.0f, AMMO_MELEE, "axe");
+    WeaponComponent_add(components, j, 5.0f, 50, 7, M_PI, -1, 0.0f, 3.0f, 0.0f, AMMO_MELEE, "axe");
     add_child(components, i, j);
     enemy->weapon = j;
 
     for (int k = 0; k < 5; k++) {
         j = create_entity(components);
-        pos = sum(pos, mult(3.0f, rand_vector()));
-        CoordinateComponent_add(components, j, pos, rand_angle());
+        pos = sum(pos, polar_to_cartesian(3.0f, angle));
+        CoordinateComponent_add(components, j, pos, 0.0f);
         PhysicsComponent_add(components, j, 10.0f);
-        ColliderComponent_add_circle(components, j, 1.5f, GROUP_ENEMIES);
+        ColliderComponent_add_rectangle(components, j, 3.0f, 1.5f, GROUP_ENEMIES);
         ImageComponent_add(components, j, "boss_body", 6.0f, 4.0f, LAYER_ENEMIES);
         AnimationComponent_add(components, j, 4)->current_frame = 2 * (k % 2);
         JointComponent_add(components, j, i, 3.0f, 3.0f, 1.0f);
@@ -234,12 +233,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
         if (enemy->state != ENEMY_ATTACK && enemy->state != ENEMY_DEAD) {
             update_vision(components, grid, i);
             float delta_angle = angle_diff(enemy->desired_angle, coord->angle);
-            phys->angular_velocity = 5.0f * delta_angle;
-
-            // AnimationComponent* animation = AnimationComponent_get(components, i);
-            // if (animation) {
-            //     animation->framerate = phys->speed;
-            // }
+            phys->angular_velocity = enemy->turn_speed * delta_angle;
         }
 
         switch (enemy->state) {
@@ -303,6 +297,18 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                     enemy->attack_timer = enemy->attack_delay;
                     enemy->state = ENEMY_ATTACK;
                 } else {
+                    // TODO: dont hit other enemies
+                    for (int j = 0; j < weapon->shots; j++) {
+                        float angle = j * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
+                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, i) + angle);
+                        HitInfo info = raycast(components, grid, pos, dir, 1.1f * ColliderComponent_get(components, i)->radius, GROUP_BULLETS);
+
+                        if (HealthComponent_get(components, info.entity)) {
+                            enemy->state = ENEMY_ATTACK;
+                            break;
+                        }
+                    }
+
                     if (phys->speed < enemy->run_speed) {
                         phys->acceleration = sum(phys->acceleration, mult(enemy->acceleration, normalized(v)));
                     }

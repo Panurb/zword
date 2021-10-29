@@ -16,3 +16,5 @@ void create_outhouse(ComponentData* components, sfVector2f pos);
 void create_garage(ComponentData* components, sfVector2f pos);
 
 void create_mansion(ComponentData* components, sfVector2f pos);
+
+void create_school(ComponentData* components, sfVector2f pos);

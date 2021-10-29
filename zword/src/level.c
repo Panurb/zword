@@ -200,8 +200,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     create_house(components, start);
 
     angle = rand_angle();
-    int n = randi(5, 7);
-    int buildings[7] = {1, 2, 2, 3, 4, 1, 2};
+    int n = randi(5, 8);
+    int buildings[8] = {5, 1, 2, 2, 3, 4, 2, 3};
     permute(buildings, n);
     float rad = 0.5f * (LEVEL_WIDTH - 3) * CHUNK_WIDTH;
 
@@ -225,6 +225,9 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
                     break;
                 case 4:
                     create_mansion(components, pos);
+                    break;
+                case 5: 
+                    create_school(components, pos);
                     break;
             }
 
@@ -305,7 +308,7 @@ void test(ComponentData* components, ColliderGrid* grid) {
 
     sfVector2f start = zeros();
     // create_mansion(components, start);
-    create_boss(components, grid, sum(start, mult(10.0f, rand_vector())));
+    create_school(components, start);
 
     create_player(components, start, -1);
     create_assault_rifle(components, sum(start, rand_vector()));

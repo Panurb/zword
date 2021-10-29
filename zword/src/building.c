@@ -11,6 +11,7 @@
 #include "item.h"
 #include "vehicle.h"
 #include "image.h"
+#include "enemy.h"
 
 
 void create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
@@ -185,6 +186,34 @@ void create_lamp(ComponentData* components, sfVector2f position) {
     ParticleComponent_add_splinter(components, i);
     SoundComponent_add(components, i, "wood_hit");
     LightComponent_add(components, i, 10.0f, 2.0f * M_PI, sfWhite, 0.5f, 5.0f)->flicker = 0.1f;
+    ColliderComponent_add_circle(components, i, 0.5f, GROUP_VEHICLES);
+}
+
+
+void create_desk(ComponentData* components, sfVector2f position, float angle) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, angle);
+    ImageComponent_add(components, i, "desk", 2.0, 2.0f, LAYER_ITEMS);
+    ColliderComponent_add_rectangle(components, i, 1.3f, 1.8f, GROUP_WALLS);
+    ParticleComponent_add_splinter(components, i);
+    SoundComponent_add(components, i, "wood_hit");
+    HealthComponent_add(components, i, 100, "", "", "wood_destroy");
+    PhysicsComponent_add(components, i, 2.0f);
+
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, -0.75f}, 0.0f);
+    ImageComponent_add(components, j, "desk_destroyed", 2.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
+    ColliderComponent_add_rectangle(components, j, 1.3f, 1.0f, GROUP_DEBRIS)->enabled = false;
+    PhysicsComponent_add(components, j, 1.0f);
+    add_child(components, i, j);
+
+    j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, 0.25f}, 0.0f);
+    ImageComponent_add(components, j, "desk_debris", 2.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
+    ColliderComponent_add_rectangle(components, j, 1.3f, 1.0f, GROUP_DEBRIS)->enabled = false;
+    PhysicsComponent_add(components, j, 1.0f);
+    add_child(components, i, j);
 }
 
 
@@ -540,4 +569,47 @@ void create_mansion(ComponentData* components, sfVector2f pos) {
 
     create_waypoint(components, sum(pos, lin_comb(-5.0f, w, 15.0f, h)));
     create_waypoint(components, sum(pos, lin_comb(-5.0f, w, -15.0f, h)));
+}
+
+
+void create_school(ComponentData* components, sfVector2f pos) {
+    float angle = rand_angle();
+
+    sfVector2f w = polar_to_cartesian(1.0f, angle);
+    sfVector2f h = perp(w);
+
+    create_floor(components, pos, 32.0f, 26.0f, angle, "board_tile");
+
+    // Outside walls
+    create_wall(components, sum(pos, mult(-15.5f, w)), angle + 0.5 * M_PI, 26.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, mult(12.5f, h)), angle, 30.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, mult(-12.5f, h)), angle, 30.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(15.5f, w, 7.0f, h)), angle + 0.5 * M_PI, 12.0f, 1.0f, "brick_tile");
+    create_wall(components, sum(pos, lin_comb(15.5f, w, -7.0f, h)), angle + 0.5 * M_PI, 12.0f, 1.0f, "brick_tile");
+
+    create_waypoint(components, sum(pos, lin_comb(17.0f, w, 17.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(17.0f, w, -17.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, 17.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, -17.0f, h)));
+
+    create_lamp(components, sum(pos, lin_comb(14.0f, w, 11.0f, h)));
+    create_lamp(components, sum(pos, lin_comb(14.0f, w, -11.0f, h)));
+    create_lamp(components, sum(pos, lin_comb(-14.0f, w, 11.0f, h)));
+    create_lamp(components, sum(pos, lin_comb(-14.0f, w, -11.0f, h)));
+
+    for (int i = 0; i < 10; i++) {
+        sfVector2f r = { randf(-14.0f, 14.0f), randf(-11.0f, 11.0f) };
+        create_decal(components, sum(pos, lin_comb(r.x, w, r.y, h)), "blood_large");
+    }
+    
+    create_door(components, sum(pos, mult(15.5f, w)), angle + 0.5f * M_PI);
+
+    for (int i = -2; i < 3; i++) {
+        for (int j = -2; j < 3; j++) {
+            sfVector2f r = sum(pos, lin_comb(4.0f * (i + 1), w, 4.0f * j, h));
+            create_desk(components, r, angle + randf(-0.1f, 0.1f));
+        }
+    }
+
+    create_boss(components, sum(pos, lin_comb(-10.0f, w, 5.0f, h)), angle + 1.5f * M_PI);
 }

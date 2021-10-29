@@ -6,6 +6,8 @@
 #include <SFML/Graphics.h>
 
 
+#define COLOR_ENERGY get_color(0.5f, 1.0f, 0.0f, 1.0f)
+
 typedef struct {
     float a;
     float b;

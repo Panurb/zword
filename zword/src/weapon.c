@@ -67,7 +67,7 @@ void create_energy(ComponentData* components, sfVector2f position, sfVector2f ve
     phys->drag_sideways = 0.0f;
     phys->lifetime = 5.0f;
     ColliderComponent_add_circle(components, i, 0.25f, GROUP_ENERGY);
-    LightComponent_add(components, i, 8.0f, 2.0f * M_PI, get_color(0.5f, 1.0f, 0.0f, 1.0f), 0.5f, 2.5f)->enabled = false;
+    LightComponent_add(components, i, 8.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 2.5f)->enabled = false;
     ParticleComponent_add_energy(components, i);
     SoundComponent_add(components, i, "");
 }

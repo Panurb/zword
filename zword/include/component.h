@@ -191,6 +191,7 @@ typedef struct {
     float desired_angle;
     float attack_delay;
     float attack_timer;
+    float turn_speed;
 } EnemyComponent;
 
 typedef struct {

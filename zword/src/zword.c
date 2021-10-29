@@ -72,7 +72,7 @@ int main() {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
 
-    float ambient_light = 0.7f;
+    float ambient_light = 0.4f;
     int seed = time(NULL);
 
     int camera = create_camera(components, mode);

@@ -18,7 +18,7 @@ void create_priest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
 void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f pos);
 
-void create_boss(ComponentData* components, ColliderGrid* grid, sfVector2f pos);
+void create_boss(ComponentData* components, sfVector2f pos, float angle);
 
 void draw_enemies(ComponentData* component, sfRenderWindow* window, int camera);
 
