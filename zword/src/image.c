@@ -19,6 +19,10 @@ static const char* IMAGES[] = {
     "ammo_pistol",
     "ammo_rifle",
     "ammo_shotgun",
+    "arms",
+    "arms_assault_rifle",
+    "arms_pistol",
+    "arms_shotgun",
     "assault_rifle",
     "axe",
     "beach_corner",
@@ -87,7 +91,7 @@ void create_decal(ComponentData* components, sfVector2f pos, Filename filename) 
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
     ImageComponent_add(components, i, filename, 0.0f, 0.0f, LAYER_DECALS);
-    PhysicsComponent_add(components, i, 0.0f)->lifetime = 10.0f;
+    PhysicsComponent_add(components, i, 0.0f)->lifetime = INFINITY;
 }
 
 
@@ -253,6 +257,8 @@ void change_texture(ComponentData* components, int entity, Filename filename, fl
     image->texture_changed = true;
     if (filename[0] == '\0') {
         image->alpha = 0.0f;
+    } else {
+        image->alpha = 1.0f;
     }
 }
 

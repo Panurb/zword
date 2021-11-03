@@ -170,7 +170,7 @@ void create_boss(ComponentData* components, sfVector2f pos, float angle) {
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 5000, "boss_dead", "blood", "stone_hit");
     SoundComponent_add(components, i, "squish");
-    LightComponent_add(components, i, 5.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 1.0f);
+    LightComponent_add(components, i, 5.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 1.0f)->flicker = 0.1f;
 
     sfVector2f r = { 0.5f, 0.0f };
     int j = create_entity(components);

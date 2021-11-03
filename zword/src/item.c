@@ -2,6 +2,7 @@
 #include "grid.h"
 #include "util.h"
 #include "image.h"
+#include "weapon.h"
 
 
 void create_flashlight(ComponentData* components, sfVector2f position) {
@@ -10,9 +11,9 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
+    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
     ItemComponent_add(components, i, 0);
     LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
-    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
 }
 
 
@@ -22,8 +23,8 @@ void create_gas(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, rand_angle());
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
-    ItemComponent_add(components, i, 0);
     ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
+    ItemComponent_add(components, i, 0);
 }
 
 
@@ -59,7 +60,7 @@ void create_item(ComponentData* components, sfVector2f position, int tier) {
             }
             break;
         default:
-            create_ammo(components, position, rand() % 3 + 1);
+            create_ammo(components, position, randi(1, 3));
             break;
     }
 }
@@ -97,13 +98,17 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
         if (i != -1) {
             player->inventory[i] = player->target;
             coord->parent = entity;
-            coord->position = (sfVector2f) { 0.75, 0.0 };
+            coord->position = (sfVector2f) { 0.75f, 0.0f };
             coord->angle = 0.0f;
             ColliderComponent_get(components, player->target)->enabled = false;
             change_layer(components, player->target, LAYER_WEAPONS);
             image->outline = 0.0f;
             if (player->item != i) {
-                image->alpha = 0.0;
+                image->alpha = 0.0f;
+            }
+            WeaponComponent* weapon = WeaponComponent_get(components, player->target);
+            if (weapon && weapon->ammo_type != AMMO_MELEE) {
+                image->alpha = 0.0f;
             }
         }
     }

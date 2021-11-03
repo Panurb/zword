@@ -109,6 +109,29 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                 }
             }
         }
+
+        if (weapon) {
+            switch (weapon->ammo_type) {
+                case AMMO_PISTOL:
+                    change_texture(components, player->arms, "arms_pistol", 0.0f, 0.0f);
+                    break;
+                case AMMO_RIFLE:
+                    change_texture(components, player->arms, "arms_assault_rifle", 0.0f, 0.0f);
+                    break;
+                case AMMO_SHOTGUN:
+                    change_texture(components, player->arms, "arms_shotgun", 0.0f, 0.0f);
+                    break;
+                default:
+                    change_texture(components, player->arms, "", 0.0f, 0.0f);
+                    break;
+            }
+        } else {
+            if (itco) {
+                change_texture(components, player->arms, "arms", 0.0f, 0.0f);
+            } else {
+                change_texture(components, player->arms, "", 0.0f, 0.0f);
+            }
+        }
         
         switch (player->state) {
             case PLAYER_ON_FOOT:;
@@ -241,7 +264,10 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                     }
                     if (new_item != -1) {
                         itco = ItemComponent_get(components, new_item);
-                        ImageComponent_get(components, new_item)->alpha = 1.0f;
+
+                        if (!WeaponComponent_get(components, new_item)) {
+                            ImageComponent_get(components, new_item)->alpha = 1.0f;
+                        }
                         for (int j = 0; j < itco->size; j++) {
                             int k = itco->attachments[j];
                             if (k != -1) {

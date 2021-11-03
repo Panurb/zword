@@ -29,8 +29,8 @@ typedef enum {
     LAYER_ITEMS,
     LAYER_VEHICLES,
     LAYER_ENEMIES,
-    LAYER_PLAYERS,
     LAYER_WEAPONS,
+    LAYER_PLAYERS,
     LAYER_TREES,
     LAYER_PARTICLES,
     LAYER_ROOFS
@@ -152,6 +152,7 @@ typedef struct {
     int ammo_size;
     int ammo[4];
     sfCircleShape* crosshair;
+    int arms;
 } PlayerComponent;
 
 typedef struct {

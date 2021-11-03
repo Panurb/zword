@@ -29,12 +29,14 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
     PlayerComponent* player = PlayerComponent_get(components, entity);
 
     if (player) {
+        float angle = coord->angle;
         for (int j = 0; j < player->inventory_size; j++) {
             if (player->inventory[j] != -1) {
                 coord->angle = rand_angle();
                 drop_item(components, entity);
             }
         }
+        coord->angle = angle;
 
         for (int j = 1; j < player->ammo_size; j++) {
             AmmoComponent* ammo = AmmoComponent_get(components, player->ammo[j]);

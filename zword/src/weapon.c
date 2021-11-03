@@ -13,6 +13,7 @@
 #include "collider.h"
 #include "particle.h"
 #include "health.h"
+#include "image.h"
 
 
 int get_akimbo(ComponentData* components, int entity) {
@@ -257,10 +258,10 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
 void update_weapons(ComponentData* components, float time_step) {
     for (int i = 0; i < components->entities; i++) {
-        WeaponComponent* weapon = components->weapon[i];
+        WeaponComponent* weapon = WeaponComponent_get(components, i);
         if (!weapon) continue;
 
-        weapon->cooldown = fmax(0.0f, weapon->cooldown - time_step);
+        weapon->cooldown = fmaxf(0.0f, weapon->cooldown - time_step);
 
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         int parent = coord->parent;
@@ -381,9 +382,9 @@ int create_lasersight(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
     PhysicsComponent_add(components, i, 0.5f);
+    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent_add(components, i, 0);
     LightComponent_add(components, i, 20.0, 0.01, sfRed, 1.0, 10.0)->enabled = false;
-    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
 
     return i;
 }

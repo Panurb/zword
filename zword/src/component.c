@@ -260,6 +260,11 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->crosshair = sfCircleShape_create();
     sfCircleShape_setOutlineThickness(player->crosshair, 1.0f);
 
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = entity;
+    ImageComponent_add(components, i, "", 0.0f, 0.0f, LAYER_WEAPONS);
+    player->arms = i;
+
     components->player.array[entity] = player;
     List_add(components->player.order, entity);
 
@@ -507,7 +512,6 @@ ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size
     }
 
     components->item[entity] = item;
-
     return item;
 }
 
