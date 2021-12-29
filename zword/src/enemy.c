@@ -1,10 +1,6 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
-#include <string.h>
-
-#include <SFML/Window.h>
-#include <SFML/System/Vector2.h>
 
 #include "component.h"
 #include "raycast.h"

@@ -587,10 +587,16 @@ void create_school(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(15.5f, w, 7.0f, h)), angle + 0.5 * M_PI, 12.0f, 1.0f, "brick_tile");
     create_wall(components, sum(pos, lin_comb(15.5f, w, -7.0f, h)), angle + 0.5 * M_PI, 12.0f, 1.0f, "brick_tile");
 
-    create_waypoint(components, sum(pos, lin_comb(17.0f, w, 17.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(17.0f, w, -17.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, 17.0f, h)));
-    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, -17.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(17.0f, w, 14.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(17.0f, w, -14.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, 14.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, -14.0f, h)));
+
+    create_waypoint(components, sum(pos, lin_comb(-17.0f, w, 0.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(6.0f, w, 14.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(6.0f, w, -14.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-6.0f, w, 14.0f, h)));
+    create_waypoint(components, sum(pos, lin_comb(-6.0f, w, -14.0f, h)));
 
     create_lamp(components, sum(pos, lin_comb(14.0f, w, 11.0f, h)));
     create_lamp(components, sum(pos, lin_comb(14.0f, w, -11.0f, h)));
@@ -611,5 +617,5 @@ void create_school(ComponentData* components, sfVector2f pos) {
         }
     }
 
-    // create_boss(components, sum(pos, lin_comb(-10.0f, w, 5.0f, h)), angle + 1.5f * M_PI);
+    create_boss(components, sum(pos, lin_comb(-10.0f, w, 5.0f, h)), angle + 1.5f * M_PI);
 }
