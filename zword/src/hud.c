@@ -100,7 +100,7 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
 
         char buffer[20];
         snprintf(buffer, 20, "%i", AmmoComponent_get(components, i)->size);
-        draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice + 0.1f * M_PI)), buffer);
+        draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice + 0.1f * M_PI)), buffer, sfWhite);
     }
 }
 

@@ -29,7 +29,7 @@ void draw_slice_outline(sfRenderWindow* window, ComponentData* components, int c
 
 void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index);
 
-void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100]);
+void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100], sfColor color);
 
 void update_camera(ComponentData* components, int camera, float time_step);
 

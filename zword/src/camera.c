@@ -66,15 +66,10 @@ void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sf
     }
 
     sfVector2f r = diff(end, start);
-
     sfRectangleShape_setPosition(line, world_to_screen(components, camera, start));
-
     sfRectangleShape_setFillColor(line, color);
-    
     sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * cam->zoom, width * cam->zoom });
-
     sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));
-
     sfRenderWindow_drawRectangleShape(window, line, NULL);
 
     if (created) {
@@ -137,16 +132,11 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
     }
 
     sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * width * cam->zoom, 0.5 * height * cam->zoom });
-
     sfRectangleShape_setPosition(shape, world_to_screen(components, camera, position));
-
     sfVector2f size = { width * cam->zoom, height * cam->zoom };
     sfRectangleShape_setSize(shape, size);
-
     sfRectangleShape_setRotation(shape, -to_degrees(angle));
-
     sfRectangleShape_setFillColor(shape, color);
-
     sfRenderWindow_drawRectangleShape(window, shape, NULL);
 
     if (created) {
@@ -267,7 +257,7 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
 }
 
 
-void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100]) {
+void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100], sfColor color) {
     bool created = false;
     if (!text) {
         text = sfText_create();
@@ -275,7 +265,7 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
 
     sfText_setFont(text, CameraComponent_get(components, camera)->fonts[0]);
     sfText_setCharacterSize(text, 20);
-    sfText_setColor(text, sfWhite);
+    sfText_setColor(text, color);
 
     sfText_setString(text, string);
     sfText_setPosition(text, world_to_screen(components, camera, position));

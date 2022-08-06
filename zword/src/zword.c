@@ -9,27 +9,11 @@
 #include <SFML/System/Vector2.h>
 #include <SFML/Window/Keyboard.h>
 
-#include "camera.h"
-#include "player.h"
-#include "component.h"
-#include "level.h"
-#include "collider.h"
-#include "physics.h"
-#include "util.h"
-#include "image.h"
-#include "light.h"
-#include "grid.h"
-#include "enemy.h"
-#include "particle.h"
-#include "navigation.h"
-#include "interface.h"
-#include "perlin.h"
-#include "weapon.h"
-#include "road.h"
 #include "sound.h"
-#include "hud.h"
-#include "animation.h"
-#include "door.h"
+#include "game.h"
+#include "interface.h"
+#include "menu.h"
+#include "globals.h"
 
 
 int main() {
@@ -43,25 +27,14 @@ int main() {
     sfRenderWindow_setMouseCursorVisible(window, false);
     // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
+
     bool focus = true;
     sfJoystick_update();
-    
-    sfTexture** textures = load_textures();
-    sfSoundBuffer** sounds = load_sounds();
 
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
         channels[i] = sfSound_create();
     }
-
-    sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
-    sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
-    sfSprite* light_sprite = sfSprite_create();
-    sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), sfTrue);
-
-    sfRenderTexture* shadow_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
-    sfSprite* shadow_sprite = sfSprite_create();
-    sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), sfTrue);
 
     FpsCounter* fps = FpsCounter_create();
 
@@ -69,18 +42,10 @@ int main() {
     float time_step = 1.0f / 60.0f;
     float elapsed_time = 0.0f;
 
-    ComponentData* components = ComponentData_create();
-    ColliderGrid* grid = ColliderGrid_create();
+    GameData data = create_game(mode);
+    start_game(data);
 
-    float ambient_light = 0.4f;
-    int seed = time(NULL);
-
-    int camera = create_camera(components, mode);
-    // create_level(components, grid, seed);
-    test(components, grid);
-    init_grid(components, grid);
-
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    create_menu(data);
 
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
@@ -100,25 +65,24 @@ int main() {
                     break;
                 case sfEvtKeyPressed:
                     if (event.key.code == sfKeyEscape) {
-                        sfRenderWindow_close(window);
+                        if (game_state == STATE_GAME) {
+                            game_state = STATE_PAUSE;
+                        } else if (game_state == STATE_PAUSE) {
+                            game_state = STATE_GAME;
+                        }
                     } else if (event.key.code == sfKeyF5 || event.key.code == sfKeyF6) {
                         if (event.key.code == sfKeyF6) {
-                            seed = time(NULL);
+                            data.seed = time(NULL);
                         }
 
-                        ColliderGrid_clear(grid);
-                        ComponentData_clear(components);
                         clear_sounds(channels);
-
-                        camera = create_camera(components, mode);
-                        cam = CameraComponent_get(components, camera);
-                        create_level(components, grid, seed);
-                        init_grid(components, grid);
                         sfClock_restart(clock);
+                        reset_game(data);
                     }
                     break;
                 case sfEvtMouseWheelScrolled:;
-                    cam->zoom_target = fmaxf(1.0f, cam->zoom_target + event.mouseWheelScroll.delta);
+                    // CameraComponent* cam = CameraComponent_get(components, camera);
+                    // cam->zoom_target = fmaxf(1.0f, cam->zoom_target + event.mouseWheelScroll.delta);
                     break;
                 default:
                     break;
@@ -128,29 +92,19 @@ int main() {
         if (focus) {
             while (elapsed_time > time_step) {
                 elapsed_time -= time_step;
-
-                input(components, window, camera);
-
-                update(components, time_step, grid);
-                collide(components, grid);
-                update_waypoints(components, grid, camera);
-                update_doors(components);
-
-                update_players(components, grid);
-                update_weapons(components, time_step);
-                update_enemies(components, grid, time_step);
-                update_energy(components, grid);
-
-                update_particles(components, camera, time_step);
-                update_lights(components, time_step);
-                update_camera(components, camera, time_step);
-
-                draw_shadows(components, shadow_texture, camera);
-                draw_lights(components, grid, light_texture, camera, ambient_light);
-
-                animate(components, time_step);
-
-                // spawn_enemies(components, grid, camera);
+                switch (game_state) {
+                    case STATE_MENU:
+                        update_menu(data, window, time_step);
+                        break;
+                    case STATE_GAME:
+                        update_game(data, window, time_step);
+                        break;
+                    case STATE_PAUSE:
+                        break;
+                    case STATE_QUIT:
+                        sfRenderWindow_close(window);
+                        break;
+                }
             }
 
             elapsed_time += delta_time;
@@ -158,25 +112,15 @@ int main() {
 
         sfRenderWindow_clear(window, sfBlack);
 
-        draw_ground(components, window, camera, textures);
-        sfRenderWindow_drawSprite(window, shadow_sprite, &state);
-        draw(components, window, camera, textures);
-        sfRenderWindow_drawSprite(window, light_sprite, &state);
-
-        draw_roofs(components, window, camera, textures);
-        draw_outlines(components, window, camera);
-        draw_hud(components, window, camera);
-
-        // draw_colliders(components, window, camera);
-        // draw_waypoints(components, window, camera);
-        // draw_enemies(components, window, camera);
-        // draw_grid(components, grid, window, camera);
-        // draw_occupied_tiles(components, grid, window, camera);
+        draw_game(data, window);
+        if (game_state == STATE_MENU) {
+            draw_menu(data, window);
+        }
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);
 
-        play_sounds(components, camera, sounds, channels);
+        play_sounds(data.components, data.camera, data.sounds, channels);
     }
 
     sfRenderWindow_destroy(window);

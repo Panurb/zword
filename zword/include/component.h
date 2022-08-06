@@ -33,7 +33,8 @@ typedef enum {
     LAYER_PLAYERS,
     LAYER_TREES,
     LAYER_PARTICLES,
-    LAYER_ROOFS
+    LAYER_ROOFS,
+    LAYER_MENU
 } Layer;
 
 typedef struct {
@@ -347,6 +348,12 @@ typedef struct {
     float max_angle;
 } JointComponent;
 
+typedef struct ButtonComponent {
+    bool selected;
+    ButtonText text;
+    void (*on_click)();
+} ButtonComponent;
+
 typedef struct {
     void* array[MAX_ENTITIES];
     List* order;
@@ -374,6 +381,7 @@ typedef struct {
     AnimationComponent* animation[MAX_ENTITIES];
     DoorComponent* door[MAX_ENTITIES];
     JointComponent* joint[MAX_ENTITIES];
+    ButtonComponent* button[MAX_ENTITIES];
 } ComponentData;
 
 ComponentData* ComponentData_create();
@@ -458,6 +466,10 @@ void DoorComponent_remove(ComponentData* components, int entity);
 JointComponent* JointComponent_add(ComponentData* components, int entity, int parent, float min_length, float max_length, float strength);
 JointComponent* JointComponent_get(ComponentData* components, int entity);
 void JointComponent_remove(ComponentData* components, int entity);
+
+ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text);
+ButtonComponent* ButtonComponent_get(ComponentData* components, int entity);
+void ButtonComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

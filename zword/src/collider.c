@@ -34,6 +34,10 @@ bool inside_collider(ComponentData* components, int i, sfVector2f point) {
             0.0f < dot(am, ad) && dot(am, ad) < dot(ad, ad)) {
             return true;
         }
+    } else if (col->type == COLLIDER_CIRCLE) {
+        if (norm2(diff(get_position(components, i), point)) < col->radius * col->radius) {
+            return true;
+        }
     }
     return false;
 }

@@ -178,7 +178,7 @@ void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* wi
                 if (grid->array[i][j]->size > 0) {
                     char size[10];
                     snprintf(size, 10, "%i", grid->array[i][j]->size);
-                    draw_text(window, components, camera, text, r, size);
+                    draw_text(window, components, camera, text, r, size, sfWhite);
                 }
             }
         }

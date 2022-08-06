@@ -16,6 +16,8 @@ set(SOURCES
     zword/src/component.c
     zword/src/door.c
     zword/src/enemy.c
+    zword/src/game.c
+    zword/src/globals.c
     zword/src/grid.c
     zword/src/health.c
     zword/src/heap.c
@@ -27,6 +29,7 @@ set(SOURCES
     zword/src/level.c
     zword/src/light.c
     zword/src/list.c
+    zword/src/menu.c
     zword/src/navigation.c
     zword/src/particle.c
     zword/src/perlin.c

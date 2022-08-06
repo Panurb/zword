@@ -180,8 +180,7 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
         ImageComponent* image = ImageComponent_get(components, i);
 
         if (image->layer <= LAYER_DECALS) continue;
-        if (image->layer == LAYER_ROOFS) break;
-
+        if (image->layer >= LAYER_ROOFS) break;
 
         if (image->texture_changed) {
             set_texture(image, textures);

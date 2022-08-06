@@ -813,6 +813,32 @@ void JointComponent_remove(ComponentData* components, int entity) {
 }
 
 
+ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text) {
+    ButtonComponent* button = malloc(sizeof(ButtonComponent));
+    button->selected = false;
+    strcpy(button->text, text);
+    button->on_click = NULL;
+    
+    components->button[entity] = button;
+    return button;
+}
+
+
+ButtonComponent* ButtonComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->button[entity];
+}
+
+
+void ButtonComponent_remove(ComponentData* components, int entity) {
+    ButtonComponent* button = ButtonComponent_get(components, entity);
+    if (button) {
+        free(button);
+        components->button[entity] = NULL;
+    }
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {

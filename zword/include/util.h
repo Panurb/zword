@@ -17,6 +17,8 @@ typedef struct {
 
 typedef char Filename[20];
 
+typedef char ButtonText[20];
+
 sfVector2f zeros();
 
 sfVector2f ones();
