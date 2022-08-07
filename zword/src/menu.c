@@ -8,7 +8,7 @@
 
 
 void play() {
-    game_state = STATE_GAME;
+    game_state = STATE_START;
 }
 
 
@@ -17,10 +17,10 @@ void quit() {
 }
 
 
-int create_button(ComponentData* components, int camera, ButtonText text, sfVector2f position, void (*on_click)()) {
+int create_button(ComponentData* components, int camera, ButtonText text, sfVector2f position, OnClick on_click) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f)->parent = camera;
-    ColliderComponent_add_rectangle(components, i, 5.0f, 2.0f, GROUP_WALLS);
+    ColliderComponent_add_rectangle(components, i, 5.0f, 2.0f, GROUP_WALLS)->enabled = false;
     ButtonComponent* button = ButtonComponent_add(components, i, text);
     button->on_click = on_click;
 
@@ -76,7 +76,7 @@ void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera)
         sfVector2f corners[4];
         get_corners(components, i, corners);
 
-        draw_text(window, components, camera, NULL, pos, button->text, sfWhite);
+        draw_text(window, components, camera, button->text, pos, button->string, sfWhite);
         if (button->selected) {
             draw_line(window, components, camera, NULL, corners[1], corners[2], 0.1f, sfWhite);
         }

@@ -50,7 +50,6 @@ GameData create_game(sfVideoMode mode) {
 void start_game(GameData data) {
     create_level(data.components, data.grid, data.seed);
     init_grid(data.components, data.grid);
-    data.camera = create_camera(data.components, data.mode);
 }
 
 

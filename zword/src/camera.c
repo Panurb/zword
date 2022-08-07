@@ -261,6 +261,7 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
     bool created = false;
     if (!text) {
         text = sfText_create();
+        created = true;
     }
 
     sfText_setFont(text, CameraComponent_get(components, camera)->fonts[0]);

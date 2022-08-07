@@ -43,8 +43,6 @@ int main() {
     float elapsed_time = 0.0f;
 
     GameData data = create_game(mode);
-    start_game(data);
-
     create_menu(data);
 
     while (sfRenderWindow_isOpen(window)) {
@@ -96,10 +94,15 @@ int main() {
                     case STATE_MENU:
                         update_menu(data, window, time_step);
                         break;
+                    case STATE_START:
+                        start_game(data);
+                        game_state = STATE_GAME;
+                        break;
                     case STATE_GAME:
                         update_game(data, window, time_step);
                         break;
                     case STATE_PAUSE:
+                        update_menu(data, window, time_step);
                         break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);
@@ -112,10 +115,25 @@ int main() {
 
         sfRenderWindow_clear(window, sfBlack);
 
-        draw_game(data, window);
-        if (game_state == STATE_MENU) {
-            draw_menu(data, window);
+        switch (game_state) {
+            case STATE_MENU:
+                draw_menu(data, window);
+                break;
+            case STATE_START:
+                draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
+                break;
+            case STATE_GAME:
+                draw_game(data, window);
+                break;
+            case STATE_PAUSE:
+                draw_game(data, window);
+                draw_text(window, data.components, data.camera, NULL, zeros(), "PAUSED", sfWhite);
+                break;
+            case STATE_QUIT:
+                sfRenderWindow_close(window);
+                break;
         }
+
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);

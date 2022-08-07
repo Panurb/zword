@@ -350,8 +350,9 @@ typedef struct {
 
 typedef struct ButtonComponent {
     bool selected;
-    ButtonText text;
-    void (*on_click)();
+    ButtonText string;
+    sfText* text;
+    OnClick on_click;
 } ButtonComponent;
 
 typedef struct {

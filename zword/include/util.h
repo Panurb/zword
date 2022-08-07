@@ -19,6 +19,8 @@ typedef char Filename[20];
 
 typedef char ButtonText[20];
 
+typedef void (*OnClick)();
+
 sfVector2f zeros();
 
 sfVector2f ones();
