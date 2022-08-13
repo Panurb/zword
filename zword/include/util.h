@@ -25,6 +25,8 @@ sfVector2f zeros();
 
 sfVector2f ones();
 
+sfVector2f vec(float x, float y);
+
 float norm(sfVector2f v);
 
 float norm2(sfVector2f v);

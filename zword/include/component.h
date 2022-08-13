@@ -348,11 +348,18 @@ typedef struct {
     float max_angle;
 } JointComponent;
 
-typedef struct ButtonComponent {
+typedef enum {
+    MENU_MAIN,
+    MENU_SETTINGS,
+    MENU_PAUSE,
+} ButtonMenu;
+
+typedef struct {
     bool selected;
     ButtonText string;
     sfText* text;
     OnClick on_click;
+    ButtonMenu menu;
 } ButtonComponent;
 
 typedef struct {
@@ -468,7 +475,7 @@ JointComponent* JointComponent_add(ComponentData* components, int entity, int pa
 JointComponent* JointComponent_get(ComponentData* components, int entity);
 void JointComponent_remove(ComponentData* components, int entity);
 
-ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text);
+ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text, ButtonMenu menu,  OnClick on_click);
 ButtonComponent* ButtonComponent_get(ComponentData* components, int entity);
 void ButtonComponent_remove(ComponentData* components, int entity);
 

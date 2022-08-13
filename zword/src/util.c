@@ -12,11 +12,15 @@
 
 
 sfVector2f zeros() {
-    return (sfVector2f) { 0.0, 0.0 };
+    return (sfVector2f) { 0.0f, 0.0f };
 }
 
 sfVector2f ones() {
-    return (sfVector2f) { 1.0, 1.0 };
+    return (sfVector2f) { 1.0f, 1.0f };
+}
+
+sfVector2f vec(float x, float y) {
+    return (sfVector2f) { x, y };
 }
 
 float norm(sfVector2f v) {

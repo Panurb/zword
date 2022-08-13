@@ -37,6 +37,7 @@ set(SOURCES
     zword/src/player.c
     zword/src/raycast.c
     zword/src/road.c
+    zword/src/settings.c
     zword/src/sound.c
     zword/src/util.c
     zword/src/zword.c
@@ -76,5 +77,13 @@ set(SHADERS
 )
 
 install(FILES ${SHADERS}
+    DESTINATION ${CMAKE_SOURCE_DIR}/build
+)
+
+set(CONFIG 
+    ${CMAKE_SOURCE_DIR}/zword/config.cfg
+)
+
+install(FILES ${CONFIG}
     DESTINATION ${CMAKE_SOURCE_DIR}/build
 )

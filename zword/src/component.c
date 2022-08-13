@@ -813,12 +813,13 @@ void JointComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText string) {
+ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText string, ButtonMenu menu,  OnClick on_click) {
     ButtonComponent* button = malloc(sizeof(ButtonComponent));
     button->selected = false;
     strcpy(button->string, string);
     button->text = sfText_create();
-    button->on_click = NULL;
+    button->on_click = on_click;
+    button->menu = menu;
     
     components->button[entity] = button;
     return button;

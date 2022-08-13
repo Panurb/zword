@@ -14,16 +14,22 @@
 #include "interface.h"
 #include "menu.h"
 #include "globals.h"
+#include "settings.h"
 
 
 int main() {
-    sfVideoMode mode = { 1920, 1080, 32 };
+    load_settings();
+
+    sfVideoMode mode = { game_settings.width, game_settings.height, 32 };
     sfContext* context = sfContext_create();
     sfContextSettings settings = sfContext_getSettings(context);
-    settings.antialiasingLevel = 8;
-    sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfClose, &settings);
-    // sfRenderWindow* window = sfRenderWindow_create(mode, "zword", sfFullscreen, &settings);
-    sfRenderWindow_setKeyRepeatEnabled(window, sfFalse);
+    settings.antialiasingLevel = game_settings.antialiasing;
+    sfUint32 style = sfClose;
+    if (game_settings.fullscreen) {
+        style = sfFullscreen;
+    }
+    sfRenderWindow* window = sfRenderWindow_create(mode, "zword", style, &settings);
+    sfRenderWindow_setKeyRepeatEnabled(window, false);
     sfRenderWindow_setMouseCursorVisible(window, false);
     // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
     // sfWindow_setFramerateLimit((sfWindow*) window, 60);
@@ -83,6 +89,7 @@ int main() {
                     // cam->zoom_target = fmaxf(1.0f, cam->zoom_target + event.mouseWheelScroll.delta);
                     break;
                 default:
+                    input_menu(data.components, event);
                     break;
             }
         }
@@ -92,7 +99,7 @@ int main() {
                 elapsed_time -= time_step;
                 switch (game_state) {
                     case STATE_MENU:
-                        update_menu(data, window, time_step);
+                        update_menu(data, window, MENU_MAIN);
                         break;
                     case STATE_START:
                         start_game(data);
@@ -102,7 +109,12 @@ int main() {
                         update_game(data, window, time_step);
                         break;
                     case STATE_PAUSE:
-                        update_menu(data, window, time_step);
+                        update_menu(data, window, MENU_PAUSE);
+                        break;
+                    case STATE_SETTINGS:
+                        update_menu(data, window, MENU_SETTINGS);
+                        break;
+                    case STATE_APPLY:
                         break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);
@@ -117,7 +129,7 @@ int main() {
 
         switch (game_state) {
             case STATE_MENU:
-                draw_menu(data, window);
+                draw_menu(data, window, MENU_MAIN);
                 break;
             case STATE_START:
                 draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
@@ -127,7 +139,13 @@ int main() {
                 break;
             case STATE_PAUSE:
                 draw_game(data, window);
+                draw_menu(data, window, MENU_PAUSE);
                 draw_text(window, data.components, data.camera, NULL, zeros(), "PAUSED", sfWhite);
+                break;
+            case STATE_SETTINGS:
+                draw_menu(data, window, MENU_SETTINGS);
+                break;
+            case STATE_APPLY:
                 break;
             case STATE_QUIT:
                 sfRenderWindow_close(window);

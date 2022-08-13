@@ -3,10 +3,12 @@
 
 void create_menu(GameData data);
 
-void update_menu(GameData data, sfRenderWindow* window, float time_step);
+void update_menu(GameData data, sfRenderWindow* window, ButtonMenu menu);
 
-void draw_menu(GameData data, sfRenderWindow* window);
+void input_menu(ComponentData* components, sfEvent event);
 
-void update_buttons(ComponentData* components, sfRenderWindow* window, int camera);
+void draw_menu(GameData data, sfRenderWindow* window, ButtonMenu menu);
 
-void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera);
+void update_buttons(ComponentData* components, sfRenderWindow* window, int camera, ButtonMenu menu);
+
+void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera, ButtonMenu menu);
