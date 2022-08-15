@@ -6,6 +6,8 @@ typedef struct {
     int height;
     int antialiasing;
     bool fullscreen;
+    bool vsync;
+    int max_fps;
 } Settings;
 
 typedef struct {
@@ -13,7 +15,11 @@ typedef struct {
     int value;
 } KeyValue;
 
+typedef char Line[255];
+
 extern Settings game_settings;
+
+KeyValue parse_line(Line string, char* delim);
 
 void load_settings();
 

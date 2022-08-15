@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "game.h"
 #include "menu.h"
@@ -34,20 +35,31 @@ void back() {
 
 
 void apply() {
+    ButtonText text;
+    strcpy(text, BUTTON_RESOLUTION->string);
+    char* width = strtok(text, "x");
+    char* height = strtok(NULL, "x");
+
+    printf("%sx%s\n", width, height);
+
+    game_settings.width = strtol(width, NULL, 10);
+    game_settings.height = strtol(height, NULL, 10);
+    // game_settings.antialiasing;
+    save_settings();
     game_state = STATE_APPLY;
 }
 
 
 void change_resolution(int dir) {
     char* string = BUTTON_RESOLUTION->string;
-    printf(string);
     int len = sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]);
     for (int i = 0; i < len; i++) {
         if (strcmp(string, RESOLUTIONS[i]) == 0) {
             strcpy(BUTTON_RESOLUTION->string, RESOLUTIONS[(int) mod(i + dir, len)]);
-            break;
+            return;
         }
     }
+    strcpy(BUTTON_RESOLUTION->string, RESOLUTIONS[0]);
 }
 
 
@@ -77,12 +89,13 @@ void create_menu(GameData data) {
     create_button(data.components, "QUIT", (sfVector2f) { 0.0f, -5.0f }, MENU_MAIN, quit);
 
     create_button(data.components, "RESOLUTION", (sfVector2f) { 0.0f, 5.0f }, MENU_SETTINGS, NULL);
-    char buffer[20];
+    ButtonText buffer;
     sprintf(buffer, "%ix%i", game_settings.width, game_settings.height);
     int i = create_button(data.components, buffer, (sfVector2f) { 0.0f, 4.0f }, MENU_SETTINGS, NULL);
     BUTTON_RESOLUTION = ButtonComponent_get(data.components, i);
     create_button(data.components, "<", (sfVector2f) { -4.0f, 4.0f }, MENU_SETTINGS, resolution_down);
     create_button(data.components, ">", (sfVector2f) { 4.0f, 4.0f }, MENU_SETTINGS, resolution_up);
+
     create_button(data.components, "VOLUME", (sfVector2f) { 0.0f, 0.0f }, MENU_SETTINGS, NULL);
     create_button(data.components, "APPLY", (sfVector2f) { 5.0f, -5.0f }, MENU_SETTINGS, apply);
     create_button(data.components, "BACK", (sfVector2f) { -5.0f, -5.0f }, MENU_SETTINGS, back);
@@ -147,7 +160,7 @@ void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera,
         get_corners(components, i, corners);
 
         draw_text(window, components, camera, button->text, pos, button->string, sfWhite);
-        if (button->selected) {
+        if (button->selected && button->on_click) {
             draw_line(window, components, camera, NULL, corners[1], corners[2], 0.1f, sfWhite);
         }
     }

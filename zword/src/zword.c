@@ -17,22 +17,30 @@
 #include "settings.h"
 
 
+sfRenderWindow* create_game_window(sfVideoMode* mode) {
+    mode->width = game_settings.width;
+    mode->height = game_settings.height;
+    sfContext* context = sfContext_create();
+    sfContextSettings settings = sfContext_getSettings(context);
+    sfContext_destroy(context);
+    settings.antialiasingLevel = game_settings.antialiasing;
+    sfUint32 style = game_settings.fullscreen ? sfFullscreen : sfClose;
+    sfRenderWindow* window = sfRenderWindow_create(*mode, "zword", style, &settings);
+    sfRenderWindow_setKeyRepeatEnabled(window, false);
+    sfRenderWindow_setMouseCursorVisible(window, false);
+    sfWindow_setVerticalSyncEnabled((sfWindow*) window, game_settings.vsync);
+    if (game_settings.max_fps) {
+        sfWindow_setFramerateLimit((sfWindow*) window, 60);
+    }
+    return window;
+}
+
+
 int main() {
     load_settings();
 
     sfVideoMode mode = { game_settings.width, game_settings.height, 32 };
-    sfContext* context = sfContext_create();
-    sfContextSettings settings = sfContext_getSettings(context);
-    settings.antialiasingLevel = game_settings.antialiasing;
-    sfUint32 style = sfClose;
-    if (game_settings.fullscreen) {
-        style = sfFullscreen;
-    }
-    sfRenderWindow* window = sfRenderWindow_create(mode, "zword", style, &settings);
-    sfRenderWindow_setKeyRepeatEnabled(window, false);
-    sfRenderWindow_setMouseCursorVisible(window, false);
-    // sfWindow_setVerticalSyncEnabled((sfWindow*) window, true);
-    // sfWindow_setFramerateLimit((sfWindow*) window, 60);
+    sfRenderWindow* window = create_game_window(&mode);
 
     bool focus = true;
     sfJoystick_update();
@@ -115,6 +123,10 @@ int main() {
                         update_menu(data, window, MENU_SETTINGS);
                         break;
                     case STATE_APPLY:
+                        sfRenderWindow_destroy(window);
+                        window = create_game_window(&mode);
+                        resize_game(&data, mode);
+                        game_state = STATE_SETTINGS;
                         break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);

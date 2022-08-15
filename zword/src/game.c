@@ -33,17 +33,28 @@ GameData create_game(sfVideoMode mode) {
     sfTexture** textures = load_textures();
     sfSoundBuffer** sounds = load_sounds();
 
-    sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
+    sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, false);
     sfSprite* light_sprite = sfSprite_create();
-    sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), sfTrue);
+    sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), true);
 
-    sfRenderTexture* shadow_texture = sfRenderTexture_create(mode.width, mode.height, sfFalse);
+    sfRenderTexture* shadow_texture = sfRenderTexture_create(mode.width, mode.height, false);
     sfSprite* shadow_sprite = sfSprite_create();
-    sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), sfTrue);
+    sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
 
     GameData data = { textures, sounds, components, grid, ambient_light, seed, camera, 
         light_texture, light_sprite, shadow_texture, shadow_sprite, mode };
     return data;
+}
+
+
+void resize_game(GameData* data, sfVideoMode mode) {
+    CameraComponent* camera = CameraComponent_get(data->components, data->camera);
+    camera->resolution.x = mode.width;
+    camera->resolution.y = mode.height;
+    sfRenderTexture_destroy(data->light_texture);
+    data->light_texture = sfRenderTexture_create(mode.width, mode.height, false);
+    sfRenderTexture_destroy(data->shadow_texture);
+    data->shadow_texture = sfRenderTexture_create(mode.width, mode.height, false);
 }
 
 

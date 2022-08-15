@@ -8,10 +8,7 @@
 #include "settings.h"
 
 
-typedef char Line[255];
-
-
-Settings game_settings = { 1920, 1080, 8, 0 };
+Settings game_settings = { 1920, 1080, 8, 0, 0, 0 };
 
 
 KeyValue parse_line(Line string, char* delim) {
@@ -45,7 +42,11 @@ void load_settings() {
             game_settings.antialiasing = line.value;
         } else if (strcmp(line.key, "FULLSCREEN") == 0) {
             game_settings.fullscreen = line.value;
-        }
+        } else if (strcmp(line.key, "VSYNC") == 0) {
+            game_settings.vsync = line.value;
+        } else if (strcmp(line.key, "MAX_FPS") == 0) {
+            game_settings.max_fps = line.value;
+        } 
     }
 
     fclose(file);
@@ -59,11 +60,8 @@ void save_settings() {
     fprintf(file, "HEIGHT=%i\n", game_settings.height);
     fprintf(file, "ANTIALIASING=%i\n", game_settings.antialiasing);
     fprintf(file, "FULLSCREEN=%i\n", game_settings.fullscreen);
+    fprintf(file, "VSYNC=%i\n", game_settings.vsync);
+    fprintf(file, "MAX_FPS=%i\n", game_settings.max_fps);
 
     fclose(file);
-}
-
-
-void apply_settings() {
-
 }

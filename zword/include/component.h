@@ -351,7 +351,7 @@ typedef struct {
 typedef enum {
     MENU_MAIN,
     MENU_SETTINGS,
-    MENU_PAUSE,
+    MENU_PAUSE
 } ButtonMenu;
 
 typedef struct {
