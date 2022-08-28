@@ -92,12 +92,8 @@ int main() {
                         reset_game(data);
                     }
                     break;
-                case sfEvtMouseWheelScrolled:;
-                    // CameraComponent* cam = CameraComponent_get(components, camera);
-                    // cam->zoom_target = fmaxf(1.0f, cam->zoom_target + event.mouseWheelScroll.delta);
-                    break;
                 default:
-                    input_menu(data.components, event);
+                    input_menu(data.components, data.camera, event);
                     break;
             }
         }
@@ -107,7 +103,7 @@ int main() {
                 elapsed_time -= time_step;
                 switch (game_state) {
                     case STATE_MENU:
-                        update_menu(data, window, MENU_MAIN);
+                        update_menu(data, window);
                         break;
                     case STATE_START:
                         start_game(data);
@@ -117,10 +113,10 @@ int main() {
                         update_game(data, window, time_step);
                         break;
                     case STATE_PAUSE:
-                        update_menu(data, window, MENU_PAUSE);
+                        update_menu(data, window);
                         break;
                     case STATE_SETTINGS:
-                        update_menu(data, window, MENU_SETTINGS);
+                        update_menu(data, window);
                         break;
                     case STATE_APPLY:
                         sfRenderWindow_destroy(window);
@@ -141,7 +137,7 @@ int main() {
 
         switch (game_state) {
             case STATE_MENU:
-                draw_menu(data, window, MENU_MAIN);
+                draw_menu(data, window);
                 break;
             case STATE_START:
                 draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
@@ -151,11 +147,11 @@ int main() {
                 break;
             case STATE_PAUSE:
                 draw_game(data, window);
-                draw_menu(data, window, MENU_PAUSE);
+                draw_menu(data, window);
                 draw_text(window, data.components, data.camera, NULL, zeros(), "PAUSED", sfWhite);
                 break;
             case STATE_SETTINGS:
-                draw_menu(data, window, MENU_SETTINGS);
+                draw_menu(data, window);
                 break;
             case STATE_APPLY:
                 break;

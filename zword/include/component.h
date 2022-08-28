@@ -349,17 +349,33 @@ typedef struct {
 } JointComponent;
 
 typedef enum {
-    MENU_MAIN,
-    MENU_SETTINGS,
-    MENU_PAUSE
-} ButtonMenu;
+    WIDGET_WINDOW,
+    WIDGET_CONTAINER,
+    WIDGET_LABEL,
+    WIDGET_BUTTON,
+    WIDGET_SPINBOX,
+    WIDGET_SLIDER,
+    WIDGET_DROPDOWN
+} WidgetType;
+
+typedef struct ComponentData ComponentData;
+
+typedef void (*OnClick)(ComponentData*, int);
+typedef void (*OnChange)(ComponentData*, int, int);
 
 typedef struct {
+    bool enabled;
+    WidgetType type;
     bool selected;
     ButtonText string;
     sfText* text;
     OnClick on_click;
-    ButtonMenu menu;
+    OnChange on_change;
+    int value;
+    int min_value;
+    int max_value;
+    bool cyclic;
+    ButtonText* strings;
 } ButtonComponent;
 
 typedef struct {
@@ -367,7 +383,7 @@ typedef struct {
     List* order;
 } OrderedArray;
 
-typedef struct {
+struct ComponentData {
     int entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     OrderedArray image;
@@ -390,7 +406,7 @@ typedef struct {
     DoorComponent* door[MAX_ENTITIES];
     JointComponent* joint[MAX_ENTITIES];
     ButtonComponent* button[MAX_ENTITIES];
-} ComponentData;
+};
 
 ComponentData* ComponentData_create();
 
@@ -475,12 +491,13 @@ JointComponent* JointComponent_add(ComponentData* components, int entity, int pa
 JointComponent* JointComponent_get(ComponentData* components, int entity);
 void JointComponent_remove(ComponentData* components, int entity);
 
-ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text, ButtonMenu menu,  OnClick on_click);
+ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text, WidgetType type);
 ButtonComponent* ButtonComponent_get(ComponentData* components, int entity);
 void ButtonComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
+void destroy_entity_recursive(ComponentData* components, int entity);
 void add_child(ComponentData* components, int parent, int child);
 void remove_children(ComponentData* components, int parent);
 

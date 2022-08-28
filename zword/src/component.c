@@ -813,13 +813,20 @@ void JointComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText string, ButtonMenu menu,  OnClick on_click) {
+ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText string, WidgetType type) {
     ButtonComponent* button = malloc(sizeof(ButtonComponent));
+    button->enabled = true;
+    button->type = type;
     button->selected = false;
     strcpy(button->string, string);
     button->text = sfText_create();
-    button->on_click = on_click;
-    button->menu = menu;
+    button->on_click = NULL;
+    button->on_change = NULL;
+    button->value = 0;
+    button->max_value = 0;
+    button->min_value = 0;
+    button->cyclic = false;
+    button->strings = NULL;
     
     components->button[entity] = button;
     return button;
@@ -895,6 +902,16 @@ void destroy_entity(ComponentData* components, int entity) {
     if (entity == components->entities - 1) {
         components->entities--;
     }
+}
+
+
+void destroy_entity_recursive(ComponentData* components, int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        destroy_entity_recursive(components, node->value);
+    }
+    List_clear(coord->children);
+    destroy_entity(components, entity);
 }
 
 
