@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SFML/Audio.h>
 
 #include "component.h"

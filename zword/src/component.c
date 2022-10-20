@@ -64,6 +64,9 @@ CoordinateComponent* CoordinateComponent_get(ComponentData* components, int enti
 void CoordinateComponent_remove(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     if (coord) {
+        // if (coord->parent != -1) {
+        //     List_remove(CoordinateComponent_get(components, coord->parent)->children, entity);
+        // }
         for (ListNode* node = coord->children->head; node; node = node->next) {
             CoordinateComponent_get(components, node->value)->parent = -1;
         }
@@ -813,8 +816,8 @@ void JointComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText string, WidgetType type) {
-    ButtonComponent* button = malloc(sizeof(ButtonComponent));
+WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, ButtonText string, WidgetType type) {
+    WidgetComponent* button = malloc(sizeof(WidgetComponent));
     button->enabled = true;
     button->type = type;
     button->selected = false;
@@ -833,14 +836,14 @@ ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, Butt
 }
 
 
-ButtonComponent* ButtonComponent_get(ComponentData* components, int entity) {
+WidgetComponent* WidgetComponent_get(ComponentData* components, int entity) {
     if (entity == -1) return NULL;
     return components->button[entity];
 }
 
 
-void ButtonComponent_remove(ComponentData* components, int entity) {
-    ButtonComponent* button = ButtonComponent_get(components, entity);
+void WidgetComponent_remove(ComponentData* components, int entity) {
+    WidgetComponent* button = WidgetComponent_get(components, entity);
     if (button) {
         free(button);
         components->button[entity] = NULL;

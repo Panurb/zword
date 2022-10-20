@@ -1,4 +1,8 @@
+#pragma once
+
 #include "util.h"
+#include "component.h"
+#include "game.h"
 
 
 void create_menu(GameData data);

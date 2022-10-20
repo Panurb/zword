@@ -38,7 +38,7 @@ void create_fence(ComponentData* components, sfVector2f pos, float angle, float 
 }
 
 
-void create_window(ComponentData* components, sfVector2f pos, float angle) {
+static void create_window(ComponentData* components, sfVector2f pos, float angle) {
     create_fence(components, pos, angle, 1.0f, 4.0f);
     create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle)));
     create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle)));

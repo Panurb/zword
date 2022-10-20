@@ -2,22 +2,20 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "game.h"
 #include "menu.h"
+#include "game.h"
 #include "component.h"
 #include "collider.h"
 #include "globals.h"
 #include "settings.h"
+#include "widget.h"
 
 
-static ButtonText RESOLUTIONS[] = {"1280x720", "1920x1080", "2560x1440"};
-static ButtonComponent* BUTTON_RESOLUTION = NULL;
+static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "2160x3840"};
+static WidgetComponent* BUTTON_RESOLUTION = NULL;
 
-static int SETTINGS_WINDOW;
+static int SETTINGS_WINDOW = -1;
 static int MOUSE_ENTITY;
-
-float BUTTON_WIDTH = 5.0f;
-float BUTTON_HEIGHT = 2.0f;
 
 
 void play() {
@@ -25,18 +23,8 @@ void play() {
 }
 
 
-void settings() {
-    game_state = STATE_SETTINGS;
-}
-
-
 void quit() {
     game_state = STATE_QUIT;
-}
-
-
-void back() {
-    game_state = STATE_MENU;
 }
 
 
@@ -69,47 +57,8 @@ void change_resolution(ComponentData* components, int entity, int dir) {
 }
 
 
-int create_button(ComponentData* components, ButtonText text, sfVector2f position, OnClick on_click) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    ButtonComponent_add(components, i, text, WIDGET_BUTTON)->on_click = on_click;
-
-    return i;
-}
-
-
-int create_container(ComponentData* components, sfVector2f position, int height) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    ButtonComponent* button = ButtonComponent_add(components, i, "", WIDGET_CONTAINER);
-    button->type = WIDGET_CONTAINER;
-
-    return i;
-}
-
-
-int add_button_to_container(ComponentData* components, int container, ButtonText string, OnClick on_click) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, container);
-    ButtonComponent* button = ButtonComponent_get(components, container);
-    float height = ColliderComponent_get(components, container)->height;
-
-    sfVector2f pos = vec(0.0f, 0.5f * height - coord->children->size * BUTTON_HEIGHT - 0.5f * BUTTON_HEIGHT);
-    int i = create_button(components, string, pos, on_click);
-    add_child(components, container, i);
-
-    if (coord->children->size * BUTTON_HEIGHT > height) {
-        button->max_value += 1;
-        ButtonComponent_get(components, i)->enabled = false;
-    }
-
-    return i;
-}
-
-
 void increment_value(ComponentData* components, int entity, int direction) {
-    ButtonComponent* button = ButtonComponent_get(components, entity);
+    WidgetComponent* button = WidgetComponent_get(components, entity);
     sfVector2f v = vec(0.0f, direction * BUTTON_HEIGHT);
     button->value += direction;
 
@@ -139,67 +88,29 @@ void increment_value(ComponentData* components, int entity, int direction) {
         coord_child->position = sum(coord_child->position, v);
 
         sfVector2f pos = coord_child->position;
-        ButtonComponent_get(components, node->value)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
+        WidgetComponent_get(components, node->value)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
     }
-}
-
-
-void spinbox_up(ComponentData* components, int entity) {
-    int parent = CoordinateComponent_get(components, entity)->parent;
-    increment_value(components, parent, 1);
-}
-
-
-void spinbox_down(ComponentData* components, int entity) {
-    int parent = CoordinateComponent_get(components, entity)->parent;
-    increment_value(components, parent, -1);
-}
-
-
-int create_spinbox(ComponentData* components, sfVector2f position, OnChange on_change) {
-    int i = create_button(components, "0", position, NULL);
-    ButtonComponent* button = ButtonComponent_get(components, i);
-    button->on_change = change_resolution;
-    button->strings = RESOLUTIONS;
-    button->type = WIDGET_SPINBOX;
-
-    int j = create_button(components, ">", vec(BUTTON_WIDTH, 0.0f), spinbox_up);
-    CoordinateComponent_get(components, j)->parent = i;
-    j = create_button(components, "<", vec(-BUTTON_WIDTH, 0.0f), spinbox_down);
-    CoordinateComponent_get(components, j)->parent = i;
-
-    return i;
-}
-
-
-static int create_window(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    ButtonComponent_add(components, i, "window", WIDGET_WINDOW);
-
-    return i;
 }
 
 
 void close_settings(ComponentData* components, int entity) {
     destroy_entity_recursive(components, SETTINGS_WINDOW);
+    SETTINGS_WINDOW = -1;
 }
 
 
 void open_settings(ComponentData* components, int entity) {
+    if (SETTINGS_WINDOW != -1) {
+        return;
+    }
+
     SETTINGS_WINDOW = create_window(components, zeros());
 
-    int i = create_button(components, "X", vec(4.0f, 0.0f), close_settings);
+    int i = create_button_small(components, "X", vec(4.0f, 0.0f), close_settings);
     add_child(components, SETTINGS_WINDOW, i);
 
-    int container = create_container(components, vec(0.0f, -2.0f * BUTTON_HEIGHT), 3);
-    add_child(components, SETTINGS_WINDOW, container);
-    add_button_to_container(components, container, "A", NULL);
-    add_button_to_container(components, container, "B", NULL);
-    add_button_to_container(components, container, "C", NULL);
-    add_button_to_container(components, container, "D", NULL);
-    add_button_to_container(components, container, "E", NULL);
+    i = create_dropdown(components, vec(0.0f, -BUTTON_HEIGHT), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
+    add_child(components, SETTINGS_WINDOW, i);
 }
 
 
@@ -210,8 +121,6 @@ void create_menu(GameData data) {
     // create_button(data.components, "PLAY", (sfVector2f) { 0.0f, 5.0f }, MENU_MAIN, play);
     create_button(data.components, "SETTINGS", (sfVector2f) { 0.0f, 0.0f }, open_settings);
     // create_button(data.components, "QUIT", (sfVector2f) { 0.0f, -5.0f }, MENU_MAIN, quit);
-
-
 
     // create_button(data.components, "RESOLUTION", (sfVector2f) { 0.0f, 5.0f }, MENU_SETTINGS, NULL);
     // create_spinbox(data.components, vec(0.0f, 4.0f), MENU_SETTINGS, change_resolution);
@@ -229,7 +138,7 @@ void update_menu(GameData data, sfRenderWindow* window) {
 
 void input_menu(ComponentData* components, int camera, sfEvent event) {
     for (int i = 0; i < components->entities; i++) {
-        ButtonComponent* button = ButtonComponent_get(components, i);
+        WidgetComponent* button = WidgetComponent_get(components, i);
         if (!button) continue;
 
         CoordinateComponent* mouse_coord = CoordinateComponent_get(components, MOUSE_ENTITY);
@@ -272,37 +181,56 @@ void draw_menu(GameData data, sfRenderWindow* window) {
 
 
 void update_buttons(ComponentData* components, sfRenderWindow* window, int camera) {
+    int last_selected = -1;
     for (int i = 0; i < components->entities; i++) {
-        ButtonComponent* button = ButtonComponent_get(components, i);
+        WidgetComponent* button = WidgetComponent_get(components, i);
         if (!button) continue;
-        if (!button->enabled) continue;;
+        if (!button->enabled) continue;
 
         sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
-        button->selected = inside_collider(components, i, mouse);
+        button->selected = false;
+        if (inside_collider(components, i, mouse)) {
+            last_selected = i;
+        }
+    }
+    if (last_selected != -1) {
+        WidgetComponent_get(components, last_selected)->selected = true;
     }
 }
 
 
 void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
-        ButtonComponent* button = ButtonComponent_get(components, i);
+        WidgetComponent* button = WidgetComponent_get(components, i);
         if (!button) continue;
         if (!button->enabled) continue;
 
-        sfVector2f corners[4];
-        get_corners(components, i, corners);
+        sfVector2f pos = get_position(components, i);
+        ColliderComponent* collider = ColliderComponent_get(components, i);
+        sfColor color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
+        draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
+
+        if (button->strings) {
+            draw_text(window, components, camera, button->text, pos, button->strings[button->value], sfWhite);
+        } else {
+            draw_text(window, components, camera, button->text, pos, button->string, sfWhite);
+        }
+
         if (button->selected) {
+            sfVector2f corners[4];
+            get_corners(components, i, corners);
             draw_line(window, components, camera, NULL, corners[1], corners[2], 0.1f, sfMagenta);
             draw_line(window, components, camera, NULL, corners[2], corners[3], 0.1f, sfMagenta);
             draw_line(window, components, camera, NULL, corners[3], corners[0], 0.1f, sfMagenta);
             draw_line(window, components, camera, NULL, corners[0], corners[1], 0.1f, sfMagenta);
         }
 
-        sfVector2f pos = get_position(components, i);
-        if (button->strings) {
-            draw_text(window, components, camera, button->text, pos, button->strings[button->value], sfWhite);
-        } else {
-            draw_text(window, components, camera, button->text, pos, button->string, sfWhite);
+        switch (button->type) {
+        case WIDGET_WINDOW:
+            // draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height);
+            break;
+        default:
+            break;
         }
     }
 }

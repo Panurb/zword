@@ -376,7 +376,7 @@ typedef struct {
     int max_value;
     bool cyclic;
     ButtonText* strings;
-} ButtonComponent;
+} WidgetComponent;
 
 typedef struct {
     void* array[MAX_ENTITIES];
@@ -405,7 +405,7 @@ struct ComponentData {
     AnimationComponent* animation[MAX_ENTITIES];
     DoorComponent* door[MAX_ENTITIES];
     JointComponent* joint[MAX_ENTITIES];
-    ButtonComponent* button[MAX_ENTITIES];
+    WidgetComponent* button[MAX_ENTITIES];
 };
 
 ComponentData* ComponentData_create();
@@ -491,9 +491,9 @@ JointComponent* JointComponent_add(ComponentData* components, int entity, int pa
 JointComponent* JointComponent_get(ComponentData* components, int entity);
 void JointComponent_remove(ComponentData* components, int entity);
 
-ButtonComponent* ButtonComponent_add(ComponentData* components, int entity, ButtonText text, WidgetType type);
-ButtonComponent* ButtonComponent_get(ComponentData* components, int entity);
-void ButtonComponent_remove(ComponentData* components, int entity);
+WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, ButtonText text, WidgetType type);
+WidgetComponent* WidgetComponent_get(ComponentData* components, int entity);
+void WidgetComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "component.h"
 #include "collider.h"
 #include "image.h"
