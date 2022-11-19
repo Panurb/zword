@@ -122,6 +122,18 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
 }
 
 
+void draw_triangle(sfRenderWindow* window, ComponentData* components, int camera, sfConvexShape* shape,
+                   sfVector2f position, float width, float angle, sfColor color) {
+    bool created = false;
+    if (!shape) {
+        shape = sfConvexShape_create();
+        created = true;
+    }
+    
+    
+}
+
+
 void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color) {
     CameraComponent* cam = CameraComponent_get(components, camera);
 

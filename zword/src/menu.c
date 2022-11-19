@@ -12,28 +12,30 @@
 
 
 static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "2160x3840"};
-static WidgetComponent* BUTTON_RESOLUTION = NULL;
+int BUTTON_RESOLUTION = -1;
 
 static int SETTINGS_WINDOW = -1;
 static int MOUSE_ENTITY;
 
 
-void play() {
+void play(ComponentData* components, int entity) {
     game_state = STATE_START;
 }
 
 
-void quit() {
+void quit(ComponentData* components, int entity) {
     game_state = STATE_QUIT;
 }
 
 
-void apply() {
+void apply(ComponentData* components, int entity) {
+    WidgetComponent* widget = WidgetComponent_get(components, BUTTON_RESOLUTION);
     ButtonText text;
-    strcpy(text, BUTTON_RESOLUTION->string);
+    strcpy(text, RESOLUTIONS[widget->value]);
     char* width = strtok(text, "x");
     char* height = strtok(NULL, "x");
 
+    printf("%d\n", widget->value);
     printf("%sx%s\n", width, height);
 
     game_settings.width = strtol(width, NULL, 10);
@@ -45,15 +47,16 @@ void apply() {
 
 
 void change_resolution(ComponentData* components, int entity, int dir) {
-    char* string = BUTTON_RESOLUTION->string;
+    WidgetComponent* widget = WidgetComponent_get(components, BUTTON_RESOLUTION);
+    char* string = widget->string;
     int len = sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]);
     for (int i = 0; i < len; i++) {
         if (strcmp(string, RESOLUTIONS[i]) == 0) {
-            strcpy(BUTTON_RESOLUTION->string, RESOLUTIONS[(int) mod(i + dir, len)]);
+            strcpy(widget->string, RESOLUTIONS[(int) mod(i + dir, len)]);
             return;
         }
     }
-    strcpy(BUTTON_RESOLUTION->string, RESOLUTIONS[0]);
+    strcpy(widget->string, RESOLUTIONS[0]);
 }
 
 
@@ -104,13 +107,19 @@ void open_settings(ComponentData* components, int entity) {
         return;
     }
 
-    SETTINGS_WINDOW = create_window(components, zeros());
+    SETTINGS_WINDOW = create_window(components, zeros(), "SETTINGS");
 
-    int i = create_button_small(components, "X", vec(4.0f, 0.0f), close_settings);
+    int i = create_button_small(components, "X", vec(BUTTON_WIDTH - 0.5 * BUTTON_HEIGHT, 0.0f), close_settings);
     add_child(components, SETTINGS_WINDOW, i);
 
-    i = create_dropdown(components, vec(0.0f, -BUTTON_HEIGHT), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
-    add_child(components, SETTINGS_WINDOW, i);
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    add_child(components, SETTINGS_WINDOW, container);
+
+    int label = create_label(components, "Resolution", zeros());
+    BUTTON_RESOLUTION = create_dropdown(components, zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
+    add_row_to_container(components, container, label, BUTTON_RESOLUTION);
+
+    add_button_to_container(components, container, "Apply", apply);
 }
 
 
@@ -118,9 +127,10 @@ void create_menu(GameData data) {
     MOUSE_ENTITY = create_entity(data.components);
     CoordinateComponent_add(data.components, MOUSE_ENTITY, zeros(), 0.0f);
 
-    // create_button(data.components, "PLAY", (sfVector2f) { 0.0f, 5.0f }, MENU_MAIN, play);
-    create_button(data.components, "SETTINGS", (sfVector2f) { 0.0f, 0.0f }, open_settings);
-    // create_button(data.components, "QUIT", (sfVector2f) { 0.0f, -5.0f }, MENU_MAIN, quit);
+    int container = create_container(data.components, vec(-20.0f, 0.0f), 1, 3);
+    add_button_to_container(data.components, container, "PLAY", play);
+    add_button_to_container(data.components, container, "SETTINGS", open_settings);
+    add_button_to_container(data.components, container, "QUIT", quit);
 
     // create_button(data.components, "RESOLUTION", (sfVector2f) { 0.0f, 5.0f }, MENU_SETTINGS, NULL);
     // create_spinbox(data.components, vec(0.0f, 4.0f), MENU_SETTINGS, change_resolution);
@@ -132,38 +142,38 @@ void create_menu(GameData data) {
 
 
 void update_menu(GameData data, sfRenderWindow* window) {
-    update_buttons(data.components, window, data.camera);
+    update_widgets(data.components, window, data.camera);
 }
 
 
 void input_menu(ComponentData* components, int camera, sfEvent event) {
     for (int i = 0; i < components->entities; i++) {
-        WidgetComponent* button = WidgetComponent_get(components, i);
-        if (!button) continue;
+        WidgetComponent* widget = WidgetComponent_get(components, i);
+        if (!widget) continue;
 
         CoordinateComponent* mouse_coord = CoordinateComponent_get(components, MOUSE_ENTITY);
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
 
-        if (button->selected) {
+        if (widget->selected) {
             if (event.type == sfEvtMouseMoved) {
                 sfVector2f v = screen_to_world(components, camera, (sfVector2i) { event.mouseMove.x, event.mouseMove.y });
                 mouse_coord->position = v;
             }
             if (event.type == sfEvtMouseButtonPressed) {
-                if (button->type == WIDGET_WINDOW) {
+                if (widget->type == WIDGET_WINDOW) {
                     add_child(components, MOUSE_ENTITY, i);
                     coord->position = diff(coord->position, mouse_coord->position);
                 }
             } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
-                if (button->type == WIDGET_WINDOW) {
+                if (widget->type == WIDGET_WINDOW) {
                     coord->position = get_position(components, i);
                     remove_children(components, MOUSE_ENTITY);
                 }
-                if (button->on_click) {
-                    button->on_click(components, i);
+                if (widget->on_click) {
+                    widget->on_click(components, i);
                 }
             } else if (event.type == sfEvtMouseWheelScrolled) {
-                if (button->type == WIDGET_CONTAINER || button->type == WIDGET_SPINBOX) {
+                if (widget->type == WIDGET_CONTAINER || widget->type == WIDGET_SPINBOX) {
                     increment_value(components, i, (int) -event.mouseWheelScroll.delta);
                 }
             }
@@ -173,14 +183,14 @@ void input_menu(ComponentData* components, int camera, sfEvent event) {
 
 
 void draw_menu(GameData data, sfRenderWindow* window) {
-    draw_buttons(data.components, window, data.camera);
+    draw_widgets(data.components, window, data.camera);
 
     sfVector2f pos = screen_to_world(data.components, data.camera, sfMouse_getPosition((sfWindow*) window));
     draw_circle(window, data.components, data.camera, NULL, pos, 0.1f, sfWhite);
 }
 
 
-void update_buttons(ComponentData* components, sfRenderWindow* window, int camera) {
+void update_widgets(ComponentData* components, sfRenderWindow* window, int camera) {
     int last_selected = -1;
     for (int i = 0; i < components->entities; i++) {
         WidgetComponent* button = WidgetComponent_get(components, i);
@@ -199,38 +209,67 @@ void update_buttons(ComponentData* components, sfRenderWindow* window, int camer
 }
 
 
-void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera) {
+void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
-        WidgetComponent* button = WidgetComponent_get(components, i);
-        if (!button) continue;
-        if (!button->enabled) continue;
+        WidgetComponent* widget = WidgetComponent_get(components, i);
+        if (!widget) continue;
+        if (!widget->enabled) continue;
 
         sfVector2f pos = get_position(components, i);
         ColliderComponent* collider = ColliderComponent_get(components, i);
-        sfColor color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
-        draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
 
-        if (button->strings) {
-            draw_text(window, components, camera, button->text, pos, button->strings[button->value], sfWhite);
-        } else {
-            draw_text(window, components, camera, button->text, pos, button->string, sfWhite);
+        sfColor color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
+        switch (widget->type) {
+            case WIDGET_CONTAINER:
+                color = get_color(0.1f, 0.1f, 0.1f, 1.0f);
+                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
+                break;
+            case WIDGET_LABEL:
+                break;
+            case WIDGET_BUTTON:
+                color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
+                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
+
+                color = get_color(0.3f, 0.3f, 0.3f, 1.0f);
+                float w = collider->width;
+                float h = collider->height;
+                draw_rectangle(window, components, camera, NULL, sum(pos, vec(-0.1f, 0.1f)), w - 0.2f, h - 0.2f, 0.0f, color);
+                break;
+            case WIDGET_DROPDOWN:
+                color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
+                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
+
+                color = get_color(0.3f, 0.3f, 0.3f, 1.0f);
+                w = collider->width;
+                h = collider->height;
+                sfVector2f r = sum(pos, vec(-0.1f, 0.1f));
+                draw_rectangle(window, components, camera, NULL, r, w - 0.2f, h - 0.2f, 0.0f, color);
+
+                r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
+                if (CoordinateComponent_get(components, i)->children->size == 0) {
+                    draw_text(window, components, camera, NULL, r, "v", sfWhite);
+                } else {
+                    draw_text(window, components, camera, NULL, r, "^", sfWhite);
+                }
+                break;
+            default:
+                color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
+                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
         }
 
-        if (button->selected) {
+        if (widget->strings) {
+            draw_text(window, components, camera, widget->text, pos, widget->strings[widget->value], sfWhite);
+        } else {
+            draw_text(window, components, camera, widget->text, pos, widget->string, sfWhite);
+        }
+
+        if (widget->selected) {
             sfVector2f corners[4];
             get_corners(components, i, corners);
             draw_line(window, components, camera, NULL, corners[1], corners[2], 0.1f, sfMagenta);
             draw_line(window, components, camera, NULL, corners[2], corners[3], 0.1f, sfMagenta);
             draw_line(window, components, camera, NULL, corners[3], corners[0], 0.1f, sfMagenta);
             draw_line(window, components, camera, NULL, corners[0], corners[1], 0.1f, sfMagenta);
-        }
-
-        switch (button->type) {
-        case WIDGET_WINDOW:
-            // draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height);
-            break;
-        default:
-            break;
         }
     }
 }

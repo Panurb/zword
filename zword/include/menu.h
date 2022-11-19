@@ -13,6 +13,6 @@ void input_menu(ComponentData* components, int camera, sfEvent event);
 
 void draw_menu(GameData data, sfRenderWindow* window);
 
-void update_buttons(ComponentData* components, sfRenderWindow* window, int camera);
+void update_widgets(ComponentData* components, sfRenderWindow* window, int camera);
 
-void draw_buttons(ComponentData* components, sfRenderWindow* window, int camera);
+void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera);
