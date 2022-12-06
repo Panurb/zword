@@ -34,3 +34,5 @@ void reset_game(GameData data);
 void update_game(GameData data, sfRenderWindow* window, float time_step);
 
 void draw_game(GameData data, sfRenderWindow* window);
+
+void draw_debug(GameData data, sfRenderWindow* window, int debug_level);

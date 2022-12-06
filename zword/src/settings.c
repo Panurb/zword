@@ -8,7 +8,7 @@
 #include "settings.h"
 
 
-Settings game_settings = { 1920, 1080, 8, 0, 0, 0 };
+Settings game_settings = { 1920, 1080, 8, 0, 0, 0, 100, 100 };
 
 
 KeyValue parse_line(Line string, char* delim) {
@@ -46,7 +46,11 @@ void load_settings() {
             game_settings.vsync = line.value;
         } else if (strcmp(line.key, "MAX_FPS") == 0) {
             game_settings.max_fps = line.value;
-        } 
+        } else if (strcmp(line.key, "VOLUME") == 0) {
+            game_settings.volume = line.value;
+        } else if (strcmp(line.key, "MUSIC") == 0) {
+            game_settings.music = line.value;
+        }
     }
 
     fclose(file);
@@ -62,6 +66,8 @@ void save_settings() {
     fprintf(file, "FULLSCREEN=%i\n", game_settings.fullscreen);
     fprintf(file, "VSYNC=%i\n", game_settings.vsync);
     fprintf(file, "MAX_FPS=%i\n", game_settings.max_fps);
+    fprintf(file, "VOLUME=%i\n", game_settings.volume);
+    fprintf(file, "MUSIC=%i\n", game_settings.music);
 
     fclose(file);
 }

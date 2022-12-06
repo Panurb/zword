@@ -7,11 +7,19 @@ float BUTTON_HEIGHT = 2.0f;
 float BUTTON_MARGIN = 0.2f;
 
 
-int create_window(ComponentData* components, sfVector2f position, ButtonText text) {
+void bring_to_top(ComponentData* components, int entity) {
+
+}
+
+
+int create_window(ComponentData* components, sfVector2f position, ButtonText text, OnClick on_close) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, 2 * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(components, i, text, WIDGET_WINDOW);
+
+    int j = create_button_small(components, "X", vec(BUTTON_WIDTH - 0.5 * BUTTON_HEIGHT, 0.0f), on_close);
+    add_child(components, i, j);
 
     return i;
 }
@@ -84,6 +92,42 @@ int add_button_to_container(ComponentData* components, int container, ButtonText
 }
 
 
+void increment_value(ComponentData* components, int entity, int direction) {
+    WidgetComponent* button = WidgetComponent_get(components, entity);
+    sfVector2f v = vec(0.0f, direction * BUTTON_HEIGHT);
+    button->value += direction;
+
+    if (button->value > button->max_value) {
+        if (button->cyclic) {
+            button->value = button->min_value;
+            v.y = button->max_value - button->min_value;
+        } else {
+            button->value = button->max_value;
+            v.y = 0.0f;
+        }
+    }
+    if (button->value < button->min_value) {
+        if (button->cyclic) {
+            button->value = button->min_value;
+            v.y = button->min_value - button->max_value;
+        } else {
+            button->value = button->min_value;
+            v.y = 0.0f;
+        }
+    }
+
+    float height = ColliderComponent_get(components, entity)->height;
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        CoordinateComponent* coord_child = CoordinateComponent_get(components, node->value);
+        coord_child->position = sum(coord_child->position, v);
+
+        sfVector2f pos = coord_child->position;
+        WidgetComponent_get(components, node->value)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
+    }
+}
+
+
 void add_row_to_container(ComponentData* components, int container, int left, int right) {
     add_widget_to_container(components, container, left);
     CoordinateComponent* coord_left = CoordinateComponent_get(components, left);
@@ -137,11 +181,11 @@ void toggle_dropdown(ComponentData* components, int entity) {
 }
 
 
-int create_dropdown(ComponentData* components, sfVector2f position, ButtonText* strings, int max_value) {
+int create_dropdown(ComponentData* components, sfVector2f position, ButtonText* strings, int size) {
     int i = create_button(components, strings[0], position, toggle_dropdown);
     WidgetComponent* widget = WidgetComponent_get(components, i);
     widget->strings = strings;
-    widget->max_value = max_value;
+    widget->max_value = size - 1;
     widget->type = WIDGET_DROPDOWN;
 
     return i;
@@ -157,13 +201,14 @@ void set_slider(ComponentData* components, int entity, sfVector2f mouse_position
 }
 
 
-int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value) {
+int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value, int value) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS);
     WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_SLIDER);
     widget->min_value = min_value;
     widget->max_value = max_value;
+    widget->value = value;
 
     return i;
 }

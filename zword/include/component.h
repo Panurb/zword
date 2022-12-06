@@ -405,7 +405,7 @@ struct ComponentData {
     AnimationComponent* animation[MAX_ENTITIES];
     DoorComponent* door[MAX_ENTITIES];
     JointComponent* joint[MAX_ENTITIES];
-    WidgetComponent* button[MAX_ENTITIES];
+    OrderedArray widget;
 };
 
 ComponentData* ComponentData_create();

@@ -20,6 +20,7 @@ ComponentData* ComponentData_create() {
 
     components->image.order = List_create();
     components->player.order = List_create();
+    components->widget.order = List_create();
 
     for (int i = 0; i < MAX_ENTITIES; i++) {
         components->image.array[i] = NULL;
@@ -37,6 +38,7 @@ ComponentData* ComponentData_create() {
         components->health[i] = NULL;
         components->door[i] = NULL;
         components->joint[i] = NULL;
+        components->widget.array[i] = NULL;
     }
     return components;
 }
@@ -817,28 +819,29 @@ void JointComponent_remove(ComponentData* components, int entity) {
 
 
 WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, ButtonText string, WidgetType type) {
-    WidgetComponent* button = malloc(sizeof(WidgetComponent));
-    button->enabled = true;
-    button->type = type;
-    button->selected = false;
-    strcpy(button->string, string);
-    button->text = sfText_create();
-    button->on_click = NULL;
-    button->on_change = NULL;
-    button->value = 0;
-    button->max_value = 0;
-    button->min_value = 0;
-    button->cyclic = false;
-    button->strings = NULL;
+    WidgetComponent* widget = malloc(sizeof(WidgetComponent));
+    widget->enabled = true;
+    widget->type = type;
+    widget->selected = false;
+    strcpy(widget->string, string);
+    widget->text = sfText_create();
+    widget->on_click = NULL;
+    widget->on_change = NULL;
+    widget->value = 0;
+    widget->max_value = 0;
+    widget->min_value = 0;
+    widget->cyclic = false;
+    widget->strings = NULL;
     
-    components->button[entity] = button;
-    return button;
+    components->widget.array[entity] = widget;
+    List_add(components->widget.order, entity);
+    return widget;
 }
 
 
 WidgetComponent* WidgetComponent_get(ComponentData* components, int entity) {
     if (entity == -1) return NULL;
-    return components->button[entity];
+    return components->widget.array[entity];
 }
 
 
@@ -846,7 +849,8 @@ void WidgetComponent_remove(ComponentData* components, int entity) {
     WidgetComponent* button = WidgetComponent_get(components, entity);
     if (button) {
         free(button);
-        components->button[entity] = NULL;
+        components->widget.array[entity] = NULL;
+        List_remove(components->widget.order, entity);
     }
 }
 

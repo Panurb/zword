@@ -8,6 +8,8 @@ typedef struct {
     bool fullscreen;
     bool vsync;
     int max_fps;
+    int volume;
+    int music;
 } Settings;
 
 typedef struct {

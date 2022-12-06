@@ -43,6 +43,7 @@ int main() {
     sfRenderWindow* window = create_game_window(&mode);
 
     bool focus = true;
+    int debug_level = 0;
     sfJoystick_update();
 
     sfSound* channels[MAX_SOUNDS];
@@ -90,10 +91,14 @@ int main() {
                         clear_sounds(channels);
                         sfClock_restart(clock);
                         reset_game(data);
+                    } else if (event.key.code == sfKeyF1) {
+                        debug_level = (debug_level + 1) % 4; 
                     }
                     break;
                 default:
-                    input_menu(data.components, data.camera, event);
+                    if (game_state == STATE_MENU) {
+                        input_menu(data.components, data.camera, event);
+                    }
                     break;
             }
         }
@@ -115,14 +120,11 @@ int main() {
                     case STATE_PAUSE:
                         update_menu(data, window);
                         break;
-                    case STATE_SETTINGS:
-                        update_menu(data, window);
-                        break;
                     case STATE_APPLY:
                         sfRenderWindow_destroy(window);
                         window = create_game_window(&mode);
                         resize_game(&data, mode);
-                        game_state = STATE_SETTINGS;
+                        game_state = STATE_MENU;
                         break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);
@@ -144,14 +146,14 @@ int main() {
                 break;
             case STATE_GAME:
                 draw_game(data, window);
+                if (debug_level) {
+                    draw_debug(data, window, debug_level);
+                }
                 break;
             case STATE_PAUSE:
                 draw_game(data, window);
                 draw_menu(data, window);
                 draw_text(window, data.components, data.camera, NULL, zeros(), "PAUSED", sfWhite);
-                break;
-            case STATE_SETTINGS:
-                draw_menu(data, window);
                 break;
             case STATE_APPLY:
                 break;

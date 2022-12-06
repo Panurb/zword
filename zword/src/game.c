@@ -51,6 +51,8 @@ void resize_game(GameData* data, sfVideoMode mode) {
     CameraComponent* camera = CameraComponent_get(data->components, data->camera);
     camera->resolution.x = mode.width;
     camera->resolution.y = mode.height;
+    camera->zoom_target = 25.0f;
+    camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
     sfRenderTexture_destroy(data->light_texture);
     data->light_texture = sfRenderTexture_create(mode.width, mode.height, false);
     sfRenderTexture_destroy(data->shadow_texture);
@@ -66,7 +68,10 @@ void start_game(GameData data) {
 
 void reset_game(GameData data) {
     ColliderGrid_clear(data.grid);
+    CameraComponent* cam = CameraComponent_get(data.components, data.camera);
+    sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear(data.components);
+    data.camera = create_camera(data.components, mode);
 
     start_game(data);
 }
@@ -109,10 +114,17 @@ void draw_game(GameData data, sfRenderWindow* window) {
     draw_roofs(data.components, window, data.camera, data.textures);
     draw_outlines(data.components, window, data.camera);
     draw_hud(data.components, window, data.camera);
+}
 
-    // draw_colliders(components, window, camera);
-    // draw_waypoints(components, window, camera);
-    // draw_enemies(components, window, camera);
-    // draw_grid(components, grid, window, camera);
-    // draw_occupied_tiles(components, grid, window, camera);
+
+void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
+    draw_colliders(data.components, window, data.camera);
+    draw_waypoints(data.components, window, data.camera);
+    draw_enemies(data.components, window, data.camera);
+    if (debug_level > 1) {
+        draw_occupied_tiles(data.components, data.grid, window, data.camera);
+    }
+    if (debug_level > 2) {
+        draw_grid(data.components, data.grid, window, data.camera);
+    }
 }
