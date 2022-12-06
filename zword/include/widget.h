@@ -23,3 +23,7 @@ int add_button_to_container(ComponentData* components, int container, ButtonText
 void add_row_to_container(ComponentData* components, int container, int left, int right);
 
 int create_dropdown(ComponentData* components, sfVector2f position, ButtonText* strings, int max_value);
+
+void set_slider(ComponentData* components, int entity, sfVector2f mouse_position);
+
+int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value);

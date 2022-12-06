@@ -139,18 +139,28 @@ void toggle_dropdown(ComponentData* components, int entity) {
 
 int create_dropdown(ComponentData* components, sfVector2f position, ButtonText* strings, int max_value) {
     int i = create_button(components, strings[0], position, toggle_dropdown);
-    WidgetComponent* button = WidgetComponent_get(components, i);
-    button->strings = strings;
-    button->max_value = max_value;
-    button->type = WIDGET_DROPDOWN;
+    WidgetComponent* widget = WidgetComponent_get(components, i);
+    widget->strings = strings;
+    widget->max_value = max_value;
+    widget->type = WIDGET_DROPDOWN;
 
     return i;
 }
 
 
+void set_slider(ComponentData* components, int entity, sfVector2f mouse_position) {
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    ColliderComponent* collider = ColliderComponent_get(components, entity);
+    float x = mouse_position.x - get_position(components, entity).x + 0.5f * collider->width;
+    float value = clamp(x  / collider->width, 0.0f, 1.0f) * (widget->max_value - widget->min_value);
+    widget->value = (int) value;
+}
+
+
 int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value) {
     int i = create_entity(components);
-
+    CoordinateComponent_add(components, i, position, 0.0f);
+    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS);
     WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_SLIDER);
     widget->min_value = min_value;
     widget->max_value = max_value;
