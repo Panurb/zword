@@ -834,7 +834,7 @@ WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, Butt
     widget->strings = NULL;
     
     components->widget.array[entity] = widget;
-    List_add(components->widget.order, entity);
+    List_append(components->widget.order, entity);
     return widget;
 }
 
@@ -846,9 +846,9 @@ WidgetComponent* WidgetComponent_get(ComponentData* components, int entity) {
 
 
 void WidgetComponent_remove(ComponentData* components, int entity) {
-    WidgetComponent* button = WidgetComponent_get(components, entity);
-    if (button) {
-        free(button);
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    if (widget) {
+        free(widget);
         components->widget.array[entity] = NULL;
         List_remove(components->widget.order, entity);
     }
@@ -864,6 +864,17 @@ int create_entity(ComponentData* components) {
 
     components->entities++;
     return components->entities - 1;
+}
+
+
+int get_root(ComponentData* components, int entity) {
+    int root = entity;
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    while (coord->parent != -1) {
+        root = coord->parent;
+        coord = CoordinateComponent_get(components, coord->parent);
+    }
+    return root;
 }
 
 
@@ -905,6 +916,7 @@ void destroy_entity(ComponentData* components, int entity) {
     AnimationComponent_remove(components, entity);
     DoorComponent_remove(components, entity);
     JointComponent_remove(components, entity);
+    WidgetComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

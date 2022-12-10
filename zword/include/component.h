@@ -85,7 +85,7 @@ typedef enum {
     GROUP_VEHICLES,
     GROUP_TREES,
     GROUP_ROADS,
-    GROUP_RIVERS,
+    GROUP_OBSTACLES,
     GROUP_BULLETS,
     GROUP_LIGHTS,
     GROUP_CORPSES,
@@ -498,6 +498,7 @@ void WidgetComponent_remove(ComponentData* components, int entity);
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);
 void destroy_entity_recursive(ComponentData* components, int entity);
+int get_root(ComponentData* components, int entity);
 void add_child(ComponentData* components, int parent, int child);
 void remove_children(ComponentData* components, int parent);
 

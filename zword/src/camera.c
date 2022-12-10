@@ -341,3 +341,13 @@ void shake_camera(ComponentData* components, float speed) {
         }
     }
 }
+
+
+void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera) {
+    CameraComponent* cam = CameraComponent_get(components, camera);
+    float width = cam->resolution.x / cam->zoom;
+    float height = cam->resolution.y / cam->zoom;
+    sfVector2f pos = get_position(components, camera);
+    sfColor color = get_color(0.0f, 0.0f, 0.0f, 0.4f);
+    draw_rectangle(window, components, camera, NULL, pos, width, height, 0.0f, color);
+}

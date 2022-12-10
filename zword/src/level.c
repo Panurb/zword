@@ -30,10 +30,10 @@ void create_fire(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(components, i, 5.0, 2.0 * M_PI, orange, 0.8, 10.0)->flicker = 0.2;
-    ParticleComponent* particle = ParticleComponent_add(components, i, 0.5 * M_PI, 1.0, 0.6, 0.2, 1.0, 5.0, orange, orange);
+    ParticleComponent* particle = ParticleComponent_add(components, i, 0.5 * M_PI, 1.0, 0.6, 0.2, 1.0, 5.0, orange, sfYellow);
     particle->loop = true;
     particle->enabled = true;
-    ColliderComponent_add_circle(components, i, 0.35, GROUP_WALLS);
+    ColliderComponent_add_circle(components, i, 0.35, GROUP_OBSTACLES);
     ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_PARTICLES);
 }
 
@@ -267,10 +267,10 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
                 }
             }
 
-            // for (int i = 0; i < 2; i++) {
-            //     sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-            //     create_uranium(components, grid, sum(pos, r));
-            // }
+            for (int i = 0; i < 2; i++) {
+                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+                create_uranium(components, grid, sum(pos, r));
+            }
         }
     }
 
@@ -307,8 +307,9 @@ void test(ComponentData* components, ColliderGrid* grid) {
     init_grid(components, grid);
 
     sfVector2f start = zeros();
-    // create_mansion(components, start);
-    create_school(components, start);
+    create_mansion(components, start);
+    // create_school(components, start);
+    create_fire(components, zeros());
 
     create_player(components, start, -1);
     create_assault_rifle(components, sum(start, rand_vector()));

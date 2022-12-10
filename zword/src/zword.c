@@ -15,6 +15,7 @@
 #include "menu.h"
 #include "globals.h"
 #include "settings.h"
+#include "hud.h"
 
 
 sfRenderWindow* create_game_window(sfVideoMode* mode) {
@@ -60,6 +61,8 @@ int main() {
     GameData data = create_game(mode);
     create_menu(data);
 
+    int prev_state = game_state;
+
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
 
@@ -90,13 +93,13 @@ int main() {
 
                         clear_sounds(channels);
                         sfClock_restart(clock);
-                        reset_game(data);
+                        start_game(data);
                     } else if (event.key.code == sfKeyF1) {
                         debug_level = (debug_level + 1) % 4; 
                     }
                     break;
                 default:
-                    if (game_state == STATE_MENU) {
+                    if (game_state == STATE_MENU || game_state == STATE_PAUSE) {
                         input_menu(data.components, data.camera, event);
                     }
                     break;
@@ -106,6 +109,10 @@ int main() {
         if (focus) {
             while (elapsed_time > time_step) {
                 elapsed_time -= time_step;
+                if (game_state != prev_state) {
+                    PRINT(game_state);
+                    prev_state = game_state;
+                }
                 switch (game_state) {
                     case STATE_MENU:
                         update_menu(data, window);
@@ -135,7 +142,7 @@ int main() {
             elapsed_time += delta_time;
         }
 
-        sfRenderWindow_clear(window, sfBlack);
+        sfRenderWindow_clear(window, get_color(0.05f, 0.05f, 0.05f, 1.0f));
 
         switch (game_state) {
             case STATE_MENU:
@@ -146,20 +153,19 @@ int main() {
                 break;
             case STATE_GAME:
                 draw_game(data, window);
-                if (debug_level) {
-                    draw_debug(data, window, debug_level);
-                }
+                draw_hud(data.components, window, data.camera);
                 break;
             case STATE_PAUSE:
                 draw_game(data, window);
+                draw_overlay(window, data.components, data.camera);
                 draw_menu(data, window);
-                draw_text(window, data.components, data.camera, NULL, zeros(), "PAUSED", sfWhite);
                 break;
-            case STATE_APPLY:
+            default:
                 break;
-            case STATE_QUIT:
-                sfRenderWindow_close(window);
-                break;
+        }
+
+        if (debug_level) {
+            draw_debug(data, window, debug_level);
         }
 
         draw_fps(window, fps, delta_time);

@@ -5,6 +5,14 @@
 #include "camera.h"
 
 typedef enum {
+    ACTION_WALK_UP,
+    ACTION_WALK_DOWN,
+    ACTION_WALK_LEFT,
+    ACTION_WALK_RIGHT,
+    ACTION_
+} Action;
+
+typedef enum {
     BUTTON_A,
     BUTTON_B,
     BUTTON_X,

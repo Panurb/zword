@@ -287,7 +287,7 @@ int create_pistol(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
-    WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.0f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
+    WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
     ParticleComponent_add_bullet(components, i, 0.15f);
     ItemComponent_add(components, i, 1);
     SoundComponent_add(components, i, "metal");

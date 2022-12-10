@@ -21,6 +21,7 @@
 #include "hud.h"
 #include "animation.h"
 #include "door.h"
+#include "menu.h"
 
 
 GameData create_game(sfVideoMode mode) {
@@ -61,19 +62,15 @@ void resize_game(GameData* data, sfVideoMode mode) {
 
 
 void start_game(GameData data) {
-    create_level(data.components, data.grid, data.seed);
-    init_grid(data.components, data.grid);
-}
-
-
-void reset_game(GameData data) {
     ColliderGrid_clear(data.grid);
     CameraComponent* cam = CameraComponent_get(data.components, data.camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear(data.components);
     data.camera = create_camera(data.components, mode);
-
-    start_game(data);
+    create_pause_menu(data);
+    // create_level(data.components, data.grid, data.seed);
+    test(data.components, data.grid);
+    init_grid(data.components, data.grid);
 }
 
 
@@ -113,7 +110,6 @@ void draw_game(GameData data, sfRenderWindow* window) {
 
     draw_roofs(data.components, window, data.camera, data.textures);
     draw_outlines(data.components, window, data.camera);
-    draw_hud(data.components, window, data.camera);
 }
 
 

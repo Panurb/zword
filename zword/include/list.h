@@ -14,6 +14,8 @@ List* List_create();
 
 void List_add(List* list, int value);
 
+void List_append(List* list, int value);
+
 void List_insert(List* list, ListNode* node, int value);
 
 void List_remove(List* list, int value);

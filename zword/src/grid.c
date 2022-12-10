@@ -98,13 +98,6 @@ void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
             List_add(grid->array[i][j], entity);
         }
     }
-
-    // CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    // for (ListNode* node = coord->children->head; node; node = node->next) {
-    //     if (ColliderComponent_get(components, node->value)) {
-    //         update_grid(components, grid, node->value);
-    //     }
-    // }
 }
 
 
@@ -125,13 +118,6 @@ void clear_grid(ComponentData* components, ColliderGrid* grid, int entity) {
             List_remove(grid->array[i][j], entity);
         }
     }
-
-    // CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    // for (ListNode* node = coord->children->head; node; node = node->next) {
-    //     if (ColliderComponent_get(components, node->value)) {
-    //         clear_grid(components, grid, node->value);
-    //     }
-    // }
 }
 
 

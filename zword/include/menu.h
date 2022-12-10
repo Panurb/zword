@@ -7,6 +7,8 @@
 
 void create_menu(GameData data);
 
+void create_pause_menu(GameData data);
+
 void update_menu(GameData data, sfRenderWindow* window);
 
 void input_menu(ComponentData* components, int camera, sfEvent event);

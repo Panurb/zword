@@ -33,7 +33,7 @@ void create_wall(ComponentData* components, sfVector2f pos, float angle, float w
 void create_fence(ComponentData* components, sfVector2f pos, float angle, float width, float height) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_RIVERS);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_OBSTACLES);
     ImageComponent_add(components, i, "wood_tile", width, height, LAYER_WALLS);
 }
 

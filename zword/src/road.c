@@ -116,7 +116,7 @@ void create_road(ComponentData* components, sfVector2f start, sfVector2f end) {
 
 void create_river(ComponentData* components, sfVector2f start, sfVector2f end) {
     int current = create_road_curves(components, start, end, 1.0, 8.0, "river");
-    create_road_segments(components, current, GROUP_RIVERS);
+    create_road_segments(components, current, GROUP_OBSTACLES);
 }
 
 

@@ -6,6 +6,8 @@
 float BUTTON_WIDTH;
 float BUTTON_HEIGHT;
 
+void bring_to_top(ComponentData* components, int entity);
+
 int create_window(ComponentData* components, sfVector2f position, ButtonText text, OnClick on_close);
 
 int create_label(ComponentData* components, ButtonText text, sfVector2f position);

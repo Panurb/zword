@@ -21,6 +21,23 @@ void List_add(List* list, int value) {
 }
 
 
+void List_append(List* list, int value) {
+    ListNode* new = malloc(sizeof(List));
+    new->value = value;
+    new->next = NULL;
+    if (list->size == 0) {
+        list->head = new;
+    } else {
+        ListNode* node = list->head;
+        while (node->next) {
+            node = node->next;
+        }
+        node->next = new;
+    }
+    list->size++;
+}
+
+
 void List_insert(List* list, ListNode* node, int value) {
     ListNode* new = malloc(sizeof(List));
     new->value = value;
