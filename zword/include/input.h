@@ -4,13 +4,11 @@
 #include "component.h"
 #include "camera.h"
 
-typedef enum {
-    ACTION_WALK_UP,
-    ACTION_WALK_DOWN,
-    ACTION_WALK_LEFT,
-    ACTION_WALK_RIGHT,
-    ACTION_
-} Action;
+
+extern char* ACTIONS[];
+
+extern char* BUTTON_NAMES[];
+
 
 typedef enum {
     BUTTON_A,
@@ -21,10 +19,28 @@ typedef enum {
     BUTTON_RB,
     BUTTON_START,
     BUTTON_BACK,
-    BUTTON_L,
-    BUTTON_R,
     BUTTON_LT,
-    BUTTON_RT
+    BUTTON_RT,
+    BUTTON_L,
+    BUTTON_R
 } ControllerButton;
+
+typedef enum {
+    ACTION_UP,
+    ACTION_LEFT,
+    ACTION_DOWN,
+    ACTION_RIGHT,
+    ACTION_ATTACK,
+    ACTION_ENTER,
+    ACTION_PICKUP,
+    ACTION_RELOAD,
+    ACTION_ATTACHMENT,
+    ACTION_INVENTORY,
+    ACTION_AMMO,
+    ACTION_GRAB,
+    ACTION_DROP
+} PlayerAction;
+
+char* key_to_string(sfKeyCode key);
 
 void input(ComponentData* components, sfRenderWindow* window, int camera);

@@ -12,6 +12,8 @@
 
 #define UNUSED(x) (void)(x)
 
+#define LENGTH(x) (int)(sizeof(x)/sizeof(x[0]))
+
 typedef struct {
     float a;
     float b;

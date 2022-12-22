@@ -11,6 +11,7 @@
 #include "settings.h"
 #include "widget.h"
 #include "light.h"
+#include "input.h"
 
 
 static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "2160x3840"};
@@ -121,9 +122,9 @@ void toggle_controls(ComponentData* components, int entity) {
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(components, window_id, container);
 
-    for (int i = 0; i < 10; i++) {
-        int label = create_label(components, "action", zeros());
-        int button = create_button(components, "key", zeros(), NULL);
+    for (int i = 0; i < 12; i++) {
+        int label = create_label(components, ACTIONS[i], zeros());
+        int button = create_button(components, BUTTON_NAMES[i], zeros(), NULL);
         add_row_to_container(components, container, label, button);
     }
 }

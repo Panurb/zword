@@ -10,24 +10,74 @@
 #include "item.h"
 
 
+char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", 
+    "U", "V", "W", "X", "Y", "Z", "Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7", "Num8", "Num9", 
+    "Escape", "LControl", "LShift", "LAlt", "LSystem", "RControl", "RShift", "RAlt", "RSystem", "Menu", "LBracket", 
+    "RBracket", "Semicolon", "Comma", "Period", "Quote", "Slash", "Backslash", "Tilde", "Equal", "Hyphen", "Space", 
+    "Enter", "Backspace", "Tab", "PageUp", "PageDown", "End", "Home", "Insert", "Delete", "Add", "Subtract", "Multiply", 
+    "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", 
+    "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", 
+    "F12", "F13", "F14", "F15", "Pause"};
+
+
+char* BUTTON_NAMES[] = {
+    "A",
+    "B",
+    "X",
+    "Y",
+    "LB",
+    "RB",
+    "START",
+    "BACK",
+    "LT",
+    "RT",
+    "L",
+    "R"
+};
+
+
+char* ACTIONS[] = {
+    "Enter/exit",
+    "Cancel",
+    "Reload",
+    "Attachment",
+    "Ammo",
+    "Pick up",
+    "Pause",
+    "", 
+    "Inventory", 
+    "Attack", 
+    "", 
+    ""
+};
+
+
+char* key_to_string(sfKeyCode key) {
+    return (0 <= key && key < LENGTH(KEY_NAMES)) ? KEY_NAMES[key] : "unknown";
+}
+
+
 void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(components, i);
     int joystick = player->controller.joystick;
 
+    int* buttons = player->controller.buttons;
+    int* axes = player->controller.axes;
+
     sfVector2f left_stick = zeros();
     sfVector2f right_stick = zeros();
     if (player->controller.joystick == -1) {
-        if (sfKeyboard_isKeyPressed(sfKeyA)) {
+        if (sfKeyboard_isKeyPressed(axes[0])) {
             left_stick.x -= 1.0f;
         }
-        if (sfKeyboard_isKeyPressed(sfKeyD)) {
+        if (sfKeyboard_isKeyPressed(axes[1])) {
             left_stick.x += 1.0f;
         }
-        if (sfKeyboard_isKeyPressed(sfKeyW)) {
-            left_stick.y += 1.0f;
-        }
-        if (sfKeyboard_isKeyPressed(sfKeyS)) {
+        if (sfKeyboard_isKeyPressed(axes[2])) {
             left_stick.y -= 1.0f;
+        }
+        if (sfKeyboard_isKeyPressed(axes[3])) {
+            left_stick.y += 1.0f;
         }
         player->controller.left_stick = normalized(left_stick);
 
@@ -35,11 +85,11 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         right_stick = diff(mouse, get_position(components, i));
         player->controller.right_stick = normalized(right_stick);
 
-        player->controller.left_trigger = sfKeyboard_isKeyPressed(player->controller.buttons[BUTTON_LT]) ? 1.0f : 0.0f;
+        player->controller.left_trigger = sfKeyboard_isKeyPressed(buttons[BUTTON_LT]) ? 1.0f : 0.0f;
         player->controller.right_trigger = sfMouse_isButtonPressed(sfMouseLeft) ? 1.0f : 0.0f;
 
         for (int b = BUTTON_A; b <= BUTTON_RT; b++) {
-            bool down = sfKeyboard_isKeyPressed(player->controller.buttons[b]);
+            bool down = sfKeyboard_isKeyPressed(buttons[b]);
             if (b == BUTTON_LT) {
                 down = (player->controller.left_trigger > 0.5f);
             } else if (b == BUTTON_RT) {
@@ -97,7 +147,7 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         player->controller.dpad.x = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickPovX]);
         player->controller.dpad.y = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickPovY]);
 
-        for (int b = BUTTON_A; b <= BUTTON_RT; b++) {
+        for (int b = BUTTON_A; b <= BUTTON_R; b++) {
             bool down = sfJoystick_isButtonPressed(joystick, player->controller.buttons[b]);
             if (b == BUTTON_LT) {
                 down = (player->controller.left_trigger > 0.5f);

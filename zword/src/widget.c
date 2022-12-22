@@ -65,8 +65,8 @@ int create_container(ComponentData* components, sfVector2f position, int width, 
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, width * BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    WidgetComponent* button = WidgetComponent_add(components, i, "", WIDGET_CONTAINER);
-    button->type = WIDGET_CONTAINER;
+    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_CONTAINER);
+    widget->type = WIDGET_CONTAINER;
 
     return i;
 }
@@ -81,10 +81,12 @@ void add_widget_to_container(ComponentData* components, int container, int entit
     int columns = collider->width / BUTTON_WIDTH;
     int rows = coord->children->size / columns;
     sfVector2f pos = vec(0.0f, 0.5f * height - rows * BUTTON_HEIGHT - 0.5f * BUTTON_HEIGHT);
-    CoordinateComponent_get(components, entity)->position = pos;
+    CoordinateComponent* coord_child = CoordinateComponent_get(components, entity);
+    coord_child->position = pos;
     add_child(components, container, entity);
 
-    if (coord->children->size * BUTTON_HEIGHT > height) {
+    float width = collider->width / BUTTON_WIDTH;
+    if (coord->children->size / width * BUTTON_HEIGHT > height) {
         widget->max_value += 1;
         WidgetComponent_get(components, entity)->enabled = false;
     }
@@ -139,15 +141,12 @@ void add_row_to_container(ComponentData* components, int container, int left, in
     CoordinateComponent* coord_left = CoordinateComponent_get(components, left);
     coord_left->position.x -= 0.5f * BUTTON_WIDTH;
 
-    CoordinateComponent* coord = CoordinateComponent_get(components, container);
-    float height = ColliderComponent_get(components, container)->height;
-
-    CoordinateComponent_get(components, right)->position = sum(coord_left->position, vec(BUTTON_WIDTH, 0.0f));
     add_child(components, container, right);
-
-    if (coord->children->size / 2 * BUTTON_HEIGHT > height) {
-        WidgetComponent_get(components, right)->enabled = false;
-    }
+    CoordinateComponent* coord_right = CoordinateComponent_get(components, right);
+    sfVector2f pos = sum(coord_left->position, vec(BUTTON_WIDTH, 0.0f));
+    float height = ColliderComponent_get(components, container)->height;
+    coord_right->position = pos;
+    WidgetComponent_get(components, right)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
 }
 
 
