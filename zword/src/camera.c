@@ -66,7 +66,8 @@ void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sf
     }
 
     sfVector2f r = diff(end, start);
-    sfRectangleShape_setPosition(line, world_to_screen(components, camera, start));
+    sfVector2f pos = sum(start, mult(0.5f * width / norm(r), perp(r)));
+    sfRectangleShape_setPosition(line, world_to_screen(components, camera, pos));
     sfRectangleShape_setFillColor(line, color);
     sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * cam->zoom, width * cam->zoom });
     sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -6,7 +5,6 @@
 #include "menu.h"
 #include "game.h"
 #include "component.h"
-#include "collider.h"
 #include "globals.h"
 #include "settings.h"
 #include "widget.h"
@@ -153,66 +151,7 @@ void update_menu(GameData data, sfRenderWindow* window) {
 
 
 void input_menu(ComponentData* components, int camera, sfEvent event) {
-    static sfVector2f mouse_position = { 0.0f, 0.0f };
-    static bool mouse_down = false;
-    static int grabbed_window = -1;
-    static sfVector2f grab_offset = { 0.0f, 0.0f };
-    
-    if (event.type == sfEvtMouseMoved) {
-        sfVector2i mouse_screen = { event.mouseMove.x, event.mouseMove.y };
-        mouse_position = screen_to_world(components, camera, mouse_screen);
-    } else if (event.type == sfEvtMouseButtonPressed && event.mouseButton.button == sfMouseLeft) {
-        mouse_down = true;
-    } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
-        mouse_down = false;
-        grabbed_window = -1;
-    }
-
-    for (int i = 0; i < components->entities; i++) {
-        WidgetComponent* widget = WidgetComponent_get(components, i);
-        if (!widget) continue;
-        if (!widget->selected) continue;
-
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
-
-        if (event.type == sfEvtMouseMoved) {
-            if (widget->type == WIDGET_WINDOW) {
-                if (i == grabbed_window) {
-                    coord->position = sum(mouse_position, grab_offset);
-                }
-            } else if (widget->type == WIDGET_SLIDER) {
-                if (mouse_down) {
-                    set_slider(components, i, mouse_position);
-                }
-            }
-        } else if (event.type == sfEvtMouseButtonPressed && event.mouseButton.button == sfMouseLeft) {
-            if (widget->type == WIDGET_WINDOW) {
-                grabbed_window = i;
-                grab_offset = diff(coord->position, mouse_position);
-            } else if (widget->type == WIDGET_SLIDER) {
-                set_slider(components, i, mouse_position);
-            }
-            int root = get_root(components, i);
-            bring_to_top(components, root);
-        } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
-            if (widget->on_click) {
-                widget->on_click(components, i);
-            }
-        } else if (event.type == sfEvtMouseWheelScrolled) {
-            if (widget->type == WIDGET_CONTAINER || widget->type == WIDGET_SPINBOX) {
-                increment_value(components, i, (int) -event.mouseWheelScroll.delta);
-            } else {
-                if (coord->parent) {
-                    WidgetComponent* parent = WidgetComponent_get(components, coord->parent);
-                    if (parent && parent->type == WIDGET_CONTAINER) {
-                        increment_value(components, coord->parent, (int) -event.mouseWheelScroll.delta);
-                    }
-                }
-            }
-        }
-
-        break;
-    }
+    input_widgets(components, camera, event);
 }
 
 
@@ -221,86 +160,4 @@ void draw_menu(GameData data, sfRenderWindow* window) {
 
     sfVector2f pos = screen_to_world(data.components, data.camera, sfMouse_getPosition((sfWindow*) window));
     draw_circle(window, data.components, data.camera, NULL, pos, 0.1f, sfWhite);
-}
-
-
-void update_widgets(ComponentData* components, sfRenderWindow* window, int camera) {
-    int last_selected = -1;
-    for (ListNode* node = components->widget.order->head; node; node = node->next) {
-        int i = node->value;
-        WidgetComponent* widget = WidgetComponent_get(components, i);
-        if (!widget->enabled) continue;
-
-        sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
-        mouse = diff(mouse, get_position(components, camera));
-        widget->selected = false;
-        if (inside_collider(components, i, mouse)) {
-            last_selected = i;
-        }
-    }
-    if (last_selected != -1) {
-        WidgetComponent_get(components, last_selected)->selected = true;
-    }
-}
-
-
-void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera) {
-    for (ListNode* node = components->widget.order->head; node; node = node->next) {
-        int i = node->value;
-        WidgetComponent* widget = WidgetComponent_get(components, i);
-        if (!widget->enabled) continue;
-
-        sfVector2f pos = sum(get_position(components, camera), get_position(components, i));
-        ColliderComponent* collider = ColliderComponent_get(components, i);
-
-        sfColor color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
-        switch (widget->type) {
-            case WIDGET_CONTAINER:
-                color = get_color(0.1f, 0.1f, 0.1f, 1.0f);
-                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
-                break;
-            case WIDGET_LABEL:
-                break;
-            case WIDGET_BUTTON:
-                color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
-                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
-
-                color = get_color(0.3f, 0.3f, 0.3f, 1.0f);
-                float w = collider->width;
-                float h = collider->height;
-                draw_rectangle(window, components, camera, NULL, sum(pos, vec(-0.1f, 0.1f)), w - 0.2f, h - 0.2f, 0.0f, color);
-                break;
-            case WIDGET_DROPDOWN:
-                color = get_color(0.2f, 0.2f, 0.2f, 1.0f);
-                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
-
-                color = get_color(0.3f, 0.3f, 0.3f, 1.0f);
-                w = collider->width;
-                h = collider->height;
-                sfVector2f r = sum(pos, vec(-0.1f, 0.1f));
-                draw_rectangle(window, components, camera, NULL, r, w - 0.2f, h - 0.2f, 0.0f, color);
-
-                r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
-                if (CoordinateComponent_get(components, i)->children->size == 0) {
-                    draw_text(window, components, camera, NULL, r, "v", sfWhite);
-                } else {
-                    draw_text(window, components, camera, NULL, r, "^", sfWhite);
-                }
-                break;
-            case WIDGET_SLIDER:
-                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
-                char buffer[255];
-                sprintf(buffer, "%d", widget->value);
-                draw_text(window, components, camera, NULL, pos, buffer, sfWhite);
-                break;
-            default:
-                draw_rectangle(window, components, camera, NULL, pos, collider->width, collider->height, 0.0f, color);
-        }
-
-        if (widget->strings) {
-            draw_text(window, components, camera, widget->text, pos, widget->strings[widget->value], sfWhite);
-        } else {
-            draw_text(window, components, camera, widget->text, pos, widget->string, sfWhite);
-        }
-    }
 }
