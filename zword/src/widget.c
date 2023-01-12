@@ -7,13 +7,20 @@
 
 
 void bring_to_top(ComponentData* components, int entity) {
-    List_remove(components->widget.order, entity);
-    List_append(components->widget.order, entity);
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    for (ListNode* node = coord->children->head; node; node = node->next) {
-        int i = node->value;
-        bring_to_top(components, i);
+    // Breadth-first search
+    List* queue = List_create();
+    List_add(queue, entity);
+    while (queue->size > 0) {
+        int entity = List_pop(queue);
+        List_remove(components->widget.order, entity);
+        List_append(components->widget.order, entity);
+        CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+        for (ListNode* node = coord->children->head; node; node = node->next) {
+            int child = node->value;
+            List_append(queue, child);
+        }
     }
+    List_delete(queue);
 }
 
 
@@ -72,34 +79,6 @@ int create_container(ComponentData* components, sfVector2f position, int width, 
 }
 
 
-void add_widget_to_container(ComponentData* components, int container, int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, container);
-    WidgetComponent* widget = WidgetComponent_get(components, container);
-    ColliderComponent* collider = ColliderComponent_get(components, container);
-    float height = collider->height;
-
-    int columns = collider->width / BUTTON_WIDTH;
-    int rows = coord->children->size / columns;
-    sfVector2f pos = vec(0.0f, 0.5f * height - rows * BUTTON_HEIGHT - 0.5f * BUTTON_HEIGHT);
-    CoordinateComponent* coord_child = CoordinateComponent_get(components, entity);
-    coord_child->position = pos;
-    add_child(components, container, entity);
-
-    float width = collider->width / BUTTON_WIDTH;
-    if (coord->children->size / width * BUTTON_HEIGHT > height) {
-        widget->max_value += 1;
-        WidgetComponent_get(components, entity)->enabled = false;
-    }
-}
-
-
-int add_button_to_container(ComponentData* components, int container, ButtonText string, OnClick on_click) {
-    int i = create_button(components, string, zeros(), on_click);
-    add_widget_to_container(components, container, i);
-    return i;
-}
-
-
 void increment_value(ComponentData* components, int entity, int direction) {
     WidgetComponent* button = WidgetComponent_get(components, entity);
     sfVector2f v = vec(0.0f, direction * BUTTON_HEIGHT);
@@ -133,6 +112,49 @@ void increment_value(ComponentData* components, int entity, int direction) {
         sfVector2f pos = coord_child->position;
         WidgetComponent_get(components, node->value)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
     }
+
+    if (button->on_change) {
+        button->on_change(components, entity, direction);
+    }
+}
+
+
+void scroll_container(ComponentData* components, int entity, int delta) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    coord = CoordinateComponent_get(components, coord->parent);
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        int i = node->value;
+        if (WidgetComponent_get(components, i)->type == WIDGET_CONTAINER) {
+            increment_value(components, i, delta);
+        }
+    }
+}
+
+
+void add_widget_to_container(ComponentData* components, int container, int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, container);
+    WidgetComponent* widget = WidgetComponent_get(components, container);
+    ColliderComponent* collider = ColliderComponent_get(components, container);
+
+    int columns = collider->width / BUTTON_WIDTH;
+    int rows = coord->children->size / columns;
+    sfVector2f pos = vec(0.0f, 0.5f * collider->height - rows * BUTTON_HEIGHT - 0.5f * BUTTON_HEIGHT);
+    CoordinateComponent* coord_child = CoordinateComponent_get(components, entity);
+    coord_child->position = pos;
+    add_child(components, container, entity);
+
+    int n = columns * collider->height / BUTTON_HEIGHT;
+    if (coord->children->size > n) {
+        widget->max_value += 1;
+        WidgetComponent_get(components, entity)->enabled = false;
+    }
+}
+
+
+int add_button_to_container(ComponentData* components, int container, ButtonText string, OnClick on_click) {
+    int i = create_button(components, string, zeros(), on_click);
+    add_widget_to_container(components, container, i);
+    return i;
 }
 
 
@@ -153,6 +175,7 @@ void add_row_to_container(ComponentData* components, int container, int left, in
 void close_dropdown(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     destroy_entity_recursive(components, coord->children->head->value);
+    destroy_entity_recursive(components, coord->children->head->next->value);
     List_clear(coord->children);
 }
 
@@ -167,6 +190,44 @@ void set_dropdown(ComponentData* components, int entity) {
 }
 
 
+void update_scrollbar(ComponentData* components, int entity, int delta) {
+    UNUSED(delta);
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    coord = CoordinateComponent_get(components, coord->parent);
+    int value = WidgetComponent_get(components, entity)->value;
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        int i = node->value;
+        WidgetComponent* widget = WidgetComponent_get(components, i);
+        if (widget->type == WIDGET_SCROLLBAR) {
+            widget->value = value;
+        }
+    }
+}
+
+
+void add_scrollbar_to_container(ComponentData* components, int container) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, container);
+    WidgetComponent* widget = WidgetComponent_get(components, container);
+    ColliderComponent* collider = ColliderComponent_get(components, container);
+
+    widget->on_change = update_scrollbar;
+
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        int i = node->value;
+        ColliderComponent_get(components, i)->width = BUTTON_WIDTH - SCROLLBAR_WIDTH;
+        CoordinateComponent* coord_child = CoordinateComponent_get(components, i);
+        coord_child->position = diff(coord_child->position, vec(0.5f * SCROLLBAR_WIDTH, 0.0f));
+    }
+
+    int parent = coord->parent;
+    int height = collider->height / BUTTON_HEIGHT;
+    float w = ColliderComponent_get(components, parent)->width;
+    sfVector2f pos = vec(0.5f * w - 0.5f * SCROLLBAR_WIDTH, -0.5f * (height + 1) * BUTTON_HEIGHT);
+    int scrollbar = create_scrollbar(components, pos, height, widget->max_value, scroll_container);
+    add_child(components, parent, scrollbar);
+}
+
+
 void toggle_dropdown(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     WidgetComponent* widget = WidgetComponent_get(components, entity);
@@ -174,6 +235,7 @@ void toggle_dropdown(ComponentData* components, int entity) {
         close_dropdown(components, entity);
     } else {
         int height = min(3, widget->max_value);
+
         int container = create_container(components, vec(0.0f, -2.0f * BUTTON_HEIGHT), 1, height);
         add_child(components, entity, container);
         for (int i = widget->min_value; i <= widget->max_value; i++) {
@@ -181,6 +243,10 @@ void toggle_dropdown(ComponentData* components, int entity) {
             WidgetComponent* widget_child = WidgetComponent_get(components, j);
             widget_child->value = i;
             widget_child->strings = widget->strings;
+        }
+
+        if (widget->max_value > 3) {
+            add_scrollbar_to_container(components, container);
         }
     }
 }
@@ -201,12 +267,18 @@ void set_slider(ComponentData* components, int entity, sfVector2f mouse_position
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     ColliderComponent* collider = ColliderComponent_get(components, entity);
     float x = mouse_position.x - get_position(components, entity).x + 0.5f * collider->width;
-    float value = clamp(x  / collider->width, 0.0f, 1.0f) * (widget->max_value - widget->min_value);
-    widget->value = (int) value;
+    int n = widget->max_value - widget->min_value;
+    int value = clamp(x  / collider->width, 0.0f, 1.0f) * n;
+    int delta = value - widget->value;
+    widget->value = value;
+    if (widget->on_change) {
+        widget->on_change(components, entity, delta);
+    }
 }
 
 
-int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value, int value) {
+int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value, int value, 
+        OnChange on_change) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
@@ -214,6 +286,35 @@ int create_slider(ComponentData* components, sfVector2f position, int min_value,
     widget->min_value = min_value;
     widget->max_value = max_value;
     widget->value = value;
+    widget->on_change = on_change;
+
+    return i;
+}
+
+
+void set_scrollbar(ComponentData* components, int entity, sfVector2f mouse_position) {
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    ColliderComponent* collider = ColliderComponent_get(components, entity);
+    float y = mouse_position.y - get_position(components, entity).y + 0.5f * collider->height;
+    int n = widget->max_value - widget->min_value;
+    int value = clamp(1.0f - y  / collider->height, 0.0f, 0.99f) * (n + 1);
+    int delta = value - widget->value;
+    widget->value = value;
+    if (widget->on_change) {
+        widget->on_change(components, entity, delta);
+    }
+}
+
+
+int create_scrollbar(ComponentData* components, sfVector2f position, int height, int max_value, OnChange on_change) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, 0.0f);
+    ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, SCROLLBAR_WIDTH, 
+        BUTTON_HEIGHT * height, GROUP_WALLS);
+    collider->enabled = false;
+    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_SCROLLBAR);
+    widget->max_value = max_value;
+    widget->on_change = on_change;
 
     return i;
 }
@@ -236,6 +337,18 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
     if (last_selected != -1) {
         WidgetComponent_get(components, last_selected)->selected = true;
     }
+}
+
+
+void draw_button(sfRenderWindow* window, ComponentData* components, int camera, sfVector2f position, float width, 
+        float height, bool selected) {
+    draw_rectangle(window, components, camera, NULL, position, width, height, 0.0f, COLOR_SHADOW);
+    sfVector2f r = sum(position, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
+    draw_rectangle(window, components, camera, NULL, r, width - BORDER_WIDTH, height - BORDER_WIDTH, 0.0f, 
+        COLOR_HIGHLIGHT);
+    sfColor color = selected ? COLOR_HIGHLIGHT : COLOR_BUTTON;
+    draw_rectangle(window, components, camera, NULL, position, width - 2.0f * BORDER_WIDTH, 
+        height - 2.0f * BORDER_WIDTH, 0.0f, color);
 }
 
 
@@ -268,18 +381,12 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
             case WIDGET_LABEL:
                 break;
             case WIDGET_BUTTON:
-                draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
-                sfVector2f r = sum(pos, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
-                draw_rectangle(window, components, camera, NULL, r, w - BORDER_WIDTH, h - BORDER_WIDTH, 0.0f, 
-                    COLOR_HIGHLIGHT);
-                sfColor color = widget->selected ? COLOR_HIGHLIGHT : COLOR_BUTTON;
-                draw_rectangle(window, components, camera, NULL, pos, w - 2.0f * BORDER_WIDTH, h - 2.0f * BORDER_WIDTH, 
-                    0.0f, color);
+                draw_button(window, components, camera, pos, w, h, widget->selected);
                 break;
             case WIDGET_DROPDOWN:
                 draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
 
-                r = sum(pos, vec(-0.1f, 0.1f));
+                sfVector2f r = sum(pos, vec(-0.1f, 0.1f));
                 draw_rectangle(window, components, camera, NULL, r, w - 0.2f, h - 0.2f, 0.0f, COLOR_BUTTON);
 
                 r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
@@ -292,11 +399,18 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
             case WIDGET_SLIDER:
                 draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
                 float x = widget->value / (float) (widget->max_value - widget->min_value);
-                draw_rectangle(window, components, camera, NULL, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 0.0f, 
-                    COLOR_BUTTON);
-                char buffer[255];
+                draw_rectangle(window, components, camera, NULL, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 
+                    0.0f, COLOR_BUTTON);
+                char buffer[256];
                 sprintf(buffer, "%d", widget->value);
                 draw_text(window, components, camera, NULL, pos, buffer, COLOR_TEXT);
+                break;
+            case WIDGET_SCROLLBAR:
+                draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_CONTAINER);
+                float n = widget->max_value - widget->min_value + 1;
+                float y = widget->value / n;
+                r = sum(pos, vec(0.0f, ((h / BUTTON_HEIGHT - 1.5f) / n - y) * h));
+                draw_button(window, components, camera, r, w, h / n, widget->selected);
                 break;
             default:
                 draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
@@ -343,6 +457,10 @@ void input_widgets(ComponentData* components, int camera, sfEvent event) {
                 if (mouse_down) {
                     set_slider(components, i, mouse_position);
                 }
+            } else if (widget->type == WIDGET_SCROLLBAR){
+                if (mouse_down) {
+                    set_scrollbar(components, i, mouse_position);
+                }
             }
         } else if (event.type == sfEvtMouseButtonPressed && event.mouseButton.button == sfMouseLeft) {
             if (widget->type == WIDGET_WINDOW) {
@@ -358,13 +476,15 @@ void input_widgets(ComponentData* components, int camera, sfEvent event) {
                 widget->on_click(components, i);
             }
         } else if (event.type == sfEvtMouseWheelScrolled) {
-            if (widget->type == WIDGET_CONTAINER || widget->type == WIDGET_SPINBOX) {
-                increment_value(components, i, (int) -event.mouseWheelScroll.delta);
+            int delta = -event.mouseWheelScroll.delta;
+            if (widget->type == WIDGET_CONTAINER || widget->type == WIDGET_SPINBOX 
+                    || widget->type == WIDGET_SCROLLBAR) {
+                increment_value(components, i, delta);
             } else {
                 if (coord->parent) {
                     WidgetComponent* parent = WidgetComponent_get(components, coord->parent);
                     if (parent && parent->type == WIDGET_CONTAINER) {
-                        increment_value(components, coord->parent, (int) -event.mouseWheelScroll.delta);
+                        increment_value(components, coord->parent, delta);
                     }
                 }
             }

@@ -20,6 +20,8 @@ void List_insert(List* list, ListNode* node, int value);
 
 void List_remove(List* list, int value);
 
+int List_pop(List* list);
+
 void List_clear(List* list);
 
 void List_delete(List* list);

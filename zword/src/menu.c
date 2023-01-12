@@ -98,7 +98,7 @@ void toggle_settings(ComponentData* components, int entity) {
     add_row_to_container(components, container, label, RESOLUTION_ID);
 
     label = create_label(components, "Sound", zeros());
-    SOUND_ID = create_slider(components, zeros(), 0, 100, game_settings.volume);
+    SOUND_ID = create_slider(components, zeros(), 0, 100, game_settings.volume, NULL);
     add_row_to_container(components, container, label, SOUND_ID);
 
     add_button_to_container(components, container, "Apply", apply);
@@ -125,6 +125,7 @@ void toggle_controls(ComponentData* components, int entity) {
         int button = create_button(components, BUTTON_NAMES[i], zeros(), NULL);
         add_row_to_container(components, container, label, button);
     }
+    add_scrollbar_to_container(components, container);
 }
 
 

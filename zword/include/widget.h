@@ -6,6 +6,7 @@
 #define BUTTON_WIDTH 8.0f
 #define BUTTON_HEIGHT 2.0f
 #define BORDER_WIDTH 0.2f
+#define SCROLLBAR_WIDTH 1.0f
 #define COLOR_CONTAINER get_color(0.1f, 0.1f, 0.1f, 1.0f)
 #define COLOR_SHADOW get_color(0.2f, 0.2f, 0.2f, 1.0f)
 #define COLOR_BUTTON get_color(0.3f, 0.3f, 0.3f, 1.0f)
@@ -37,7 +38,14 @@ int create_dropdown(ComponentData* components, sfVector2f position, ButtonText* 
 
 void set_slider(ComponentData* components, int entity, sfVector2f mouse_position);
 
-int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value, int value);
+int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value, int value, 
+    OnChange on_change);
+
+void set_scrollbar(ComponentData* components, int entity, sfVector2f mouse_position);
+
+int create_scrollbar(ComponentData* components, sfVector2f position, int height, int max_value, OnChange on_change);
+
+void add_scrollbar_to_container(ComponentData* components, int container);
 
 void update_widgets(ComponentData* components, sfRenderWindow* window, int camera);
 

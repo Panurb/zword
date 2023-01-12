@@ -65,6 +65,13 @@ void List_remove(List* list, int value) {
 }
 
 
+int List_pop(List* list) {
+    int value = list->head->value;
+    List_remove(list, value);
+    return value;
+}
+
+
 void List_clear(List* list) {
     ListNode* current = list->head;
     while (current) {
