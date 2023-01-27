@@ -6,9 +6,12 @@ project(zword)
 
 include_directories(CSFML/include)
 
+include_directories(cJSON/include)
+
 include_directories(zword/include)
 
 set(SOURCES
+    cJSON/src/cJSON.c
     zword/src/animation.c
     zword/src/building.c
     zword/src/camera.c
@@ -37,6 +40,7 @@ set(SOURCES
     zword/src/player.c
     zword/src/raycast.c
     zword/src/road.c
+    zword/src/serialize.c
     zword/src/settings.c
     zword/src/sound.c
     zword/src/util.c

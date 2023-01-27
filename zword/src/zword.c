@@ -16,8 +16,8 @@
 #include "globals.h"
 #include "settings.h"
 #include "hud.h"
-
 #include "input.h"
+#include "serialize.h"
 
 
 sfRenderWindow* create_game_window(sfVideoMode* mode) {
@@ -117,6 +117,8 @@ int main() {
                         break;
                     case STATE_START:
                         start_game(data);
+                        save_game(&data);
+                        // load_game(&data);
                         game_state = STATE_GAME;
                         break;
                     case STATE_GAME:

@@ -242,8 +242,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->controller.joystick = joystick;
 
     if (joystick == -1) {
-        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeyLShift, -1, sfKeyEscape, sfKeyEnter, sfKeySpace, sfKeyX, 
-            sfKeyZ, -1 };
+        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeyLShift, -1, sfKeyEscape, -1, sfKeySpace, -1, -1, -1 };
         memcpy(player->controller.buttons, buttons, sizeof(buttons));
         int axes[8] = { sfKeyA, sfKeyD, sfKeyS, sfKeyW, -1, -1, -1, -1 };
         memcpy(player->controller.axes, axes, sizeof(axes));

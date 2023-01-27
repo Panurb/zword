@@ -21,6 +21,8 @@ typedef char Line[255];
 
 extern Settings game_settings;
 
+extern int keyboard_controls[12];
+
 KeyValue parse_line(Line string, char* delim);
 
 void load_settings();
