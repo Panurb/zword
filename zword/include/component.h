@@ -440,7 +440,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity);
 EnemyComponent* EnemyComponent_get(ComponentData* components, int entity);
 void EnemyComponent_remove(ComponentData* components, int entity);
 
-ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float max_size, float min_size, float speed, float rate, sfColor outer_color, sfColor inner_color);
+ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float start_size, float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color);
 ParticleComponent* ParticleComponent_get(ComponentData* components, int entity);
 void ParticleComponent_remove(ComponentData* components, int entity);
 

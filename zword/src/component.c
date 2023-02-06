@@ -302,7 +302,7 @@ LightComponent* LightComponent_add(ComponentData* components, int entity, float 
     light->enabled = true;
     light->range = range;
     light->angle = angle;
-    light->rays = angle * 50;
+    light->rays = angle * 100;
     light->brightness = 0.0;
     light->max_brightness = brightness;
 
@@ -379,8 +379,8 @@ void EnemyComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float max_size, 
-                                         float min_size, float speed, float rate, sfColor outer_color, sfColor inner_color) {
+ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float start_size, 
+                                         float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
     particle->enabled = false;
     particle->loop = false;
@@ -389,8 +389,8 @@ ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, 
     particle->particles = 0;
     particle->max_particles = 100;
     particle->iterator = 0;
-    particle->start_size = max_size;
-    particle->end_size = min_size;
+    particle->start_size = start_size;
+    particle->end_size = end_size;
     particle->speed = speed;
     particle->speed_spread = 0.5;
     particle->max_time = 0.5;

@@ -1,5 +1,8 @@
+#define _USE_MATH_DEFINES
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include <cJSON.h>
 
@@ -14,7 +17,7 @@ void serialize_int(cJSON* json, char* name, int value, int default_value) {
 }
 
 
-float deserialize_int(cJSON* json, char* name, int value) {
+int deserialize_int(cJSON* json, char* name, int value) {
     cJSON* val = cJSON_GetObjectItem(json, name);
     if (val) {
         return val->valueint;
@@ -48,7 +51,7 @@ void CoordinateComponent_serialize(cJSON* entity_json, ComponentData* components
     cJSON_AddNumberToObject(json, "x", coord->position.x);
     cJSON_AddNumberToObject(json, "y", coord->position.y);
     serialize_float(json, "angle", coord->angle, 0.0f);
-    serialize_int(json, "parent", coord->angle, -1);
+    serialize_int(json, "parent", coord->parent, -1);
 }
 
 
@@ -58,13 +61,8 @@ void CoordinateComponent_deserialize(cJSON* entity_json, ComponentData* componen
     pos.x = cJSON_GetObjectItem(coord_json, "x")->valuedouble;
     pos.y = cJSON_GetObjectItem(coord_json, "y")->valuedouble;
     float angle = deserialize_float(coord_json, "angle", 0.0f);
-    CoordinateComponent_add(components, entity, pos, angle);
-
-    cJSON* parent_json = cJSON_GetObjectItem(coord_json, "parent");
-    if (parent_json) {
-        add_child(components, parent_json->valueint, entity);
-    }
-
+    CoordinateComponent* coord = CoordinateComponent_add(components, entity, pos, angle);
+    coord->parent = deserialize_int(coord_json, "parent", coord->parent);
 }
 
 
@@ -78,18 +76,22 @@ void ImageComponent_serialize(cJSON* entity_json, ComponentData* components, int
     cJSON_AddNumberToObject(json, "width", image->width);
     cJSON_AddNumberToObject(json, "height", image->height);
     cJSON_AddNumberToObject(json, "layer", image->layer);
+    serialize_float(json, "scale_x", image->scale.x, 1.0f);
+    serialize_float(json, "scale_y", image->scale.y, 1.0f);
 }
 
 
 void ImageComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
-    cJSON* image_json = cJSON_GetObjectItem(entity_json, "Image");
-    if (!image_json) return;
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Image");
+    if (!json) return;
 
-    char* filename = cJSON_GetObjectItem(image_json, "filename")->valuestring;
-    float width = cJSON_GetObjectItem(image_json, "width")->valuedouble;
-    float height = cJSON_GetObjectItem(image_json, "height")->valuedouble;
-    float layer = cJSON_GetObjectItem(image_json, "layer")->valueint;
-    ImageComponent_add(components, entity, filename, width, height, layer);
+    char* filename = cJSON_GetObjectItem(json, "filename")->valuestring;
+    float width = cJSON_GetObjectItem(json, "width")->valuedouble;
+    float height = cJSON_GetObjectItem(json, "height")->valuedouble;
+    float layer = cJSON_GetObjectItem(json, "layer")->valueint;
+    ImageComponent* image = ImageComponent_add(components, entity, filename, width, height, layer);
+    image->scale.x = deserialize_float(json, "scale_x", image->scale.x);
+    image->scale.y = deserialize_float(json, "scale_y", image->scale.y);
 }
 
 
@@ -156,9 +158,122 @@ void ColliderComponent_deserialize(cJSON* entity_json, ComponentData* components
 }
 
 
+void LightComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    LightComponent* light = LightComponent_get(components, entity);
+    if (!light) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Light", json);
+    cJSON_AddNumberToObject(json, "range", light->range);
+    cJSON_AddNumberToObject(json, "angle", light->angle);
+    cJSON_AddNumberToObject(json, "color_r", light->color.r);
+    cJSON_AddNumberToObject(json, "color_g", light->color.g);
+    cJSON_AddNumberToObject(json, "color_b", light->color.b);
+    cJSON_AddNumberToObject(json, "brightness", light->max_brightness);
+    cJSON_AddNumberToObject(json, "speed", light->speed);
+    serialize_float(json, "flicker", light->flicker, 0.0f);
+}
+
+
+void LightComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Light");
+    if (!json) return;
+
+    float range = cJSON_GetObjectItem(json, "range")->valuedouble;
+    float angle = cJSON_GetObjectItem(json, "angle")->valuedouble;
+    sfColor color = sfWhite;
+    color.r = cJSON_GetObjectItem(json, "color_r")->valuedouble;
+    color.g = cJSON_GetObjectItem(json, "color_g")->valuedouble;
+    color.b = cJSON_GetObjectItem(json, "color_b")->valuedouble;
+    float brightness = cJSON_GetObjectItem(json, "brightness")->valuedouble;
+    float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
+    LightComponent* light = LightComponent_add(components, entity, range, angle, color, brightness, speed);
+    light->flicker = deserialize_float(json, "flicker", light->flicker);
+}
+
+
+void ParticleComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    ParticleComponent* particle = ParticleComponent_get(components, entity);
+    if (!particle) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Particle", json);
+    cJSON_AddNumberToObject(json, "angle", particle->angle);
+    cJSON_AddNumberToObject(json, "spread", particle->spread);
+    cJSON_AddNumberToObject(json, "start_size", particle->start_size);
+    cJSON_AddNumberToObject(json, "end_size", particle->end_size);
+    cJSON_AddNumberToObject(json, "speed", particle->speed);
+    cJSON_AddNumberToObject(json, "rate", particle->rate);
+    cJSON_AddNumberToObject(json, "outer_r", particle->outer_color.r);
+    cJSON_AddNumberToObject(json, "outer_g", particle->outer_color.g);
+    cJSON_AddNumberToObject(json, "outer_b", particle->outer_color.b);
+    cJSON_AddNumberToObject(json, "inner_r", particle->inner_color.r);
+    cJSON_AddNumberToObject(json, "inner_g", particle->inner_color.g);
+    cJSON_AddNumberToObject(json, "inner_b", particle->inner_color.b);
+    serialize_int(json, "loop", particle->loop, false);
+}
+
+
+void ParticleComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Particle");
+    if (!json) return;
+
+    float angle = cJSON_GetObjectItem(json, "angle")->valuedouble;
+    float spread = cJSON_GetObjectItem(json, "spread")->valuedouble;
+    float start_size = cJSON_GetObjectItem(json, "start_size")->valuedouble;
+    float end_size = cJSON_GetObjectItem(json, "end_size")->valuedouble;
+    float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
+    float rate = cJSON_GetObjectItem(json, "rate")->valuedouble;
+    sfColor outer_color = sfWhite;
+    outer_color.r = cJSON_GetObjectItem(json, "outer_r")->valueint;
+    outer_color.g = cJSON_GetObjectItem(json, "outer_g")->valueint;
+    outer_color.b = cJSON_GetObjectItem(json, "outer_b")->valueint;
+    sfColor inner_color = sfWhite;
+    inner_color.r = cJSON_GetObjectItem(json, "inner_r")->valueint;
+    inner_color.g = cJSON_GetObjectItem(json, "inner_g")->valueint;
+    inner_color.b = cJSON_GetObjectItem(json, "inner_b")->valueint;
+    ParticleComponent* particle = ParticleComponent_add(components, entity, angle, spread, start_size, end_size, speed, 
+        rate, outer_color, inner_color);
+    particle->loop = deserialize_int(json, "loop", particle->loop);
+    if (particle->loop) {
+        particle->enabled = true;
+    }
+}
+
+
+void JointComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    JointComponent* joint = JointComponent_get(components, entity);
+    if (!joint) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Joint", json);
+    cJSON_AddNumberToObject(json, "parent", joint->parent);
+    cJSON_AddNumberToObject(json, "min_length", joint->min_length);
+    cJSON_AddNumberToObject(json, "max_length", joint->max_length);
+    cJSON_AddNumberToObject(json, "strength", joint->strength);
+    serialize_float(json, "max_angle", joint->max_angle, M_PI);
+}
+
+
+void JointComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Joint");
+    if (!json) return;
+
+    int parent = cJSON_GetObjectItem(json, "parent")->valueint;
+    float min_length = cJSON_GetObjectItem(json, "min_length")->valuedouble;
+    float max_length = cJSON_GetObjectItem(json, "max_length")->valuedouble;
+    float strength = cJSON_GetObjectItem(json, "strength")->valuedouble;
+    JointComponent* joint = JointComponent_add(components, entity, parent, min_length, max_length, strength);
+    joint->max_angle = deserialize_float(json, "max_angle", joint->max_angle);
+}
+
+
 void serialize_entity(cJSON* entities_json, ComponentData* components, int entity) {
+    if (!CoordinateComponent_get(components, entity)) return;
     if (WidgetComponent_get(components, entity)) return;
     if (CameraComponent_get(components, entity)) return;
+    if (PlayerComponent_get(components, entity)) return;
+    if (ItemComponent_get(components, entity)) return;
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToArray(entities_json, json);
@@ -168,6 +283,9 @@ void serialize_entity(cJSON* entities_json, ComponentData* components, int entit
     ImageComponent_serialize(json, components, entity);
     ColliderComponent_serialize(json, components, entity);
     PhysicsComponent_serialize(json, components, entity);
+    LightComponent_serialize(json, components, entity);
+    ParticleComponent_serialize(json, components, entity);
+    JointComponent_serialize(json, components, entity);
 }
 
 
@@ -178,7 +296,12 @@ void deserialize_entity(cJSON* entity_json, ComponentData* components) {
     }
 
     CoordinateComponent_deserialize(entity_json, components, entity);
+    ImageComponent_deserialize(entity_json, components, entity);
     ColliderComponent_deserialize(entity_json, components, entity);
+    PhysicsComponent_deserialize(entity_json, components, entity);
+    LightComponent_deserialize(entity_json, components, entity);
+    ParticleComponent_deserialize(entity_json, components, entity);
+    JointComponent_deserialize(entity_json, components, entity);
 }
 
 
@@ -188,8 +311,12 @@ char* serialize_game(GameData* data) {
     cJSON* entities = cJSON_CreateArray();
     cJSON_AddItemToObject(json, "entities", entities);
     for (int i = 0; i < data->components->entities; i++) {
-        if (CoordinateComponent_get(data->components, i)) {
-            serialize_entity(entities, data->components, i);
+        serialize_entity(entities, data->components, i);
+    }
+    for (int i = 0; i < data->components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(data->components, i);
+        if (coord->parent != -1) {
+            add_child(data->components, coord->parent, i);
         }
     }
 

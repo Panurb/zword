@@ -28,11 +28,7 @@ void create_fire(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, 0.0);
-    sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
-    LightComponent_add(components, i, 5.0, 2.0 * M_PI, orange, 0.8, 10.0)->flicker = 0.2;
-    ParticleComponent* particle = ParticleComponent_add(components, i, 0.5 * M_PI, 1.0, 0.6, 0.2, 1.0, 5.0, orange, sfYellow);
-    particle->loop = true;
-    particle->enabled = true;
+    ParticleComponent_add_fire(components, i, 0.6f);
     ColliderComponent_add_circle(components, i, 0.35, GROUP_OBSTACLES);
     ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_PARTICLES);
 }
