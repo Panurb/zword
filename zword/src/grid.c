@@ -16,8 +16,8 @@ ColliderGrid* ColliderGrid_create() {
     grid->columns = LEVEL_WIDTH * CHUNK_WIDTH;
     grid->rows = LEVEL_HEIGHT * CHUNK_HEIGHT;
     grid->tile_size = 10;
-    grid->tile_width = 1.0;
-    grid->tile_height = 1.0;
+    grid->tile_width = 2.0;
+    grid->tile_height = 2.0;
     grid->width = grid->columns * grid->tile_width;
     grid->height = grid->rows * grid->tile_height;
 

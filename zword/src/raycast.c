@@ -90,8 +90,8 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
     int step_x = sign(velocity.x);
     int step_y = sign(velocity.y);
 
-    float t_max_x = (grid->tile_width - mod(step_x * start.x, grid->tile_width)) / fabs(velocity.x);
-    float t_max_y = (grid->tile_height - mod(step_y * start.y, grid->tile_height)) / fabs(velocity.y);
+    float t_max_x = (grid->tile_width - mod(step_x * (start.x + 1e-6), grid->tile_width)) / fabs(velocity.x);
+    float t_max_y = (grid->tile_height - mod(step_y * (start.y + 1e-6), grid->tile_height)) / fabs(velocity.y);
 
     float t_delta_x = grid->tile_width / fabs(velocity.x);
     float t_delta_y = grid->tile_height / fabs(velocity.y);

@@ -305,7 +305,7 @@ void test(ComponentData* components, ColliderGrid* grid) {
     sfVector2f start = zeros();
     create_mansion(components, start);
     // create_school(components, start);
-    create_fire(components, zeros());
+    create_fire(components, vec(0.0f, 1.0f));
 
     create_player(components, start, -1);
     create_assault_rifle(components, sum(start, rand_vector()));

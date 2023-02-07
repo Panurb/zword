@@ -118,7 +118,7 @@ int main() {
                     case STATE_START:
                         start_game(data);
                         save_game(&data);
-                        // load_game(&data);
+                        load_game(&data);
                         game_state = STATE_GAME;
                         break;
                     case STATE_GAME:
