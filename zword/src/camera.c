@@ -123,18 +123,6 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
 }
 
 
-void draw_triangle(sfRenderWindow* window, ComponentData* components, int camera, sfConvexShape* shape,
-                   sfVector2f position, float width, float angle, sfColor color) {
-    bool created = false;
-    if (!shape) {
-        shape = sfConvexShape_create();
-        created = true;
-    }
-    
-    
-}
-
-
 void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color) {
     CameraComponent* cam = CameraComponent_get(components, camera);
 
@@ -151,6 +139,36 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
     sfRectangleShape_setRotation(shape, -to_degrees(angle));
     sfRectangleShape_setFillColor(shape, color);
     sfRenderWindow_drawRectangleShape(window, shape, NULL);
+
+    if (created) {
+        sfRectangleShape_destroy(shape);
+    }
+}
+
+
+
+void draw_rectangle_outline(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, 
+        sfVector2f position, float width, float height, float angle, float line_width, sfColor color) {
+    CameraComponent* cam = CameraComponent_get(components, camera);
+
+    bool created = false;
+    if (!shape) {
+        shape = sfRectangleShape_create();
+        created = true;
+    }
+
+    sfVector2f hw = polar_to_cartesian(0.5 * width, angle);
+    sfVector2f hh = polar_to_cartesian(0.5 * height, angle + 0.5 * M_PI);
+
+    sfVector2f corners[4];
+    corners[0] = sum(position, sum(hw, hh));
+    corners[1] = diff(corners[0], mult(2, hh));
+    corners[2] = diff(corners[1], mult(2, hw));
+    corners[3] = sum(corners[2], mult(2, hh));
+
+    for (int i = 0; i < 4; i++) {
+        draw_line(window, components, camera, shape, corners[i], corners[(i + 1) % 4], line_width, color);
+    }
 
     if (created) {
         sfRectangleShape_destroy(shape);

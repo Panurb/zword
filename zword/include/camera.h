@@ -21,6 +21,9 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
 
 void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color);
 
+void draw_rectangle_outline(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, 
+    sfVector2f position, float width, float height, float angle, float line_width, sfColor color);
+
 void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread);
 
 void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, sfVertexArray* verts, int verts_size, sfVector2f position, float min_range, float max_range, float angle, float spread, sfColor color);

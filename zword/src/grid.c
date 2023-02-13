@@ -16,8 +16,8 @@ ColliderGrid* ColliderGrid_create() {
     grid->columns = LEVEL_WIDTH * CHUNK_WIDTH;
     grid->rows = LEVEL_HEIGHT * CHUNK_HEIGHT;
     grid->tile_size = 10;
-    grid->tile_width = 2.0;
-    grid->tile_height = 2.0;
+    grid->tile_width = TILE_WIDTH;
+    grid->tile_height = TILE_HEIGHT;
     grid->width = grid->columns * grid->tile_width;
     grid->height = grid->rows * grid->tile_height;
 
@@ -148,7 +148,7 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 
 void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
     sfRectangleShape* shape = sfRectangleShape_create();
-    sfText* text = sfText_create();
+    // sfText* text = sfText_create();
     sfVector2f w = { 0.5f * grid->tile_width, 0.0f };
     sfVector2f h = { 0.0f, 0.5f * grid->tile_height };
     float linewidth = 0.01f;
@@ -161,14 +161,14 @@ void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* wi
                 draw_line(window, components, camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
                 draw_line(window, components, camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);
                 draw_line(window, components, camera, shape, diff(sum(r, w), h), sum(sum(r, w), h), linewidth, color);
-                if (grid->array[i][j]->size > 0) {
-                    char size[10];
-                    snprintf(size, 10, "%i", grid->array[i][j]->size);
-                    draw_text(window, components, camera, text, r, size, sfWhite);
-                }
+                // if (grid->array[i][j]->size > 0) {
+                //     char size[10];
+                //     snprintf(size, 10, "%i", grid->array[i][j]->size);
+                //     draw_text(window, components, camera, text, r, size, sfWhite);
+                // }
             }
         }
     }
     sfRectangleShape_destroy(shape);
-    sfText_destroy(text);
+    // sfText_destroy(text);
 }

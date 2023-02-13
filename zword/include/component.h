@@ -78,6 +78,7 @@ typedef enum {
 } ColliderType;
 
 typedef enum {
+    GROUP_ALL,
     GROUP_WALLS,
     GROUP_ITEMS,
     GROUP_PLAYERS,

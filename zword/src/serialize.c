@@ -409,4 +409,6 @@ void load_game(GameData* data) {
     deserialize_game(data, string, false);
 
     free(string);
+
+    init_grid(data->components, data->grid);
 }

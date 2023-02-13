@@ -18,6 +18,7 @@
 #include "hud.h"
 #include "input.h"
 #include "serialize.h"
+#include "editor.h"
 
 
 sfRenderWindow* create_game_window(sfVideoMode* mode) {
@@ -80,8 +81,6 @@ int main() {
                     sfRenderWindow_close(window);
                     break;
                 case sfEvtKeyPressed:
-                    printf(key_to_string(event.key.code));
-                    printf("\n");
                     if (event.key.code == sfKeyEscape) {
                         if (game_state == STATE_GAME) {
                             game_state = STATE_PAUSE;
@@ -101,6 +100,9 @@ int main() {
                     }
                     break;
                 default:
+                    if (game_state == STATE_EDITOR) {
+                        input_editor(data.components, data.camera, event);
+                    }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE) {
                         input_menu(data.components, data.camera, event);
                     }
@@ -133,6 +135,14 @@ int main() {
                         resize_game(&data, mode);
                         game_state = STATE_MENU;
                         break;
+                    case STATE_LOAD:
+                        load_game(&data);
+                        game_state = STATE_EDITOR;
+                        break;
+                    case STATE_EDITOR:
+                        update_game(data, window, time_step);
+                        update_editor(data, window, time_step);
+                        break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);
                         break;
@@ -160,6 +170,12 @@ int main() {
                 draw_overlay(window, data.components, data.camera);
                 draw_menu(data, window);
                 break;
+            case STATE_LOAD:
+                draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
+                break;
+            case STATE_EDITOR:
+                data.ambient_light = 1.0f;
+                draw_editor(data, window);
             default:
                 break;
         }

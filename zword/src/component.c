@@ -946,7 +946,7 @@ void ComponentData_clear(ComponentData* components) {
 
 sfVector2f get_position(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    sfVector2f position = components->coordinate[entity]->position;
+    sfVector2f position = coord->position;
 
     int parent = coord->parent;
     if (parent != -1) {

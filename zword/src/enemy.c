@@ -22,7 +22,7 @@ int create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos)
     CoordinateComponent_add(components, i, pos, rand_angle());
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return -1;
     }
@@ -52,7 +52,7 @@ void create_farmer(ComponentData* components, ColliderGrid* grid, sfVector2f pos
     CoordinateComponent_add(components, i, pos, rand_angle());
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return;
     }
@@ -84,7 +84,7 @@ void create_priest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
     CoordinateComponent_add(components, i, pos, rand_angle());
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return;
     }
@@ -119,7 +119,7 @@ void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f po
     CoordinateComponent_add(components, i, pos, rand_angle());
     ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return;
     }

@@ -9,6 +9,8 @@
 #define CHUNK_HEIGHT 32
 #define LEVEL_WIDTH 13
 #define LEVEL_HEIGHT 13
+#define TILE_WIDTH 1.0f
+#define TILE_HEIGHT 1.0f
 
 
 typedef struct {
@@ -35,14 +37,14 @@ void ColliderGrid_clear(ColliderGrid* grid);
 
 List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius);
 
-void update_grid(ComponentData* component, ColliderGrid* grid, int i);
+void update_grid(ComponentData* components, ColliderGrid* grid, int i);
 
-void init_grid(ComponentData* component, ColliderGrid* grid);
+void init_grid(ComponentData* components, ColliderGrid* grid);
 
-void clear_grid(ComponentData* component, ColliderGrid* grid, int i);
+void clear_grid(ComponentData* components, ColliderGrid* grid, int i);
 
-Bounds get_bounds(ComponentData* component, ColliderGrid* grid, int i);
+Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i);
 
-void get_neighbors(ComponentData* component, ColliderGrid* grid, int i, int entities[100]);
+void get_neighbors(ComponentData* components, ColliderGrid* grid, int i, int entities[100]);
 
 void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera);

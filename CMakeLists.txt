@@ -18,6 +18,7 @@ set(SOURCES
     zword/src/collider.c
     zword/src/component.c
     zword/src/door.c
+    zword/src/editor.c
     zword/src/enemy.c
     zword/src/game.c
     zword/src/globals.c

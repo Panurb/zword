@@ -46,8 +46,6 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         if (coord->parent != -1) continue;
 
-        JointComponent* joint = JointComponent_get(components, i);
-
         if (physics->collision.entities->size > 0) {
             physics->velocity = physics->collision.velocity;
 
@@ -61,6 +59,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
         float delta_angle = time_step * physics->angular_velocity;
 
+        JointComponent* joint = JointComponent_get(components, i);
         if (joint && joint->parent != -1) {
             sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
             float d = norm(r);

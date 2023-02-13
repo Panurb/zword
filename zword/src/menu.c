@@ -32,6 +32,13 @@ void change_state_game(ComponentData* components, int entity) {
 }
 
 
+void change_state_editor(ComponentData* components, int entity) {
+    UNUSED(components);
+    UNUSED(entity);
+    game_state = STATE_LOAD;
+}
+
+
 void change_state_quit(ComponentData* components, int entity) {
     UNUSED(components);
     UNUSED(entity);
@@ -74,6 +81,25 @@ void toggle_play(ComponentData* components, int entity) {
     add_child(components, window_id, container);
 
     add_button_to_container(components, container, "START", change_state_start);
+}
+
+
+void toggle_editor(ComponentData* components, int entity) {
+    UNUSED(entity);
+    static int window_id = -1;
+    if (window_id != -1) {
+        destroy_entity_recursive(components, window_id);
+        window_id = -1;
+        return;
+    }
+
+    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_id = create_window(components, pos, "EDITOR", toggle_editor);
+
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    add_child(components, window_id, container);
+
+    add_button_to_container(components, container, "OPEN", change_state_editor);
 }
 
 
@@ -132,6 +158,7 @@ void toggle_controls(ComponentData* components, int entity) {
 void create_menu(GameData data) {
     int container = create_container(data.components, vec(-20.0f, 0.0f), 1, 4);
     add_button_to_container(data.components, container, "NEW GAME", toggle_play);
+    add_button_to_container(data.components, container, "EDITOR", toggle_editor);
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
     add_button_to_container(data.components, container, "QUIT", change_state_quit);

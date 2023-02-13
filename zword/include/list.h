@@ -1,5 +1,7 @@
 #pragma once
 
+#define FOREACH(node, list) for (node = list->head; node != NULL; node = node->next)
+
 typedef struct ListNode {
     int value;
     struct ListNode* next;

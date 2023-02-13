@@ -6,6 +6,8 @@ typedef enum {
     STATE_GAME,
     STATE_PAUSE,
     STATE_APPLY,
+    STATE_LOAD,
+    STATE_EDITOR,
     STATE_QUIT
 } GameState;
 

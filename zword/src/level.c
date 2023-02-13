@@ -85,7 +85,7 @@ void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     float size = randf(1.0f, 1.5f);
     ColliderComponent_add_circle(components, i, 1.25f * size, GROUP_TREES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return;
     }
@@ -100,7 +100,7 @@ void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f posit
     float size = randf(0.75f, 2.0f);
     ColliderComponent_add_circle(components, i, 1.4 * size, GROUP_TREES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return;
     }
@@ -135,7 +135,7 @@ void create_uranium(ComponentData* components, ColliderGrid* grid, sfVector2f po
     float r = randf(0.8, 1.2);
     ColliderComponent_add_circle(components, i, 0.5 * r, GROUP_TREES);
 
-    if (collides_with(components, grid, i)) {
+    if (collides_with(components, grid, i, NULL)) {
         destroy_entity(components, i);
         return;
     }
