@@ -115,7 +115,7 @@ void draw_game(GameData data, sfRenderWindow* window) {
 
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     draw_colliders(data.components, window, data.camera);
-    draw_waypoints(data.components, window, data.camera);
+    draw_waypoints(data.components, window, data.camera, true);
     draw_enemies(data.components, window, data.camera);
     if (debug_level > 1) {
         draw_occupied_tiles(data.components, data.grid, window, data.camera);

@@ -40,6 +40,14 @@ void ColliderGrid_clear(ColliderGrid* grid) {
 }
 
 
+sfVector2i world_to_grid(ColliderGrid* grid, sfVector2f position) {
+    int x = floorf((position.x + 0.5 * grid->width) / grid->tile_width);
+    int y = floorf((position.y + 0.5 * grid->height) / grid->tile_height);
+    
+    return (sfVector2i) { x, y };
+}
+
+
 Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
     sfVector2f pos = get_position(components, i);
     

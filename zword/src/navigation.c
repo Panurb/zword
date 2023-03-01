@@ -149,7 +149,7 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera)
 }
 
 
-void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera) {
+void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera, bool draw_neighbors) {
     sfCircleShape* shape = sfCircleShape_create();
     sfRectangleShape* line = sfRectangleShape_create();
 
@@ -166,11 +166,13 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
 
         sfRenderWindow_drawCircleShape(window, shape, NULL);
 
-        for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
-            int k = node->value;
-            sfColor color = sfWhite;
-            color.a = 64;
-            draw_line(window, components, camera, line, pos, get_position(components, k), 0.02f, color);
+        if (draw_neighbors) {
+            for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
+                int k = node->value;
+                sfColor color = sfWhite;
+                color.a = 64;
+                draw_line(window, components, camera, line, pos, get_position(components, k), 0.04f, color);
+            }
         }
     }
 

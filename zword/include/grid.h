@@ -35,6 +35,8 @@ ColliderGrid* ColliderGrid_create();
 
 void ColliderGrid_clear(ColliderGrid* grid);
 
+sfVector2i world_to_grid(ColliderGrid* grid, sfVector2f position);
+
 List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius);
 
 void update_grid(ComponentData* components, ColliderGrid* grid, int i);

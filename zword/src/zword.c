@@ -101,7 +101,7 @@ int main() {
                     break;
                 default:
                     if (game_state == STATE_EDITOR) {
-                        input_editor(data.components, data.camera, event);
+                        input_editor(data, window, event);
                     }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE) {
                         input_menu(data.components, data.camera, event);

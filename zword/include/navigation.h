@@ -17,4 +17,4 @@ bool a_star(ComponentData* component, int start, int goal, List* path);
 
 void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera);
 
-void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera);
+void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera, bool draw_neighbors);
