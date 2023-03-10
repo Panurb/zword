@@ -180,3 +180,10 @@ void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* wi
     sfRectangleShape_destroy(shape);
     // sfText_destroy(text);
 }
+
+
+sfVector2f snap_to_grid(sfVector2f vector) {
+    vector.x = TILE_WIDTH * roundf(vector.x / TILE_WIDTH);
+    vector.y = TILE_HEIGHT * roundf(vector.y / TILE_HEIGHT);
+    return vector;
+}

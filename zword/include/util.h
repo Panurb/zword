@@ -21,9 +21,9 @@ typedef struct {
     float d;
 } Matrix2f;
 
-typedef char Filename[20];
+typedef char Filename[128];
 
-typedef char ButtonText[20];
+typedef char ButtonText[128];
 
 sfVector2f zeros();
 

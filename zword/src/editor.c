@@ -6,6 +6,7 @@
 #include "util.h"
 #include "collider.h"
 #include "navigation.h"
+#include "serialize.h"
 
 
 typedef enum {
@@ -18,31 +19,59 @@ static int selection_box = -1;
 static sfVector2f selection_start = { 0.0f, 0.0f };
 static sfVector2f selection_end = { 0.0f, 0.0f };
 static List* selections = NULL;
-static Tool tool = TOOL_WALL;
+static Tool tool = TOOL_SELECT;
 static sfVector2f mouse_world = { 0.0f, 0.0f };
 
 
-void move_selections(GameData data, sfVector2f delta_pos) {
+void save_prefab(ComponentData* components, Filename filename) {
+    sfVector2f center = zeros();
+    ListNode* node;
+    FOREACH(node, selections) {
+        int i = node->value;
+        if (CoordinateComponent_get(components, i)->parent == -1) {
+            center = sum(center, get_position(components, i));
+        }
+    }
+    center = snap_to_grid(center);
+    center = mult(-1.0f, center);
+
+    cJSON* json = serialize_entities(components, selections, center);
+
+    save_json(json, "prefabs", filename);
+    cJSON_Delete(json);
+}
+
+
+void load_prefab(GameData* data, Filename filename, sfVector2f position, float angle) {
+    cJSON* json = load_json("prefabs", filename);
+
+    deserialize_entities(json, data, position, angle);
+
+    cJSON_Delete(json);
+}
+
+
+void move_selections(GameData* data, sfVector2f delta_pos) {
     if (non_zero(delta_pos)) {
         ListNode* node;
         FOREACH (node, selections) {
             int i = node->value;
-            clear_grid(data.components, data.grid, i);
-            CoordinateComponent* coord = CoordinateComponent_get(data.components, node->value);
+            clear_grid(data->components, data->grid, i);
+            CoordinateComponent* coord = CoordinateComponent_get(data->components, node->value);
             coord->position = sum(coord->position, delta_pos);
-            update_grid(data.components, data.grid, i);
+            update_grid(data->components, data->grid, i);
         }
         delta_pos = zeros();
     }
 }
 
 
-void destroy_selections(GameData data) {
+void destroy_selections(GameData* data) {
     ListNode* node;
     FOREACH (node, selections) {
         int i = node->value;
-        clear_grid(data.components, data.grid, i);
-        destroy_entity_recursive(data.components, i);
+        clear_grid(data->components, data->grid, i);
+        destroy_entity_recursive(data->components, i);
     }
     List_clear(selections);
 }
@@ -79,10 +108,10 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
 }
 
 
-void input_tool_select(GameData data, sfEvent event) {
+void input_tool_select(GameData* data, sfEvent event) {
     static bool grabbed = false;
 
-    ComponentData* components = data.components;
+    ComponentData* components = data->components;
 
     if (event.type == sfEvtMouseMoved) {
         if (selection_box != -1) {
@@ -137,23 +166,21 @@ void input_tool_select(GameData data, sfEvent event) {
 }
 
 
-void create_prefab(GameData data, sfVector2f position, float width, float height) {
-    int i = create_entity(data.components);
-    CoordinateComponent_add(data.components, i, position, 0.0f);
-    ColliderComponent_add_rectangle(data.components, i, width, height, GROUP_WALLS);
+void create_prefab(GameData* data, sfVector2f position, float width, float height) {
+    int i = create_entity(data->components);
+    CoordinateComponent_add(data->components, i, position, 0.0f);
+    ColliderComponent_add_rectangle(data->components, i, width, height, GROUP_WALLS);
 }
 
 
-void input_tool_wall(GameData data, sfEvent event) {
+void input_tool_wall(GameData* data, sfEvent event) {
     static ButtonText wall_name;
 
     if (event.type == sfEvtMouseMoved) {
-        selection_end.x = TILE_WIDTH * roundf(mouse_world.x / TILE_WIDTH);
-        selection_end.y = TILE_HEIGHT * roundf(mouse_world.y / TILE_HEIGHT);
+        selection_end = snap_to_grid(mouse_world);
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            selection_start.x = TILE_WIDTH * roundf(mouse_world.x / TILE_WIDTH);
-            selection_start.y = TILE_HEIGHT * roundf(mouse_world.y / TILE_HEIGHT);
+            selection_start = snap_to_grid(mouse_world);
         } else if (event.mouseButton.button == sfMouseRight) {
 
         }
@@ -168,13 +195,14 @@ void input_tool_wall(GameData data, sfEvent event) {
 }
 
 
-void input_editor(GameData data, sfRenderWindow* window, sfEvent event) {
-    static sfVector2i mouse_screen = { 0.0f, 0.0f };
+void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
+    UNUSED(window);
+    static sfVector2i mouse_screen = { 0, 0 };
 
-    ComponentData* components = data.components;
+    ComponentData* components = data->components;
 
-    CoordinateComponent* cam_coord = CoordinateComponent_get(components, data.camera);
-    CameraComponent* cam = CameraComponent_get(components, data.camera);
+    CoordinateComponent* cam_coord = CoordinateComponent_get(components, data->camera);
+    CameraComponent* cam = CameraComponent_get(components, data->camera);
 
     switch (tool) {
         case TOOL_SELECT:
@@ -185,11 +213,21 @@ void input_editor(GameData data, sfRenderWindow* window, sfEvent event) {
             break;
     }
 
+    if (event.type == sfEvtKeyPressed) {
+        if (event.key.code == sfKeyS) {
+            if (selections) {
+                save_prefab(components, "testi.json");
+            }
+        }
+        if (event.key.code == sfKeyL) {
+            load_prefab(data, "testi.json", snap_to_grid(mouse_world), 0.0f);
+        }
+    }
     if (event.type == sfEvtMouseMoved) {
         sfVector2i mouse_new = { event.mouseMove.x, event.mouseMove.y };
         sfVector2f mouse_delta = { mouse_new.x - mouse_screen.x, mouse_screen.y - mouse_new.y };
         mouse_screen = mouse_new;
-        mouse_world = screen_to_world(components, data.camera, mouse_screen);
+        mouse_world = screen_to_world(components, data->camera, mouse_screen);
 
         if (sfMouse_isButtonPressed(sfMouseMiddle)) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
@@ -220,8 +258,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
     } else if (tool == TOOL_WALL) {
         if (sfMouse_isButtonPressed(sfMouseLeft)) {
             sfVector2f end = screen_to_world(data.components, data.camera, sfMouse_getPosition((sfWindow*)window));
-            end.x = TILE_WIDTH * roundf(end.x / TILE_WIDTH);
-            end.y = TILE_HEIGHT * roundf(end.y / TILE_HEIGHT);
+            end = snap_to_grid(end);
             float width = fabsf(end.x - selection_start.x);
             float height = fabsf(end.y - selection_start.y);
             pos = mult(0.5f, sum(end, selection_start));

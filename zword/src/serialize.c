@@ -42,25 +42,27 @@ float deserialize_float(cJSON* json, char* name, float value) {
 }
 
 
-void CoordinateComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void CoordinateComponent_serialize(cJSON* entity_json, ComponentData* components, int entity,
+        sfVector2f offset) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     if (!coord) return;
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Coordinate", json);
-    cJSON_AddNumberToObject(json, "x", coord->position.x);
-    cJSON_AddNumberToObject(json, "y", coord->position.y);
+    cJSON_AddNumberToObject(json, "x", coord->position.x + offset.x);
+    cJSON_AddNumberToObject(json, "y", coord->position.y + offset.y);
     serialize_float(json, "angle", coord->angle, 0.0f);
     serialize_int(json, "parent", coord->parent, -1);
 }
 
 
-void CoordinateComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void CoordinateComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity,
+        sfVector2f offset, float rotation) {
     cJSON* coord_json = cJSON_GetObjectItem(entity_json, "Coordinate");
     sfVector2f pos;
-    pos.x = cJSON_GetObjectItem(coord_json, "x")->valuedouble;
-    pos.y = cJSON_GetObjectItem(coord_json, "y")->valuedouble;
-    float angle = deserialize_float(coord_json, "angle", 0.0f);
+    pos.x = cJSON_GetObjectItem(coord_json, "x")->valuedouble + offset.x;
+    pos.y = cJSON_GetObjectItem(coord_json, "y")->valuedouble + offset.y;
+    float angle = deserialize_float(coord_json, "angle", 0.0f) + rotation;
     CoordinateComponent* coord = CoordinateComponent_add(components, entity, pos, angle);
     coord->parent = deserialize_int(coord_json, "parent", coord->parent);
 }
@@ -285,7 +287,8 @@ void WaypointComponent_deserialize(cJSON* entity_json, ComponentData* components
 }
 
 
-bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id) {
+bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
+        sfVector2f offset) {
     if (!CoordinateComponent_get(components, entity)) return false;
     if (WidgetComponent_get(components, entity)) return false;
     if (CameraComponent_get(components, entity)) return false;
@@ -296,7 +299,7 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
     cJSON_AddItemToArray(entities_json, json);
     cJSON_AddNumberToObject(json, "id", id);
 
-    CoordinateComponent_serialize(json, components, entity);
+    CoordinateComponent_serialize(json, components, entity, offset);
     ImageComponent_serialize(json, components, entity);
     ColliderComponent_serialize(json, components, entity);
     PhysicsComponent_serialize(json, components, entity);
@@ -309,7 +312,8 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
 }
 
 
-int deserialize_entity(cJSON* entity_json, ComponentData* components, bool preserve_id) {
+int deserialize_entity(cJSON* entity_json, ComponentData* components, bool preserve_id,
+        sfVector2f offset, float rotation) {
     int entity;
     if (preserve_id) {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
@@ -320,7 +324,7 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
         entity = create_entity(components);
     }
 
-    CoordinateComponent_deserialize(entity_json, components, entity);
+    CoordinateComponent_deserialize(entity_json, components, entity, offset, rotation);
     ImageComponent_deserialize(entity_json, components, entity);
     ColliderComponent_deserialize(entity_json, components, entity);
     PhysicsComponent_deserialize(entity_json, components, entity);
@@ -333,88 +337,136 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
 }
 
 
-char* serialize_game(GameData* data, bool preserve_id) {
+void update_serialized_ids(cJSON* entities_json, int ids[MAX_ENTITIES]) {
+    // Update parent ids to match new ids.
+    cJSON* entity;
+    cJSON_ArrayForEach(entity, entities_json) {
+        cJSON* coord_json = cJSON_GetObjectItem(entity, "Coordinate");
+        cJSON* parent_json = cJSON_GetObjectItem(coord_json, "parent");
+        if (parent_json) {
+            cJSON_SetNumberValue(parent_json, ids[parent_json->valueint]);
+        }
+        cJSON* joint_json = cJSON_GetObjectItem(entity, "Joint");
+        if (joint_json) {
+            parent_json = cJSON_GetObjectItem(joint_json, "parent");
+            cJSON_SetNumberValue(parent_json, ids[parent_json->valueint]);
+        }
+    }
+}
+
+
+cJSON* serialize_entities(GameData* components, List* entities, sfVector2f offset) {
     cJSON* json = cJSON_CreateObject();
 
-    cJSON* entities = cJSON_CreateArray();
-    cJSON_AddItemToObject(json, "entities", entities);
+    cJSON* entities_json = cJSON_CreateArray();
+    cJSON_AddItemToObject(json, "entities", entities_json);
 
     int ids[MAX_ENTITIES];
     int id = 0;
+    ListNode* node;
+    FOREACH(node, entities) {
+        int i = node->value;
+        if (serialize_entity(entities_json, components, i, id, offset)) {
+            ids[i] = id;
+            id++;
+        }
+    }
+
+    update_serialized_ids(entities_json, ids);
+
+    return json;
+}
+
+
+cJSON* serialize_game(GameData* data, bool preserve_id) {
+    cJSON* json = cJSON_CreateObject();
+
+    cJSON* entities_json = cJSON_CreateArray();
+    cJSON_AddItemToObject(json, "entities", entities_json);
+
+    int ids[MAX_ENTITIES];
+    int id = 0;
+    sfVector2f offset = zeros();
     for (int i = 0; i < data->components->entities; i++) {
         if (preserve_id) {
-            serialize_entity(entities, data->components, i, i);
+            serialize_entity(entities_json, data->components, i, i, offset);
         } else {
-            if (serialize_entity(entities, data->components, i, id)) {
+            if (serialize_entity(entities_json, data->components, i, id, offset)) {
                 ids[i] = id;
                 id++;
             }
         }
     }
 
-    // Update parent ids to match new ids.
     if (!preserve_id) {
-        cJSON* entity;
-        cJSON_ArrayForEach(entity, entities) {
-            cJSON* coord_json = cJSON_GetObjectItem(entity, "Coordinate");
-            cJSON* parent_json = cJSON_GetObjectItem(coord_json, "parent");
-            if (parent_json) {
-                cJSON_SetNumberValue(parent_json, ids[parent_json->valueint]);
-            }
-            cJSON* joint_json = cJSON_GetObjectItem(entity, "Joint");
-            if (joint_json) {
-                parent_json = cJSON_GetObjectItem(joint_json, "parent");
-                cJSON_SetNumberValue(parent_json, ids[parent_json->valueint]);
-            }
-        }
+        update_serialized_ids(entities_json, ids);
     }
 
-    char* string = cJSON_Print(json);
-    cJSON_Delete(json);
-    return string;
+    return json;
 }
 
 
-void deserialize_game(GameData* data, char* string, bool preserve_id) {
-    cJSON* json = cJSON_Parse(string);
+void update_deserialized_id(ComponentData* components, int ids[MAX_ENTITIES], int entity) {
+    // Update parent ids to match new ids.
+    int id = ids[entity];
+    CoordinateComponent* coord = CoordinateComponent_get(components, id);
+    if (coord->parent != -1) {
+        coord->parent = ids[coord->parent];
+        add_child(components, coord->parent, id);
+    }
+    JointComponent* joint = JointComponent_get(components, id);
+    if (joint) {
+        joint->parent = ids[joint->parent];
+    }
+}
 
+
+void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float rotation) {
+    cJSON* entities = cJSON_GetObjectItem(json, "entities");
+    cJSON* entity;
+    int ids[MAX_ENTITIES];
+    int n = 0;
+    cJSON_ArrayForEach(entity, entities) {
+        ids[n] = deserialize_entity(entity, data->components, false, offset, rotation);
+        update_grid(data->components, data->grid, ids[n]);
+        n++;
+    }
+
+    for (int i = 0; i < n; i++) {
+        update_deserialized_id(data->components, ids, i);
+    }
+}
+
+
+void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
     cJSON* entities = cJSON_GetObjectItem(json, "entities");
     cJSON* entity;
     int ids[MAX_ENTITIES];
     int i = 0;
+    sfVector2f offset = zeros();
     cJSON_ArrayForEach(entity, entities) {
-        ids[i] = deserialize_entity(entity, data->components, preserve_id);
+        ids[i] = deserialize_entity(entity, data->components, preserve_id, offset, 0.0f);
         i++;
     }
 
-    // Update parent ids to match new ids.
     if (!preserve_id) {
         for (int i = 0; i < data->components->entities; i++) {
-            int id = ids[i];
-            CoordinateComponent* coord = CoordinateComponent_get(data->components, id);
-            if (coord->parent != -1) {
-                coord->parent = ids[coord->parent];
-                add_child(data->components, coord->parent, id);
-            }
-            JointComponent* joint = JointComponent_get(data->components, id);
-            if (joint) {
-                joint->parent = ids[joint->parent];
-            }
+            update_deserialized_id(data->components, ids, i);
         }
     }
-
-    cJSON_Delete(json);
 }
 
 
-void save_game(GameData* data) {
-    FILE* file = fopen("data/maps/map.json", "w");
+void save_json(cJSON* json, Filename directory, Filename filename) {
+    Filename path;
+    snprintf(path, 128, "%s/%s/%s", "data", directory, filename);
+    FILE* file = fopen(path, "w");
     if (!file) {
         printf("Could not open file.\n");
         return;
     }
 
-    char* string = serialize_game(data, false);
+    char* string = cJSON_Print(json);
     fputs(string, file);
 
     fclose(file);
@@ -422,11 +474,13 @@ void save_game(GameData* data) {
 }
 
 
-void load_game(GameData* data) {
-    FILE* file = fopen("data/maps/map.json", "r");
+cJSON* load_json(Filename directory, Filename filename) {
+    Filename path;
+    snprintf(path, 128, "%s/%s/%s", "data", directory, filename);
+    FILE* file = fopen(path, "r");
     if (!file) {
         printf("Could not open file.\n");
-        return;
+        return NULL;
     }
 
     fseek(file, 0, SEEK_END);
@@ -439,9 +493,25 @@ void load_game(GameData* data) {
 
     string[fsize] = 0;
 
-    deserialize_game(data, string, false);
-
+    cJSON* json = cJSON_Parse(string);
     free(string);
+    return json;
+}
+
+
+void save_game(GameData* data) {
+    cJSON* json = serialize_game(data, false);
+    save_json(json, "maps", "map.json");
+    cJSON_Delete(json);
+}
+
+
+void load_game(GameData* data) {
+    cJSON* json = load_json("maps", "map.json");
+    if (json) {
+        deserialize_game(json, data, false);
+        cJSON_Delete(json);
+    }
 
     init_grid(data->components, data->grid);
 }

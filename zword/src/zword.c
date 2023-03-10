@@ -98,10 +98,9 @@ int main() {
                     } else if (event.key.code == sfKeyF1) {
                         debug_level = (debug_level + 1) % 4; 
                     }
-                    break;
                 default:
                     if (game_state == STATE_EDITOR) {
-                        input_editor(data, window, event);
+                        input_editor(&data, window, event);
                     }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE) {
                         input_menu(data.components, data.camera, event);
