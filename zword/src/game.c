@@ -120,7 +120,4 @@ void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     if (debug_level > 1) {
         draw_occupied_tiles(data.components, data.grid, window, data.camera);
     }
-    if (debug_level > 2) {
-        draw_grid(data.components, data.grid, window, data.camera);
-    }
 }

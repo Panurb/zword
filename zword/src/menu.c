@@ -75,7 +75,7 @@ void toggle_play(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "NEW GAME", toggle_play);
+    window_id = create_window(components, pos, "NEW GAME", 2, toggle_play);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(components, window_id, container);
@@ -94,7 +94,7 @@ void toggle_editor(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "EDITOR", toggle_editor);
+    window_id = create_window(components, pos, "EDITOR", 2, toggle_editor);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(components, window_id, container);
@@ -113,7 +113,7 @@ void toggle_settings(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "SETTINGS", toggle_settings);
+    window_id = create_window(components, pos, "SETTINGS", 2, toggle_settings);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(components, window_id, container);
@@ -141,7 +141,7 @@ void toggle_controls(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "CONTROLS", toggle_controls);
+    window_id = create_window(components, pos, "CONTROLS", 2, toggle_controls);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(components, window_id, container);

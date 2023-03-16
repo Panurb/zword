@@ -387,6 +387,7 @@ typedef struct {
 
 struct ComponentData {
     int entities;
+    List* added_entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     OrderedArray image;
     PhysicsComponent* physics[MAX_ENTITIES];

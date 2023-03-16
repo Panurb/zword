@@ -17,6 +17,7 @@
 ComponentData* ComponentData_create() {
     ComponentData* components = malloc(sizeof(ComponentData));
     components->entities = 0;
+    components->added_entities = NULL;
 
     components->image.order = List_create();
     components->player.order = List_create();
@@ -860,11 +861,17 @@ void WidgetComponent_remove(ComponentData* components, int entity) {
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
+            if (components->added_entities) {
+                List_add(components->added_entities, i);
+            }
             return i;
         }
     }
 
     components->entities++;
+    if (components->added_entities) {
+        List_add(components->added_entities, components->entities - 1);
+    }
     return components->entities - 1;
 }
 

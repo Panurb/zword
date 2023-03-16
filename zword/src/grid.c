@@ -154,36 +154,46 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 }
 
 
-void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
-    sfRectangleShape* shape = sfRectangleShape_create();
-    // sfText* text = sfText_create();
-    sfVector2f w = { 0.5f * grid->tile_width, 0.0f };
-    sfVector2f h = { 0.0f, 0.5f * grid->tile_height };
+void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, float tile_width, float tile_height) {
+    CameraComponent* cam = CameraComponent_get(components, camera);
+    float width = cam->resolution.x / cam->zoom;
+    float height = cam->resolution.y / cam->zoom;
+    sfVector2f pos = get_position(components, camera);
     float linewidth = 0.01f;
-    sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
-    for (int i = 0; i < grid->width; i++) {
-        for (int j = 0; j < grid->height; j++) {
-            sfVector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
-            if (on_screen(components, camera, r, grid->tile_width, grid->tile_height)) {
-                draw_line(window, components, camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
-                draw_line(window, components, camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
-                draw_line(window, components, camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);
-                draw_line(window, components, camera, shape, diff(sum(r, w), h), sum(sum(r, w), h), linewidth, color);
-                // if (grid->array[i][j]->size > 0) {
-                //     char size[10];
-                //     snprintf(size, 10, "%i", grid->array[i][j]->size);
-                //     draw_text(window, components, camera, text, r, size, sfWhite);
-                // }
-            }
-        }
+    float left = pos.x - 0.5f * width;
+    float right = pos.x + 0.5f * width;
+    float bottom = pos.y - 0.5f * height;
+    float top = pos.y + 0.5f * height;
+
+    // sfRectangleShape* shape = sfRectangleShape_create();
+    // for (int x = left - mod(left, TILE_WIDTH); x < right; x += TILE_WIDTH) {
+    //     for (int y = left - mod(left, TILE_HEIGHT); y < right; y += TILE_HEIGHT) {
+    //         draw_rectangle(window, components, camera, shape, vec(x, y), 0.05f, 0.05f, 0.0f, sfWhite);
+    //     }
+    // }
+    // sfRectangleShape_destroy(shape);
+
+    // return;
+
+    for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
+        draw_line(window, components, camera, NULL, vec(x, bottom), vec(x, top), linewidth, sfWhite);
     }
-    sfRectangleShape_destroy(shape);
-    // sfText_destroy(text);
+
+    for (float y = left - mod(left, tile_height); y < right; y += tile_height) {
+        draw_line(window, components, camera, NULL, vec(left, y), vec(right, y), linewidth, sfWhite);
+    }
 }
 
 
 sfVector2f snap_to_grid(sfVector2f vector) {
     vector.x = TILE_WIDTH * roundf(vector.x / TILE_WIDTH);
     vector.y = TILE_HEIGHT * roundf(vector.y / TILE_HEIGHT);
+    return vector;
+}
+
+
+sfVector2f snap_to_grid_center(sfVector2f vector) {
+    vector.x = TILE_WIDTH * roundf((vector.x + 0.5f) / TILE_WIDTH) - 0.5f * TILE_WIDTH;
+    vector.y = TILE_HEIGHT * roundf((vector.y + 0.5f) / TILE_HEIGHT) - 0.5f * TILE_HEIGHT;
     return vector;
 }

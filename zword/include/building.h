@@ -7,6 +7,10 @@
 #include "component.h"
 
 
+int create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename);
+
+void create_bench(ComponentData* components, sfVector2f position, float angle);
+
 void create_church(ComponentData* components, sfVector2f pos);
 
 void create_barn(ComponentData* components, sfVector2f pos);

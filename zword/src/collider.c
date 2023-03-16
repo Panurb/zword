@@ -326,25 +326,30 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
 
 void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera) {
-    for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* col = ColliderComponent_get(components, i);
-        if (!col) continue;
-
-        sfVector2f pos = get_position(components, i);
-        float r = col->radius;
-        if (!on_screen(components, camera, pos, r, r)) {
-            continue;
-        }
-
-        Bounds bounds = get_bounds(components, grid, i);
-        for (int j = bounds.left; j <= bounds.right; j++) {
-            for (int k = bounds.bottom; k <= bounds.top; k++) {
-                sfVector2f pos = { j * grid->tile_width - 0.5 * grid->width + 0.5 * grid->tile_width, 
-                                   k * grid->tile_height - 0.5 * grid->height + 0.5 * grid->tile_height };
-                draw_rectangle(window, components, camera, NULL, pos, grid->tile_width, grid->tile_height, 0.0, get_color(1.0, 1.0, 1.0, 0.25));
+    sfRectangleShape* shape = sfRectangleShape_create();
+    sfText* text = sfText_create();
+    sfVector2f w = { 0.5f * grid->tile_width, 0.0f };
+    sfVector2f h = { 0.0f, 0.5f * grid->tile_height };
+    float linewidth = 0.01f;
+    sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
+    for (int i = 0; i < grid->width; i++) {
+        for (int j = 0; j < grid->height; j++) {
+            sfVector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
+            if (on_screen(components, camera, r, grid->tile_width, grid->tile_height)) {
+                draw_line(window, components, camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
+                draw_line(window, components, camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
+                draw_line(window, components, camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);
+                draw_line(window, components, camera, shape, diff(sum(r, w), h), sum(sum(r, w), h), linewidth, color);
+                if (grid->array[i][j]->size > 0) {
+                    char size[10];
+                    snprintf(size, 10, "%i", grid->array[i][j]->size);
+                    draw_text(window, components, camera, text, r, size, sfWhite);
+                }
             }
         }
     }
+    sfRectangleShape_destroy(shape);
+    sfText_destroy(text);
 }
 
 

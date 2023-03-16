@@ -16,7 +16,7 @@
 
 void bring_to_top(ComponentData* components, int entity);
 
-int create_window(ComponentData* components, sfVector2f position, ButtonText text, OnClick on_close);
+int create_window(ComponentData* components, sfVector2f position, ButtonText text, int width, OnClick on_close);
 
 int create_label(ComponentData* components, ButtonText text, sfVector2f position);
 
@@ -51,4 +51,4 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
 
 void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera);
 
-void input_widgets(ComponentData* components, int camera, sfEvent event);
+bool input_widgets(ComponentData* components, int camera, sfEvent event);

@@ -49,6 +49,8 @@ Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i);
 
 void get_neighbors(ComponentData* components, ColliderGrid* grid, int i, int entities[100]);
 
-void draw_grid(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera);
+void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, float tile_width, float tile_height);
 
 sfVector2f snap_to_grid(sfVector2f vector);
+
+sfVector2f snap_to_grid_center(sfVector2f vector);

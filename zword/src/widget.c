@@ -24,13 +24,13 @@ void bring_to_top(ComponentData* components, int entity) {
 }
 
 
-int create_window(ComponentData* components, sfVector2f position, ButtonText text, OnClick on_close) {
+int create_window(ComponentData* components, sfVector2f position, ButtonText text, int width, OnClick on_close) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, 2 * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(components, i, width * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(components, i, text, WIDGET_WINDOW);
 
-    int j = create_button_small(components, "X", vec(BUTTON_WIDTH - 0.5 * BUTTON_HEIGHT, 0.0f), on_close);
+    int j = create_button_small(components, "X", vec(0.5 * (width * BUTTON_WIDTH - BUTTON_HEIGHT), 0.0f), on_close);
     add_child(components, i, j);
 
     return i;
@@ -425,7 +425,7 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
 }
 
 
-void input_widgets(ComponentData* components, int camera, sfEvent event) {
+bool input_widgets(ComponentData* components, int camera, sfEvent event) {
     static sfVector2f mouse_position = { 0.0f, 0.0f };
     static bool mouse_down = false;
     static int grabbed_window = -1;
@@ -490,6 +490,8 @@ void input_widgets(ComponentData* components, int camera, sfEvent event) {
             }
         }
 
-        break;
+        return true;
     }
+
+    return false;
 }

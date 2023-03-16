@@ -14,7 +14,7 @@
 #include "enemy.h"
 
 
-void create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
+int create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
@@ -27,6 +27,8 @@ void create_wall(ComponentData* components, sfVector2f pos, float angle, float w
         ParticleComponent_add_rock(components, i);
         SoundComponent_add(components, i, "stone_hit");
     }
+
+    return i;
 }
 
 

@@ -96,7 +96,7 @@ int main() {
                         sfClock_restart(clock);
                         start_game(data);
                     } else if (event.key.code == sfKeyF1) {
-                        debug_level = (debug_level + 1) % 4; 
+                        debug_level = (debug_level + 1) % 3; 
                     }
                 default:
                     if (game_state == STATE_EDITOR) {
@@ -173,7 +173,7 @@ int main() {
                 draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
                 break;
             case STATE_EDITOR:
-                data.ambient_light = 1.0f;
+                data.ambient_light = 0.8f;
                 draw_editor(data, window);
             default:
                 break;
