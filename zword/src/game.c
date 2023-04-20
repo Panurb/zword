@@ -75,8 +75,6 @@ void start_game(GameData data) {
 
 
 void update_game(GameData data, sfRenderWindow* window, float time_step) {
-    input(data.components, window, data.camera);
-
     update(data.components, time_step, data.grid);
     collide(data.components, data.grid);
     update_waypoints(data.components, data.grid, data.camera);

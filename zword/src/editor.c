@@ -11,6 +11,10 @@
 #include "navigation.h"
 #include "serialize.h"
 #include "building.h"
+#include "particle.h"
+#include "light.h"
+#include "physics.h"
+#include "animation.h"
 
 
 typedef enum {
@@ -59,7 +63,9 @@ static ButtonText objects[] = {
     "flashlight",
     "gas",
     "hay bale",
-    "lamp"
+    "lamp",
+    "priest",
+    "zombie"
 };
 
 
@@ -235,7 +241,18 @@ void update_selections(GameData data) {
 
 
 void update_editor(GameData data, sfRenderWindow* window, float time_step) {
-    UNUSED(time_step);
+    update(data.components, time_step, data.grid);
+    collide(data.components, data.grid);
+    update_waypoints(data.components, data.grid, data.camera);
+
+    update_particles(data.components, data.camera, time_step);
+    update_lights(data.components, time_step);
+    update_camera(data.components, data.camera, time_step);
+
+    draw_shadows(data.components, data.shadow_texture, data.camera);
+    draw_lights(data.components, data.grid, data.light_texture, data.camera, data.ambient_light);
+
+    animate(data.components, time_step);
 
     update_widgets(data.components, window, data.camera);
 

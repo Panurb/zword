@@ -238,7 +238,9 @@ void create_object(ComponentData* components, int object, sfVector2f position, f
         create_flashlight,
         create_gas,
         create_hay_bale,
-        create_lamp
+        create_lamp,
+        create_priest,
+        create_zombie
     };
 
     object_constructors[object](components, position, angle);

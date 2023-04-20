@@ -123,6 +123,7 @@ int main() {
                         game_state = STATE_GAME;
                         break;
                     case STATE_GAME:
+                        input(data.components, window, data.camera);
                         update_game(data, window, time_step);
                         break;
                     case STATE_PAUSE:
@@ -139,7 +140,6 @@ int main() {
                         game_state = STATE_EDITOR;
                         break;
                     case STATE_EDITOR:
-                        update_game(data, window, time_step);
                         update_editor(data, window, time_step);
                         break;
                     case STATE_QUIT:

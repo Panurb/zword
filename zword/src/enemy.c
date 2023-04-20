@@ -16,16 +16,12 @@
 #include "weapon.h"
 
 
-int create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    angle = rand_angle();
+    CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return -1;
-    }
 
     ImageComponent_add(components, i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(components, i, 1.0f);
@@ -46,16 +42,12 @@ int create_zombie(ComponentData* components, ColliderGrid* grid, sfVector2f pos)
 }
 
 
-void create_farmer(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+void create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    angle = rand_angle();
+    CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return;
-    }
 
     ImageComponent_add(components, i, "farmer", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(components, i, 1.0f);
@@ -78,16 +70,12 @@ void create_farmer(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 }
 
 
-void create_priest(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+void create_priest(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    angle = rand_angle();
+    CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return;
-    }
 
     ImageComponent_add(components, i, "priest", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(components, i, 1.0f);
@@ -113,16 +101,12 @@ void create_priest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 }
 
 
-void create_big_boy(ComponentData* components, ColliderGrid* grid, sfVector2f pos) {
+void create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    angle = rand_angle();
+    CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return;
-    }
 
     ImageComponent_add(components, i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
     AnimationComponent_add(components, i, 2);
@@ -388,7 +372,8 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera) {
 
     float radius = 40.0f;
     if (count < 10) {
-        int i = create_zombie(components, grid, sum(get_position(components, camera), mult(radius, rand_vector())));
+        int i = create_zombie(components, sum(get_position(components, camera), mult(radius, rand_vector())), 0.0f);
+        // TODO: check collision
         int p = components->player.order->head->value;
         if (i != -1) {
             EnemyComponent* enemy = EnemyComponent_get(components, i);
