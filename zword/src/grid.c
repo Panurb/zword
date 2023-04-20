@@ -164,24 +164,19 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
     float right = pos.x + 0.5f * width;
     float bottom = pos.y - 0.5f * height;
     float top = pos.y + 0.5f * height;
+    sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.25f);
 
-    // sfRectangleShape* shape = sfRectangleShape_create();
-    // for (int x = left - mod(left, TILE_WIDTH); x < right; x += TILE_WIDTH) {
-    //     for (int y = left - mod(left, TILE_HEIGHT); y < right; y += TILE_HEIGHT) {
-    //         draw_rectangle(window, components, camera, shape, vec(x, y), 0.05f, 0.05f, 0.0f, sfWhite);
-    //     }
-    // }
-    // sfRectangleShape_destroy(shape);
-
-    // return;
-
+    sfRectangleShape* shape = sfRectangleShape_create();
+    
     for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
-        draw_line(window, components, camera, NULL, vec(x, bottom), vec(x, top), linewidth, sfWhite);
+        draw_line(window, components, camera, NULL, vec(x, bottom), vec(x, top), linewidth, color);
     }
 
     for (float y = left - mod(left, tile_height); y < right; y += tile_height) {
-        draw_line(window, components, camera, NULL, vec(left, y), vec(right, y), linewidth, sfWhite);
+        draw_line(window, components, camera, NULL, vec(left, y), vec(right, y), linewidth, color);
     }
+    
+    sfRectangleShape_destroy(shape);
 }
 
 

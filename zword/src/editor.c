@@ -32,12 +32,34 @@ static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
 
-static int current_object = 0;
-static ButtonText objects[] = {
-    "bench"
+static int selected_wall = 0;
+static ButtonText wall_names[] = {
+    "altar_tile",
+    "board_tile",
+    "brick_tile",
+    "grass_tile",
+    "roof_tile",
+    "stone_tile",
+    "tiles_tile",
+    "water_tile",
+    "wood_tile"
 };
-static void (*object_constructors[])(ComponentData*, sfVector2f, float) = {
-    create_bench
+
+static int selected_object = 0;
+static ButtonText objects[] = {
+    "bed",
+    "bench",
+    "big boy",
+    "boss",
+    "candle",
+    "car",
+    "desk",
+    "door",
+    "farmer",
+    "flashlight",
+    "gas",
+    "hay bale",
+    "lamp"
 };
 
 
@@ -58,29 +80,55 @@ sfVector2f get_selections_center(ComponentData* components) {
 
 void select_object(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
-    current_object = widget->value;
+    selected_object = widget->value;
     tool = TOOL_OBJECT;
+}
+
+
+int toggle_list_window(ComponentData* components, int window_id, ButtonText title, OnClick close, ButtonText* values, 
+        int length, OnClick select) {
+    if (window_id != -1) {
+        destroy_entity_recursive(components, window_id);
+        return -1;
+    }
+
+    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_id = create_window(components, pos, title, 1, close);
+
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    add_child(components, window_id, container);
+
+    for (int i = 0; i < length; i++) {
+        int j = add_button_to_container(components, container, values[i], select);
+        WidgetComponent_get(components, j)->value = i;
+    }
+
+    add_scrollbar_to_container(components, container);
+
+    return window_id;
+}
+
+
+void select_wall(ComponentData* components, int entity) {
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    selected_wall = widget->value;
+    tool = TOOL_WALL;
+}
+
+
+void toggle_walls(ComponentData* components, int entity) {
+    UNUSED(entity);
+    static int window_id = -1;
+    window_id = toggle_list_window(components, window_id, "WALLS", toggle_walls, wall_names, LENGTH(wall_names), 
+        select_wall);
 }
 
 
 void toggle_objects(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
-        return;
-    }
-
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "OBJECTS", 1, toggle_objects);
-
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_id, container);
-
-    for (int i = 0; i < LENGTH(objects); i++) {
-        add_button_to_container(components, container, objects[i], select_object);
-    }
+    window_id = toggle_list_window(components, window_id, "OBJECTS", toggle_objects, objects, LENGTH(objects), 
+        select_object);
 }
 
 
@@ -94,22 +142,9 @@ void select_prefab(ComponentData* components, int entity) {
 void toggle_prefabs(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
-        return;
-    }
-
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "PREFABS", 1, toggle_prefabs);
-
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_id, container);
-
-    for (int i = 0; i < LENGTH(prefabs); i++) {
-        // TODO: list files in directory
-        add_button_to_container(components, container, prefabs[i], select_prefab);
-    }
+    // TODO: list files in directory
+    window_id = toggle_list_window(components, window_id, "PREFABS", toggle_prefabs, prefabs, LENGTH(prefabs), 
+        select_prefab);
 }
 
 
@@ -173,7 +208,7 @@ void destroy_selections(GameData* data) {
     FOREACH (node, selections) {
         int i = node->value;
         clear_grid(data->components, data->grid, i);
-        destroy_entity_recursive(data->components, i);
+        destroy_entity(data->components, i);
     }
     List_clear(selections);
 }
@@ -243,12 +278,13 @@ void input_tool_select(GameData* data, sfEvent event) {
             if (selections) {
                 ListNode* node;
                 FOREACH (node, selections) {
-                    int i = node->value;
-                    if (inside_collider(components, i, mouse_world)) {
+                    if (inside_collider(components, node->value, mouse_world)) {
                         grabbed = true;
                         break;
                     }
                 }
+            } else {
+                // TODO: grab top entity
             }
             if (!grabbed) {
                 selection_box = create_entity(components);
@@ -285,8 +321,6 @@ void input_tool_select(GameData* data, sfEvent event) {
 
 
 void input_tool_wall(GameData* data, sfEvent event) {
-    static Filename wall_name = "brick_tile";
-
     if (event.type == sfEvtMouseMoved) {
         selection_end = snap_to_grid(mouse_world);
     } else if (event.type == sfEvtMouseButtonPressed) {
@@ -298,7 +332,7 @@ void input_tool_wall(GameData* data, sfEvent event) {
         float height = fabsf(selection_end.y - selection_start.y);
         sfVector2f pos = mult(0.5f, sum(selection_end, selection_start));
         if (width > 0.0f && height > 0.0f) {
-            int i = create_wall(data->components, pos, 0.0f, width, height, wall_name);
+            int i = create_wall(data->components, pos, 0.0f, width, height, wall_names[selected_wall]);
             update_grid(data->components, data->grid, i);
         }
     }
@@ -309,10 +343,12 @@ void input_tool_object(GameData* data, sfEvent event) {
     if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
             data->components->added_entities = List_create();
-            object_constructors[current_object](data->components, snap_to_grid_center(mouse_world), 0.0f);
+            create_object(data->components, selected_object, snap_to_grid_center(mouse_world), 0.0f);
             ListNode* node;
             FOREACH(node, data->components->added_entities) {
-                update_grid(data->components, data->grid, node->value);
+                if (ColliderComponent_get(data->components, node->value)) {
+                   update_grid(data->components, data->grid, node->value);
+                }
             }
             List_delete(data->components->added_entities);
             data->components->added_entities = NULL;
@@ -380,6 +416,8 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
             toggle_objects(data->components, -1);
         } else if (event.key.code == sfKeyP) {
             toggle_prefabs(data->components, -1);
+        } else if (event.key.code == sfKeyW) {
+            toggle_walls(data->components, -1);
         } else if (event.key.code == sfKeyDash) {
             grid_size_index = max(grid_size_index - 1, 0);
         } else if (event.key.code == sfKeyEqual) {

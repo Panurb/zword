@@ -5,10 +5,11 @@
 #include "weapon.h"
 
 
-void create_flashlight(ComponentData* components, sfVector2f position) {
+void create_flashlight(ComponentData* components, sfVector2f position, float angle) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, position, rand_angle());
+    angle = rand_angle();
+    CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
@@ -17,10 +18,11 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_gas(ComponentData* components, sfVector2f position) {
+void create_gas(ComponentData* components, sfVector2f position, float angle) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, position, rand_angle());
+    angle = rand_angle();
+    CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
@@ -32,9 +34,9 @@ void create_item(ComponentData* components, sfVector2f position, int tier) {
     switch (tier) {
         case 0:
             if (randi(0, 1) == 0) {
-                create_flashlight(components, position);
+                create_flashlight(components, position, 0.0f);
             } else {
-                create_gas(components, position);
+                create_gas(components, position, 0.0f);
             }
             break;
         case 1:
