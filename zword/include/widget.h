@@ -52,3 +52,5 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
 void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera);
 
 bool input_widgets(ComponentData* components, int camera, sfEvent event);
+
+void destroy_widgets(ComponentData* components);

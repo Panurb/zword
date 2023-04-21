@@ -19,6 +19,7 @@
 #include "input.h"
 #include "serialize.h"
 #include "editor.h"
+#include "widget.h"
 
 
 sfRenderWindow* create_game_window(sfVideoMode* mode) {
@@ -103,7 +104,7 @@ int main() {
                         input_editor(&data, window, event);
                     }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE) {
-                        input_menu(data.components, data.camera, event);
+                        input_menu(data.components, data.menu_camera, event);
                     }
                     break;
             }
@@ -171,6 +172,7 @@ int main() {
                 break;
             case STATE_LOAD:
                 draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
+                create_editor_menu(&data);
                 break;
             case STATE_EDITOR:
                 data.ambient_light = 0.8f;

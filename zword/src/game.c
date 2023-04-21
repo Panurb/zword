@@ -30,6 +30,7 @@ GameData create_game(sfVideoMode mode) {
     float ambient_light = 0.4f;
     int seed = time(NULL);
     int camera = create_camera(components, mode);
+    int menu_camera = create_camera(components, mode);
 
     sfTexture** textures = load_textures();
     sfSoundBuffer** sounds = load_sounds();
@@ -42,7 +43,7 @@ GameData create_game(sfVideoMode mode) {
     sfSprite* shadow_sprite = sfSprite_create();
     sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
 
-    GameData data = { textures, sounds, components, grid, ambient_light, seed, camera, 
+    GameData data = { textures, sounds, components, grid, ambient_light, seed, camera, menu_camera,
         light_texture, light_sprite, shadow_texture, shadow_sprite, mode };
     return data;
 }

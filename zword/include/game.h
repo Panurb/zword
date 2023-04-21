@@ -15,6 +15,7 @@ typedef struct {
     float ambient_light;
     int seed;
     int camera;
+    int menu_camera;
     sfRenderTexture* light_texture;
     sfSprite* light_sprite;
     sfRenderTexture* shadow_texture;

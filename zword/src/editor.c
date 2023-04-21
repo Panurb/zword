@@ -240,6 +240,18 @@ void update_selections(GameData data) {
 }
 
 
+void create_editor_menu(GameData* data) {
+    sfVector2f size = camera_size(data->components, data->menu_camera);
+    sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
+    destroy_widgets(data->components);
+    create_button(data->components, "WALLS", pos, toggle_walls);
+    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "OBJECTS", pos, toggle_objects);
+    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "PREFABS", pos, toggle_prefabs);
+}
+
+
 void update_editor(GameData data, sfRenderWindow* window, float time_step) {
     update(data.components, time_step, data.grid);
     collide(data.components, data.grid);
@@ -254,7 +266,7 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
 
     animate(data.components, time_step);
 
-    update_widgets(data.components, window, data.camera);
+    update_widgets(data.components, window, data.menu_camera);
 
     if (selection_box != -1) {
         update_selections(data);
@@ -387,7 +399,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
     UNUSED(window);
     static sfVector2i mouse_screen = { 0, 0 };
 
-    if (input_widgets(data->components, data->camera, event)) {
+    if (input_widgets(data->components, data->menu_camera, event)) {
         return;
     }
 
@@ -509,7 +521,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
 
     draw_waypoints(data.components, window, data.camera, waypoint_selected);
 
-    draw_widgets(data.components, window, data.camera);
+    draw_widgets(data.components, window, data.menu_camera);
 
     draw_circle(window, data.components, data.camera, NULL, mouse_pos, 0.1f, sfWhite);
 }

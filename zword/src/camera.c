@@ -26,6 +26,14 @@ int create_camera(ComponentData* components, sfVideoMode mode) {
 }
 
 
+sfVector2f camera_size(ComponentData* components, int camera) {
+    CameraComponent* cam = CameraComponent_get(components, camera);
+    sfVector2i res = cam->resolution;
+    float zoom = cam->zoom;
+    return (sfVector2f) { res.x / zoom, res.y / zoom };
+}
+
+
 sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) {
     CameraComponent* cam = CameraComponent_get(components, camera);
     sfVector2f pos = sum(get_position(components, camera), cam->shake.position);

@@ -7,6 +7,8 @@
 
 int create_camera(ComponentData* components, sfVideoMode mode);
 
+sfVector2f camera_size(ComponentData* components, int camera);
+
 sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a);
 
 sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a);

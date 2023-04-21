@@ -328,7 +328,6 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
         if (!widget->enabled) continue;
 
         sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
-        mouse = diff(mouse, get_position(components, camera));
         widget->selected = false;
         if (inside_collider(components, i, mouse)) {
             last_selected = i;
@@ -494,4 +493,13 @@ bool input_widgets(ComponentData* components, int camera, sfEvent event) {
     }
 
     return false;
+}
+
+
+void destroy_widgets(ComponentData* components) {
+    for (int i = 0; i < components->entities; i++) {
+        if (WidgetComponent_get(components, i)) {
+            destroy_entity(components, i);
+        }
+    }
 }

@@ -174,7 +174,7 @@ void create_pause_menu(GameData data) {
 
 
 void update_menu(GameData data, sfRenderWindow* window) {
-    update_widgets(data.components, window, data.camera);
+    update_widgets(data.components, window, data.menu_camera);
 }
 
 
@@ -184,8 +184,8 @@ void input_menu(ComponentData* components, int camera, sfEvent event) {
 
 
 void draw_menu(GameData data, sfRenderWindow* window) {
-    draw_widgets(data.components, window, data.camera);
+    draw_widgets(data.components, window, data.menu_camera);
 
-    sfVector2f pos = screen_to_world(data.components, data.camera, sfMouse_getPosition((sfWindow*) window));
-    draw_circle(window, data.components, data.camera, NULL, pos, 0.1f, sfWhite);
+    sfVector2f pos = screen_to_world(data.components, data.menu_camera, sfMouse_getPosition((sfWindow*) window));
+    draw_circle(window, data.components, data.menu_camera, NULL, pos, 0.1f, sfWhite);
 }
