@@ -65,6 +65,8 @@ int main() {
     GameData data = create_game(mode);
     create_menu(data);
 
+    ButtonText buffer;
+
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
 
@@ -136,8 +138,18 @@ int main() {
                         resize_game(&data, mode);
                         game_state = STATE_MENU;
                         break;
+                    case STATE_CREATE:
+                        get_map_name(data.components, buffer);
+                        set_map_name(buffer);
+                        destroy_menu(data);
+                        create_editor_menu(&data);
+                        game_state = STATE_EDITOR;
+                        break;
                     case STATE_LOAD:
+                        get_map_name(data.components, buffer);
                         load_game(&data);
+                        destroy_menu(data);
+                        create_editor_menu(&data);
                         game_state = STATE_EDITOR;
                         break;
                     case STATE_EDITOR:
@@ -172,7 +184,6 @@ int main() {
                 break;
             case STATE_LOAD:
                 draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
-                create_editor_menu(&data);
                 break;
             case STATE_EDITOR:
                 data.ambient_light = 0.8f;

@@ -47,6 +47,8 @@ int create_scrollbar(ComponentData* components, sfVector2f position, int height,
 
 void add_scrollbar_to_container(ComponentData* components, int container);
 
+int create_textbox(ComponentData* components, sfVector2f position, int width);
+
 void update_widgets(ComponentData* components, sfRenderWindow* window, int camera);
 
 void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera);

@@ -26,8 +26,9 @@ typedef enum {
 
 
 static int selection_box = -1;
-static sfVector2f selection_start = { 0.0f, 0.0f };
-static sfVector2f selection_end = { 0.0f, 0.0f };
+static sfVector2f wall_start = { 0.0f, 0.0f };
+static sfVector2f wall_end = { 0.0f, 0.0f };
+static bool wall_started = false;
 static List* selections = NULL;
 static Tool tool = TOOL_WALL;
 static sfVector2f mouse_world = { 0.0f, 0.0f };
@@ -35,6 +36,8 @@ static ButtonText prefabs[] = { "testi.json", "prefab.json" };
 static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
+static Layer layer = LAYER_GROUND;
+static ButtonText map_name = "";
 
 static int selected_wall = 0;
 static ButtonText wall_names[] = {
@@ -67,6 +70,11 @@ static ButtonText objects[] = {
     "priest",
     "zombie"
 };
+
+
+void set_map_name(ButtonText name) {
+    strcpy(map_name, name);
+}
 
 
 sfVector2f get_selections_center(ComponentData* components) {
@@ -240,6 +248,14 @@ void update_selections(GameData data) {
 }
 
 
+void save_map(ComponentData* components, int entity) {
+    UNUSED(entity);
+    cJSON* json = cJSON_CreateObject();
+    serialize_map(json, components, false);
+    save_json(json, "maps", map_name);
+}
+
+
 void create_editor_menu(GameData* data) {
     sfVector2f size = camera_size(data->components, data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
@@ -249,6 +265,8 @@ void create_editor_menu(GameData* data) {
     create_button(data->components, "OBJECTS", pos, toggle_objects);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "PREFABS", pos, toggle_prefabs);
+    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "SAVE", pos, save_map);
 }
 
 
@@ -283,26 +301,26 @@ void input_tool_select(GameData* data, sfEvent event) {
         if (selection_box != -1) {
             CoordinateComponent* coord = CoordinateComponent_get(components, selection_box);
             ColliderComponent* collider = ColliderComponent_get(components, selection_box);
-            collider->width = fabsf(mouse_world.x - selection_start.x);
-            collider->height = fabsf(mouse_world.y - selection_start.y);
-            coord->position = mult(0.5f, sum(selection_start, mouse_world));
+            collider->width = fabsf(mouse_world.x - wall_start.x);
+            collider->height = fabsf(mouse_world.y - wall_start.y);
+            coord->position = mult(0.5f, sum(wall_start, mouse_world));
         }
 
         if (grabbed) {
-            float dx = mouse_world.x - selection_start.x;
-            float dy = mouse_world.y - selection_start.y;
+            float dx = mouse_world.x - wall_start.x;
+            float dy = mouse_world.y - wall_start.y;
             if (grid_sizes[grid_size_index]) {
                 dx = grid_sizes[grid_size_index] * floorf(dx / grid_sizes[grid_size_index]);
                 dy = grid_sizes[grid_size_index] * floorf(dy / grid_sizes[grid_size_index]);
             }
             sfVector2f delta_pos = vec(dx, dy);
-            selection_start = sum(selection_start, vec(dx, dy));
+            wall_start = sum(wall_start, vec(dx, dy));
 
             move_selections(data, delta_pos);
         }
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            selection_start = mouse_world;
+            wall_start = mouse_world;
 
             if (selections) {
                 ListNode* node;
@@ -317,7 +335,7 @@ void input_tool_select(GameData* data, sfEvent event) {
             }
             if (!grabbed) {
                 selection_box = create_entity(components);
-                CoordinateComponent_add(components, selection_box, selection_start, 0.0f);
+                CoordinateComponent_add(components, selection_box, wall_start, 0.0f);
                 ColliderComponent_add_rectangle(components, selection_box, 0.0f, 0.0f, GROUP_ALL);
             }
         } else if (event.mouseButton.button == sfMouseRight) {
@@ -351,19 +369,21 @@ void input_tool_select(GameData* data, sfEvent event) {
 
 void input_tool_wall(GameData* data, sfEvent event) {
     if (event.type == sfEvtMouseMoved) {
-        selection_end = snap_to_grid(mouse_world);
+        wall_end = snap_to_grid(mouse_world);
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            selection_start = snap_to_grid(mouse_world);
+            wall_start = snap_to_grid(mouse_world);
+            wall_started = true;
         }
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
-        float width = fabsf(selection_end.x - selection_start.x);
-        float height = fabsf(selection_end.y - selection_start.y);
-        sfVector2f pos = mult(0.5f, sum(selection_end, selection_start));
+        float width = fabsf(wall_end.x - wall_start.x);
+        float height = fabsf(wall_end.y - wall_start.y);
+        sfVector2f pos = mult(0.5f, sum(wall_end, wall_start));
         if (width > 0.0f && height > 0.0f) {
             int i = create_wall(data->components, pos, 0.0f, width, height, wall_names[selected_wall]);
             update_grid(data->components, data->grid, i);
         }
+        wall_started = false;
     }
 }
 
@@ -467,17 +487,18 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             if (selection_box != -1) {
                 sfVector2f pos = get_position(data.components, selection_box);
                 ColliderComponent* collider = ColliderComponent_get(data.components, selection_box);
-                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, collider->height, 0.0f, 
-                    0.05f, sfWhite);
+                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
+                    collider->height, 0.0f, 0.05f, sfWhite);
             }
             break;
         case TOOL_WALL:
-            if (sfMouse_isButtonPressed(sfMouseLeft)) {
+            if (wall_started) {
                 sfVector2f end = snap_to_grid(mouse_pos);
-                float width = fabsf(end.x - selection_start.x);
-                float height = fabsf(end.y - selection_start.y);
-                sfVector2f pos = mult(0.5f, sum(end, selection_start));
-                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, width, height, 0.0f, 0.05f, sfWhite);
+                float width = fabsf(end.x - wall_start.x);
+                float height = fabsf(end.y - wall_start.y);
+                sfVector2f pos = mult(0.5f, sum(end, wall_start));
+                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, width, height, 0.0f, 0.05f, 
+                    sfWhite);
             } else {
                 sfVector2f pos = snap_to_grid(mouse_pos);
                 draw_line(window, data.components, data.camera, NULL, vec(pos.x - 0.2f, pos.y), 

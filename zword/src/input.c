@@ -1,4 +1,5 @@
 #include <math.h>
+#include <ctype.h>
 
 #include <SFML/Window/Keyboard.h>
 
@@ -18,6 +19,10 @@ char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
     "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", 
     "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", 
     "F12", "F13", "F14", "F15", "Pause"};
+
+
+char* LETTERS[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", 
+    "u", "v", "w", "x", "y", "z"};
 
 
 char* BUTTON_NAMES[] = {
@@ -54,6 +59,11 @@ char* ACTIONS[] = {
 
 char* key_to_string(sfKeyCode key) {
     return (0 <= key && key < LENGTH(KEY_NAMES)) ? KEY_NAMES[key] : "unknown";
+}
+
+
+char* key_to_letter(sfKeyCode key) {
+    return (0 <= key && key < LENGTH(LETTERS)) ? LETTERS[key] : "";
 }
 
 

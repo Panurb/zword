@@ -12,6 +12,8 @@ cJSON* load_json(Filename directory, Filename filename);
 
 cJSON* serialize_entities(ComponentData* components, List* entities, sfVector2f offset);
 
+void serialize_map(cJSON* json, ComponentData* components, bool preserve_id);
+
 void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float rotation);
 
 void save_game(GameData* data);

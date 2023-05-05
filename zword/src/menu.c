@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "menu.h"
 #include "game.h"
@@ -16,6 +17,23 @@ static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x108
 int RESOLUTION_ID = -1;
 int SOUND_ID = -1;
 int MUSIC_ID = -1;
+int MAP_NAME_ID = -1;
+
+
+void get_map_name(ComponentData* components, ButtonText buffer) {
+    WidgetComponent* widget = WidgetComponent_get(components, MAP_NAME_ID);
+    if (widget) {
+        printf(widget->string);
+        strcpy(buffer, widget->string);
+    }
+}
+
+
+void change_state_create(ComponentData* components, int entity) {
+    UNUSED(components);
+    UNUSED(entity);
+    game_state = STATE_CREATE;
+}
 
 
 void change_state_start(ComponentData* components, int entity) {
@@ -84,6 +102,28 @@ void toggle_play(ComponentData* components, int entity) {
 }
 
 
+void toggle_new_map(ComponentData* components, int entity) {
+    UNUSED(entity);
+    static int window_id = -1;
+    if (window_id != -1) {
+        destroy_entity_recursive(components, window_id);
+        window_id = -1;
+        return;
+    }
+
+    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_id = create_window(components, pos, "NEW MAP", 2, toggle_new_map);
+
+    int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 2, 2);
+    add_child(components, window_id, container);
+
+    int label = create_label(components, "NAME", zeros());
+    MAP_NAME_ID = create_textbox(components, zeros(), 1);
+    add_row_to_container(components, container, label, MAP_NAME_ID);
+    add_button_to_container(components, container, "CREATE", change_state_create);
+}
+
+
 void toggle_editor(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
@@ -99,7 +139,9 @@ void toggle_editor(ComponentData* components, int entity) {
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(components, window_id, container);
 
-    add_button_to_container(components, container, "OPEN", change_state_editor);
+    int textbox = create_textbox(components, zeros(), 1);
+    add_widget_to_container(components, container, textbox);
+    add_button_to_container(components, container, "NEW MAP", toggle_new_map);
 }
 
 
@@ -162,6 +204,16 @@ void create_menu(GameData data) {
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
     add_button_to_container(data.components, container, "QUIT", change_state_quit);
+}
+
+
+void destroy_menu(GameData data) {
+    for (int i = 0; i < data.components->entities; i++) {
+        WidgetComponent* widget = WidgetComponent_get(data.components, i);
+        if (widget) {
+            destroy_entity(data.components, i);
+        }
+    }
 }
 
 

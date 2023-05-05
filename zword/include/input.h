@@ -43,4 +43,6 @@ typedef enum {
 
 char* key_to_string(sfKeyCode key);
 
+char* key_to_letter(sfKeyCode key);
+
 void input(ComponentData* components, sfRenderWindow* window, int camera);

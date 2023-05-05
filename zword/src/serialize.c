@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include <cJSON.h>
 
@@ -355,7 +356,7 @@ void update_serialized_ids(cJSON* entities_json, int ids[MAX_ENTITIES]) {
 }
 
 
-cJSON* serialize_entities(GameData* components, List* entities, sfVector2f offset) {
+cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
     cJSON* json = cJSON_CreateObject();
 
     cJSON* entities_json = cJSON_CreateArray();
@@ -366,7 +367,7 @@ cJSON* serialize_entities(GameData* components, List* entities, sfVector2f offse
     ListNode* node;
     FOREACH(node, entities) {
         int i = node->value;
-        if (serialize_entity(entities_json, components, i, id, offset)) {
+        if (serialize_entity(entities_json, data->components, i, id, offset)) {
             ids[i] = id;
             id++;
         }
@@ -378,20 +379,18 @@ cJSON* serialize_entities(GameData* components, List* entities, sfVector2f offse
 }
 
 
-cJSON* serialize_game(GameData* data, bool preserve_id) {
-    cJSON* json = cJSON_CreateObject();
-
+void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
     cJSON* entities_json = cJSON_CreateArray();
     cJSON_AddItemToObject(json, "entities", entities_json);
 
     int ids[MAX_ENTITIES];
     int id = 0;
     sfVector2f offset = zeros();
-    for (int i = 0; i < data->components->entities; i++) {
+    for (int i = 0; i < components->entities; i++) {
         if (preserve_id) {
-            serialize_entity(entities_json, data->components, i, i, offset);
+            serialize_entity(entities_json, components, i, i, offset);
         } else {
-            if (serialize_entity(entities_json, data->components, i, id, offset)) {
+            if (serialize_entity(entities_json, components, i, id, offset)) {
                 ids[i] = id;
                 id++;
             }
@@ -401,6 +400,13 @@ cJSON* serialize_game(GameData* data, bool preserve_id) {
     if (!preserve_id) {
         update_serialized_ids(entities_json, ids);
     }
+}
+
+
+cJSON* serialize_game(GameData* data, bool preserve_id) {
+    cJSON* json = cJSON_CreateObject();
+    serialize_map(json, data->components, preserve_id);
+    // TODO: ambient light etc.
 
     return json;
 }
@@ -459,7 +465,7 @@ void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
 
 void save_json(cJSON* json, Filename directory, Filename filename) {
     Filename path;
-    snprintf(path, 128, "%s/%s/%s", "data", directory, filename);
+    snprintf(path, 128, "%s/%s/%s%s", "data", directory, filename, ".json");
     FILE* file = fopen(path, "w");
     if (!file) {
         printf("Could not open file.\n");
@@ -476,7 +482,7 @@ void save_json(cJSON* json, Filename directory, Filename filename) {
 
 cJSON* load_json(Filename directory, Filename filename) {
     Filename path;
-    snprintf(path, 128, "%s/%s/%s", "data", directory, filename);
+    snprintf(path, 128, "%s/%s/%s%s", "data", directory, filename, ".json");
     FILE* file = fopen(path, "r");
     if (!file) {
         printf("Could not open file.\n");
@@ -499,15 +505,15 @@ cJSON* load_json(Filename directory, Filename filename) {
 }
 
 
-void save_game(GameData* data) {
+void save_game(GameData* data, ButtonText map_name) {
     cJSON* json = serialize_game(data, false);
-    save_json(json, "maps", "map.json");
+    save_json(json, "maps", map_name);
     cJSON_Delete(json);
 }
 
 
-void load_game(GameData* data) {
-    cJSON* json = load_json("maps", "map.json");
+void load_game(GameData* data, ButtonText map_name) {
+    cJSON* json = load_json("maps", map_name);
     if (json) {
         deserialize_game(json, data, false);
         cJSON_Delete(json);

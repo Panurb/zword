@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "widget.h"
 #include "component.h"
 #include "camera.h"
 #include "collider.h"
+#include "input.h"
 
 
 void bring_to_top(ComponentData* components, int entity) {
@@ -320,6 +322,18 @@ int create_scrollbar(ComponentData* components, sfVector2f position, int height,
 }
 
 
+int create_textbox(ComponentData* components, sfVector2f position, int width) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, 0.0f);
+    ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH * width, 
+        BUTTON_HEIGHT, GROUP_WALLS);
+    collider->enabled = false;
+    WidgetComponent_add(components, i, "", WIDGET_TEXTBOX);
+
+    return i;
+}
+
+
 void update_widgets(ComponentData* components, sfRenderWindow* window, int camera) {
     int last_selected = -1;
     for (ListNode* node = components->widget.order->head; node; node = node->next) {
@@ -411,6 +425,10 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
                 r = sum(pos, vec(0.0f, ((h / BUTTON_HEIGHT - 1.5f) / n - y) * h));
                 draw_button(window, components, camera, r, w, h / n, widget->selected);
                 break;
+            case WIDGET_TEXTBOX:
+                draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
+                draw_text(window, components, camera, widget->text, pos, widget->string, sfWhite);
+                break;
             default:
                 draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
         }
@@ -440,9 +458,14 @@ bool input_widgets(ComponentData* components, int camera, sfEvent event) {
         grabbed_window = -1;
     }
 
+    bool input_detected = false;
+    int top_textbox = -1;
     for (int i = 0; i < components->entities; i++) {
         WidgetComponent* widget = WidgetComponent_get(components, i);
         if (!widget) continue;
+        if (widget->type == WIDGET_TEXTBOX) {
+            top_textbox = i;
+        }
         if (!widget->selected) continue;
 
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
@@ -489,10 +512,27 @@ bool input_widgets(ComponentData* components, int camera, sfEvent event) {
             }
         }
 
-        return true;
+        input_detected = true;
     }
 
-    return false;
+    if (top_textbox != -1) {
+        WidgetComponent* widget = WidgetComponent_get(components, top_textbox);
+        if (event.type == sfEvtKeyPressed) {
+            int len = strlen(widget->string);
+            if (event.key.code == sfKeyBackspace) {
+                if (len > 0) {
+                    widget->string[len - 1] = '\0';
+                }
+            } else {
+                if (len < 18) {
+                    strcat(widget->string, key_to_letter(event.key.code));
+                }
+            }
+            input_detected = true;
+        }
+    }
+
+    return input_detected;
 }
 
 
