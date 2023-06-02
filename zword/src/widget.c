@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#define NOMINMAX
+#include <windows.h>
+#include <stdlib.h>
 
 #include "widget.h"
 #include "component.h"
@@ -171,6 +174,31 @@ void add_row_to_container(ComponentData* components, int container, int left, in
     float height = ColliderComponent_get(components, container)->height;
     coord_right->position = pos;
     WidgetComponent_get(components, right)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
+}
+
+
+void add_files_to_container(ComponentData* components, int container, Filename directory, OnClick on_click) {
+    Filename path;
+    snprintf(path, 128, "%s/%s/*.*", "data", directory);
+    
+    WIN32_FIND_DATA file;
+    HANDLE handle = FindFirstFile(path, &file);
+
+    if (handle == INVALID_HANDLE_VALUE) {
+        printf("Path not found: %s\n", path);
+        return;
+    }
+
+    do {
+        if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
+            continue;
+        }
+        char* dot = strchr(file.cFileName, '.');
+        if (dot) {
+            *dot = '\0';
+        }
+        add_button_to_container(components, container, file.cFileName, on_click);
+    } while (FindNextFile(handle, &file));
 }
 
 

@@ -10,11 +10,12 @@
 #include "collider.h"
 #include "navigation.h"
 #include "serialize.h"
-#include "building.h"
 #include "particle.h"
 #include "light.h"
 #include "physics.h"
+#include "object.h"
 #include "animation.h"
+#include "tile.h"
 
 
 typedef enum {
@@ -36,12 +37,13 @@ static ButtonText prefabs[] = { "testi.json", "prefab.json" };
 static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
-static Layer layer = LAYER_GROUND;
 static ButtonText map_name = "";
 
-static int selected_wall = 0;
-static ButtonText wall_names[] = {
+static int selected_tile = 0;
+static ButtonText tile_names[] = {
     "altar_tile",
+    "beach_tile",
+    "beach_corner",
     "board_tile",
     "brick_tile",
     "grass_tile",
@@ -53,7 +55,7 @@ static ButtonText wall_names[] = {
 };
 
 static int selected_object = 0;
-static ButtonText objects[] = {
+ButtonText object_names[] = {
     "bed",
     "bench",
     "big boy",
@@ -70,7 +72,6 @@ static ButtonText objects[] = {
     "priest",
     "zombie"
 };
-
 
 void set_map_name(ButtonText name) {
     strcpy(map_name, name);
@@ -125,7 +126,7 @@ int toggle_list_window(ComponentData* components, int window_id, ButtonText titl
 
 void select_wall(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
-    selected_wall = widget->value;
+    selected_tile = widget->value;
     tool = TOOL_WALL;
 }
 
@@ -133,7 +134,7 @@ void select_wall(ComponentData* components, int entity) {
 void toggle_walls(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "WALLS", toggle_walls, wall_names, LENGTH(wall_names), 
+    window_id = toggle_list_window(components, window_id, "TILES", toggle_walls, tile_names, LENGTH(tile_names), 
         select_wall);
 }
 
@@ -141,7 +142,7 @@ void toggle_walls(ComponentData* components, int entity) {
 void toggle_objects(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "OBJECTS", toggle_objects, objects, LENGTH(objects), 
+    window_id = toggle_list_window(components, window_id, "OBJECTS", toggle_objects, object_names, LENGTH(object_names), 
         select_object);
 }
 
@@ -260,7 +261,7 @@ void create_editor_menu(GameData* data) {
     sfVector2f size = camera_size(data->components, data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
     destroy_widgets(data->components);
-    create_button(data->components, "WALLS", pos, toggle_walls);
+    create_button(data->components, "TILES", pos, toggle_walls);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "OBJECTS", pos, toggle_objects);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
@@ -380,8 +381,16 @@ void input_tool_wall(GameData* data, sfEvent event) {
         float height = fabsf(wall_end.y - wall_start.y);
         sfVector2f pos = mult(0.5f, sum(wall_end, wall_start));
         if (width > 0.0f && height > 0.0f) {
-            int i = create_wall(data->components, pos, 0.0f, width, height, wall_names[selected_wall]);
-            update_grid(data->components, data->grid, i);
+            data->components->added_entities = List_create();
+            create_tile(data->components, selected_tile, pos, 0.0f, width, height);
+            ListNode* node;
+            FOREACH(node, data->components->added_entities) {
+                if (ColliderComponent_get(data->components, node->value)) {
+                   update_grid(data->components, data->grid, node->value);
+                }
+            }
+            List_delete(data->components->added_entities);
+            data->components->added_entities = NULL;
         }
         wall_started = false;
     }
@@ -455,22 +464,24 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
     } else if (event.type == sfEvtMouseWheelScrolled) {
         cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.mouseWheelScroll.delta), 10.0f, 100.0f);
     } else if (event.type == sfEvtKeyPressed) {
-        if (event.key.code == sfKeyNum1) {
-            tool = TOOL_SELECT;
-        } else if (event.key.code == sfKeyNum2) {
-            tool = TOOL_WALL;
-        } else if (event.key.code == sfKeyNum3) {
-            tool = TOOL_PREFAB;
-        } else if (event.key.code == sfKeyO) {
-            toggle_objects(data->components, -1);
-        } else if (event.key.code == sfKeyP) {
-            toggle_prefabs(data->components, -1);
-        } else if (event.key.code == sfKeyW) {
-            toggle_walls(data->components, -1);
-        } else if (event.key.code == sfKeyDash) {
-            grid_size_index = max(grid_size_index - 1, 0);
-        } else if (event.key.code == sfKeyEqual) {
-            grid_size_index = min(grid_size_index + 1, LENGTH(grid_sizes) - 1);
+        switch (event.key.code) {
+            case sfKeyO:
+                toggle_objects(data->components, -1);
+                break;
+            case sfKeyP:
+                toggle_prefabs(data->components, -1);
+                break;
+            case sfKeyW:
+                toggle_walls(data->components, -1);
+                break;
+            case sfKeyDash:
+                grid_size_index = max(grid_size_index - 1, 0);
+                break;
+            case sfKeyEqual:
+                grid_size_index = min(grid_size_index + 1, LENGTH(grid_sizes) - 1);
+                break;
+            default:
+                break;
         }
     }
 }

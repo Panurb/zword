@@ -14,239 +14,6 @@
 #include "enemy.h"
 
 
-int create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
-    ImageComponent_add(components, i, filename, width, height, LAYER_WALLS);
-
-    if (strcmp(filename, "wood_tile") == 0) {
-        ParticleComponent_add_splinter(components, i);
-        SoundComponent_add(components, i, "wood_hit");
-    } else {
-        ParticleComponent_add_rock(components, i);
-        SoundComponent_add(components, i, "stone_hit");
-    }
-
-    return i;
-}
-
-
-void create_fence(ComponentData* components, sfVector2f pos, float angle, float width, float height) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_OBSTACLES);
-    ImageComponent_add(components, i, "wood_tile", width, height, LAYER_WALLS);
-}
-
-
-static void create_window(ComponentData* components, sfVector2f pos, float angle) {
-    create_fence(components, pos, angle, 1.0f, 4.0f);
-    create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle)));
-    create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle)));
-}
-
-
-void create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle, Filename filename) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, filename, width, height, LAYER_FLOOR);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
-}
-
-
-void create_roof(ComponentData* components, sfVector2f pos, float width, float height, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
-    ImageComponent_add(components, i, "roof_tile", width, height, LAYER_ROOFS);
-}
-
-
-void create_bench(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 0.8f, 2.8f, GROUP_WALLS);
-    ParticleComponent_add_splinter(components, i);
-    HealthComponent_add(components, i, 100, "", "", "wood_destroy");
-    PhysicsComponent_add(components, i, 2.0f);
-    SoundComponent_add(components, i, "wood_hit");
-
-    int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, -1.0f}, 0.0f);
-    ImageComponent_add(components, j, "bench_debris", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 0.8f, 1.2f, GROUP_DEBRIS)->enabled = false;
-    PhysicsComponent_add(components, j, 1.0f);
-    add_child(components, i, j);
-
-    j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, 0.5f}, 0.0f);
-    ImageComponent_add(components, j, "bench_destroyed", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 0.8f, 1.4f, GROUP_DEBRIS)->enabled = false;
-    PhysicsComponent_add(components, j, 1.0f);
-    add_child(components, i, j);
-}
-
-
-void create_table(ComponentData* components, sfVector2f position, float angle) {
-    UNUSED(angle);
-
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, rand_angle());
-    ImageComponent_add(components, i, "table", 3.0f, 3.0f, LAYER_ITEMS)->alpha = 1.0f;
-    ColliderComponent_add_circle(components, i, 1.4f, GROUP_WALLS);
-    ParticleComponent_add_splinter(components, i);
-    HealthComponent_add(components, i, 100, "", "", "wood_destroy");
-    PhysicsComponent_add(components, i, 2.0f);
-    SoundComponent_add(components, i, "wood_hit");
-
-    int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {-0.6f, 0.0f}, 0.0f);
-    ImageComponent_add(components, j, "table_destroyed", 2.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS)->enabled = false;
-    PhysicsComponent_add(components, j, 1.0f);
-    add_child(components, i, j);
-
-    j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {0.6f, 0.0f}, M_PI);
-    ImageComponent_add(components, j, "table_destroyed", 2.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS)->enabled = false;
-    PhysicsComponent_add(components, j, 1.0f);
-    add_child(components, i, j);
-}
-
-
-void create_hay_bale(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "hay_bale", 3.0f, 2.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 2.8f, 1.5f, GROUP_WALLS);
-    ParticleComponent_add_splinter(components, i);
-}
-
-
-void create_stove(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "stove", 2.0f, 2.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 1.8f, 1.8f, GROUP_WALLS);
-    ParticleComponent_add_sparks(components, i);
-    SoundComponent_add(components, i, "metal_hit");
-}
-
-
-void create_sink(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "sink", 2.0f, 3.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 1.8f, 2.8f, GROUP_WALLS);
-    ParticleComponent_add_sparks(components, i);
-    SoundComponent_add(components, i, "metal_hit");
-}
-
-
-void create_toilet(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "toilet", 2.0f, 2.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 1.8f, 1.3f, GROUP_WALLS);
-    ParticleComponent_add_sparks(components, i);
-    SoundComponent_add(components, i, "metal_hit");
-}
-
-
-void create_bed(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "bed", 4.0f, 2.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 3.8f, 1.8f, GROUP_WALLS);
-    ParticleComponent_add_splinter(components, i);
-    SoundComponent_add(components, i, "wood_hit");
-}
-
-
-void create_candle(ComponentData* components, sfVector2f pos, float angle) {
-    UNUSED(angle);
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, pos, rand_angle());
-    ColliderComponent_add_circle(components, i, 0.5f, LAYER_WALLS);
-    ParticleComponent_add_fire(components, i, 0.25f);
-    ImageComponent_add(components, i, "candle", 1.0f, 1.0f, LAYER_ITEMS);
-}
-
-
-void create_lamp(ComponentData* components, sfVector2f position, float angle) {
-    UNUSED(angle);
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, rand_angle());
-    ImageComponent_add(components, i, "lamp", 1.0f, 1.0f, LAYER_ITEMS);
-    ParticleComponent_add_splinter(components, i);
-    SoundComponent_add(components, i, "wood_hit");
-    LightComponent_add(components, i, 10.0f, 2.0f * M_PI, sfWhite, 0.5f, 5.0f)->flicker = 0.1f;
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_VEHICLES);
-}
-
-
-void create_desk(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
-
-    CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "desk", 2.0, 2.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 1.3f, 1.8f, GROUP_WALLS);
-    ParticleComponent_add_splinter(components, i);
-    SoundComponent_add(components, i, "wood_hit");
-    HealthComponent_add(components, i, 100, "", "", "wood_destroy");
-    PhysicsComponent_add(components, i, 2.0f);
-
-    int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, -0.75f}, 0.0f);
-    ImageComponent_add(components, j, "desk_destroyed", 2.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 1.3f, 1.0f, GROUP_DEBRIS)->enabled = false;
-    PhysicsComponent_add(components, j, 1.0f);
-    add_child(components, i, j);
-
-    j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) {0.0f, 0.25f}, 0.0f);
-    ImageComponent_add(components, j, "desk_debris", 2.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
-    ColliderComponent_add_rectangle(components, j, 1.3f, 1.0f, GROUP_DEBRIS)->enabled = false;
-    PhysicsComponent_add(components, j, 1.0f);
-    add_child(components, i, j);
-}
-
-
-void create_object(ComponentData* components, int object, sfVector2f position, float angle) {
-    static void (*object_constructors[])(ComponentData*, sfVector2f, float) = {
-        create_bed,
-        create_bench,
-        create_big_boy,
-        create_boss,
-        create_candle,
-        create_car,
-        create_desk,
-        create_door,
-        create_farmer,
-        create_flashlight,
-        create_gas,
-        create_hay_bale,
-        create_lamp,
-        create_priest,
-        create_zombie
-    };
-
-    object_constructors[object](components, position, angle);
-}
-
-
 void create_church(ComponentData* components, sfVector2f pos) {
     float angle = rand_angle();
 
@@ -531,12 +298,12 @@ void create_mansion(ComponentData* components, sfVector2f pos) {
 
     // Front walls
     create_wall(components, sum(pos, lin_comb(15.5f, w, -21.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(15.5f, w, -16.0f, h)), angle);
+    create_glass(components, sum(pos, lin_comb(15.5f, w, -16.0f, h)), angle);
     create_wall(components, sum(pos, lin_comb(15.5f, w, -11.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
     create_waypoint(components, sum(pos, lin_comb(17.0f, w, -25.0f, h)));
 
     create_wall(components, sum(pos, lin_comb(15.5f, w, 11.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(15.5f, w, 16.0f, h)), angle);
+    create_glass(components, sum(pos, lin_comb(15.5f, w, 16.0f, h)), angle);
     create_wall(components, sum(pos, lin_comb(15.5f, w, 21.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
     create_waypoint(components, sum(pos, lin_comb(17.0f, w, 25.0f, h)));
 
@@ -552,20 +319,20 @@ void create_mansion(ComponentData* components, sfVector2f pos) {
 
     // Right wall
     create_wall(components, sum(pos, lin_comb(-20.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(-15.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
+    create_glass(components, sum(pos, lin_comb(-15.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
     create_wall(components, sum(pos, lin_comb(-9.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(-4.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
+    create_glass(components, sum(pos, lin_comb(-4.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
     create_wall(components, sum(pos, lin_comb(1.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(7.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
+    create_glass(components, sum(pos, lin_comb(7.0f, w, -23.5f, h)), angle + 0.5f * M_PI);
     create_wall(components, sum(pos, lin_comb(12.5f, w, -23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
 
     // Left wall
     create_wall(components, sum(pos, lin_comb(-20.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(-15.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
+    create_glass(components, sum(pos, lin_comb(-15.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
     create_wall(components, sum(pos, lin_comb(-9.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(-4.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
+    create_glass(components, sum(pos, lin_comb(-4.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
     create_wall(components, sum(pos, lin_comb(1.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
-    create_window(components, sum(pos, lin_comb(7.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
+    create_glass(components, sum(pos, lin_comb(7.0f, w, 23.5f, h)), angle + 0.5f * M_PI);
     create_wall(components, sum(pos, lin_comb(12.5f, w, 23.5f, h)), angle, 7.0f, 1.0f, "brick_tile");
     
     // Back walls
@@ -589,7 +356,7 @@ void create_mansion(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(4.5f, w, -4.5f, h)), angle + 0.5f * M_PI, 5.0f, 1.0f, "brick_tile");
     create_waypoint(components, sum(pos, lin_comb(6.0f, w, 9.0f, h)));
     create_waypoint(components, sum(pos, lin_comb(6.0f, w, -9.0f, h)));
-    create_window(components, sum(pos, lin_comb(4.5, w, 0.0f, h)), angle);
+    create_glass(components, sum(pos, lin_comb(4.5, w, 0.0f, h)), angle);
     create_waypoint(components, sum(pos, lin_comb(15.0f, w, 0.0f, h)));
     create_wall(components, sum(pos, lin_comb(4.5f, w, 4.5f, h)), angle + 0.5f * M_PI, 5.0f, 1.0f, "brick_tile");
 

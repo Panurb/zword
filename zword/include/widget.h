@@ -34,6 +34,8 @@ void increment_value(ComponentData* components, int entity, int direction);
 
 void add_row_to_container(ComponentData* components, int container, int left, int right);
 
+void add_files_to_container(ComponentData* components, int container, Filename path, OnClick on_click);
+
 int create_dropdown(ComponentData* components, sfVector2f position, ButtonText* strings, int size);
 
 void set_slider(ComponentData* components, int entity, sfVector2f mouse_position);

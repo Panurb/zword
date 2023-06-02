@@ -121,8 +121,8 @@ int main() {
                         break;
                     case STATE_START:
                         start_game(data);
-                        save_game(&data);
-                        load_game(&data);
+                        // save_game(&data);
+                        // load_game(&data);
                         game_state = STATE_GAME;
                         break;
                     case STATE_GAME:
@@ -139,18 +139,27 @@ int main() {
                         game_state = STATE_MENU;
                         break;
                     case STATE_CREATE:
-                        get_map_name(data.components, buffer);
+                        get_map_name(&data, buffer);
                         set_map_name(buffer);
-                        destroy_menu(data);
-                        create_editor_menu(&data);
-                        game_state = STATE_EDITOR;
+                        if (buffer[0] == '\0') {
+                            game_state = STATE_MENU;
+                        } else {
+                            destroy_menu(data);
+                            create_editor_menu(&data);
+                            game_state = STATE_EDITOR;
+                        }
                         break;
                     case STATE_LOAD:
-                        get_map_name(data.components, buffer);
-                        load_game(&data);
-                        destroy_menu(data);
-                        create_editor_menu(&data);
-                        game_state = STATE_EDITOR;
+                        get_map_name(&data, buffer);
+                        set_map_name(buffer);
+                        if (buffer[0] == '\0') {
+                            game_state = STATE_MENU;
+                        } else {
+                            destroy_menu(data);
+                            create_editor_menu(&data);
+                            load_game(&data, buffer);
+                            game_state = STATE_EDITOR;
+                        }
                         break;
                     case STATE_EDITOR:
                         update_editor(data, window, time_step);

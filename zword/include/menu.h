@@ -5,7 +5,7 @@
 #include "game.h"
 
 
-void get_map_name(ComponentData* components, ButtonText buffer);
+void get_map_name(GameData* data, ButtonText buffer);
 
 void create_menu(GameData data);
 

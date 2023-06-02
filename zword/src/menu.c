@@ -18,13 +18,15 @@ int RESOLUTION_ID = -1;
 int SOUND_ID = -1;
 int MUSIC_ID = -1;
 int MAP_NAME_ID = -1;
+static ButtonText map_name = "mansion";
 
 
-void get_map_name(ComponentData* components, ButtonText buffer) {
-    WidgetComponent* widget = WidgetComponent_get(components, MAP_NAME_ID);
+void get_map_name(GameData* data, ButtonText buffer) {
+    WidgetComponent* widget = WidgetComponent_get(data->components, MAP_NAME_ID);
     if (widget) {
-        printf(widget->string);
         strcpy(buffer, widget->string);
+    } else {
+        strcpy(buffer, map_name);
     }
 }
 
@@ -50,9 +52,9 @@ void change_state_game(ComponentData* components, int entity) {
 }
 
 
-void change_state_editor(ComponentData* components, int entity) {
-    UNUSED(components);
-    UNUSED(entity);
+void change_state_load(ComponentData* components, int entity) {
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    strcpy(map_name, widget->string);
     game_state = STATE_LOAD;
 }
 
@@ -134,14 +136,13 @@ void toggle_editor(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "EDITOR", 2, toggle_editor);
+    window_id = create_window(components, pos, "EDITOR", 1, toggle_editor);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
     add_child(components, window_id, container);
 
-    int textbox = create_textbox(components, zeros(), 1);
-    add_widget_to_container(components, container, textbox);
     add_button_to_container(components, container, "NEW MAP", toggle_new_map);
+    add_files_to_container(components, container, "maps", change_state_load);
 }
 
 

@@ -10,7 +10,7 @@
 
 void update_enemies(ComponentData* component, ColliderGrid* grid, float time_step);
 
-int create_zombie(ComponentData* component, sfVector2f pos, float angle);
+void create_zombie(ComponentData* component, sfVector2f pos, float angle);
 
 void create_farmer(ComponentData* component, sfVector2f pos, float angle);
 

@@ -111,7 +111,8 @@ void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
 
 void init_grid(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        if (ColliderComponent_get(components, i)) {
+        ColliderComponent* collider = ColliderComponent_get(components, i);
+        if (collider && collider->enabled) {
             update_grid(components, grid, i);
         }
     }

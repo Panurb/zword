@@ -35,6 +35,7 @@ set(SOURCES
     zword/src/list.c
     zword/src/menu.c
     zword/src/navigation.c
+    zword/src/object.c
     zword/src/particle.c
     zword/src/perlin.c
     zword/src/physics.c
@@ -44,6 +45,7 @@ set(SOURCES
     zword/src/serialize.c
     zword/src/settings.c
     zword/src/sound.c
+    zword/src/tile.c
     zword/src/util.c
     zword/src/zword.c
     zword/src/vehicle.c
@@ -76,6 +78,7 @@ install(DIRECTORY zword/data
         PATTERN "*.png"
         PATTERN "*.ttf"
         PATTERN "*.wav"
+		PATTERN "*.json"
 )
 
 set(SHADERS

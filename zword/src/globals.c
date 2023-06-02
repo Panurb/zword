@@ -2,5 +2,4 @@
 #include "util.h"
 
 
-GameState game_state = STATE_MENU;
-ButtonText map_name = ""; 
+GameState game_state = STATE_LOAD;

@@ -21,6 +21,7 @@ typedef struct {
     sfRenderTexture* shadow_texture;
     sfSprite* shadow_sprite;
     sfVideoMode mode;
+    ButtonText map_name;
 } GameData;
 
 

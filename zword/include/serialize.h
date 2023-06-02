@@ -16,6 +16,6 @@ void serialize_map(cJSON* json, ComponentData* components, bool preserve_id);
 
 void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float rotation);
 
-void save_game(GameData* data);
+void save_game(GameData* data, ButtonText map_name);
 
-void load_game(GameData* data);
+void load_game(GameData* data, ButtonText map_name);

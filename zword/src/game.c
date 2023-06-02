@@ -44,7 +44,7 @@ GameData create_game(sfVideoMode mode) {
     sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
 
     GameData data = { textures, sounds, components, grid, ambient_light, seed, camera, menu_camera,
-        light_texture, light_sprite, shadow_texture, shadow_sprite, mode };
+        light_texture, light_sprite, shadow_texture, shadow_sprite, mode, "" };
     return data;
 }
 

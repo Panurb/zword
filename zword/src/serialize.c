@@ -468,7 +468,7 @@ void save_json(cJSON* json, Filename directory, Filename filename) {
     snprintf(path, 128, "%s/%s/%s%s", "data", directory, filename, ".json");
     FILE* file = fopen(path, "w");
     if (!file) {
-        printf("Could not open file.\n");
+        printf("Could not open file: %s\n", path);
         return;
     }
 
@@ -485,7 +485,7 @@ cJSON* load_json(Filename directory, Filename filename) {
     snprintf(path, 128, "%s/%s/%s%s", "data", directory, filename, ".json");
     FILE* file = fopen(path, "r");
     if (!file) {
-        printf("Could not open file.\n");
+        printf("Could not open file: %s\n", path);
         return NULL;
     }
 
@@ -517,7 +517,7 @@ void load_game(GameData* data, ButtonText map_name) {
     if (json) {
         deserialize_game(json, data, false);
         cJSON_Delete(json);
+        init_grid(data->components, data->grid);
+        strcpy(data->map_name, map_name);
     }
-
-    init_grid(data->components, data->grid);
 }
