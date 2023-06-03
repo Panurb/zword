@@ -14,7 +14,7 @@ void create_door(ComponentData* components, sfVector2f pos, float angle) {
     CoordinateComponent_add(components, i, pos, angle);
     ImageComponent_add(components, i, "door", 2.0f, 1.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
-    ParticleComponent_add_splinter(components, i);
+    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(components, i, "wood_hit");
     DoorComponent_add(components, i, sum(pos, polar_to_cartesian(-1.0f, angle)));
     PhysicsComponent_add(components, i, 1.0f);

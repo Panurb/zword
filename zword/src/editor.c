@@ -20,18 +20,18 @@
 
 typedef enum {
     TOOL_SELECT,
-    TOOL_WALL,
+    TOOL_TILE,
     TOOL_OBJECT,
     TOOL_PREFAB
 } Tool;
 
 
 static int selection_box = -1;
-static sfVector2f wall_start = { 0.0f, 0.0f };
-static sfVector2f wall_end = { 0.0f, 0.0f };
-static bool wall_started = false;
+static sfVector2f tile_start = { 0.0f, 0.0f };
+static sfVector2f tile_end = { 0.0f, 0.0f };
+static bool tile_started = false;
 static List* selections = NULL;
-static Tool tool = TOOL_WALL;
+static Tool tool = TOOL_TILE;
 static sfVector2f mouse_world = { 0.0f, 0.0f };
 static ButtonText prefabs[] = { "testi.json", "prefab.json" };
 static Filename prefab_name = "";
@@ -124,18 +124,18 @@ int toggle_list_window(ComponentData* components, int window_id, ButtonText titl
 }
 
 
-void select_wall(ComponentData* components, int entity) {
+void select_tile(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     selected_tile = widget->value;
-    tool = TOOL_WALL;
+    tool = TOOL_TILE;
 }
 
 
-void toggle_walls(ComponentData* components, int entity) {
+void toggle_tiles(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "TILES", toggle_walls, tile_names, LENGTH(tile_names), 
-        select_wall);
+    window_id = toggle_list_window(components, window_id, "TILES", toggle_tiles, tile_names, LENGTH(tile_names), 
+        select_tile);
 }
 
 
@@ -261,7 +261,7 @@ void create_editor_menu(GameData* data) {
     sfVector2f size = camera_size(data->components, data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
     destroy_widgets(data->components);
-    create_button(data->components, "TILES", pos, toggle_walls);
+    create_button(data->components, "TILES", pos, toggle_tiles);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "OBJECTS", pos, toggle_objects);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
@@ -302,26 +302,26 @@ void input_tool_select(GameData* data, sfEvent event) {
         if (selection_box != -1) {
             CoordinateComponent* coord = CoordinateComponent_get(components, selection_box);
             ColliderComponent* collider = ColliderComponent_get(components, selection_box);
-            collider->width = fabsf(mouse_world.x - wall_start.x);
-            collider->height = fabsf(mouse_world.y - wall_start.y);
-            coord->position = mult(0.5f, sum(wall_start, mouse_world));
+            collider->width = fabsf(mouse_world.x - tile_start.x);
+            collider->height = fabsf(mouse_world.y - tile_start.y);
+            coord->position = mult(0.5f, sum(tile_start, mouse_world));
         }
 
         if (grabbed) {
-            float dx = mouse_world.x - wall_start.x;
-            float dy = mouse_world.y - wall_start.y;
+            float dx = mouse_world.x - tile_start.x;
+            float dy = mouse_world.y - tile_start.y;
             if (grid_sizes[grid_size_index]) {
                 dx = grid_sizes[grid_size_index] * floorf(dx / grid_sizes[grid_size_index]);
                 dy = grid_sizes[grid_size_index] * floorf(dy / grid_sizes[grid_size_index]);
             }
             sfVector2f delta_pos = vec(dx, dy);
-            wall_start = sum(wall_start, vec(dx, dy));
+            tile_start = sum(tile_start, vec(dx, dy));
 
             move_selections(data, delta_pos);
         }
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            wall_start = mouse_world;
+            tile_start = mouse_world;
 
             if (selections) {
                 ListNode* node;
@@ -336,7 +336,7 @@ void input_tool_select(GameData* data, sfEvent event) {
             }
             if (!grabbed) {
                 selection_box = create_entity(components);
-                CoordinateComponent_add(components, selection_box, wall_start, 0.0f);
+                CoordinateComponent_add(components, selection_box, tile_start, 0.0f);
                 ColliderComponent_add_rectangle(components, selection_box, 0.0f, 0.0f, GROUP_ALL);
             }
         } else if (event.mouseButton.button == sfMouseRight) {
@@ -368,18 +368,18 @@ void input_tool_select(GameData* data, sfEvent event) {
 }
 
 
-void input_tool_wall(GameData* data, sfEvent event) {
+void input_tool_tile(GameData* data, sfEvent event) {
     if (event.type == sfEvtMouseMoved) {
-        wall_end = snap_to_grid(mouse_world);
+        tile_end = snap_to_grid(mouse_world);
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            wall_start = snap_to_grid(mouse_world);
-            wall_started = true;
+            tile_start = snap_to_grid(mouse_world);
+            tile_started = true;
         }
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
-        float width = fabsf(wall_end.x - wall_start.x);
-        float height = fabsf(wall_end.y - wall_start.y);
-        sfVector2f pos = mult(0.5f, sum(wall_end, wall_start));
+        float width = fabsf(tile_end.x - tile_start.x);
+        float height = fabsf(tile_end.y - tile_start.y);
+        sfVector2f pos = mult(0.5f, sum(tile_end, tile_start));
         if (width > 0.0f && height > 0.0f) {
             data->components->added_entities = List_create();
             create_tile(data->components, selected_tile, pos, 0.0f, width, height);
@@ -392,7 +392,7 @@ void input_tool_wall(GameData* data, sfEvent event) {
             List_delete(data->components->added_entities);
             data->components->added_entities = NULL;
         }
-        wall_started = false;
+        tile_started = false;
     }
 }
 
@@ -441,8 +441,8 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
         case TOOL_SELECT:
             input_tool_select(data, event);
             break;
-        case TOOL_WALL:
-            input_tool_wall(data, event);
+        case TOOL_TILE:
+            input_tool_tile(data, event);
             break;
         case TOOL_OBJECT:
             input_tool_object(data, event);
@@ -463,6 +463,10 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
         }
     } else if (event.type == sfEvtMouseWheelScrolled) {
         cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.mouseWheelScroll.delta), 10.0f, 100.0f);
+    } else if (event.type == sfEvtMouseButtonPressed) {
+        if (event.mouseButton.button == sfMouseRight) {
+            tool = TOOL_SELECT;
+        }
     } else if (event.type == sfEvtKeyPressed) {
         switch (event.key.code) {
             case sfKeyO:
@@ -472,7 +476,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
                 toggle_prefabs(data->components, -1);
                 break;
             case sfKeyW:
-                toggle_walls(data->components, -1);
+                toggle_tiles(data->components, -1);
                 break;
             case sfKeyDash:
                 grid_size_index = max(grid_size_index - 1, 0);
@@ -502,12 +506,12 @@ void draw_editor(GameData data, sfRenderWindow* window) {
                     collider->height, 0.0f, 0.05f, sfWhite);
             }
             break;
-        case TOOL_WALL:
-            if (wall_started) {
+        case TOOL_TILE:
+            if (tile_started) {
                 sfVector2f end = snap_to_grid(mouse_pos);
-                float width = fabsf(end.x - wall_start.x);
-                float height = fabsf(end.y - wall_start.y);
-                sfVector2f pos = mult(0.5f, sum(end, wall_start));
+                float width = fabsf(end.x - tile_start.x);
+                float height = fabsf(end.y - tile_start.y);
+                sfVector2f pos = mult(0.5f, sum(end, tile_start));
                 draw_rectangle_outline(window, data.components, data.camera, NULL, pos, width, height, 0.0f, 0.05f, 
                     sfWhite);
             } else {

@@ -64,10 +64,10 @@ int create_wall(ComponentData* components, sfVector2f pos, float angle, float wi
     ImageComponent_add(components, i, filename, width, height, LAYER_WALLS);
 
     if (strcmp(filename, "wood_tile") == 0) {
-        ParticleComponent_add_splinter(components, i);
+        ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
         SoundComponent_add(components, i, "wood_hit");
     } else {
-        ParticleComponent_add_rock(components, i);
+        ParticleComponent_add_type(components, i, PARTICLE_ROCK, 0.0f);
         SoundComponent_add(components, i, "stone_hit");
     }
 

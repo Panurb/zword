@@ -3,21 +3,7 @@
 #include "camera.h"
 
 
-void ParticleComponent_add_bullet(ComponentData* components, int entity, float size);
-
-void ParticleComponent_add_blood(ComponentData* components, int entity);
-
-void ParticleComponent_add_sparks(ComponentData* components, int entity);
-
-void ParticleComponent_add_dirt(ComponentData* components, int entity);
-
-void ParticleComponent_add_rock(ComponentData* components, int entity);
-
-void ParticleComponent_add_splinter(ComponentData* components, int entity);
-
-void ParticleComponent_add_fire(ComponentData* components, int entity, float size);
-
-void ParticleComponent_add_energy(ComponentData* components, int entity);
+void ParticleComponent_add_type(ComponentData* components, int entity, ParticleType type, float size);
 
 void add_particles(ComponentData* components, int entity, int n);
 

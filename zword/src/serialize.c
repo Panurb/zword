@@ -9,6 +9,7 @@
 
 #include "game.h"
 #include "component.h"
+#include "particle.h"
 
 
 void serialize_int(cJSON* json, char* name, int value, int default_value) {
@@ -201,18 +202,23 @@ void ParticleComponent_serialize(cJSON* entity_json, ComponentData* components, 
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Particle", json);
-    cJSON_AddNumberToObject(json, "angle", particle->angle);
-    cJSON_AddNumberToObject(json, "spread", particle->spread);
-    cJSON_AddNumberToObject(json, "start_size", particle->start_size);
-    cJSON_AddNumberToObject(json, "end_size", particle->end_size);
-    cJSON_AddNumberToObject(json, "speed", particle->speed);
-    cJSON_AddNumberToObject(json, "rate", particle->rate);
-    cJSON_AddNumberToObject(json, "outer_r", particle->outer_color.r);
-    cJSON_AddNumberToObject(json, "outer_g", particle->outer_color.g);
-    cJSON_AddNumberToObject(json, "outer_b", particle->outer_color.b);
-    cJSON_AddNumberToObject(json, "inner_r", particle->inner_color.r);
-    cJSON_AddNumberToObject(json, "inner_g", particle->inner_color.g);
-    cJSON_AddNumberToObject(json, "inner_b", particle->inner_color.b);
+    if (particle->type == PARTICLE_NONE) {
+        cJSON_AddNumberToObject(json, "angle", particle->angle);
+        cJSON_AddNumberToObject(json, "spread", particle->spread);
+        cJSON_AddNumberToObject(json, "start_size", particle->start_size);
+        cJSON_AddNumberToObject(json, "end_size", particle->end_size);
+        cJSON_AddNumberToObject(json, "speed", particle->speed);
+        cJSON_AddNumberToObject(json, "rate", particle->rate);
+        cJSON_AddNumberToObject(json, "outer_r", particle->outer_color.r);
+        cJSON_AddNumberToObject(json, "outer_g", particle->outer_color.g);
+        cJSON_AddNumberToObject(json, "outer_b", particle->outer_color.b);
+        cJSON_AddNumberToObject(json, "inner_r", particle->inner_color.r);
+        cJSON_AddNumberToObject(json, "inner_g", particle->inner_color.g);
+        cJSON_AddNumberToObject(json, "inner_b", particle->inner_color.b);
+    } else {
+        cJSON_AddNumberToObject(json, "type", particle->type);
+        cJSON_AddNumberToObject(json, "start_size", particle->start_size);
+    }
     serialize_int(json, "loop", particle->loop, false);
 }
 
@@ -221,25 +227,31 @@ void ParticleComponent_deserialize(cJSON* entity_json, ComponentData* components
     cJSON* json = cJSON_GetObjectItem(entity_json, "Particle");
     if (!json) return;
 
-    float angle = cJSON_GetObjectItem(json, "angle")->valuedouble;
-    float spread = cJSON_GetObjectItem(json, "spread")->valuedouble;
-    float start_size = cJSON_GetObjectItem(json, "start_size")->valuedouble;
-    float end_size = cJSON_GetObjectItem(json, "end_size")->valuedouble;
-    float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
-    float rate = cJSON_GetObjectItem(json, "rate")->valuedouble;
-    sfColor outer_color = sfWhite;
-    outer_color.r = cJSON_GetObjectItem(json, "outer_r")->valueint;
-    outer_color.g = cJSON_GetObjectItem(json, "outer_g")->valueint;
-    outer_color.b = cJSON_GetObjectItem(json, "outer_b")->valueint;
-    sfColor inner_color = sfWhite;
-    inner_color.r = cJSON_GetObjectItem(json, "inner_r")->valueint;
-    inner_color.g = cJSON_GetObjectItem(json, "inner_g")->valueint;
-    inner_color.b = cJSON_GetObjectItem(json, "inner_b")->valueint;
-    ParticleComponent* particle = ParticleComponent_add(components, entity, angle, spread, start_size, end_size, speed, 
-        rate, outer_color, inner_color);
-    particle->loop = deserialize_int(json, "loop", particle->loop);
-    if (particle->loop) {
+    ParticleType type = deserialize_int(json, "type", PARTICLE_NONE);
+    if (type == PARTICLE_NONE) {
+        float angle = cJSON_GetObjectItem(json, "angle")->valuedouble;
+        float spread = cJSON_GetObjectItem(json, "spread")->valuedouble;
+        float start_size = cJSON_GetObjectItem(json, "start_size")->valuedouble;
+        float end_size = cJSON_GetObjectItem(json, "end_size")->valuedouble;
+        float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
+        float rate = cJSON_GetObjectItem(json, "rate")->valuedouble;
+        sfColor outer_color = sfWhite;
+        outer_color.r = cJSON_GetObjectItem(json, "outer_r")->valueint;
+        outer_color.g = cJSON_GetObjectItem(json, "outer_g")->valueint;
+        outer_color.b = cJSON_GetObjectItem(json, "outer_b")->valueint;
+        sfColor inner_color = sfWhite;
+        inner_color.r = cJSON_GetObjectItem(json, "inner_r")->valueint;
+        inner_color.g = cJSON_GetObjectItem(json, "inner_g")->valueint;
+        inner_color.b = cJSON_GetObjectItem(json, "inner_b")->valueint;
+        ParticleComponent* particle = ParticleComponent_add(components, entity, angle, spread, start_size, end_size, speed, 
+            rate, outer_color, inner_color);
+        particle->loop = deserialize_int(json, "loop", particle->loop);
+        if (particle->loop) {
         particle->enabled = true;
+        }
+    } else {
+        float size = cJSON_GetObjectItem(json, "start_size")->valuedouble;
+        ParticleComponent_add_type(components, entity, type, size);
     }
 }
 

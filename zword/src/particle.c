@@ -54,7 +54,6 @@ void ParticleComponent_add_splinter(ComponentData* components, int entity) {
 
 void ParticleComponent_add_fire(ComponentData* components, int entity, float size) {
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
-    LightComponent_add(components, entity, 30.0f * size, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
     float angle = 0.5f * M_PI - get_angle(components, entity);
     ParticleComponent* particle = ParticleComponent_add(components, entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, sfYellow);
     particle->loop = true;
@@ -65,6 +64,38 @@ void ParticleComponent_add_fire(ComponentData* components, int entity, float siz
 void ParticleComponent_add_energy(ComponentData* components, int entity) {
     sfColor green = get_color(0.5f, 1.0f, 0.0f, 1.0f);
     ParticleComponent_add(components, entity, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, green, green);
+}
+
+
+void ParticleComponent_add_type(ComponentData* components, int entity, ParticleType type, float size) {
+    ParticleComponent* particle;
+    switch (type) {
+        case PARTICLE_BULLET:
+            ParticleComponent_add_bullet(components, entity, size);
+            break;
+        case PARTICLE_BLOOD:
+            ParticleComponent_add_blood(components, entity);
+            break;
+        case PARTICLE_SPARKS:
+            ParticleComponent_add_sparks(components, entity);
+            break;
+        case PARTICLE_DIRT:
+            ParticleComponent_add_dirt(components, entity);
+            break;
+        case PARTICLE_ROCK:
+            ParticleComponent_add_rock(components, entity);
+            break;
+        case PARTICLE_SPLINTER:
+            ParticleComponent_add_splinter(components, entity);
+            break;
+        case PARTICLE_FIRE:
+            ParticleComponent_add_fire(components, entity, size);
+            break;
+        case PARTICLE_ENERGY:
+            ParticleComponent_add_energy(components, entity);
+            break;
+    }
+    ParticleComponent_get(components, entity)->type = type;
 }
 
 

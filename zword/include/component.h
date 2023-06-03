@@ -197,7 +197,20 @@ typedef struct {
     float turn_speed;
 } EnemyComponent;
 
+typedef enum ParticleType {
+    PARTICLE_NONE,
+    PARTICLE_BULLET,
+    PARTICLE_BLOOD,
+    PARTICLE_SPARKS,
+    PARTICLE_DIRT,
+    PARTICLE_ROCK,
+    PARTICLE_SPLINTER,
+    PARTICLE_FIRE,
+    PARTICLE_ENERGY
+} ParticleType;
+
 typedef struct {
+    ParticleType type;
     bool enabled;
     bool loop;
     float angle;

@@ -380,9 +380,10 @@ void EnemyComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float start_size, 
-                                         float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color) {
+ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, 
+        float start_size, float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
+    particle->type = PARTICLE_NONE;
     particle->enabled = false;
     particle->loop = false;
     particle->angle = angle;
