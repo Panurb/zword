@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "editor.h"
 #include "widget.h"
@@ -26,6 +27,16 @@ typedef enum {
 } Tool;
 
 
+typedef enum {
+    CATEGORY_TERRAIN,
+    CATEGORY_FLOOR,
+    CATEGORY_DECALS,
+    CATEGORY_WALLS,
+    CATEGORY_OBJECTS,
+    CATEGORY_WAYPOINTS
+} EntityCategory;
+
+
 static int selection_box = -1;
 static sfVector2f tile_start = { 0.0f, 0.0f };
 static sfVector2f tile_end = { 0.0f, 0.0f };
@@ -38,6 +49,11 @@ static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
 static ButtonText map_name = "";
+
+
+
+char* category_names[] = { "terrain", "floor", "decals", "walls", "objects", "waypoints" };
+bool selected_categories[] = { true, true, true, true, true, true };
 
 static int selected_tile = 0;
 static ButtonText tile_names[] = {
@@ -73,6 +89,39 @@ ButtonText object_names[] = {
     "zombie"
 };
 
+
+bool category_selected(ComponentData* components, int entity) {
+    if (WaypointComponent_get(components, entity)) {
+        return selected_categories[CATEGORY_WAYPOINTS];
+    }
+
+    ImageComponent* image = ImageComponent_get(components, entity);
+    if (image) {
+        switch (image->layer) {
+        case LAYER_GROUND:
+            return selected_categories[CATEGORY_TERRAIN];
+        case LAYER_ROADS:
+        case LAYER_FLOOR:
+            return selected_categories[CATEGORY_FLOOR];
+        case LAYER_DECALS:
+            return selected_categories[CATEGORY_DECALS];
+        case LAYER_WALLS:
+            return selected_categories[CATEGORY_WALLS];
+        case LAYER_CORPSES:
+        case LAYER_ITEMS:
+        case LAYER_VEHICLES:
+        case LAYER_ENEMIES:
+        case LAYER_WEAPONS:
+        case LAYER_PLAYERS:
+        case LAYER_TREES:
+            return selected_categories[CATEGORY_OBJECTS];
+        default:
+            return false;
+        }
+    }
+}
+
+
 void set_map_name(ButtonText name) {
     strcpy(map_name, name);
 }
@@ -87,7 +136,9 @@ sfVector2f get_selections_center(ComponentData* components) {
             center = sum(center, get_position(components, i));
         }
     }
-    center = mult(1.0f / selections->size, center);
+    if (selections->size != 0) {
+        center = mult(1.0f / selections->size, center);
+    }
 
     return center;
 }
@@ -189,10 +240,14 @@ void move_selections(GameData* data, sfVector2f delta_pos) {
         ListNode* node;
         FOREACH (node, selections) {
             int i = node->value;
-            clear_grid(data->components, data->grid, i);
             CoordinateComponent* coord = CoordinateComponent_get(data->components, node->value);
-            coord->position = sum(coord->position, delta_pos);
-            update_grid(data->components, data->grid, i);
+            if (ColliderComponent_get(data->components, i)) {
+                clear_grid(data->components, data->grid, i);
+                coord->position = sum(coord->position, delta_pos);
+                update_grid(data->components, data->grid, i);
+            } else {
+                coord->position = sum(coord->position, delta_pos);
+            }
         }
         delta_pos = zeros();
     }
@@ -210,10 +265,15 @@ void rotate_selections(GameData* data) {
 
         sfVector2f r = diff(coord->position, center);
         r = perp(r);
-        clear_grid(data->components, data->grid, i);
-        coord->position = sum(center, r);
-        coord->angle += 0.5f * M_PI;
-        update_grid(data->components, data->grid, i);
+        if (ColliderComponent_get(data->components, i)) {
+            clear_grid(data->components, data->grid, i);
+            coord->position = sum(center, r);
+            coord->angle += 0.5f * M_PI;
+            update_grid(data->components, data->grid, i);
+        } else {
+            coord->position = sum(center, r);
+            coord->angle += 0.5f * M_PI;
+        }
     }
 }
 
@@ -222,7 +282,9 @@ void destroy_selections(GameData* data) {
     ListNode* node;
     FOREACH (node, selections) {
         int i = node->value;
-        clear_grid(data->components, data->grid, i);
+        if (ColliderComponent_get(data->components, i)) {
+            clear_grid(data->components, data->grid, i);
+        }
         destroy_entity(data->components, i);
     }
     List_clear(selections);
@@ -235,17 +297,34 @@ void update_selections(GameData data) {
     }
     List_clear(selections);
 
-    List* collisions = List_create();
-    collides_with(data.components, data.grid, selection_box, collisions);
+    for (int i = 0; i < data.components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(data.components, i);
+        if (!coord) continue;
+        if (i == selection_box) continue;
+        if (WidgetComponent_get(data.components, i)) continue;
+        if (coord->parent != -1) continue;
 
-    ListNode* node;
-    FOREACH (node, collisions) {
-        int i = node->value;
-        if (CoordinateComponent_get(data.components, i)->parent == -1) {
+        if (!category_selected(data.components, i)) {
+            continue;
+        }
+
+        ColliderComponent* collider = ColliderComponent_get(data.components, i);
+        ImageComponent* image = ImageComponent_get(data.components, i);
+        sfVector2f overlap = zeros();
+        if (collider) {
+            overlap = overlap_collider_collider(data.components, selection_box, i);
+        } else if (image) {
+            overlap = overlap_rectangle_image(data.components, selection_box, i);
+        } else {
+            if (point_inside_collider(data.components, selection_box, get_position(data.components, i))) {
+                overlap = ones();
+            }
+        }
+        
+        if (non_zero(overlap)) {
             List_add(selections, i);
         }
     }
-    List_delete(collisions);
 }
 
 
@@ -326,9 +405,16 @@ void input_tool_select(GameData* data, sfEvent event) {
             if (selections) {
                 ListNode* node;
                 FOREACH (node, selections) {
-                    if (inside_collider(components, node->value, mouse_world)) {
-                        grabbed = true;
-                        break;
+                    if (ColliderComponent_get(components, node->value)) {
+                        if (point_inside_collider(components, node->value, mouse_world)) {
+                            grabbed = true;
+                            break;
+                        }
+                    } else if (ImageComponent_get(components, node->value)) {
+                        if (point_inside_image(components, node->value, mouse_world)) {
+                            grabbed = true;
+                            break;
+                        }
                     }
                 }
             } else {
@@ -340,7 +426,9 @@ void input_tool_select(GameData* data, sfEvent event) {
                 ColliderComponent_add_rectangle(components, selection_box, 0.0f, 0.0f, GROUP_ALL);
             }
         } else if (event.mouseButton.button == sfMouseRight) {
-            rotate_selections(data);
+            if (selections) {
+                rotate_selections(data);
+            }
         }
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
         if (selection_box != -1) {
@@ -350,18 +438,35 @@ void input_tool_select(GameData* data, sfEvent event) {
         grabbed = false;
     } else if (event.type == sfEvtKeyPressed) {
         if (selections) {
-            if (event.key.code == sfKeyDelete) {
+            switch (event.key.code) {
+            case sfKeyDelete:
                 destroy_selections(data);
-            } else if (event.key.code == sfKeyS) {
+                break;
+            case sfKeyS:
                 save_prefab(data->components, "prefab.json");
-            } else if (event.key.code == sfKeyLeft) {
-                move_selections(data, vec(grid_sizes[grid_size_index], 0.0f));
-            } else if (event.key.code == sfKeyRight) {
+                break;
+            case sfKeyLeft:
                 move_selections(data, vec(-grid_sizes[grid_size_index], 0.0f));
-            } else if (event.key.code == sfKeyDown) {
+                break;
+            case sfKeyRight:
+                move_selections(data, vec(grid_sizes[grid_size_index], 0.0f));
+                break;
+            case sfKeyDown:
                 move_selections(data, vec(0.0f, -grid_sizes[grid_size_index]));
-            } else if (event.key.code == sfKeyUp) {
+                break;
+            case sfKeyUp:
                 move_selections(data, vec(0.0f, grid_sizes[grid_size_index]));
+                break;
+            case sfKeyNum1:
+            case sfKeyNum2:
+            case sfKeyNum3:
+            case sfKeyNum4:
+            case sfKeyNum5:
+            case sfKeyNum6:
+                selected_categories[event.key.code - 27] = !selected_categories[event.key.code - 27];
+                break;
+            default:
+                break;
             }
         }
     }
@@ -505,6 +610,10 @@ void draw_editor(GameData data, sfRenderWindow* window) {
                 draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
                     collider->height, 0.0f, 0.05f, sfWhite);
             }
+            for (int i = 0; i < LENGTH(category_names); i++) {
+                sfColor color = selected_categories[i] ? sfWhite : get_color(0.6f, 0.6f, 0.6f, 1.0f);
+                draw_text(window, data.components, data.menu_camera, NULL, vec(-23, i), category_names[i], color);
+            }
             break;
         case TOOL_TILE:
             if (tile_started) {
@@ -541,13 +650,19 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             float angle = get_angle(data.components, i);
 
             ImageComponent* image = ImageComponent_get(data.components, i);
+            ColliderComponent* collider = ColliderComponent_get(data.components, i);
             if (image) {
                 draw_sprite(window, data.components, data.camera, image->sprite, pos, angle, image->scale, 1);
             }
-
-            ColliderComponent* collider = ColliderComponent_get(data.components, i);
-            draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, collider->height, 
-                angle, 0.05f, sfWhite);
+            
+            if (collider) {
+                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
+                    collider->height, angle, 0.05f, sfWhite);
+            }
+            
+            if (!image && !collider) {
+                draw_circle(window, data.components, data.camera, NULL, pos, 0.1f, sfWhite);
+            }
 
             if (WaypointComponent_get(data.components, i)) {
                 waypoint_selected = true;

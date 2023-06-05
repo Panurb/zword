@@ -1,3 +1,5 @@
+#pragma once
+
 extern ButtonText object_names[];
 
 void create_bench(ComponentData* components, sfVector2f position, float angle);

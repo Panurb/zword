@@ -114,3 +114,7 @@ bool non_zero(sfVector2f v);
 float clamp(float val, float min_val, float max_val);
 
 float angle_diff(float a, float b);
+
+bool collides_aabb(sfVector2f pos1, float w1, float h1, sfVector2f pos2, float w2, float h2);
+
+bool point_inside_rectangle(sfVector2f position, float angle, float width, float height, sfVector2f point);

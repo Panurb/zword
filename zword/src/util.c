@@ -250,3 +250,30 @@ float clamp(float val, float min_val, float max_val) {
 float angle_diff(float a, float b) {
     return mod(a - b + M_PI, 2.0f * M_PI) - M_PI;
 }
+
+bool collides_aabb(sfVector2f pos1, float w1, float h1, sfVector2f pos2, float w2, float h2) {
+    if (pos1.x < pos2.x + w2 && pos1.x + w1 > pos2.x && pos1.y < pos2.y + h2 && pos1.y + h1 > pos2.y) {
+        return true;
+    }
+    return false;
+}
+
+bool point_inside_rectangle(sfVector2f position, float angle, float width, float height, sfVector2f point) {
+    sfVector2f hw = polar_to_cartesian(0.5f * width, angle);
+    sfVector2f hh = mult(height / width, perp(hw));
+
+    sfVector2f a = sum(position, sum(hw, hh));
+    sfVector2f b = diff(a, mult(2, hh));
+    sfVector2f c = diff(b, mult(2, hw));
+    sfVector2f d = sum(c, mult(2, hh));
+
+    sfVector2f w = polar_to_cartesian(0.5f * width, angle);
+    sfVector2f am = diff(point, a);
+    sfVector2f ab = diff(b, a);
+    sfVector2f ad = diff(d, a);
+
+    if (0.0f < dot(am, ab) && dot(am, ab) < dot(ab, ab) && 0.0f < dot(am, ad) && dot(am, ad) < dot(ad, ad)) {
+        return true;
+    }
+    return false;
+}

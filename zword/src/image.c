@@ -305,3 +305,11 @@ void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfC
         }
     }
 }
+
+
+bool point_inside_image(ComponentData* components, int entity, sfVector2f point) {
+    sfVector2f position = get_position(components, entity);
+    float angle = get_angle(components, entity);
+    ImageComponent* image = ImageComponent_get(components, entity);
+    return point_inside_rectangle(position, angle, image->width, image->height, point);
+}

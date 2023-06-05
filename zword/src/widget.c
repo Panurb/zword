@@ -371,7 +371,7 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
 
         sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
         widget->selected = false;
-        if (inside_collider(components, i, mouse)) {
+        if (point_inside_collider(components, i, mouse)) {
             last_selected = i;
         }
     }

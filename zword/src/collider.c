@@ -21,19 +21,13 @@
 #include "health.h"
 
 
-bool inside_collider(ComponentData* components, int i, sfVector2f point) {
+bool point_inside_collider(ComponentData* components, int i, sfVector2f point) {
     // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
     ColliderComponent* col = ColliderComponent_get(components, i);
     if (col->type == COLLIDER_RECTANGLE) {
-        sfVector2f corners[4];
-        get_corners(components, i, corners);
-        sfVector2f am = diff(point, corners[0]);
-        sfVector2f ab = diff(corners[1], corners[0]);
-        sfVector2f ad = diff(corners[3], corners[0]);
-        if (0.0f < dot(am, ab) && dot(am, ab) < dot(ab, ab) && 
-            0.0f < dot(am, ad) && dot(am, ad) < dot(ad, ad)) {
-            return true;
-        }
+        sfVector2f pos = get_position(components, i);
+        float angle = get_angle(components, i);
+        return point_inside_rectangle(pos, angle, col->width, col->height, point);
     } else if (col->type == COLLIDER_CIRCLE) {
         if (norm2(diff(get_position(components, i), point)) < col->radius * col->radius) {
             return true;
@@ -190,7 +184,7 @@ sfVector2f overlap_rectangle_rectangle(ComponentData* components, int i, int j) 
 }
 
 
-sfVector2f overlap(ComponentData* components, int i, int j) {
+sfVector2f overlap_collider_collider(ComponentData* components, int i, int j) {
     sfVector2f ol = zeros();
 
     ColliderComponent* a = ColliderComponent_get(components, i);
@@ -218,6 +212,37 @@ sfVector2f overlap(ComponentData* components, int i, int j) {
 }
 
 
+sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j) {
+    ImageComponent* image = ImageComponent_get(components, j);
+
+    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(components, i));
+    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(components, j));
+
+    float overlaps[4];
+    sfVector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
+
+    sfVector2f a = get_position(components, i);
+    sfVector2f b = get_position(components, j);
+
+    for (int k = 0; k < 4; k++) {
+        sfVector2f hw = polar_to_cartesian(0.5 * image->width, get_angle(components, i));
+        sfVector2f hh = polar_to_cartesian(0.5 * image->height, get_angle(components, i) + 0.5 * M_PI);
+        float image_axis_half_width = fabs(dot(hw, axes[k])) + fabs(dot(hh, axes[k]));
+
+        overlaps[k] = axis_overlap(axis_half_width(components, i, axes[k]), a,
+                                   image_axis_half_width, b, axes[k]);
+
+        if (fabs(overlaps[k]) < 1e-6) {
+            return (sfVector2f) zeros();
+        }
+    }
+
+    int k = abs_argmin(overlaps, 4);
+
+    return mult(overlaps[k], axes[k]);
+}
+
+
 bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* entities) {
     ColliderGroup group = ColliderComponent_get(components, i)->group;
     Bounds bounds = get_bounds(components, grid, i);
@@ -239,7 +264,7 @@ bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* e
                 }
                 collider->last_collision = i;
 
-                sfVector2f ol = overlap(components, i, n);
+                sfVector2f ol = overlap_collider_collider(components, i, n);
 
                 if (non_zero(ol)) {
                     if (entities) {
@@ -284,7 +309,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
                     collider->last_collision = i;
 
-                    sfVector2f ol = overlap(components, i, n);
+                    sfVector2f ol = overlap_collider_collider(components, i, n);
 
                     if (!non_zero(ol)) continue;
 
