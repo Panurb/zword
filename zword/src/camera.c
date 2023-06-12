@@ -321,24 +321,26 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
 }
 
 
-void update_camera(ComponentData* components, int camera, float time_step) {
+void update_camera(ComponentData* components, int camera, float time_step, bool follow_players) {
     CoordinateComponent* coord = CoordinateComponent_get(components, camera);
     CameraComponent* cam = CameraComponent_get(components, camera);
 
     sfVector2f pos = zeros();
 
-    int n = 0;
-    for (ListNode* node = components->player.order->head; node; node = node->next) {
-        int i = node->value;
-        PlayerComponent* player = PlayerComponent_get(components, i);
-        if (player->state != PLAYER_DEAD) {
-            n += 1;
-            pos = sum(pos, get_position(components, i));
+    if (follow_players) {
+        int n = 0;
+        for (ListNode* node = components->player.order->head; node; node = node->next) {
+            int i = node->value;
+            PlayerComponent* player = PlayerComponent_get(components, i);
+            if (player->state != PLAYER_DEAD) {
+                n += 1;
+                pos = sum(pos, get_position(components, i));
+            }
         }
-    }
-    if (n != 0) {
-        pos = mult(1.0 / n, pos);
-        coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
+        if (n != 0) {
+            pos = mult(1.0 / n, pos);
+            coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
+        }
     }
 
     cam->zoom += 10.0 * time_step * (cam->zoom_target * cam->resolution.y / 720.0 - cam->zoom);

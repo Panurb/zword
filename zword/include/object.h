@@ -1,6 +1,28 @@
 #pragma once
 
-extern ButtonText object_names[];
+#include "component.h"
+
+typedef enum {
+    OBJECT_BED,
+    OBJECT_BENCH,
+    OBJECT_BIG_BOY,
+    OBJECT_BOSS,
+    OBJECT_CANDLE,
+    OBJECT_CAR,
+    OBJECT_DESK,
+    OBJECT_DOOR,
+    OBJECT_FARMER,
+    OBJECT_FLASHLIGHT,
+    OBJECT_GAS,
+    OBJECT_HAY_BALE,
+    OBJECT_LAMP,
+    OBJECT_PLAYER,
+    OBJECT_PRIEST,
+    OBJECT_ROCK,
+    OBJECT_TREE,
+    OBJECT_WAYPOINT,
+    OBJECT_ZOMBIE
+} Object;
 
 void create_bench(ComponentData* components, sfVector2f position, float angle);
 
@@ -16,16 +38,16 @@ void create_toilet(ComponentData* components, sfVector2f position, float angle);
 
 void create_bed(ComponentData* components, sfVector2f position, float angle);
 
-void create_candle(ComponentData* components, sfVector2f pos, float angle);
+void create_candle(ComponentData* components, sfVector2f pos);
 
-void create_lamp(ComponentData* components, sfVector2f position, float angle);
+void create_lamp(ComponentData* components, sfVector2f position);
 
 void create_desk(ComponentData* components, sfVector2f position, float angle);
 
 void create_fire(ComponentData* components, sfVector2f pos);
 
-void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position);
+void create_tree(ComponentData* components, sfVector2f position);
 
-void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position);
+void create_rock(ComponentData* components, sfVector2f position);
 
-void create_object(ComponentData* components, int object, sfVector2f position, float angle);
+void create_object(ComponentData* components, Object object, sfVector2f position, float angle);

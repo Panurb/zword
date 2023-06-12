@@ -160,7 +160,7 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
     sfVector2f pos = get_position(components, camera);
-    float linewidth = 0.01f;
+    float major_lines = 16.0f;
     float left = pos.x - 0.5f * width;
     float right = pos.x + 0.5f * width;
     float bottom = pos.y - 0.5f * height;
@@ -170,11 +170,13 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
     sfRectangleShape* shape = sfRectangleShape_create();
     
     for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
-        draw_line(window, components, camera, NULL, vec(x, bottom), vec(x, top), linewidth, color);
+        float linewidth = mod(x, major_lines) == 0.0f ? 0.05f : 0.01f;
+        draw_line(window, components, camera, shape, vec(x, bottom), vec(x, top), linewidth, color);
     }
 
-    for (float y = left - mod(left, tile_height); y < right; y += tile_height) {
-        draw_line(window, components, camera, NULL, vec(left, y), vec(right, y), linewidth, color);
+    for (float y = bottom - mod(bottom, tile_height); y < top; y += tile_height) {
+        float linewidth = mod(y, major_lines) == 0.0f ? 0.05f : 0.01f;
+        draw_line(window, components, camera, shape, vec(left, y), vec(right, y), linewidth, color);
     }
     
     sfRectangleShape_destroy(shape);

@@ -23,7 +23,8 @@ typedef struct {
 
 typedef char Filename[128];
 
-typedef char ButtonText[128];
+#define BUTTON_TEXT_SIZE 128
+typedef char ButtonText[BUTTON_TEXT_SIZE];
 
 sfVector2f zeros();
 

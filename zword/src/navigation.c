@@ -156,15 +156,11 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
     for (int i = 0; i < components->entities; i++) {
         WaypointComponent* waypoint = WaypointComponent_get(components, i);
         if (!waypoint) continue;
-
-        float radius = ColliderComponent_get(components, i)->radius * CameraComponent_get(components, camera)->zoom;
-        sfCircleShape_setOrigin(shape, (sfVector2f) { radius, radius });
-        sfCircleShape_setRadius(shape, radius);
+        if (ImageComponent_get(components, i)) continue;
 
         sfVector2f pos = get_position(components, i);
-        sfCircleShape_setPosition(shape, world_to_screen(components, camera, pos));
-
-        sfRenderWindow_drawCircleShape(window, shape, NULL);
+        float radius = ColliderComponent_get(components, i)->radius;
+        draw_circle(window, components, camera, shape, pos, radius, sfWhite);
 
         if (draw_neighbors) {
             for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {

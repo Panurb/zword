@@ -5,10 +5,10 @@
 #include "weapon.h"
 
 
-void create_flashlight(ComponentData* components, sfVector2f position, float angle) {
+void create_flashlight(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    angle = rand_angle();
+    float angle = rand_angle();
     CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
@@ -18,10 +18,10 @@ void create_flashlight(ComponentData* components, sfVector2f position, float ang
 }
 
 
-void create_gas(ComponentData* components, sfVector2f position, float angle) {
+void create_gas(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    angle = rand_angle();
+    float angle = rand_angle();
     CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
@@ -34,9 +34,9 @@ void create_item(ComponentData* components, sfVector2f position, int tier) {
     switch (tier) {
         case 0:
             if (randi(0, 1) == 0) {
-                create_flashlight(components, position, 0.0f);
+                create_flashlight(components, position);
             } else {
-                create_gas(components, position, 0.0f);
+                create_gas(components, position);
             }
             break;
         case 1:

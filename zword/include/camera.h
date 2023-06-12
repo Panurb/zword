@@ -5,6 +5,11 @@
 #include "component.h"
 
 
+typedef enum {
+    SHADER_NONE,
+    SHADER_OUTLINE
+} CameraShader;
+
 int create_camera(ComponentData* components, sfVideoMode mode);
 
 sfVector2f camera_size(ComponentData* components, int camera);
@@ -36,7 +41,7 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
 
 void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100], sfColor color);
 
-void update_camera(ComponentData* components, int camera, float time_step);
+void update_camera(ComponentData* components, int camera, float time_step, bool follow_players);
 
 bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height);
 

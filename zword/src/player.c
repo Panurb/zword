@@ -25,10 +25,11 @@
 #include "health.h"
 
 
-void create_player(ComponentData* components, sfVector2f pos, int joystick) {
+void create_player(ComponentData* components, sfVector2f pos, float angle) {
+    int joystick = -1;
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, pos, 0.0);
+    CoordinateComponent_add(components, i, pos, angle);
     ImageComponent_add(components, i, "player", 1.0, 1.0, LAYER_PLAYERS);
     PhysicsComponent* phys = PhysicsComponent_add(components, i, 1.0f);
     phys->bounce = 0.0f;

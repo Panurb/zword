@@ -3,6 +3,7 @@
 
 #include <SFML/System.h>
 
+#include "object.h"
 #include "component.h"
 #include "particle.h"
 #include "enemy.h"
@@ -10,6 +11,8 @@
 #include "door.h"
 #include "vehicle.h"
 #include "collider.h"
+#include "navigation.h"
+#include "player.h"
 
 
 void create_bench(ComponentData* components, sfVector2f position, float angle) {
@@ -120,8 +123,7 @@ void create_bed(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-void create_candle(ComponentData* components, sfVector2f pos, float angle) {
-    UNUSED(angle);
+void create_candle(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, rand_angle());
@@ -133,8 +135,7 @@ void create_candle(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-void create_lamp(ComponentData* components, sfVector2f position, float angle) {
-    UNUSED(angle);
+void create_lamp(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, rand_angle());
@@ -185,54 +186,84 @@ void create_fire(ComponentData* components, sfVector2f pos) {
 }
 
 
-void create_tree(ComponentData* components, ColliderGrid* grid, sfVector2f position) {
+void create_tree(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());    
     float size = randf(1.0f, 1.5f);
     ColliderComponent_add_circle(components, i, 1.25f * size, GROUP_TREES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return;
-    }
-
     ImageComponent_add(components, i, "tree", 3.0, 3.0, LAYER_TREES)->scale = (sfVector2f) { size, size };
 }
 
 
-void create_rock(ComponentData* components, ColliderGrid* grid, sfVector2f position) {
+void create_rock(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
     float size = randf(0.75f, 2.0f);
     ColliderComponent_add_circle(components, i, 1.4 * size, GROUP_TREES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return;
-    }
-
     ImageComponent_add(components, i, "rock", 3.0, 3.0, LAYER_DECALS)->scale = (sfVector2f) { size, size };
 }
 
 
-void create_object(ComponentData* components, int object, sfVector2f position, float angle) {
-    static void (*object_constructors[])(ComponentData*, sfVector2f, float) = {
-        create_bed,
-        create_bench,
-        create_big_boy,
-        create_boss,
-        create_candle,
-        create_car,
-        create_desk,
-        create_door,
-        create_farmer,
-        create_flashlight,
-        create_gas,
-        create_hay_bale,
-        create_lamp,
-        create_priest,
-        create_zombie
-    };
-
-    object_constructors[object](components, position, angle);
+void create_object(ComponentData* components, Object object, sfVector2f position, float angle) {
+    switch (object) {
+    case OBJECT_BED:
+        create_bed(components, position, angle);
+        break;
+    case OBJECT_BENCH:
+        create_bench(components, position, angle);
+        break;
+    case OBJECT_BIG_BOY:
+        create_big_boy(components, position, angle);
+        break;
+    case OBJECT_BOSS:
+        create_boss(components, position, angle);
+        break;
+    case OBJECT_CANDLE:
+        create_candle(components, position);
+        break;
+    case OBJECT_CAR:
+        create_car(components, position, angle);
+        break;
+    case OBJECT_DESK:
+        create_desk(components, position, angle);
+        break;
+    case OBJECT_DOOR:
+        create_door(components, position, angle);
+        break;
+    case OBJECT_FARMER:
+        create_farmer(components, position, angle);
+        break;
+    case OBJECT_FLASHLIGHT:
+        create_flashlight(components, position);
+        break;
+    case OBJECT_GAS:
+        create_gas(components, position);
+        break;
+    case OBJECT_HAY_BALE:
+        create_hay_bale(components, position, angle);
+        break;
+    case OBJECT_LAMP:
+        create_lamp(components, position);
+        break;
+    case OBJECT_PLAYER:
+        create_player(components, position, angle);
+        break;
+    case OBJECT_PRIEST:
+        create_priest(components, position, angle);
+        break;
+    case OBJECT_ROCK:
+        create_rock(components, position);
+        break;
+    case OBJECT_TREE:
+        create_tree(components, position);
+        break;
+    case OBJECT_WAYPOINT:
+        create_waypoint(components, position);
+        break;
+    case OBJECT_ZOMBIE:
+        create_zombie(components, position, angle);
+        break;
+    default:
+        break;
+    }
 }

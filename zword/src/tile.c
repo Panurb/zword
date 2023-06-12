@@ -46,7 +46,7 @@ void create_water(ComponentData* components, sfVector2f position, float width, f
 void create_beach(ComponentData* components, sfVector2f position, float length, float angle) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, angle);
-    ImageComponent_add(components, i, "beach_tile", 16.0f, length, LAYER_GROUND);
+    ImageComponent_add(components, i, "beach_tile", 16.0f, length, LAYER_ROADS);
 }
 
 

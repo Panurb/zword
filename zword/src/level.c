@@ -36,9 +36,15 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
             if ((1.0f - forestation) < perlin(0.03f * r.x, 0.03f * r.y, 0.0, p, -1)) {
                 if (randf(0.0f, 1.0f) < 0.05f) {
-                    create_rock(components, grid, r);
+                    create_rock(components, r);
                 } else {
-                    create_tree(components, grid, r);
+                    create_tree(components, r);
+                }
+                ListNode* node;
+                FOREACH(node, components->added_entities) {
+                    if (collides_with(components, grid, node->value, NULL)) {
+                        destroy_entity(components, node->value);
+                    }
                 }
             }
         }

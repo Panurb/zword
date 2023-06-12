@@ -57,21 +57,21 @@ bool selected_categories[] = { true, true, true, true, true, true };
 
 static int selected_tile = 0;
 static ButtonText tile_names[] = {
-    "altar_tile",
-    "beach_tile",
-    "beach_corner",
-    "board_tile",
-    "brick_tile",
-    "grass_tile",
-    "roof_tile",
-    "stone_tile",
-    "tiles_tile",
-    "water_tile",
-    "wood_tile"
+    "altar",
+    "beach",
+    "beach corner",
+    "board",
+    "brick",
+    "grass",
+    "roof",
+    "stone",
+    "tiles",
+    "water",
+    "wood"
 };
 
 static int selected_object = 0;
-ButtonText object_names[] = {
+static ButtonText object_names[] = {
     "bed",
     "bench",
     "big boy",
@@ -85,7 +85,11 @@ ButtonText object_names[] = {
     "gas",
     "hay bale",
     "lamp",
+    "player",
     "priest",
+    "rock",
+    "tree",
+    "waypoint",
     "zombie"
 };
 
@@ -119,6 +123,7 @@ bool category_selected(ComponentData* components, int entity) {
             return false;
         }
     }
+    return false;
 }
 
 
@@ -255,6 +260,7 @@ void move_selections(GameData* data, sfVector2f delta_pos) {
 
 
 void rotate_selections(GameData* data) {
+    // TODO: snap to grid after rotation
     sfVector2f center = get_selections_center(data->components);
 
     ListNode* node;
@@ -357,7 +363,7 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
 
     update_particles(data.components, data.camera, time_step);
     update_lights(data.components, time_step);
-    update_camera(data.components, data.camera, time_step);
+    update_camera(data.components, data.camera, time_step, false);
 
     draw_shadows(data.components, data.shadow_texture, data.camera);
     draw_lights(data.components, data.grid, data.light_texture, data.camera, data.ambient_light);
@@ -612,7 +618,9 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             }
             for (int i = 0; i < LENGTH(category_names); i++) {
                 sfColor color = selected_categories[i] ? sfWhite : get_color(0.6f, 0.6f, 0.6f, 1.0f);
-                draw_text(window, data.components, data.menu_camera, NULL, vec(-23, i), category_names[i], color);
+                char buffer[128];
+                snprintf(buffer, 128, "%d %s", i + 1, category_names[i]);
+                draw_text(window, data.components, data.menu_camera, NULL, vec(-23, i), buffer, color);
             }
             break;
         case TOOL_TILE:
@@ -652,15 +660,17 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             ImageComponent* image = ImageComponent_get(data.components, i);
             ColliderComponent* collider = ColliderComponent_get(data.components, i);
             if (image) {
-                draw_sprite(window, data.components, data.camera, image->sprite, pos, angle, image->scale, 1);
-            }
-            
-            if (collider) {
+                if (image->layer > LAYER_WALLS) {
+                    draw_sprite(window, data.components, data.camera, image->sprite, pos, angle, image->scale, 
+                        SHADER_OUTLINE);
+                } else {
+                    draw_rectangle_outline(window, data.components, data.camera, NULL, pos, image->width, 
+                        image->height, angle, 0.05f, sfWhite);
+                }
+            } else if (collider) {
                 draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
                     collider->height, angle, 0.05f, sfWhite);
-            }
-            
-            if (!image && !collider) {
+            } else {
                 draw_circle(window, data.components, data.camera, NULL, pos, 0.1f, sfWhite);
             }
 

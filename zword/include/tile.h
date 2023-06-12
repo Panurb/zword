@@ -5,7 +5,7 @@
 #include "component.h"
 
 
-typedef enum Tile {
+typedef enum {
     TILE_ALTAR,
     TILE_BEACH,
     TILE_BEACH_CORNER,

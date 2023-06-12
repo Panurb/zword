@@ -88,7 +88,7 @@ void update_game(GameData data, sfRenderWindow* window, float time_step) {
 
     update_particles(data.components, data.camera, time_step);
     update_lights(data.components, time_step);
-    update_camera(data.components, data.camera, time_step);
+    update_camera(data.components, data.camera, time_step, true);
 
     draw_shadows(data.components, data.shadow_texture, data.camera);
     draw_lights(data.components, data.grid, data.light_texture, data.camera, data.ambient_light);
