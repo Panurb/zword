@@ -26,7 +26,7 @@ typedef enum {
 
 void create_bench(ComponentData* components, sfVector2f position, float angle);
 
-void create_table(ComponentData* components, sfVector2f position, float angle);
+void create_table(ComponentData* components, sfVector2f position);
 
 void create_hay_bale(ComponentData* components, sfVector2f position, float angle);
 

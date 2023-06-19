@@ -41,9 +41,7 @@ void create_bench(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-void create_table(ComponentData* components, sfVector2f position, float angle) {
-    UNUSED(angle);
-
+void create_table(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
     ImageComponent_add(components, i, "table", 3.0f, 3.0f, LAYER_ITEMS)->alpha = 1.0f;
@@ -181,7 +179,7 @@ void create_fire(ComponentData* components, sfVector2f pos) {
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(components, i, 18.0f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
     ParticleComponent_add_type(components, i, PARTICLE_FIRE, 0.6f);
-    ColliderComponent_add_circle(components, i, 0.35, GROUP_OBSTACLES);
+    ColliderComponent_add_circle(components, i, 0.35, GROUP_BARRIERS);
     ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_PARTICLES);
 }
 

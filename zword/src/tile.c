@@ -6,6 +6,7 @@
 #include "component.h"
 #include "navigation.h"
 #include "particle.h"
+#include "enemy.h"
 
 
 void create_ground(ComponentData* components, sfVector2f position, float width, float height, sfTexture* noise_texture) {
@@ -29,7 +30,7 @@ void create_water(ComponentData* components, sfVector2f position, float width, f
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
     ImageComponent_add(components, i, "water_tile", width, height, LAYER_GROUND);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_BARRIERS);
 
     if (noise_texture) {
         i = create_entity(components);
@@ -78,7 +79,7 @@ int create_wall(ComponentData* components, sfVector2f pos, float angle, float wi
 void create_fence(ComponentData* components, sfVector2f pos, float angle, float width, float height) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_OBSTACLES);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_BARRIERS);
     ImageComponent_add(components, i, "wood_tile", width, height, LAYER_WALLS);
 }
 
@@ -132,6 +133,9 @@ void create_tile(ComponentData* components, Tile tile, sfVector2f position, floa
             break;
         case TILE_ROOF:
             create_roof(components, position, width, height, angle);
+            break;
+        case TILE_SPAWNER:
+            create_spawner(components, position, angle, width, height);
             break;
         case TILE_STONE:
             create_wall(components, position, angle, width, height, "stone_tile");

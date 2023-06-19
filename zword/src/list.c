@@ -92,9 +92,22 @@ void List_delete(List* list) {
 
 bool List_find(List* list, int value) {
     for (ListNode* current = list->head; current; current = current->next) {
-        if (current->value = value) {
+        if (current->value == value) {
             return true;
         }
     }
     return false;
+}
+
+
+ListNode* List_get(List* list, int index) {
+    int i = 0;
+    ListNode* node;
+    FOREACH(node, list) {
+        if (i == index) {
+            return node;
+        }
+        i++;
+    }
+    return NULL;
 }

@@ -44,7 +44,7 @@ GameData create_game(sfVideoMode mode) {
     sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
 
     GameData data = { textures, sounds, components, grid, ambient_light, seed, camera, menu_camera,
-        light_texture, light_sprite, shadow_texture, shadow_sprite, mode, "" };
+        light_texture, light_sprite, shadow_texture, shadow_sprite, mode, "", MODE_SURVIVAL };
     return data;
 }
 
@@ -75,6 +75,20 @@ void start_game(GameData data) {
 }
 
 
+
+void update_game_mode(GameData data, float time_step) {
+    static int wave = 0;
+
+    switch (data.game_mode) {
+    case MODE_SURVIVAL:
+        spawn_enemies(data.components, data.grid, data.camera, time_step, wave);
+        break;
+    default:
+        break;
+    }
+}
+
+
 void update_game(GameData data, sfRenderWindow* window, float time_step) {
     update(data.components, time_step, data.grid);
     collide(data.components, data.grid);
@@ -95,7 +109,7 @@ void update_game(GameData data, sfRenderWindow* window, float time_step) {
 
     animate(data.components, time_step);
 
-    // spawn_enemies(components, grid, camera);
+    update_game_mode(data, time_step);
 }
 
 

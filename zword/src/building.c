@@ -12,6 +12,7 @@
 #include "vehicle.h"
 #include "image.h"
 #include "enemy.h"
+#include "object.h"
 
 
 void create_church(ComponentData* components, sfVector2f pos) {
@@ -31,8 +32,8 @@ void create_church(ComponentData* components, sfVector2f pos) {
 
     // Altar
     create_wall(components, sum(pos, mult(12.5f, w)), angle, 3.0f, 8.0f, "altar_tile");
-    create_candle(components, sum(pos, sum(mult(12.5f, w), mult(-3.0f, h))), 0.0f);
-    create_candle(components, sum(pos, sum(mult(12.5f, w), mult(3.0f, h))), 0.0f);
+    create_candle(components, sum(pos, sum(mult(12.5f, w), mult(-3.0f, h))));
+    create_candle(components, sum(pos, sum(mult(12.5f, w), mult(3.0f, h))));
     int k = create_entity(components);
     CoordinateComponent_add(components, k, sum(pos, mult(12.5f, w)), rand_angle());
     ImageComponent_add(components, k, "blood_large", 2.0f, 2.0f, LAYER_ITEMS);
@@ -45,7 +46,7 @@ void create_church(ComponentData* components, sfVector2f pos) {
         // Entrance
         create_wall(components, sum(pos, sum(mult(-14.5f, w), mult(3.0f, h))), angle + 0.5f * M_PI, 2.0f, 1.0f, "stone_tile");
         create_wall(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))), angle, 2.0f, 1.0f, "altar_tile");
-        create_candle(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))), 0.0f);
+        create_candle(components, sum(pos, sum(mult(-13.0f, w), mult(3.5f, h))));
 
         // Side wall entrance
         create_wall(components, sum(pos, sum(mult(-6.0f, w), mult(4.5f, h))), angle, 18.0f, 1.0f, "stone_tile");
@@ -58,7 +59,7 @@ void create_church(ComponentData* components, sfVector2f pos) {
         create_wall(components, sum(pos, sum(mult(0.5f, w), mult(7.0f, h))), angle + 0.5f * M_PI, 4.0f, 1.0f, "stone_tile");
         create_wall(components, sum(pos, sum(mult(9.5f, w), mult(7.0f, h))), angle + 0.5f * M_PI, 4.0f, 1.0f, "stone_tile");
         create_wall(components, sum(pos, sum(mult(5.0f, w), mult(8.5f, h))), angle, 2.0f, 1.0f, "altar_tile");
-        create_candle(components, sum(pos, sum(mult(5.0f, w), mult(8.5f, h))), 0.0f);
+        create_candle(components, sum(pos, sum(mult(5.0f, w), mult(8.5f, h))));
         create_waypoint(components, sum(pos, sum(mult(5.0f, w), mult(5.0f, h))));
 
         // Outside
@@ -122,8 +123,8 @@ void create_barn(ComponentData* components, sfVector2f pos) {
         create_hay_bale(components, sum(pos, sum(mult(-1.0f, w), mult(1.0f, h))), angle + randf(-0.1f, 0.1f));
         create_waypoint(components, sum(pos, lin_comb(-6.5f, w, 3.0f, h)));
         create_waypoint(components, sum(pos, lin_comb(1.5f, w, 3.0f, h)));
-        create_candle(components, sum(pos, lin_comb(-1.0f, w, 1.0f, h)), 0.0f);
-        create_candle(components, sum(pos, lin_comb(-4.0f, w, 1.0f, h)), 0.0f);
+        create_candle(components, sum(pos, lin_comb(-1.0f, w, 1.0f, h)));
+        create_candle(components, sum(pos, lin_comb(-4.0f, w, 1.0f, h)));
 
         // Outside
         create_waypoint(components, sum(pos, lin_comb(-13.5f, w, 8.0f, h)));
@@ -194,14 +195,14 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(0.0f, w, 1.75f, h)), angle, 8.0f, 0.5f, "wood_tile");
     create_wall(components, sum(pos, lin_comb(6.5f, w, 1.75f, h)), angle, 1.0f, 0.5f, "wood_tile");
     create_bed(components, sum(pos, lin_comb(-0.5f, w, 5.0f, h)), angle + 1.5f * M_PI);
-    create_lamp(components, sum(pos, lin_comb(6.5f, w, 6.5f, h)), 0.0f);
+    create_lamp(components, sum(pos, lin_comb(6.5f, w, 6.5f, h)));
 
     // Living room
     create_wall(components, sum(pos, lin_comb(0.0f, w, -1.75f, h)), angle, 4.0f, 0.5f, "wood_tile");
     create_wall(components, sum(pos, lin_comb(-5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
     create_bench(components, sum(pos, lin_comb(-3.0f, w, -5.5f, h)), angle + M_PI);
-    create_table(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)), 0.0f);
-    create_lamp(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)), 0.0f);
+    create_table(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
+    create_lamp(components, sum(pos, lin_comb(-5.5f, w, -5.5f, h)));
 
     // Kitchen
     create_wall(components, sum(pos, lin_comb(5.5f, w, -1.75f, h)), angle, 3.0f, 0.5f, "wood_tile");
@@ -395,10 +396,10 @@ void create_school(ComponentData* components, sfVector2f pos) {
     create_waypoint(components, sum(pos, lin_comb(-6.0f, w, 14.0f, h)));
     create_waypoint(components, sum(pos, lin_comb(-6.0f, w, -14.0f, h)));
 
-    create_lamp(components, sum(pos, lin_comb(14.0f, w, 11.0f, h)), 0.0f);
-    create_lamp(components, sum(pos, lin_comb(14.0f, w, -11.0f, h)), 0.0f);
-    create_lamp(components, sum(pos, lin_comb(-14.0f, w, 11.0f, h)), 0.0f);
-    create_lamp(components, sum(pos, lin_comb(-14.0f, w, -11.0f, h)), 0.0f);
+    create_lamp(components, sum(pos, lin_comb(14.0f, w, 11.0f, h)));
+    create_lamp(components, sum(pos, lin_comb(14.0f, w, -11.0f, h)));
+    create_lamp(components, sum(pos, lin_comb(-14.0f, w, 11.0f, h)));
+    create_lamp(components, sum(pos, lin_comb(-14.0f, w, -11.0f, h)));
 
     for (int i = 0; i < 10; i++) {
         sfVector2f r = { randf(-14.0f, 14.0f), randf(-11.0f, 11.0f) };

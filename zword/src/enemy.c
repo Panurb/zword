@@ -14,6 +14,7 @@
 #include "animation.h"
 #include "health.h"
 #include "weapon.h"
+#include "game.h"
 
 
 int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
@@ -357,10 +358,36 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 }
 
 
-void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera) {
+void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, angle);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
+    EnemyComponent_add(components, i)->spawner = true;
+}
+
+
+void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int wave) {
+    static List* spawners = NULL;
+    if (!spawners) {
+        spawners = List_create();
+        for (int i = 0; i < components->entities; i++) {
+            EnemyComponent* enemy = EnemyComponent_get(components, i);
+            if (enemy && enemy->spawner) {
+                List_add(spawners, i);
+            }
+        }
+    }
+
+    static float delay = 2.0;
+    if (delay > 0.0f) {
+        delay -= time_step;
+    }
+
     static int id = 0;
     id = (id + 1) % 200;
     if (id != 0) return;
+
+    int max_enemies = 10 + wave;
 
     int count = 0;
     for (int i = 0; i < components->entities; i++) {
@@ -370,15 +397,37 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera) {
         }
     }
 
-    float radius = 40.0f;
-    if (count < 10) {
-        int i = create_zombie(components, sum(get_position(components, camera), mult(radius, rand_vector())), 0.0f);
-        // TODO: check collision
+    if (count < max_enemies && delay <= 0.0f) {
+        int i = randi(0, spawners->size - 1);
+        int spawner = List_get(spawners, i)->value;
+
+        // TODO: check that not on screen
+        float x = randf(-1.0f, 1.0f);
+        float y = randf(-1.0f, 1.0f);
+
+        sfVector2f pos = lin_comb(x, half_width(components, spawner), y, half_height(components, spawner));
+
+        // TODO: update grid?
+        i = create_zombie(components, pos, 0.0f);
         int p = components->player.order->head->value;
-        if (i != -1) {
-            EnemyComponent* enemy = EnemyComponent_get(components, i);
-            enemy->target = p;
-            enemy->state = ENEMY_INVESTIGATE;
+        EnemyComponent* enemy = EnemyComponent_get(components, i);
+        enemy->target = p;
+        // TODO: more aggresive on higher waves
+        enemy->state = ENEMY_INVESTIGATE;
+    }
+}
+
+
+void draw_spawners(sfRenderWindow* window, GameData data) {
+    for (int i = 0; i <= data.components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(data.components, i);
+        if (enemy && enemy->spawner) {
+            ColliderComponent* col = ColliderComponent_get(data.components, i);
+            sfColor color = get_color(1.0f, 0.0f, 1.0f, 0.25f);
+            sfVector2f pos = get_position(data.components, i);
+            float angle = get_angle(data.components, i);
+            draw_rectangle(window, data.components, data.camera, NULL, pos, col->width, col->height, angle, color);
+            draw_text(window, data.components, data.camera, NULL, pos, "spawner", sfMagenta);
         }
     }
 }

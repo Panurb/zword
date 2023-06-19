@@ -7,6 +7,11 @@
 #include "globals.h"
 
 
+typedef enum {
+    MODE_SURVIVAL
+} GameMode;
+
+
 typedef struct {
     sfTexture** textures;
     sfSoundBuffer** sounds;
@@ -22,6 +27,7 @@ typedef struct {
     sfSprite* shadow_sprite;
     sfVideoMode mode;
     ButtonText map_name;
+    GameMode game_mode;
 } GameData;
 
 

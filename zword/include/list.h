@@ -29,3 +29,5 @@ void List_clear(List* list);
 void List_delete(List* list);
 
 bool List_find(List* list, int value);
+
+ListNode* List_get(List* list, int index);

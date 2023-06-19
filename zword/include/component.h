@@ -86,7 +86,7 @@ typedef enum {
     GROUP_VEHICLES,
     GROUP_TREES,
     GROUP_ROADS,
-    GROUP_OBSTACLES,
+    GROUP_BARRIERS,
     GROUP_BULLETS,
     GROUP_LIGHTS,
     GROUP_CORPSES,
@@ -181,6 +181,7 @@ typedef enum {
 } EnemyState;
 
 typedef struct {
+    bool spawner;
     EnemyState state;
     float acceleration;
     int target;

@@ -64,6 +64,7 @@ static ButtonText tile_names[] = {
     "brick",
     "grass",
     "roof",
+    "spawner",
     "stone",
     "tiles",
     "water",
@@ -123,7 +124,7 @@ bool category_selected(ComponentData* components, int entity) {
             return false;
         }
     }
-    return false;
+    return true;
 }
 
 
@@ -308,6 +309,7 @@ void update_selections(GameData data) {
         if (!coord) continue;
         if (i == selection_box) continue;
         if (WidgetComponent_get(data.components, i)) continue;
+        if (CameraComponent_get(data.components, i)) continue;
         if (coord->parent != -1) continue;
 
         if (!category_selected(data.components, i)) {
@@ -681,6 +683,8 @@ void draw_editor(GameData data, sfRenderWindow* window) {
     }
 
     draw_waypoints(data.components, window, data.camera, waypoint_selected);
+
+    draw_spawners(window, data);
 
     draw_widgets(data.components, window, data.menu_camera);
 

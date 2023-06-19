@@ -6,6 +6,7 @@
 #include "component.h"
 #include "grid.h"
 #include "camera.h"
+#include "game.h"
 
 
 void update_enemies(ComponentData* component, ColliderGrid* grid, float time_step);
@@ -24,4 +25,8 @@ void draw_enemies(ComponentData* component, sfRenderWindow* window, int camera);
 
 void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range);
 
-void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera);
+void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height);
+
+void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int wave);
+
+void draw_spawners(sfRenderWindow* window, GameData data);
