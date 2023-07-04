@@ -22,6 +22,7 @@
 #include "animation.h"
 #include "door.h"
 #include "menu.h"
+#include "serialize.h"
 
 
 GameData create_game(sfVideoMode mode) {
@@ -62,18 +63,19 @@ void resize_game(GameData* data, sfVideoMode mode) {
 }
 
 
-void start_game(GameData data) {
-    ColliderGrid_clear(data.grid);
-    CameraComponent* cam = CameraComponent_get(data.components, data.camera);
+void start_game(GameData* data, Filename map_name) {
+    ColliderGrid_clear(data->grid);
+    CameraComponent* cam = CameraComponent_get(data->components, data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
-    ComponentData_clear(data.components);
-    data.camera = create_camera(data.components, mode);
+    ComponentData_clear(data->components);
+    data->camera = create_camera(data->components, mode);
+    data->menu_camera = create_camera(data->components, mode);
     create_pause_menu(data);
     // create_level(data.components, data.grid, data.seed);
-    test(data.components, data.grid);
-    init_grid(data.components, data.grid);
+    // test(data.components, data.grid);
+    load_game(data, map_name);
+    init_grid(data->components, data->grid);
 }
-
 
 
 void update_game_mode(GameData data, float time_step) {
@@ -126,10 +128,23 @@ void draw_game(GameData data, sfRenderWindow* window) {
 }
 
 
+void draw_parents(GameData data, sfRenderWindow* window) {
+    for (int i = 0; i < data.components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(data.components, i);
+        if (coord->parent != -1) {
+            sfVector2f start = get_position(data.components, i);
+            sfVector2f end = get_position(data.components, coord->parent);
+            draw_line(window, data.components, data.camera, NULL, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
+        }
+    }
+}
+
+
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     draw_colliders(data.components, window, data.camera);
     draw_waypoints(data.components, window, data.camera, true);
     draw_enemies(data.components, window, data.camera);
+    draw_parents(data, window);
     if (debug_level > 1) {
         draw_occupied_tiles(data.components, data.grid, window, data.camera);
     }

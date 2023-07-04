@@ -35,7 +35,7 @@ GameData create_game(sfVideoMode mode);
 
 void resize_game(GameData* data, sfVideoMode mode);
 
-void start_game(GameData data);
+void start_game(GameData* data, Filename map_name);
 
 void reset_game(GameData data);
 

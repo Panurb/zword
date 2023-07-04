@@ -85,7 +85,6 @@ void create_priest(ComponentData* components, sfVector2f pos, float angle) {
     enemy->walk_speed = 2.0f;
     enemy->run_speed = 2.0f;
     enemy->fov = 2.0f * M_PI;
-    enemy->vision_range = 15.0f;
     ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 200, "priest_dead", "blood", "");
@@ -205,6 +204,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
     for (int i = 0; i < components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(components, i);
         if (!enemy) continue;
+        if (enemy->spawner) continue;
 
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         PhysicsComponent* phys = PhysicsComponent_get(components, i);
@@ -376,6 +376,10 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, fl
                 List_add(spawners, i);
             }
         }
+    }
+
+    if (spawners && spawners->size == 0) {
+        return;
     }
 
     static float delay = 2.0;

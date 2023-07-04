@@ -43,7 +43,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             while (ammo->size > 0) {
                 sfVector2f pos = get_position(components, entity);
                 int k = create_ammo(components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
-                int size = fminf(AmmoComponent_get(components, k)->size, ammo->size);
+                int size = min(AmmoComponent_get(components, k)->size, ammo->size);
                 AmmoComponent* drop = AmmoComponent_get(components, k);
                 drop->size = size;
                 ammo->size -= size;

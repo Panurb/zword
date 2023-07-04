@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 
 #include <SFML/System.h>
 
@@ -92,6 +93,7 @@ void create_glass(ComponentData* components, sfVector2f pos, float angle) {
 
 
 int create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle, Filename filename) {
+    printf("%f, %f, %f, %f\n", pos.x, pos.y, width, height);
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, pos, angle);

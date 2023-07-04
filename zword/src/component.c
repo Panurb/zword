@@ -357,6 +357,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     enemy->attack_delay = 0.1f;
     enemy->attack_timer = enemy->attack_delay;
     enemy->turn_speed = 5.0f;
+    enemy->spawner = false;
 
     components->enemy[entity] = enemy;
 
@@ -935,6 +936,9 @@ void destroy_entity(ComponentData* components, int entity) {
 
 
 void destroy_entity_recursive(ComponentData* components, int entity) {
+    printf("DESTROY ");
+    PRINT(entity);
+    printf("\n");
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
         destroy_entity_recursive(components, node->value);

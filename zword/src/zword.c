@@ -42,6 +42,8 @@ sfRenderWindow* create_game_window(sfVideoMode* mode) {
 
 
 int main() {
+    setbuf(stdout, NULL);
+    
     load_settings();
 
     sfVideoMode mode = { game_settings.width, game_settings.height, 32 };
@@ -90,14 +92,6 @@ int main() {
                         } else if (game_state == STATE_PAUSE) {
                             game_state = STATE_GAME;
                         }
-                    } else if (event.key.code == sfKeyF5 || event.key.code == sfKeyF6) {
-                        if (event.key.code == sfKeyF6) {
-                            data.seed = time(NULL);
-                        }
-
-                        clear_sounds(channels);
-                        sfClock_restart(clock);
-                        start_game(data);
                     } else if (event.key.code == sfKeyF1) {
                         debug_level = (debug_level + 1) % 3; 
                     }
@@ -120,9 +114,9 @@ int main() {
                         update_menu(data, window);
                         break;
                     case STATE_START:
-                        start_game(data);
-                        // save_game(&data);
-                        // load_game(&data);
+                        get_map_name(&data, buffer);
+                        set_map_name(buffer);
+                        start_game(&data, buffer);
                         game_state = STATE_GAME;
                         break;
                     case STATE_GAME:

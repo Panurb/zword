@@ -2,4 +2,4 @@
 #include "util.h"
 
 
-GameState game_state = STATE_LOAD;
+GameState game_state = STATE_MENU;

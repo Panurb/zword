@@ -39,8 +39,8 @@ void change_state_create(ComponentData* components, int entity) {
 
 
 void change_state_start(ComponentData* components, int entity) {
-    UNUSED(components);
-    UNUSED(entity);
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    strcpy(map_name, widget->string);
     game_state = STATE_START;
 }
 
@@ -95,12 +95,12 @@ void toggle_play(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "NEW GAME", 2, toggle_play);
+    window_id = create_window(components, pos, "SURVIVAL", 1, toggle_play);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
     add_child(components, window_id, container);
 
-    add_button_to_container(components, container, "START", change_state_start);
+    add_files_to_container(components, container, "maps", change_state_start);
 }
 
 
@@ -200,7 +200,7 @@ void toggle_controls(ComponentData* components, int entity) {
 
 void create_menu(GameData data) {
     int container = create_container(data.components, vec(-20.0f, 0.0f), 1, 4);
-    add_button_to_container(data.components, container, "NEW GAME", toggle_play);
+    add_button_to_container(data.components, container, "SURVIVAL", toggle_play);
     add_button_to_container(data.components, container, "EDITOR", toggle_editor);
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
@@ -218,11 +218,11 @@ void destroy_menu(GameData data) {
 }
 
 
-void create_pause_menu(GameData data) {
-    int container = create_container(data.components, vec(-20.0f, 0.0f), 1, 3);
-    add_button_to_container(data.components, container, "RESUME", change_state_game);
-    add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
-    add_button_to_container(data.components, container, "QUIT", change_state_quit);
+void create_pause_menu(GameData* data) {
+    int container = create_container(data->components, vec(-20.0f, 0.0f), 1, 3);
+    add_button_to_container(data->components, container, "RESUME", change_state_game);
+    add_button_to_container(data->components, container, "SETTINGS", toggle_settings);
+    add_button_to_container(data->components, container, "QUIT", change_state_quit);
 }
 
 

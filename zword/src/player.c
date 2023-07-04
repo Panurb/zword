@@ -40,16 +40,18 @@ void create_player(ComponentData* components, sfVector2f pos, float angle) {
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100, "player_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
-    JointComponent_add(components, i, -1, 0.0f, 0.0f, INFINITY);
 
-    for (AmmoType type = AMMO_PISTOL; type <= AMMO_SHOTGUN; type++) {
-        int j = create_ammo(components, zeros(), type);
-        player->ammo[type] = j;
-        CoordinateComponent_get(components, j)->parent = i;
-        ColliderComponent_remove(components, j);
-        ImageComponent_get(components, j)->alpha = 0.0f;
-        AmmoComponent_get(components, j)->size = 0;
-    }
+    // TODO: why?
+    // JointComponent_add(components, i, -1, 0.0f, 0.0f, INFINITY);
+
+    // for (AmmoType type = AMMO_PISTOL; type <= AMMO_SHOTGUN; type++) {
+    //     int j = create_ammo(components, zeros(), type);
+    //     player->ammo[type] = j;
+    //     CoordinateComponent_get(components, j)->parent = i;
+    //     ColliderComponent_remove(components, j);
+    //     ImageComponent_get(components, j)->alpha = 0.0f;
+    //     AmmoComponent_get(components, j)->size = 0;
+    // }
 }
 
 

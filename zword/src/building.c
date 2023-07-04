@@ -13,6 +13,7 @@
 #include "image.h"
 #include "enemy.h"
 #include "object.h"
+#include "tile.h"
 
 
 void create_church(ComponentData* components, sfVector2f pos) {

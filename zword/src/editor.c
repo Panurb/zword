@@ -17,6 +17,7 @@
 #include "object.h"
 #include "animation.h"
 #include "tile.h"
+#include "enemy.h"
 
 
 typedef enum {
@@ -292,7 +293,7 @@ void destroy_selections(GameData* data) {
         if (ColliderComponent_get(data->components, i)) {
             clear_grid(data->components, data->grid, i);
         }
-        destroy_entity(data->components, i);
+        destroy_entity_recursive(data->components, i);
     }
     List_clear(selections);
 }
@@ -339,7 +340,7 @@ void update_selections(GameData data) {
 void save_map(ComponentData* components, int entity) {
     UNUSED(entity);
     cJSON* json = cJSON_CreateObject();
-    serialize_map(json, components, false);
+    serialize_map(json, components, true);
     save_json(json, "maps", map_name);
 }
 
