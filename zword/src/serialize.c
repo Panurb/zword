@@ -414,6 +414,31 @@ void HealthComponent_deserialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
+void SoundComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    SoundComponent* sound = SoundComponent_get(components, entity);
+    if (!sound) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Sound", json);
+    if (sound->hit_sound != '\0') {
+        cJSON_AddStringToObject(json, "hit_sound", sound->hit_sound);
+    }
+}
+
+
+void SoundComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Sound");
+    if (!json) return;
+
+    char hit_sound[] = "";
+    cJSON* hit_sound_json = cJSON_GetObjectItem(json, "hit_sound");
+    if (hit_sound_json) {
+        strcpy(hit_sound, hit_sound_json->valuestring);
+    }
+    SoundComponent_add(components, entity, hit_sound);
+}
+
+
 bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
         sfVector2f offset) {
     if (!CoordinateComponent_get(components, entity)) return false;
@@ -427,15 +452,22 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
 
     CoordinateComponent_serialize(json, components, entity, offset);
     ImageComponent_serialize(json, components, entity);
-    ColliderComponent_serialize(json, components, entity);
     PhysicsComponent_serialize(json, components, entity);
-    LightComponent_serialize(json, components, entity);
-    ParticleComponent_serialize(json, components, entity);
-    JointComponent_serialize(json, components, entity);
-    WaypointComponent_serialize(json, components, entity);
+    ColliderComponent_serialize(json, components, entity);
     PlayerComponent_serialize(json, components, entity);
+    LightComponent_serialize(json, components, entity);
     EnemyComponent_serialize(json, components, entity);
+    ParticleComponent_serialize(json, components, entity);
+    // TODO: vehicle
+    // TODO: weapon
+    // TODO: item
+    WaypointComponent_serialize(json, components, entity);
     HealthComponent_serialize(json, components, entity);
+    // TODO: road
+    SoundComponent_serialize(json, components, entity);
+    // TODO: ammo
+    // TODO: animation
+    JointComponent_serialize(json, components, entity);
 
     return true;
 }
@@ -455,15 +487,16 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
 
     CoordinateComponent_deserialize(entity_json, components, entity, offset, rotation);
     ImageComponent_deserialize(entity_json, components, entity);
-    ColliderComponent_deserialize(entity_json, components, entity);
     PhysicsComponent_deserialize(entity_json, components, entity);
-    LightComponent_deserialize(entity_json, components, entity);
-    ParticleComponent_deserialize(entity_json, components, entity);
-    JointComponent_deserialize(entity_json, components, entity);
-    WaypointComponent_deserialize(entity_json, components, entity);
+    ColliderComponent_deserialize(entity_json, components, entity);
     PlayerComponent_deserialize(entity_json, components, entity);
+    LightComponent_deserialize(entity_json, components, entity);
     EnemyComponent_deserialize(entity_json, components, entity);
+    ParticleComponent_deserialize(entity_json, components, entity);
+    WaypointComponent_deserialize(entity_json, components, entity);
     HealthComponent_deserialize(entity_json, components, entity);
+    SoundComponent_deserialize(entity_json, components, entity);
+    JointComponent_deserialize(entity_json, components, entity);
 
     return entity;
 }
@@ -596,7 +629,7 @@ void update_deserialized_ids(ComponentData* components, int ids[MAX_ENTITIES], i
         }
         player->vehicle = updated_id(player->vehicle, ids);
     }
-    
+
     EnemyComponent* enemy = EnemyComponent_get(components, id);
     if (enemy) {
         enemy->target = updated_id(enemy->target, ids);
