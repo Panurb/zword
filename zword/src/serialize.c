@@ -44,6 +44,14 @@ float deserialize_float(cJSON* json, char* name, float value) {
 }
 
 
+int updated_id(int id, int ids[MAX_ENTITIES]) {
+    if (id == -1) {
+        return -1;
+    }
+    return ids[id];
+}
+
+
 void CoordinateComponent_serialize(cJSON* entity_json, ComponentData* components, int entity,
         sfVector2f offset) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
@@ -466,26 +474,41 @@ void update_serialized_ids(cJSON* entities_json, int ids[MAX_ENTITIES]) {
     cJSON* entity;
     cJSON_ArrayForEach(entity, entities_json) {
         cJSON* coord_json = cJSON_GetObjectItem(entity, "Coordinate");
+
         cJSON* parent_json = cJSON_GetObjectItem(coord_json, "parent");
         if (parent_json) {
-            cJSON_SetNumberValue(parent_json, ids[parent_json->valueint]);
+            cJSON_SetNumberValue(parent_json, updated_id(parent_json->valueint, ids));
         }
+
         cJSON* joint_json = cJSON_GetObjectItem(entity, "Joint");
         if (joint_json) {
             int parent = cJSON_GetObjectItem(joint_json, "parent")->valueint;
-            if (parent != -1) {
-                cJSON_SetNumberValue(parent_json, ids[parent]);
+            cJSON_SetNumberValue(parent_json, updated_id(parent, ids));
+        }
+
+        cJSON* player_json = cJSON_GetObjectItem(entity, "Player");
+        if (player_json) {
+            cJSON* item;
+            cJSON_ArrayForEach(item, cJSON_GetObjectItem(player_json, "inventory")) {
+                int id = item->valueint;
+                cJSON_SetNumberValue(item, updated_id(id, ids));
+            }
+            cJSON* ammo;
+            cJSON_ArrayForEach(ammo, cJSON_GetObjectItem(player_json, "ammo")) {
+                int id = ammo->valueint;
+                cJSON_SetNumberValue(ammo, updated_id(id, ids));
             }
         }
+
         cJSON* enemy_json = cJSON_GetObjectItem(entity, "Enemy");
         if (enemy_json) {
             cJSON* target_json = cJSON_GetObjectItem(enemy_json, "target");
-            if (target_json && target_json->valueint != -1) {
-                cJSON_SetNumberValue(target_json, ids[target_json->valueint]);
+            if (target_json) {
+                cJSON_SetNumberValue(target_json, updated_id(target_json->valueint, ids));
             }
             cJSON* weapon_json = cJSON_GetObjectItem(enemy_json, "weapon");
-            if (weapon_json && weapon_json->valueint != -1) {
-                cJSON_SetNumberValue(weapon_json, ids[weapon_json->valueint]);
+            if (weapon_json) {
+                cJSON_SetNumberValue(weapon_json, updated_id(weapon_json->valueint, ids));
             }
         }
     }
@@ -551,24 +574,33 @@ cJSON* serialize_game(GameData* data, bool preserve_id) {
 void update_deserialized_ids(ComponentData* components, int ids[MAX_ENTITIES], int entity) {
     // Update parent ids to match new ids.
     int id = ids[entity];
+
     CoordinateComponent* coord = CoordinateComponent_get(components, id);
     if (coord->parent != -1) {
         coord->parent = ids[coord->parent];
         add_child(components, coord->parent, id);
     }
+
     JointComponent* joint = JointComponent_get(components, id);
     if (joint) {
-        joint->parent = ids[joint->parent];
+        joint->parent = updated_id(joint->parent, ids);
     }
-    // TODO: PlayerComponent inventory and ammo and vehicle
+
+    PlayerComponent* player = PlayerComponent_get(components, id);
+    if (player) {
+        for (int i = 0; i < player->inventory_size; i++) {
+            player->inventory[i] = updated_id(player->inventory[i], ids);
+        }
+        for (int i = 0; i < player->ammo_size; i++) {
+            player->ammo[i] = updated_id(player->ammo[i], ids);
+        }
+        player->vehicle = updated_id(player->vehicle, ids);
+    }
+    
     EnemyComponent* enemy = EnemyComponent_get(components, id);
     if (enemy) {
-        if (enemy->target != -1) {
-            enemy->target = ids[enemy->target];
-        }
-        if (enemy->weapon != -1) {
-            enemy->weapon = ids[enemy->weapon];
-        }
+        enemy->target = updated_id(enemy->target, ids);
+        enemy->weapon = updated_id(enemy->weapon, ids);
     }
 }
 
