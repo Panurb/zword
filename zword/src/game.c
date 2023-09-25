@@ -78,12 +78,36 @@ void start_game(GameData* data, Filename map_name) {
 }
 
 
-void update_game_mode(GameData data, float time_step) {
+void update_game_mode(GameData data, sfRenderWindow* window, float time_step) {
     static int wave = 0;
+    static int enemies = 0;
+    static float wave_delay = 10.0f;
 
     switch (data.game_mode) {
     case MODE_SURVIVAL:
-        spawn_enemies(data.components, data.grid, data.camera, time_step, wave);
+        if (wave_delay > 0.0f) {
+            // TODO: draw text
+            wave_delay -= time_step;
+            break;
+        }
+
+        if (enemies < 15 + wave * 5) {
+            enemies += spawn_enemies(data.components, data.grid, data.camera, time_step, 5 + wave);
+        } else {
+            bool enemies_alive = false;
+            for (int i = 0; i < data.components->entities; i++) {
+                EnemyComponent* enemy = EnemyComponent_get(data.components, i);
+                if (enemy && enemy->state != ENEMY_DEAD) {
+                    enemies_alive = true;
+                    break;
+                }
+            }
+            if (!enemies_alive) {
+                wave++;
+                PRINT(wave);
+                wave_delay = 10.0f;
+            }
+        }
         break;
     default:
         break;
@@ -111,7 +135,7 @@ void update_game(GameData data, sfRenderWindow* window, float time_step) {
 
     animate(data.components, time_step);
 
-    update_game_mode(data, time_step);
+    update_game_mode(data, window, time_step);
 }
 
 

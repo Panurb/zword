@@ -51,6 +51,6 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int i, int ent
 
 void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, float tile_width, float tile_height);
 
-sfVector2f snap_to_grid(sfVector2f vector);
+sfVector2f snap_to_grid(sfVector2f vector, float tile_width, float tile_height);
 
-sfVector2f snap_to_grid_center(sfVector2f vector);
+sfVector2f snap_to_grid_center(sfVector2f vector, float tile_width, float tile_height);

@@ -183,15 +183,15 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
 }
 
 
-sfVector2f snap_to_grid(sfVector2f vector) {
-    vector.x = TILE_WIDTH * roundf(vector.x / TILE_WIDTH);
-    vector.y = TILE_HEIGHT * roundf(vector.y / TILE_HEIGHT);
+sfVector2f snap_to_grid(sfVector2f vector, float tile_width, float tile_height) {
+    vector.x = tile_width * roundf(vector.x / tile_width);
+    vector.y = tile_height * roundf(vector.y / tile_height);
     return vector;
 }
 
 
-sfVector2f snap_to_grid_center(sfVector2f vector) {
-    vector.x = TILE_WIDTH * roundf((vector.x + 0.5f) / TILE_WIDTH) - 0.5f * TILE_WIDTH;
-    vector.y = TILE_HEIGHT * roundf((vector.y + 0.5f) / TILE_HEIGHT) - 0.5f * TILE_HEIGHT;
+sfVector2f snap_to_grid_center(sfVector2f vector, float tile_width, float tile_height) {
+    vector.x = tile_width * roundf((vector.x + 0.5f) / tile_width) - 0.5f * tile_width;
+    vector.y = tile_height * roundf((vector.y + 0.5f) / tile_height) - 0.5f * tile_height;
     return vector;
 }

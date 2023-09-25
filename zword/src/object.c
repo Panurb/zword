@@ -252,6 +252,9 @@ void create_object(ComponentData* components, Object object, sfVector2f position
     case OBJECT_ROCK:
         create_rock(components, position);
         break;
+    case OBJECT_TABLE:
+        create_table(components, position);
+        break;
     case OBJECT_TREE:
         create_tree(components, position);
         break;

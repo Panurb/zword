@@ -27,6 +27,6 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 
 void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height);
 
-void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int wave);
+int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int max_enemies);
 
 void draw_spawners(sfRenderWindow* window, GameData data);

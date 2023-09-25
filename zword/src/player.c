@@ -41,6 +41,11 @@ void create_player(ComponentData* components, sfVector2f pos, float angle) {
     HealthComponent_add(components, i, 100, "player_dead", "blood", "");
     SoundComponent_add(components, i, "squish");
 
+    int j = create_entity(components);
+    CoordinateComponent_add(components, j, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
+    ImageComponent_add(components, j, "", 0.0f, 0.0f, LAYER_WEAPONS);
+    player->arms = j;
+
     // TODO: why?
     // JointComponent_add(components, i, -1, 0.0f, 0.0f, INFINITY);
 

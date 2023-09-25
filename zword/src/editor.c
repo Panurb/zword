@@ -90,6 +90,7 @@ static ButtonText object_names[] = {
     "player",
     "priest",
     "rock",
+    "table",
     "tree",
     "waypoint",
     "zombie"
@@ -223,7 +224,7 @@ void toggle_prefabs(ComponentData* components, int entity) {
 
 void save_prefab(ComponentData* components, Filename filename) {
     sfVector2f center = get_selections_center(components);
-    center = snap_to_grid_center(center);
+    center = snap_to_grid_center(center, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     center = mult(-1.0f, center);
 
     cJSON* json = serialize_entities(components, selections, center);
@@ -484,10 +485,10 @@ void input_tool_select(GameData* data, sfEvent event) {
 
 void input_tool_tile(GameData* data, sfEvent event) {
     if (event.type == sfEvtMouseMoved) {
-        tile_end = snap_to_grid(mouse_world);
+        tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            tile_start = snap_to_grid(mouse_world);
+            tile_start = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
             tile_started = true;
         }
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
@@ -515,7 +516,8 @@ void input_tool_object(GameData* data, sfEvent event) {
     if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
             data->components->added_entities = List_create();
-            create_object(data->components, selected_object, snap_to_grid_center(mouse_world), 0.0f);
+            sfVector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+            create_object(data->components, selected_object, pos, 0.0f);
             ListNode* node;
             FOREACH(node, data->components->added_entities) {
                 if (ColliderComponent_get(data->components, node->value)) {
@@ -532,7 +534,8 @@ void input_tool_object(GameData* data, sfEvent event) {
 void input_tool_prefab(GameData* data, sfEvent event) {
     if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            load_prefab(data, prefab_name, snap_to_grid_center(mouse_world), 0.0f);
+            sfVector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+            load_prefab(data, prefab_name, pos, 0.0f);
         }
     }
 }
@@ -610,6 +613,8 @@ void draw_editor(GameData data, sfRenderWindow* window) {
     draw_grid(data.components, window, data.camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
 
     sfVector2f mouse_pos = screen_to_world(data.components, data.camera, sfMouse_getPosition((sfWindow*) window));
+    sfVector2f mouse_grid_center = snap_to_grid_center(mouse_pos, grid_sizes[grid_size_index], 
+        grid_sizes[grid_size_index]);
 
     switch(tool) {
         case TOOL_SELECT:
@@ -628,14 +633,14 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             break;
         case TOOL_TILE:
             if (tile_started) {
-                sfVector2f end = snap_to_grid(mouse_pos);
+                sfVector2f end = snap_to_grid(mouse_pos, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
                 float width = fabsf(end.x - tile_start.x);
                 float height = fabsf(end.y - tile_start.y);
                 sfVector2f pos = mult(0.5f, sum(end, tile_start));
                 draw_rectangle_outline(window, data.components, data.camera, NULL, pos, width, height, 0.0f, 0.05f, 
                     sfWhite);
             } else {
-                sfVector2f pos = snap_to_grid(mouse_pos);
+                sfVector2f pos = snap_to_grid(mouse_pos, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
                 draw_line(window, data.components, data.camera, NULL, vec(pos.x - 0.2f, pos.y), 
                     vec(pos.x + 0.2f, pos.y), 0.05f, sfWhite);
                 draw_line(window, data.components, data.camera, NULL, vec(pos.x, pos.y - 0.2f), 
@@ -643,11 +648,11 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             }
             break;
         case TOOL_OBJECT:
-            draw_rectangle_outline(window, data.components, data.camera, NULL, snap_to_grid_center(mouse_pos),
+            draw_rectangle_outline(window, data.components, data.camera, NULL, mouse_grid_center,
                 1.0f, 1.0f, 0.0f, 0.05f, sfWhite);
             break;
         case TOOL_PREFAB:
-            draw_rectangle_outline(window, data.components, data.camera, NULL, snap_to_grid_center(mouse_pos),
+            draw_rectangle_outline(window, data.components, data.camera, NULL, mouse_grid_center,
                 1.0f, 1.0f, 0.0f, 0.05f, sfWhite);
             break;
     }

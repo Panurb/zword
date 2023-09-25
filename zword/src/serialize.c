@@ -331,6 +331,7 @@ void PlayerComponent_serialize(cJSON* entity_json, ComponentData* components, in
         cJSON_AddItemToArray(ammo, item);
     }
     serialize_int(json, "state", player->state, PLAYER_ON_FOOT);
+    serialize_int(json, "arms", player->arms, -1);
 }
 
 void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
@@ -352,6 +353,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, 
         i++;
     }
     player->state = deserialize_int(json, "state", player->state);
+    player->arms = deserialize_int(json, "arms", player->arms);
 }
 
 
@@ -481,6 +483,7 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
         if (CoordinateComponent_get(components, entity)) {
             destroy_entity(components, entity);
         }
+        components->entities = max(entity, components->entities);
     } else {
         entity = create_entity(components);
     }
@@ -608,6 +611,12 @@ void update_deserialized_ids(ComponentData* components, int ids[MAX_ENTITIES], i
     // Update parent ids to match new ids.
     int id = ids[entity];
 
+    if (id == -1) {
+        return;
+    }
+
+    printf("%d -> %d\n", entity, id);
+
     CoordinateComponent* coord = CoordinateComponent_get(components, id);
     if (coord->parent != -1) {
         coord->parent = ids[coord->parent];
@@ -659,16 +668,22 @@ void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
     cJSON* entities = cJSON_GetObjectItem(json, "entities");
     cJSON* entity;
     int ids[MAX_ENTITIES];
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        ids[i] = -1;
+    }
     int i = 0;
     sfVector2f offset = zeros();
     cJSON_ArrayForEach(entity, entities) {
+        if (!preserve_id) {
+            i = cJSON_GetObjectItem(entity, "id")->valueint;
+        }
         ids[i] = deserialize_entity(entity, data->components, preserve_id, offset, 0.0f);
-        i++;
     }
 
+    PRINT(data->components->entities)
     if (!preserve_id) {
-        for (int i = 0; i < data->components->entities; i++) {
-            update_deserialized_ids(data->components, ids, i);
+        for (int j = 0; j < MAX_ENTITIES; j++) {
+            update_deserialized_ids(data->components, ids, j);
         }
     }
 }

@@ -284,7 +284,8 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                         sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, i) + angle);
                         HitInfo info = raycast(components, grid, pos, dir, 1.1f * ColliderComponent_get(components, i)->radius, GROUP_BULLETS);
 
-                        if (HealthComponent_get(components, info.entity)) {
+                        if (HealthComponent_get(components, info.entity) && 
+                                !EnemyComponent_get(components, info.entity)) {
                             enemy->state = ENEMY_ATTACK;
                             break;
                         }
@@ -366,7 +367,7 @@ void create_spawner(ComponentData* components, sfVector2f position, float angle,
 }
 
 
-void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int wave) {
+int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int max_enemies) {
     static List* spawners = NULL;
     if (!spawners) {
         spawners = List_create();
@@ -379,24 +380,18 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, fl
     }
 
     if (spawners && spawners->size == 0) {
-        return;
+        return 0;
     }
 
-    static float delay = 2.0;
+    static float delay = 2.0f;
     if (delay > 0.0f) {
         delay -= time_step;
     }
 
-    static int id = 0;
-    id = (id + 1) % 200;
-    if (id != 0) return;
-
-    int max_enemies = 10 + wave;
-
     int count = 0;
     for (int i = 0; i < components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(components, i);
-        if (enemy && enemy->state != ENEMY_DEAD) {
+        if (enemy && !enemy->spawner && enemy->state != ENEMY_DEAD) {
             count++;
         }
     }
@@ -409,7 +404,8 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, fl
         float x = randf(-1.0f, 1.0f);
         float y = randf(-1.0f, 1.0f);
 
-        sfVector2f pos = lin_comb(x, half_width(components, spawner), y, half_height(components, spawner));
+        sfVector2f pos = get_position(components, spawner);
+        pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
 
         // TODO: update grid?
         i = create_zombie(components, pos, 0.0f);
@@ -418,7 +414,11 @@ void spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, fl
         enemy->target = p;
         // TODO: more aggresive on higher waves
         enemy->state = ENEMY_INVESTIGATE;
+        delay = 2.0f;
+        return 1;
     }
+
+    return 0;
 }
 
 
