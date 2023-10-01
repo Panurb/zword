@@ -93,7 +93,7 @@ int main() {
                             game_state = STATE_GAME;
                         }
                     } else if (event.key.code == sfKeyF1) {
-                        debug_level = (debug_level + 1) % 3; 
+                        debug_level = (debug_level + 1) % 4; 
                     }
                 default:
                     if (game_state == STATE_EDITOR) {
@@ -119,6 +119,9 @@ int main() {
                         start_game(&data, buffer);
                         game_state = STATE_GAME;
                         break;
+                    case STATE_END:
+                        end_game(&data);
+                        game_state = STATE_MENU;
                     case STATE_GAME:
                         input(data.components, window, data.camera);
                         update_game(data, window, time_step);
@@ -174,6 +177,7 @@ int main() {
                 draw_menu(data, window);
                 break;
             case STATE_START:
+            case STATE_END:
                 draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
                 break;
             case STATE_GAME:

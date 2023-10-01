@@ -71,7 +71,10 @@ void CoordinateComponent_remove(ComponentData* components, int entity) {
         //     List_remove(CoordinateComponent_get(components, coord->parent)->children, entity);
         // }
         for (ListNode* node = coord->children->head; node; node = node->next) {
-            CoordinateComponent_get(components, node->value)->parent = -1;
+            CoordinateComponent* child = CoordinateComponent_get(components, node->value);
+            if (child) {
+                child->parent = -1;
+            }
         }
         List_delete(coord->children);
         free(coord);
@@ -974,4 +977,13 @@ float get_angle(ComponentData* components, int entity) {
     }
 
     return mod(angle, 2.0f * M_PI);
+}
+
+
+bool entity_exists(ComponentData* components, int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    if (coord) {
+        return false;
+    }
+    return true;
 }

@@ -346,6 +346,13 @@ void save_map(ComponentData* components, int entity) {
 }
 
 
+void quit(ComponentData* components, int entity) {
+    UNUSED(components);
+    UNUSED(entity);
+    game_state = STATE_END;
+}
+
+
 void create_editor_menu(GameData* data) {
     sfVector2f size = camera_size(data->components, data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
@@ -357,6 +364,8 @@ void create_editor_menu(GameData* data) {
     create_button(data->components, "PREFABS", pos, toggle_prefabs);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "SAVE", pos, save_map);
+    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "QUIT", pos, quit);
 }
 
 

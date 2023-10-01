@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <time.h>
+
 #include "game.h"
 #include "camera.h"
 #include "player.h"
@@ -6,8 +9,6 @@
 #include "collider.h"
 #include "physics.h"
 #include "util.h"
-#include <time.h>
-
 #include "image.h"
 #include "light.h"
 #include "grid.h"
@@ -78,6 +79,17 @@ void start_game(GameData* data, Filename map_name) {
 }
 
 
+void end_game(GameData* data) {
+    ColliderGrid_clear(data->grid);
+    CameraComponent* cam = CameraComponent_get(data->components, data->camera);
+    sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
+    ComponentData_clear(data->components);
+    data->camera = create_camera(data->components, mode);
+    data->menu_camera = create_camera(data->components, mode);
+    create_menu(*data);
+}
+
+
 void update_game_mode(GameData data, sfRenderWindow* window, float time_step) {
     static int wave = 0;
     static int enemies = 0;
@@ -104,7 +116,6 @@ void update_game_mode(GameData data, sfRenderWindow* window, float time_step) {
             }
             if (!enemies_alive) {
                 wave++;
-                PRINT(wave);
                 wave_delay = 10.0f;
             }
         }
@@ -164,12 +175,27 @@ void draw_parents(GameData data, sfRenderWindow* window) {
 }
 
 
+void draw_entities(GameData data, sfRenderWindow* window) {
+    char buffer[10];
+    for (int i = 0; i < data.components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(data.components, i);
+        if (!coord) continue;
+
+        snprintf(buffer, 10, "%d", i);
+        draw_text(window, data.components, data.camera, NULL, coord->position, buffer, sfWhite);
+    }
+}
+
+
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     draw_colliders(data.components, window, data.camera);
     draw_waypoints(data.components, window, data.camera, true);
     draw_enemies(data.components, window, data.camera);
     draw_parents(data, window);
     if (debug_level > 1) {
+        draw_entities(data, window);
+    }
+    if (debug_level > 2) {
         draw_occupied_tiles(data.components, data.grid, window, data.camera);
     }
 }

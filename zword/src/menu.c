@@ -19,6 +19,20 @@ int SOUND_ID = -1;
 int MUSIC_ID = -1;
 int MAP_NAME_ID = -1;
 static ButtonText map_name = "mansion";
+static int window_play = -1;
+static int window_new_map = -1;
+static int window_editor = -1;
+static int window_settings = -1;
+static int window_controls = -1;
+
+
+void reset_ids() {
+    window_play = -1;
+    window_new_map = -1;
+    window_editor = -1;
+    window_settings = -1;
+    window_controls = -1;
+}
 
 
 void get_map_name(GameData* data, ButtonText buffer) {
@@ -31,10 +45,19 @@ void get_map_name(GameData* data, ButtonText buffer) {
 }
 
 
+void change_state_end(ComponentData* components, int entity) {
+    UNUSED(components);
+    UNUSED(entity);
+    game_state = STATE_END;
+    reset_ids();
+}
+
+
 void change_state_create(ComponentData* components, int entity) {
     UNUSED(components);
     UNUSED(entity);
     game_state = STATE_CREATE;
+    reset_ids();
 }
 
 
@@ -42,6 +65,7 @@ void change_state_start(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     strcpy(map_name, widget->string);
     game_state = STATE_START;
+    reset_ids();
 }
 
 
@@ -49,6 +73,7 @@ void change_state_game(ComponentData* components, int entity) {
     UNUSED(components);
     UNUSED(entity);
     game_state = STATE_GAME;
+    reset_ids();
 }
 
 
@@ -56,6 +81,7 @@ void change_state_load(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     strcpy(map_name, widget->string);
     game_state = STATE_LOAD;
+    reset_ids();
 }
 
 
@@ -87,18 +113,17 @@ void apply(ComponentData* components, int entity) {
 
 void toggle_play(ComponentData* components, int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
+    if (window_play != -1) {
+        destroy_entity_recursive(components, window_play);
+        window_play = -1;
         return;
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "SURVIVAL", 1, toggle_play);
+    window_play = create_window(components, pos, "SURVIVAL", 1, toggle_play);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_id, container);
+    add_child(components, window_play, container);
 
     add_files_to_container(components, container, "maps", change_state_start);
 }
@@ -106,18 +131,17 @@ void toggle_play(ComponentData* components, int entity) {
 
 void toggle_new_map(ComponentData* components, int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
+    if (window_new_map != -1) {
+        destroy_entity_recursive(components, window_new_map);
+        window_new_map = -1;
         return;
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "NEW MAP", 2, toggle_new_map);
+    window_new_map = create_window(components, pos, "NEW MAP", 2, toggle_new_map);
 
     int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 2, 2);
-    add_child(components, window_id, container);
+    add_child(components, window_new_map, container);
 
     int label = create_label(components, "NAME", zeros());
     MAP_NAME_ID = create_textbox(components, zeros(), 1);
@@ -128,18 +152,17 @@ void toggle_new_map(ComponentData* components, int entity) {
 
 void toggle_editor(ComponentData* components, int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
+    if (window_editor != -1) {
+        destroy_entity_recursive(components, window_editor);
+        window_editor = -1;
         return;
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "EDITOR", 1, toggle_editor);
+    window_editor = create_window(components, pos, "EDITOR", 1, toggle_editor);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_id, container);
+    add_child(components, window_editor, container);
 
     add_button_to_container(components, container, "NEW MAP", toggle_new_map);
     add_files_to_container(components, container, "maps", change_state_load);
@@ -148,18 +171,17 @@ void toggle_editor(ComponentData* components, int entity) {
 
 void toggle_settings(ComponentData* components, int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
+    if (window_settings != -1) {
+        destroy_entity_recursive(components, window_settings);
+        window_settings = -1;
         return;
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "SETTINGS", 2, toggle_settings);
+    window_settings = create_window(components, pos, "SETTINGS", 2, toggle_settings);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
-    add_child(components, window_id, container);
+    add_child(components, window_settings, container);
 
     int label = create_label(components, "Resolution", zeros());
     RESOLUTION_ID = create_dropdown(components, zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
@@ -176,18 +198,17 @@ void toggle_settings(ComponentData* components, int entity) {
 
 void toggle_controls(ComponentData* components, int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
-        window_id = -1;
+    if (window_controls != -1) {
+        destroy_entity_recursive(components, window_controls);
+        window_controls = -1;
         return;
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, "CONTROLS", 2, toggle_controls);
+    window_controls = create_window(components, pos, "CONTROLS", 2, toggle_controls);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
-    add_child(components, window_id, container);
+    add_child(components, window_controls, container);
 
     for (int i = 0; i < 12; i++) {
         int label = create_label(components, ACTIONS[i], zeros());
@@ -222,7 +243,7 @@ void create_pause_menu(GameData* data) {
     int container = create_container(data->components, vec(-20.0f, 0.0f), 1, 3);
     add_button_to_container(data->components, container, "RESUME", change_state_game);
     add_button_to_container(data->components, container, "SETTINGS", toggle_settings);
-    add_button_to_container(data->components, container, "QUIT", change_state_quit);
+    add_button_to_container(data->components, container, "QUIT TO MENU", change_state_end);
 }
 
 

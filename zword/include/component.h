@@ -524,3 +524,5 @@ void ComponentData_clear(ComponentData* components);
 
 sfVector2f get_position(ComponentData* components, int i);
 float get_angle(ComponentData* components, int i);
+
+bool entity_exists(ComponentData* components, int entity);

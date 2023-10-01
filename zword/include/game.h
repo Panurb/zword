@@ -37,6 +37,8 @@ void resize_game(GameData* data, sfVideoMode mode);
 
 void start_game(GameData* data, Filename map_name);
 
+void end_game(GameData* data);
+
 void reset_game(GameData data);
 
 void update_game(GameData data, sfRenderWindow* window, float time_step);
