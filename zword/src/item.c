@@ -109,7 +109,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
                 image->alpha = 0.0f;
             }
             WeaponComponent* weapon = WeaponComponent_get(components, player->target);
-            if (weapon && weapon->ammo_type != AMMO_MELEE) {
+            if (weapon) {
                 image->alpha = 0.0f;
             }
         }

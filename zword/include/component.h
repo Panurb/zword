@@ -347,6 +347,7 @@ typedef struct {
     int current_frame;
     float timer;
     float framerate;
+    bool play_once;
 } AnimationComponent;
 
 typedef struct {

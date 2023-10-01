@@ -140,118 +140,123 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
     WeaponComponent* weapon = WeaponComponent_get(components, entity);
     int parent = CoordinateComponent_get(components, entity)->parent;
 
+    if (weapon->magazine == 0) {
+        reload(components, entity);
+        return;
+    }
+
+    if (weapon->cooldown != 0.0f) {
+        return;
+    }
+
     int akimbo = get_akimbo(components, entity);
+    weapon->cooldown = 1.0f / ((1 + akimbo) * weapon->fire_rate);
+    if (weapon->max_magazine != -1) {
+        weapon->magazine--;
+    }
 
-    if (weapon->magazine > 0) {
-        if (weapon->cooldown == 0.0f) {
-            weapon->cooldown = 1.0f / ((1 + akimbo) * weapon->fire_rate);
-            if (weapon->max_magazine != -1) {
-                weapon->magazine--;
-            }
+    PlayerComponent* player = PlayerComponent_get(components, parent);
+    if (player) {
+        AnimationComponent_get(components, player->arms)->framerate = 20.0f;
+    }
 
-            sfVector2f pos = get_position(components, parent);
+    sfVector2f pos = get_position(components, parent);
 
-            switch (weapon->ammo_type) {
-                case AMMO_MELEE: {
-                    HitInfo min_info;
-                    float min_dist = INFINITY;
-                    for (int i = 0; i < weapon->shots; i++) {
-                        float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
-                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                        HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+    switch (weapon->ammo_type) {
+        case AMMO_MELEE: {
+            HitInfo min_info;
+            float min_dist = INFINITY;
+            for (int i = 0; i < weapon->shots; i++) {
+                float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
+                sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
+                HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
-                        float d = dist(info.position, pos);
-                        if (d < min_dist) {
-                            min_info = info;
-                            min_dist = d;
-                        }
-                    }
-
-                    int dmg = weapon->damage;
-                    EnemyComponent* enemy = EnemyComponent_get(components, min_info.entity);
-                    if (enemy && enemy->state == ENEMY_IDLE) {
-                        dmg = 100;
-                    }
-                    damage(components, grid, min_info.entity, min_info.position, normalized(diff(min_info.position, pos)), dmg);
-                    if (min_info.entity != -1) {
-                        shake_camera(components, 0.0125f * weapon->damage);
-                    }
-                    break;
-                } case AMMO_ENERGY: {
-                    for (int i = 0; i < weapon->shots; i++) {
-                        float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-                        if (weapon->spread > 0.0f) {
-                            angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
-                        }
-                        sfVector2f vel = polar_to_cartesian(7.0f, get_angle(components, parent) + angle);
-                        create_energy(components, sum(get_position(components, entity), mult(1.0f / 14.0f, vel)), vel);
-                    }
-                    break;
-                } case AMMO_ROPE: {
-                    float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-                    sfVector2f dir = polar_to_cartesian(1.0f, get_angle(components, parent) + angle);
-                    HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
-
-                    int i = create_rope(components, info.position, get_position(components, parent));
-
-                    int j = rope_root(components, i);
-                    JointComponent_get(components, j)->parent = info.entity;
-                    // CoordinateComponent* coord = CoordinateComponent_get(components, j);
-                    // coord->parent = j;
-                    // coord->
-                    // PhysicsComponent_remove(components, j);
-
-                    damage(components, grid, info.entity, info.position, dir, weapon->damage);
-
-                    break;
-                } default: {
-                    ParticleComponent* particle = ParticleComponent_get(components, entity);
-                    for (int i = 0; i < weapon->shots; i++) {
-                        float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-                        if (weapon->spread > 0.0f) {
-                            angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
-                        }
-                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
-                        HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
-
-                        int dmg = weapon->damage;
-                        if (dot(info.normal, dir) < -0.99f) {
-                            dmg *= 2;
-                        }
-                        damage(components, grid, info.entity, info.position, dir, dmg);
-
-                        particle->angle = angle;
-                        if (info.entity) {
-                            particle->max_time = 0.9f * dist(pos, info.position) / particle->speed;
-                        } else {
-                            particle->max_time = weapon->range / particle->speed;
-                        }
-                        add_particles(components, entity, 1);
-                    }
-
-                    weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-                    if (PlayerComponent_get(components, parent)) {
-                        alert_enemies(components, grid, parent, weapon->sound_range);
-                    }
-
-                    LightComponent* light = LightComponent_get(components, entity);
-                    if (light) {
-                        light->brightness = light->max_brightness;
-                    }
-
-                    shake_camera(components, 0.025f * weapon->shots * weapon->damage);
+                float d = dist(info.position, pos);
+                if (d < min_dist) {
+                    min_info = info;
+                    min_dist = d;
                 }
             }
 
-            SoundComponent* sound = SoundComponent_get(components, entity);
-            if (sound) {
-                add_sound(components, entity, weapon->sound, 1.0f, 1.0f);
+            int dmg = weapon->damage;
+            EnemyComponent* enemy = EnemyComponent_get(components, min_info.entity);
+            if (enemy && enemy->state == ENEMY_IDLE) {
+                dmg = 100;
             }
+            damage(components, grid, min_info.entity, min_info.position, normalized(diff(min_info.position, pos)), dmg);
+            if (min_info.entity != -1) {
+                shake_camera(components, 0.0125f * weapon->damage);
+            }
+            break;
+        } case AMMO_ENERGY: {
+            for (int i = 0; i < weapon->shots; i++) {
+                float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
+                if (weapon->spread > 0.0f) {
+                    angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+                }
+                sfVector2f vel = polar_to_cartesian(7.0f, get_angle(components, parent) + angle);
+                create_energy(components, sum(get_position(components, entity), mult(1.0f / 14.0f, vel)), vel);
+            }
+            break;
+        } case AMMO_ROPE: {
+            float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
+            sfVector2f dir = polar_to_cartesian(1.0f, get_angle(components, parent) + angle);
+            HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+
+            int i = create_rope(components, info.position, get_position(components, parent));
+
+            int j = rope_root(components, i);
+            JointComponent_get(components, j)->parent = info.entity;
+            // CoordinateComponent* coord = CoordinateComponent_get(components, j);
+            // coord->parent = j;
+            // coord->
+            // PhysicsComponent_remove(components, j);
+
+            damage(components, grid, info.entity, info.position, dir, weapon->damage);
+
+            break;
+        } default: {
+            ParticleComponent* particle = ParticleComponent_get(components, entity);
+            for (int i = 0; i < weapon->shots; i++) {
+                float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
+                if (weapon->spread > 0.0f) {
+                    angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+                }
+                sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
+                HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+
+                int dmg = weapon->damage;
+                if (dot(info.normal, dir) < -0.99f) {
+                    dmg *= 2;
+                }
+                damage(components, grid, info.entity, info.position, dir, dmg);
+
+                particle->angle = angle;
+                if (info.entity) {
+                    particle->max_time = 0.9f * dist(pos, info.position) / particle->speed;
+                } else {
+                    particle->max_time = weapon->range / particle->speed;
+                }
+                add_particles(components, entity, 1);
+            }
+
+            weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
+            if (PlayerComponent_get(components, parent)) {
+                alert_enemies(components, grid, parent, weapon->sound_range);
+            }
+
+            LightComponent* light = LightComponent_get(components, entity);
+            if (light) {
+                light->brightness = light->max_brightness;
+            }
+
+            shake_camera(components, 0.025f * weapon->shots * weapon->damage);
         }
     }
-    
-    if (weapon->magazine == 0) {
-        reload(components, entity);
+
+    SoundComponent* sound = SoundComponent_get(components, entity);
+    if (sound) {
+        add_sound(components, entity, weapon->sound, 1.0f, 1.0f);
     }
 }
 

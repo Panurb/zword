@@ -747,6 +747,7 @@ AnimationComponent* AnimationComponent_add(ComponentData* components, int entity
     anim->current_frame = 0;
     anim->framerate = 10.0f;
     anim->timer = 0.0f;
+    anim->play_once = false;
 
     components->animation[entity] = anim;
     return anim;

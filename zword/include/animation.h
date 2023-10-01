@@ -2,6 +2,7 @@
 
 #include "component.h"
 
+int animation_frames(Filename image);
 
 void animate(ComponentData* components, float time_step);
 

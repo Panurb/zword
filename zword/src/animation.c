@@ -5,6 +5,19 @@
 #include "image.h"
 
 
+int animation_frames(Filename image) {
+    if (strcmp(image, "arms_axe") == 0) {
+        return 6;
+    } else if (strcmp(image, "big_boy") == 0) {
+        return 2;
+    } else if (strcmp(image, "boss_body") == 0) {
+        return 4;
+    }
+
+    return 1;
+}
+
+
 void animate(ComponentData* components, float time_step) {
     for (int i = 0; i < components->entities; i++) {
         AnimationComponent* animation = AnimationComponent_get(components, i);
@@ -30,11 +43,15 @@ void animate(ComponentData* components, float time_step) {
         }
         if (animation->current_frame >= animation->frames) {
             animation->current_frame = 0;
+            if (animation->play_once) {
+                animation->framerate = 0.0f;
+            }
         }
 
         ImageComponent* image = ImageComponent_get(components, i);
         int width = PIXELS_PER_UNIT * image->width;
-        sfIntRect rect = { animation->current_frame * width, 0, width, image->height * PIXELS_PER_UNIT };
+        int height = PIXELS_PER_UNIT * image->height;
+        sfIntRect rect = { animation->current_frame * width, 0, width, height };
         sfSprite_setTextureRect(image->sprite, rect);
     }
 }

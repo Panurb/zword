@@ -44,6 +44,9 @@ void create_player(ComponentData* components, sfVector2f pos, float angle) {
     int j = create_entity(components);
     CoordinateComponent_add(components, j, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
     ImageComponent_add(components, j, "", 0.0f, 0.0f, LAYER_WEAPONS);
+    AnimationComponent* animation = AnimationComponent_add(components, j, 1);
+    animation->play_once = true;
+    animation->framerate = 0.0f;
     player->arms = j;
 
     // TODO: why?
@@ -130,7 +133,7 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                     change_texture(components, player->arms, "arms_shotgun", 0.0f, 0.0f);
                     break;
                 default:
-                    change_texture(components, player->arms, "", 0.0f, 0.0f);
+                    change_texture(components, player->arms, "arms_axe", 2.0f, 2.0f);
                     break;
             }
         } else {

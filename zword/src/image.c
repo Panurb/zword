@@ -21,6 +21,7 @@ static const char* IMAGES[] = {
     "ammo_shotgun",
     "arms",
     "arms_assault_rifle",
+    "arms_axe",
     "arms_pistol",
     "arms_shotgun",
     "assault_rifle",
@@ -250,6 +251,9 @@ void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, T
 
 void change_texture(ComponentData* components, int entity, Filename filename, float width, float height) {
     ImageComponent* image = ImageComponent_get(components, entity);
+    if (strcmp(image->filename, filename) == 0) {
+        return;
+    }
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
@@ -258,6 +262,11 @@ void change_texture(ComponentData* components, int entity, Filename filename, fl
         image->alpha = 0.0f;
     } else {
         image->alpha = 1.0f;
+    }
+
+    AnimationComponent* animation = AnimationComponent_get(components, entity);
+    if (animation) {
+        animation->frames = animation_frames(filename);
     }
 }
 
