@@ -469,7 +469,8 @@ void VehicleComponent_remove(ComponentData* components, int entity) {
 
 
 WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots,
-                                     float spread, int magazine, float recoil, float range, float reload_time, AmmoType ammo_type, Filename sound) {
+                                     float spread, int magazine, float recoil, float range, float reload_time, 
+                                     AmmoType ammo_type, Filename sound) {
     WeaponComponent* weapon = malloc(sizeof(WeaponComponent));
     weapon->cooldown = 0.0;
     weapon->fire_rate = fire_rate;

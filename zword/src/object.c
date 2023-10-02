@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <string.h>
 
 #include <SFML/System.h>
 
@@ -13,6 +14,7 @@
 #include "collider.h"
 #include "navigation.h"
 #include "player.h"
+#include "weapon.h"
 
 
 void create_bench(ComponentData* components, sfVector2f position, float angle) {
@@ -202,69 +204,32 @@ void create_rock(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_object(ComponentData* components, Object object, sfVector2f position, float angle) {
-    switch (object) {
-    case OBJECT_BED:
-        create_bed(components, position, angle);
-        break;
-    case OBJECT_BENCH:
-        create_bench(components, position, angle);
-        break;
-    case OBJECT_BIG_BOY:
-        create_big_boy(components, position, angle);
-        break;
-    case OBJECT_BOSS:
-        create_boss(components, position, angle);
-        break;
-    case OBJECT_CANDLE:
-        create_candle(components, position);
-        break;
-    case OBJECT_CAR:
-        create_car(components, position, angle);
-        break;
-    case OBJECT_DESK:
-        create_desk(components, position, angle);
-        break;
-    case OBJECT_DOOR:
-        create_door(components, position, angle);
-        break;
-    case OBJECT_FARMER:
-        create_farmer(components, position, angle);
-        break;
-    case OBJECT_FLASHLIGHT:
-        create_flashlight(components, position);
-        break;
-    case OBJECT_GAS:
-        create_gas(components, position);
-        break;
-    case OBJECT_HAY_BALE:
-        create_hay_bale(components, position, angle);
-        break;
-    case OBJECT_LAMP:
-        create_lamp(components, position);
-        break;
-    case OBJECT_PLAYER:
-        create_player(components, position, angle);
-        break;
-    case OBJECT_PRIEST:
-        create_priest(components, position, angle);
-        break;
-    case OBJECT_ROCK:
-        create_rock(components, position);
-        break;
-    case OBJECT_TABLE:
-        create_table(components, position);
-        break;
-    case OBJECT_TREE:
-        create_tree(components, position);
-        break;
-    case OBJECT_WAYPOINT:
-        create_waypoint(components, position);
-        break;
-    case OBJECT_ZOMBIE:
-        create_zombie(components, position, angle);
-        break;
-    default:
-        break;
-    }
+void create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
+    #define MATCH(x) if (strcmp(x, object_name) == 0)
+
+    MATCH("bed") create_bed(components, position, angle);
+    MATCH("bench") create_bench(components, position, angle);
+    MATCH("big_boy") create_big_boy(components, position, angle);
+    MATCH("boss") create_boss(components, position, angle);
+    MATCH("candle") create_candle(components, position);
+    MATCH("car") create_car(components, position, angle);
+    MATCH("desk") create_desk(components, position, angle);
+    MATCH("door") create_door(components, position, angle);
+    MATCH("farmer") create_farmer(components, position, angle);
+    MATCH("flashlight") create_flashlight(components, position);
+    MATCH("gas") create_gas(components, position);
+    MATCH("hay_bale") create_hay_bale(components, position, angle);
+    MATCH("lamp") create_lamp(components, position);
+    MATCH("player") create_player(components, position, angle);
+    MATCH("priest") create_priest(components, position, angle);
+    MATCH("rock") create_rock(components, position);
+    MATCH("table") create_table(components, position);
+    MATCH("tree") create_tree(components, position);
+    MATCH("waypoint") create_waypoint(components, position);
+    MATCH("zombie") create_zombie(components, position, angle);
+
+    MATCH("assault_rifle") create_assault_rifle(components, position);
+    MATCH("axe") create_axe(components, position);
+    MATCH("pistol") create_pistol(components, position);
+    MATCH("shotgun") create_shotgun(components, position);
 }

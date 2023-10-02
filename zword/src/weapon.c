@@ -36,7 +36,7 @@ void reload(ComponentData* components, int i) {
 
     PlayerComponent* player = PlayerComponent_get(components, CoordinateComponent_get(components, i)->parent);
     AmmoComponent* ammo = AmmoComponent_get(components, player->ammo[weapon->ammo_type]);
-    if (ammo->size == 0) {
+    if (!ammo || ammo->size == 0) {
         return;
     }
 

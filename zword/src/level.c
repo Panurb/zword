@@ -236,6 +236,8 @@ void test(ComponentData* components, ColliderGrid* grid) {
     create_ammo(components, sum(start, rand_vector()), AMMO_RIFLE);
     create_ammo(components, sum(start, rand_vector()), AMMO_RIFLE);
     create_ammo(components, sum(start, rand_vector()), AMMO_RIFLE);
+    create_axe(components, sum(start, rand_vector()));
+    // create_big_boy(components, sum(start, vec(-3.0f, 1.0f)), 0.0f);
     // create_player(components, sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(components, sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
 }

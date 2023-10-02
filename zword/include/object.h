@@ -51,4 +51,4 @@ void create_tree(ComponentData* components, sfVector2f position);
 
 void create_rock(ComponentData* components, sfVector2f position);
 
-void create_object(ComponentData* components, Object object, sfVector2f position, float angle);
+void create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle);

@@ -72,7 +72,7 @@ static ButtonText tile_names[] = {
     "wood"
 };
 
-static int selected_object = 0;
+static ButtonText selected_object_name = "";
 static ButtonText object_names[] = {
     "bed",
     "bench",
@@ -94,6 +94,13 @@ static ButtonText object_names[] = {
     "tree",
     "waypoint",
     "zombie"
+};
+
+static ButtonText weapon_names[] = {
+    "assault_rifle",
+    "axe",
+    "pistol",
+    "shotgun"
 };
 
 
@@ -154,7 +161,7 @@ sfVector2f get_selections_center(ComponentData* components) {
 
 void select_object(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
-    selected_object = widget->value;
+    strcpy(selected_object_name, widget->string);
     tool = TOOL_OBJECT;
 }
 
@@ -202,6 +209,14 @@ void toggle_objects(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
     window_id = toggle_list_window(components, window_id, "OBJECTS", toggle_objects, object_names, LENGTH(object_names), 
+        select_object);
+}
+
+
+void toggle_weapons(ComponentData* components, int entity) {
+    UNUSED(entity);
+    static int window_id = -1;
+    window_id = toggle_list_window(components, window_id, "WEAPONS", toggle_weapons, weapon_names, LENGTH(weapon_names), 
         select_object);
 }
 
@@ -360,6 +375,8 @@ void create_editor_menu(GameData* data) {
     create_button(data->components, "TILES", pos, toggle_tiles);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "OBJECTS", pos, toggle_objects);
+    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "WEAPONS", pos, toggle_weapons);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "PREFABS", pos, toggle_prefabs);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
@@ -526,7 +543,7 @@ void input_tool_object(GameData* data, sfEvent event) {
         if (event.mouseButton.button == sfMouseLeft) {
             data->components->added_entities = List_create();
             sfVector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            create_object(data->components, selected_object, pos, 0.0f);
+            create_object(data->components, selected_object_name, pos, 0.0f);
             ListNode* node;
             FOREACH(node, data->components->added_entities) {
                 if (ColliderComponent_get(data->components, node->value)) {

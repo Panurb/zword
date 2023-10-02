@@ -73,7 +73,7 @@ void start_game(GameData* data, Filename map_name) {
     data->menu_camera = create_camera(data->components, mode);
     create_pause_menu(data);
     // create_level(data.components, data.grid, data.seed);
-    // test(data.components, data.grid);
+    // test(data->components, data->grid);
     load_game(data, map_name);
     init_grid(data->components, data->grid);
 }
