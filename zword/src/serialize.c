@@ -548,6 +548,33 @@ void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
+void AnimationComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    AnimationComponent* animation = AnimationComponent_get(components, entity);
+    if (!animation) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Animation", json);
+    cJSON_AddNumberToObject(json, "frames", animation->frames);
+    serialize_int(json, "current_frame", animation->current_frame, 0);
+    serialize_float(json, "framerate", animation->framerate, 10.0f);
+    serialize_float(json, "timer", animation->timer, 0.0f);
+    serialize_int(json, "play_once", animation->play_once, false);
+}
+
+
+void AnimationComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Animation");
+    if (!json) return;
+
+    int frames = cJSON_GetObjectItem(json, "frames")->valueint;
+    AnimationComponent* animation = AnimationComponent_add(components, entity, frames);
+    animation->current_frame = deserialize_int(json, "current_frame", animation->current_frame);
+    animation->framerate = deserialize_float(json, "framerate", animation->framerate);
+    animation->timer = deserialize_float(json, "timer", animation->timer);
+    animation->play_once = deserialize_int(json, "play_once", animation->play_once);
+}
+
+
 bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
         sfVector2f offset) {
     if (!CoordinateComponent_get(components, entity)) return false;
@@ -574,7 +601,7 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
     // TODO: road
     SoundComponent_serialize(json, components, entity);
     // TODO: ammo
-    // TODO: animation
+    AnimationComponent_serialize(json, components, entity);
     JointComponent_serialize(json, components, entity);
 
     return true;
@@ -607,13 +634,14 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
     WaypointComponent_deserialize(entity_json, components, entity);
     HealthComponent_deserialize(entity_json, components, entity);
     SoundComponent_deserialize(entity_json, components, entity);
+    AnimationComponent_deserialize(entity_json, components, entity);
     JointComponent_deserialize(entity_json, components, entity);
 
     return entity;
 }
 
 
-void update_serialized_ids(cJSON* entities_json, int ids[MAX_ENTITIES]) {
+void update_serialized_ids(int ids[MAX_ENTITIES]) {
     for (int i = 0; i < LENGTH(serialized_ids); i++) {
         cJSON* id_json = serialized_ids[i];
         cJSON_SetNumberValue(id_json, updated_id(id_json->valueint, ids));
@@ -638,7 +666,7 @@ cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
         }
     }
 
-    update_serialized_ids(entities_json, ids);
+    update_serialized_ids(ids);
 
     return json;
 }
@@ -663,7 +691,7 @@ void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
     }
 
     if (!preserve_id) {
-        update_serialized_ids(entities_json, ids);
+        update_serialized_ids(ids);
     }
 }
 
