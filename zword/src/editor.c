@@ -356,7 +356,7 @@ void update_selections(GameData data) {
 void save_map(ComponentData* components, int entity) {
     UNUSED(entity);
     cJSON* json = cJSON_CreateObject();
-    serialize_map(json, components, true);
+    serialize_map(json, components, false);
     save_json(json, "maps", map_name);
 }
 

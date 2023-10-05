@@ -32,7 +32,6 @@ void serialize_id(cJSON* json, char* name, int id) {
 void serialize_id_array(cJSON* json, char* name, int* array, int size) {
     cJSON* array_json = cJSON_AddArrayToObject(json, name);
     for (int i = 0; i < size; i++) {
-        PRINT(array[i])
         cJSON* item = cJSON_CreateNumber(array[i]);
         cJSON_AddItemToArray(array_json, item);
         for (int j = 0; j < MAX_ENTITIES; j++) {
@@ -50,6 +49,12 @@ void deserialize_id_array(cJSON* json, char* name, int* array) {
     cJSON* item;
     cJSON_ArrayForEach(item, cJSON_GetObjectItem(json, name)) {
         array[i] = item->valueint;
+        for (int j = 0; j < MAX_ENTITIES; j++) {
+            if (!deserialized_ids[j]) {
+                deserialized_ids[j] = &array[i];
+                break;
+            }
+        }
         i++;
     }
 }
@@ -383,7 +388,7 @@ void PlayerComponent_serialize(cJSON* entity_json, ComponentData* components, in
     serialize_id_array(json, "inventory", player->inventory, player->inventory_size);
     serialize_id_array(json, "ammo", player->ammo, player->ammo_size);
     serialize_int(json, "state", player->state, PLAYER_ON_FOOT);
-    serialize_int(json, "arms", player->arms, -1);
+    serialize_id(json, "arms", player->arms);
 }
 
 void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
@@ -396,7 +401,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, 
     deserialize_id_array(json, "inventory", player->inventory);
     deserialize_id_array(json, "ammo", player->ammo);
     player->state = deserialize_int(json, "state", player->state);
-    player->arms = deserialize_int(json, "arms", player->arms);
+    deserialize_id(json, "arms", &player->arms);
 }
 
 
@@ -516,14 +521,18 @@ void WeaponComponent_deserialize(cJSON* entity_json, ComponentData* components, 
     float damage = cJSON_GetObjectItem(json, "damage")->valuedouble;
     int shots = cJSON_GetObjectItem(json, "shots")->valueint;
     float spread = cJSON_GetObjectItem(json, "spread")->valuedouble;
+    int max_magazine = cJSON_GetObjectItem(json, "max_magazine")->valueint;
     int magazine = cJSON_GetObjectItem(json, "magazine")->valueint;
     float recoil = cJSON_GetObjectItem(json, "recoil")->valuedouble;
     float range = cJSON_GetObjectItem(json, "range")->valuedouble;
     float reload_time = cJSON_GetObjectItem(json, "reload_time")->valuedouble;
     int ammo_type = cJSON_GetObjectItem(json, "ammo_type")->valueint;
     char* sound = cJSON_GetObjectItem(json, "sound")->valuestring;
-    WeaponComponent_add(components, entity, fire_rate, damage, shots, spread, magazine, recoil, range, reload_time, 
-        ammo_type, sound);
+    bool automatic = cJSON_GetObjectItem(json, "automatic")->valueint;
+    WeaponComponent* weapon = WeaponComponent_add(components, entity, fire_rate, damage, shots, spread, max_magazine, 
+        recoil, range, reload_time, ammo_type, sound);
+    weapon->magazine = magazine;
+    weapon->automatic = automatic;
 }
 
 
@@ -644,12 +653,20 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
 void update_serialized_ids(int ids[MAX_ENTITIES]) {
     for (int i = 0; i < LENGTH(serialized_ids); i++) {
         cJSON* id_json = serialized_ids[i];
+        if (!id_json) {
+            break;
+        }
+        printf("%d -> %d\n", id_json->valueint, updated_id(id_json->valueint, ids));
         cJSON_SetNumberValue(id_json, updated_id(id_json->valueint, ids));
     }
 }
 
 
 cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        serialized_ids[i] = NULL;
+    }
+
     cJSON* json = cJSON_CreateObject();
 
     cJSON* entities_json = cJSON_CreateArray();
@@ -673,6 +690,10 @@ cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
 
 
 void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        serialized_ids[i] = NULL;
+    }
+
     cJSON* entities_json = cJSON_CreateArray();
     cJSON_AddItemToObject(json, "entities", entities_json);
 
@@ -709,12 +730,17 @@ void update_deserialized_ids(int ids[MAX_ENTITIES]) {
     for (int i = 0; i < LENGTH(deserialized_ids); i++) {
         int* id_ptr = deserialized_ids[i];
         if (!id_ptr) break;
+        printf("%d -> %d\n", *id_ptr, updated_id(*id_ptr, ids));
         *id_ptr = updated_id(*id_ptr, ids);
     }
 }
 
 
 void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float rotation) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        deserialized_ids[i] = NULL;
+    }
+
     cJSON* entities = cJSON_GetObjectItem(json, "entities");
     cJSON* entity;
     int ids[MAX_ENTITIES];
@@ -730,6 +756,10 @@ void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float 
 
 
 void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        deserialized_ids[i] = NULL;
+    }
+
     cJSON* entities = cJSON_GetObjectItem(json, "entities");
     cJSON* entity;
     int ids[MAX_ENTITIES];

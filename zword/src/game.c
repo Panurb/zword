@@ -166,7 +166,7 @@ void draw_game(GameData data, sfRenderWindow* window) {
 void draw_parents(GameData data, sfRenderWindow* window) {
     for (int i = 0; i < data.components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(data.components, i);
-        if (coord->parent != -1) {
+        if (coord && coord->parent != -1) {
             sfVector2f start = get_position(data.components, i);
             sfVector2f end = get_position(data.components, coord->parent);
             draw_line(window, data.components, data.camera, NULL, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
