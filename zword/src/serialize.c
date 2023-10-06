@@ -245,6 +245,7 @@ void LightComponent_serialize(cJSON* entity_json, ComponentData* components, int
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Light", json);
+    serialize_int(json, "enabled", light->enabled, true);
     cJSON_AddNumberToObject(json, "range", light->range);
     cJSON_AddNumberToObject(json, "angle", light->angle);
     cJSON_AddNumberToObject(json, "color_r", light->color.r);
@@ -269,6 +270,7 @@ void LightComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     float brightness = cJSON_GetObjectItem(json, "brightness")->valuedouble;
     float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
     LightComponent* light = LightComponent_add(components, entity, range, angle, color, brightness, speed);
+    light->enabled = deserialize_int(json, "enabled", light->enabled);
     light->flicker = deserialize_float(json, "flicker", light->flicker);
 }
 
@@ -584,6 +586,27 @@ void AnimationComponent_deserialize(cJSON* entity_json, ComponentData* component
 }
 
 
+void AmmoComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    AmmoComponent* ammo = AmmoComponent_get(components, entity);
+    if (!ammo) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Ammo", json);
+    cJSON_AddNumberToObject(json, "type", ammo->type);
+    cJSON_AddNumberToObject(json, "size", ammo->size);
+}
+
+
+void AmmoComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Ammo");
+    if (!json) return;
+
+    AmmoType type = cJSON_GetObjectItem(json, "type")->valueint;
+    AmmoComponent* ammo = AmmoComponent_add(components, entity, type);
+    ammo->size = cJSON_GetObjectItem(json, "size")->valueint;
+}
+
+
 bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
         sfVector2f offset) {
     if (!CoordinateComponent_get(components, entity)) return false;
@@ -609,7 +632,7 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
     HealthComponent_serialize(json, components, entity);
     // TODO: road
     SoundComponent_serialize(json, components, entity);
-    // TODO: ammo
+    AmmoComponent_serialize(json, components, entity);
     AnimationComponent_serialize(json, components, entity);
     JointComponent_serialize(json, components, entity);
 
@@ -643,6 +666,7 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
     WaypointComponent_deserialize(entity_json, components, entity);
     HealthComponent_deserialize(entity_json, components, entity);
     SoundComponent_deserialize(entity_json, components, entity);
+    AmmoComponent_deserialize(entity_json, components, entity);
     AnimationComponent_deserialize(entity_json, components, entity);
     JointComponent_deserialize(entity_json, components, entity);
 
@@ -843,7 +867,6 @@ void load_game(GameData* data, ButtonText map_name) {
     if (json) {
         deserialize_game(json, data, false);
         cJSON_Delete(json);
-        init_grid(data->components, data->grid);
         strcpy(data->map_name, map_name);
     }
 }

@@ -224,8 +224,6 @@ void test(ComponentData* components, ColliderGrid* grid) {
         }
     }
 
-    init_grid(components, grid);
-
     sfVector2f start = zeros();
     create_mansion(components, start);
     // create_school(components, start);

@@ -97,6 +97,9 @@ static ButtonText object_names[] = {
 };
 
 static ButtonText weapon_names[] = {
+    "ammo_pistol",
+    "ammo_rifle",
+    "ammo_shotgun",
     "assault_rifle",
     "axe",
     "pistol",

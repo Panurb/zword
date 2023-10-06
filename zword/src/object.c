@@ -228,6 +228,9 @@ void create_object(ComponentData* components, ButtonText object_name, sfVector2f
     MATCH("waypoint") create_waypoint(components, position);
     MATCH("zombie") create_zombie(components, position, angle);
 
+    MATCH("ammo_pistol") create_ammo(components, position, AMMO_PISTOL);
+    MATCH("ammo_rifle") create_ammo(components, position, AMMO_RIFLE);
+    MATCH("ammo_shotgun") create_ammo(components, position, AMMO_SHOTGUN);
     MATCH("assault_rifle") create_assault_rifle(components, position);
     MATCH("axe") create_axe(components, position);
     MATCH("pistol") create_pistol(components, position);
