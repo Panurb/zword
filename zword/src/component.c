@@ -937,9 +937,6 @@ void destroy_entity(ComponentData* components, int entity) {
 
 
 void destroy_entity_recursive(ComponentData* components, int entity) {
-    printf("DESTROY ");
-    PRINT(entity);
-    printf("\n");
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
         destroy_entity_recursive(components, node->value);

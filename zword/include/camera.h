@@ -47,4 +47,4 @@ bool on_screen(ComponentData* components, int camera, sfVector2f position, float
 
 void shake_camera(ComponentData* components, float speed);
 
-void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera);
+void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera, float alpha);

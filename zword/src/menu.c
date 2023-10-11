@@ -263,3 +263,9 @@ void draw_menu(GameData data, sfRenderWindow* window) {
     sfVector2f pos = screen_to_world(data.components, data.menu_camera, sfMouse_getPosition((sfWindow*) window));
     draw_circle(window, data.components, data.menu_camera, NULL, pos, 0.1f, sfWhite);
 }
+
+
+void create_game_over_menu(GameData data) {
+    create_button(data.components, "Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_start);
+    create_button(data.components, "Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+}

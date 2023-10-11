@@ -37,7 +37,7 @@ void create_sink(ComponentData* components, sfVector2f position, float angle);
 
 void create_toilet(ComponentData* components, sfVector2f position, float angle);
 
-void create_bed(ComponentData* components, sfVector2f position, float angle);
+int create_bed(ComponentData* components, sfVector2f position, float angle);
 
 void create_candle(ComponentData* components, sfVector2f pos);
 
@@ -51,4 +51,4 @@ void create_tree(ComponentData* components, sfVector2f position);
 
 void create_rock(ComponentData* components, sfVector2f position);
 
-void create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle);
+int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle);

@@ -26,6 +26,23 @@
 #include "serialize.h"
 
 
+static float game_over_timer = 0.0f;
+
+// Survival
+static int wave = 1;
+static int enemies = 0;
+static float wave_delay = 5.0f;
+
+
+
+void change_state_game_over(GameData data) {
+    game_over_timer = 2.0f;
+    game_state = STATE_GAME_OVER;
+    destroy_menu(data);
+    create_game_over_menu(data);
+}
+
+
 GameData create_game(sfVideoMode mode) {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
@@ -89,39 +106,68 @@ void end_game(GameData* data) {
     create_menu(*data);
 }
 
-
-void update_game_mode(GameData data, sfRenderWindow* window, float time_step) {
-    static int wave = 0;
-    static int enemies = 0;
-    static float wave_delay = 10.0f;
-
-    switch (data.game_mode) {
-    case MODE_SURVIVAL:
-        if (wave_delay > 0.0f) {
-            // TODO: draw text
-            wave_delay -= time_step;
+void update_survival(GameData data, float time_step) {    
+    bool players_alive = false;
+    ListNode* node;
+    FOREACH(node, data.components->player.order) {
+        if (PlayerComponent_get(data.components, node->value)->state != PLAYER_DEAD) {
+            players_alive = true;
             break;
         }
+    }
+    if (!players_alive) {
+        change_state_game_over(data);
+    }
 
-        if (enemies < 15 + wave * 5) {
-            enemies += spawn_enemies(data.components, data.grid, data.camera, time_step, 5 + wave);
-        } else {
-            bool enemies_alive = false;
-            for (int i = 0; i < data.components->entities; i++) {
-                EnemyComponent* enemy = EnemyComponent_get(data.components, i);
-                if (enemy && enemy->state != ENEMY_DEAD) {
-                    enemies_alive = true;
-                    break;
-                }
-            }
-            if (!enemies_alive) {
-                wave++;
-                wave_delay = 10.0f;
+    if (wave_delay > 0.0f) {
+        wave_delay -= time_step;
+        return;
+    }
+
+    if (enemies < 10 + wave * 5) {
+        enemies += spawn_enemies(data.components, data.grid, data.camera, time_step, 4 + wave);
+    } else {
+        bool enemies_alive = false;
+        for (int i = 0; i < data.components->entities; i++) {
+            EnemyComponent* enemy = EnemyComponent_get(data.components, i);
+            if (enemy && !enemy->spawner && enemy->state != ENEMY_DEAD) {
+                enemies_alive = true;
+                break;
             }
         }
-        break;
-    default:
-        break;
+        if (!enemies_alive) {
+            wave++;
+            wave_delay = 5.0f;
+            enemies = 0;
+        }
+    }
+}
+
+
+void update_game_mode(GameData data, sfRenderWindow* window, float time_step) {
+    UNUSED(window);
+
+    switch (data.game_mode) {
+        case MODE_SURVIVAL:
+            update_survival(data, time_step);
+            break;
+        default:
+            break;
+    }
+}
+
+
+void draw_game_mode(GameData data, sfRenderWindow* window) {
+    switch (data.game_mode) {
+        case MODE_SURVIVAL:
+            if (wave_delay > 0.0f) {
+                char buffer[256];
+                snprintf(buffer, 256, "WAVE %d", wave);
+                draw_text(window, data.components, data.menu_camera, NULL, zeros(), buffer, sfWhite);
+            }
+            break;
+        default:
+            break;
     }
 }
 
@@ -197,5 +243,23 @@ void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     }
     if (debug_level > 2) {
         draw_occupied_tiles(data.components, data.grid, window, data.camera);
+    }
+}
+
+
+void update_game_over(GameData data, sfRenderWindow* window, float time_step) {
+    update_menu(data, window);
+    game_over_timer = fmaxf(game_over_timer - time_step, 0.0f);
+}
+
+
+void draw_game_over(GameData data, sfRenderWindow* window) {
+    draw_game(data, window);
+    float alpha = 1.0f - game_over_timer / 2.0f;
+    draw_overlay(window, data.components, data.menu_camera, alpha);
+    sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
+    draw_text(window, data.components, data.menu_camera, NULL, zeros(), "GAME OVER", color);
+    if (alpha == 1.0f) {
+        draw_menu(data, window);
     }
 }

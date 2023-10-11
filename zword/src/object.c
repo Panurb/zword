@@ -112,7 +112,7 @@ void create_toilet(ComponentData* components, sfVector2f position, float angle) 
 }
 
 
-void create_bed(ComponentData* components, sfVector2f position, float angle) {
+int create_bed(ComponentData* components, sfVector2f position, float angle) {
     int i = create_entity(components);
 
     CoordinateComponent_add(components, i, position, angle);
@@ -120,6 +120,8 @@ void create_bed(ComponentData* components, sfVector2f position, float angle) {
     ColliderComponent_add_rectangle(components, i, 3.8f, 1.8f, GROUP_WALLS);
     ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(components, i, "wood_hit");
+
+    return i;
 }
 
 
@@ -204,35 +206,35 @@ void create_rock(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
+int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
-    MATCH("bed") create_bed(components, position, angle);
-    MATCH("bench") create_bench(components, position, angle);
-    MATCH("big_boy") create_big_boy(components, position, angle);
-    MATCH("boss") create_boss(components, position, angle);
-    MATCH("candle") create_candle(components, position);
-    MATCH("car") create_car(components, position, angle);
-    MATCH("desk") create_desk(components, position, angle);
-    MATCH("door") create_door(components, position, angle);
-    MATCH("farmer") create_farmer(components, position, angle);
-    MATCH("flashlight") create_flashlight(components, position);
-    MATCH("gas") create_gas(components, position);
-    MATCH("hay_bale") create_hay_bale(components, position, angle);
-    MATCH("lamp") create_lamp(components, position);
-    MATCH("player") create_player(components, position, angle);
-    MATCH("priest") create_priest(components, position, angle);
-    MATCH("rock") create_rock(components, position);
-    MATCH("table") create_table(components, position);
-    MATCH("tree") create_tree(components, position);
-    MATCH("waypoint") create_waypoint(components, position);
-    MATCH("zombie") create_zombie(components, position, angle);
+    MATCH("bed") return create_bed(components, position, angle);
+    // MATCH("bench") return create_bench(components, position, angle);
+    // MATCH("big boy") return create_big_boy(components, position, angle);
+    // MATCH("boss") return create_boss(components, position, angle);
+    // MATCH("candle") return create_candle(components, position);
+    // MATCH("car") return create_car(components, position, angle);
+    // MATCH("desk") return create_desk(components, position, angle);
+    // MATCH("door") return create_door(components, position, angle);
+    // MATCH("farmer") return create_farmer(components, position, angle);
+    // MATCH("flashlight") return create_flashlight(components, position);
+    // MATCH("gas") return create_gas(components, position);
+    // MATCH("hay bale") return create_hay_bale(components, position, angle);
+    // MATCH("lamp") return create_lamp(components, position);
+    // MATCH("player") return create_player(components, position, angle);
+    // MATCH("priest") return create_priest(components, position, angle);
+    // MATCH("rock") return create_rock(components, position);
+    // MATCH("table") return create_table(components, position);
+    // MATCH("tree") return create_tree(components, position);
+    MATCH("waypoint") return create_waypoint(components, position);
+    // MATCH("zombie") return create_zombie(components, position, angle);
 
-    MATCH("ammo_pistol") create_ammo(components, position, AMMO_PISTOL);
-    MATCH("ammo_rifle") create_ammo(components, position, AMMO_RIFLE);
-    MATCH("ammo_shotgun") create_ammo(components, position, AMMO_SHOTGUN);
-    MATCH("assault_rifle") create_assault_rifle(components, position);
-    MATCH("axe") create_axe(components, position);
-    MATCH("pistol") create_pistol(components, position);
-    MATCH("shotgun") create_shotgun(components, position);
+    MATCH("ammo pistol") return create_ammo(components, position, AMMO_PISTOL);
+    MATCH("ammorifle") return create_ammo(components, position, AMMO_RIFLE);
+    MATCH("ammo shotgun") return create_ammo(components, position, AMMO_SHOTGUN);
+    MATCH("assault rifle") return create_assault_rifle(components, position);
+    MATCH("axe") return create_axe(components, position);
+    MATCH("pistol") return create_pistol(components, position);
+    MATCH("shotgun") return create_shotgun(components, position);
 }

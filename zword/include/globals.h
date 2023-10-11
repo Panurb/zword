@@ -12,7 +12,8 @@ typedef enum {
     STATE_CREATE,
     STATE_LOAD,
     STATE_EDITOR,
-    STATE_QUIT
+    STATE_QUIT,
+    STATE_GAME_OVER
 } GameState;
 
 

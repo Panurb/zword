@@ -414,6 +414,9 @@ int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, flo
         enemy->target = p;
         // TODO: more aggresive on higher waves
         enemy->state = ENEMY_INVESTIGATE;
+        if (randf(0.0f, 1.0f) < 0.5f) {
+            enemy->state = ENEMY_CHASE;
+        }
         delay = 2.0f;
         return 1;
     }

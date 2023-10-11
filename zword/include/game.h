@@ -46,3 +46,7 @@ void update_game(GameData data, sfRenderWindow* window, float time_step);
 void draw_game(GameData data, sfRenderWindow* window);
 
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level);
+
+void update_game_over(GameData data, sfRenderWindow* window, float time_step);
+
+void draw_game_over(GameData data, sfRenderWindow* window);

@@ -122,6 +122,7 @@ int main() {
                     case STATE_END:
                         end_game(&data);
                         game_state = STATE_MENU;
+                        break;
                     case STATE_GAME:
                         input(data.components, window, data.camera);
                         update_game(data, window, time_step);
@@ -161,6 +162,9 @@ int main() {
                     case STATE_EDITOR:
                         update_editor(data, window, time_step);
                         break;
+                    case STATE_GAME_OVER:
+                        update_game_over(data, window, time_step);
+                        break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);
                         break;
@@ -178,23 +182,28 @@ int main() {
                 break;
             case STATE_START:
             case STATE_END:
-                draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
+                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", sfWhite);
                 break;
             case STATE_GAME:
                 draw_game(data, window);
                 draw_hud(data.components, window, data.camera);
+                draw_game_mode(data, window);
                 break;
             case STATE_PAUSE:
                 draw_game(data, window);
-                draw_overlay(window, data.components, data.camera);
+                draw_overlay(window, data.components, data.camera, 0.4f);
                 draw_menu(data, window);
                 break;
             case STATE_LOAD:
-                draw_text(window, data.components, data.camera, NULL, zeros(), "LOADING", sfWhite);
+                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", sfWhite);
                 break;
             case STATE_EDITOR:
                 data.ambient_light = 0.8f;
                 draw_editor(data, window);
+                break;
+            case STATE_GAME_OVER:
+                draw_game_over(data, window);
+                break;
             default:
                 break;
         }
