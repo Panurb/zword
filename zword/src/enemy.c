@@ -407,6 +407,10 @@ int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, flo
         sfVector2f pos = get_position(components, spawner);
         pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
 
+        if (on_screen(components, camera, pos, 2.0f, 2.0f)) {
+            return 0;
+        }
+
         // TODO: update grid?
         i = create_zombie(components, pos, 0.0f);
         int p = components->player.order->head->value;

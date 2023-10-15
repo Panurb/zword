@@ -39,7 +39,6 @@ typedef enum {
 
 typedef struct {
     bool texture_changed;
-    float outline;
     Filename filename;
     float width;
     float height;
@@ -155,6 +154,7 @@ typedef struct {
     int ammo[4];
     sfCircleShape* crosshair;
     int arms;
+    int money;
 } PlayerComponent;
 
 typedef struct {
@@ -196,6 +196,7 @@ typedef struct {
     float attack_delay;
     float attack_timer;
     float turn_speed;
+    int bounty;
 } EnemyComponent;
 
 typedef enum ParticleType {
@@ -280,6 +281,8 @@ typedef struct {
 typedef struct {
     int attachments[5];
     int size;
+    int price;
+    ButtonText name;
 } ItemComponent;
 
 typedef struct {
@@ -470,7 +473,7 @@ WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, floa
 WeaponComponent* WeaponComponent_get(ComponentData* components, int entity);
 void WeaponComponent_remove(ComponentData* components, int entity);
 
-ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size);
+ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size, int price, ButtonText name);
 ItemComponent* ItemComponent_get(ComponentData* components, int entity);
 void ItemComponent_remove(ComponentData* components, int entity);
 

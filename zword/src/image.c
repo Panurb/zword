@@ -208,27 +208,6 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
 }
 
 
-void draw_outlines(ComponentData* components, sfRenderWindow* window, int camera) {
-    for (ListNode* node = components->image.order->head; node; node = node->next) {
-        int i = node->value;
-        ImageComponent* image = ImageComponent_get(components, i);
-        if (image->layer == LAYER_ROOFS) break;
-
-        sfVector2f pos = get_position(components, i);
-
-        float r = 2.0 * image->scale.x * sqrtf(image->width * image->width + image->height * image->height);
-        if (!on_screen(components, camera, pos, r, r)) {
-            continue;
-        }
-
-        if (image->outline > 0.0f) {
-            sfShader_setFloatUniform(CameraComponent_get(components, camera)->shaders[1], "offset", image->outline);
-            draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 1);
-        }
-    }
-}
-
-
 void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
     for (ListNode* node = components->image.order->head; node; node = node->next) {
         int i = node->value;

@@ -1,8 +1,11 @@
+#include <stdio.h>
+
 #include "component.h"
 #include "grid.h"
 #include "util.h"
 #include "image.h"
 #include "weapon.h"
+#include "game.h"
 
 
 void create_flashlight(ComponentData* components, sfVector2f position) {
@@ -13,7 +16,7 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 100, "Flashlight");
     LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
 }
 
@@ -26,7 +29,7 @@ void create_gas(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 0, "");
 }
 
 
@@ -74,9 +77,16 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     if (player->target == -1) {
         return;
     }
+    
+    ItemComponent* item = ItemComponent_get(components, player->target);
+    if (item->price > player->money) {
+        return;
+    }
+    player->money -= item->price;
+    item->price = 0;
 
     clear_grid(components, grid, player->target);
-    
+
     CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
     ImageComponent* image = ImageComponent_get(components, player->target);
     AmmoComponent* ammo = AmmoComponent_get(components, player->target);
@@ -88,7 +98,6 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             coord->angle = 0.0f;
             player->ammo[ammo->type] = player->target;
             image->alpha = 0.0f;
-            image->outline = 0.0f;
             ColliderComponent_get(components, player->target)->enabled = false;
         } else {
             AmmoComponent_get(components, i)->size += ammo->size;
@@ -104,7 +113,6 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             coord->angle = 0.0f;
             ColliderComponent_get(components, player->target)->enabled = false;
             change_layer(components, player->target, LAYER_WEAPONS);
-            image->outline = 0.0f;
             if (player->item != i) {
                 image->alpha = 0.0f;
             }
@@ -143,4 +151,32 @@ void drop_item(ComponentData* components, int entity) {
         ImageComponent_get(components, i)->alpha = 1.0f;
         ColliderComponent_get(components, i)->enabled = true;
     }
+}
+
+
+void draw_items(GameData* data, sfRenderWindow* window) {
+    sfText* text = sfText_create();
+    ListNode* node;
+    FOREACH(node, data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(data->components, node->value);
+        if (player->target == -1) continue;
+        ItemComponent* item = ItemComponent_get(data->components, player->target);
+        ImageComponent* image = ImageComponent_get(data->components, player->target);
+
+        sfShader_setFloatUniform(CameraComponent_get(data->components, data->camera)->shaders[1], "offset", 0.05f);
+        sfVector2f pos = get_position(data->components, player->target);
+        float angle = get_angle(data->components, player->target);
+        draw_sprite(window, data->components, data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
+
+        if (item && item->price != 0) {
+            pos = sum(pos, vec(0.0f, 1.0f));
+            char buffer[256];
+            snprintf(buffer, 256, "%d", item->price);
+            draw_text(window, data->components, data->camera, text, pos, buffer, sfYellow);
+
+            pos = sum(pos, vec(0.0f, 1.0f));
+            draw_text(window, data->components, data->camera, text, pos, item->name, sfYellow);
+        }
+    }
+    sfText_destroy(text);
 }

@@ -84,7 +84,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
 
             for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
                 int j = node->value;
-                damage(components, grid, j, get_position(components, i), zeros(), 20);
+                damage(components, grid, j, get_position(components, i), zeros(), 20, -1);
             }
             
             if (phys->collision.entities->size > 0) {
@@ -183,7 +183,8 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             if (enemy && enemy->state == ENEMY_IDLE) {
                 dmg = 100;
             }
-            damage(components, grid, min_info.entity, min_info.position, normalized(diff(min_info.position, pos)), dmg);
+            sfVector2f dir = normalized(diff(min_info.position, pos));
+            damage(components, grid, min_info.entity, min_info.position, dir, dmg, parent);
             if (min_info.entity != -1) {
                 shake_camera(components, 0.0125f * weapon->damage);
             }
@@ -212,7 +213,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
             // coord->
             // PhysicsComponent_remove(components, j);
 
-            damage(components, grid, info.entity, info.position, dir, weapon->damage);
+            damage(components, grid, info.entity, info.position, dir, weapon->damage, parent);
 
             break;
         } default: {
@@ -229,7 +230,7 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
                 if (dot(info.normal, dir) < -0.99f) {
                     dmg *= 2;
                 }
-                damage(components, grid, info.entity, info.position, dir, dmg);
+                damage(components, grid, info.entity, info.position, dir, dmg, parent);
 
                 particle->angle = angle;
                 if (info.entity) {
@@ -288,13 +289,13 @@ void update_weapons(ComponentData* components, float time_step) {
 int create_pistol(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, position, rand_angle());
+    CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
     ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.15f);
-    ItemComponent_add(components, i, 1);
+    ItemComponent_add(components, i, 1, 100, "Glock");
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 2.0, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 10.0f)->enabled = false;
 
@@ -305,13 +306,13 @@ int create_pistol(ComponentData* components, sfVector2f position) {
 int create_shotgun(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, position, rand_angle());
+    CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "shotgun", 2.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 10, 10, 0.1f * M_PI, 2, 0.25f, 20.0f, 1.5f, AMMO_SHOTGUN, "shotgun");
     ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.1f);
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 500, "Sawed-off");
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 3.0f, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0f)->enabled = false;
 
@@ -322,13 +323,13 @@ int create_shotgun(ComponentData* components, sfVector2f position) {
 int create_rifle(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, position, rand_angle());
+    CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 0.5f, 10, 1, 0.0f, -1, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
     ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.15f);
-    ItemComponent_add(components, i, 1);
+    ItemComponent_add(components, i, 1, 0, "");
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 4.0f, 2.0f * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 10.0f)->enabled = false;
 
@@ -339,13 +340,13 @@ int create_rifle(ComponentData* components, sfVector2f position) {
 int create_assault_rifle(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, position, rand_angle());
+    CoordinateComponent_add(components, i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 40, 1, 0.0f, 30, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
     ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.15f);
-    ItemComponent_add(components, i, 1);
+    ItemComponent_add(components, i, 1, 1000, "RK-62");
     SoundComponent_add(components, i, "metal");
     LightComponent_add(components, i, 4.0f, 2.0f * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 10.0f)->enabled = false;
 
@@ -361,7 +362,7 @@ int create_axe(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "axe", 2.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 1.0f);
     WeaponComponent_add(components, i, 2.0f, 50, 7, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 0, "Axe");
     SoundComponent_add(components, i, "metal");
 
     return i;
@@ -376,7 +377,7 @@ int create_rope_gun(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "pistol", 1.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 0.5f, 0, 1, 0.0f, -1, 0.0f, 25.0f, 2.0f, AMMO_ROPE, "pistol");
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 0, "");
     SoundComponent_add(components, i, "metal");
 
     return i;
@@ -388,7 +389,7 @@ int create_lasersight(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(components, i, pos, rand_angle());
     PhysicsComponent_add(components, i, 0.5f);
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 500, "Laser sight");
     LightComponent_add(components, i, 20.0, 0.01, sfRed, 1.0, 10.0)->enabled = false;
 
     return i;
@@ -415,7 +416,7 @@ int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
     }
     AmmoComponent_add(components, i, type);
     PhysicsComponent_add(components, i, 0.5f);
-    ItemComponent_add(components, i, 0);
+    ItemComponent_add(components, i, 0, 0, "");
     SoundComponent_add(components, i, "metal");
     return i;
 }

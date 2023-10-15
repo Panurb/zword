@@ -98,7 +98,8 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
 }
 
 
-void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f pos, sfVector2f dir, int dmg) {
+void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f pos, sfVector2f dir, int dmg, 
+        int dealer) {
     HealthComponent* health = components->health[entity];
     if (health) {
         int prev_health = health->health;
@@ -121,6 +122,11 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
     EnemyComponent* enemy = components->enemy[entity];
     if (enemy) {
         enemy->desired_angle = polar_angle(mult(-1.0f, dir));
+
+        PlayerComponent* player = PlayerComponent_get(components, dealer);
+        if (player) {
+            player->money += enemy->bounty;
+        }
     }
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);
@@ -151,7 +157,7 @@ void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfV
                 if (sound) {
                     add_sound(components, entity, sound->hit_sound, 1.0, 0.8);
                 }
-                damage(components, grid, entity, get_position(components, entity), vel, 100);
+                damage(components, grid, entity, get_position(components, entity), vel, 100, -1);
             }
         }
     }

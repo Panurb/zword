@@ -391,6 +391,7 @@ void PlayerComponent_serialize(cJSON* entity_json, ComponentData* components, in
     serialize_id_array(json, "ammo", player->ammo, player->ammo_size);
     serialize_int(json, "state", player->state, PLAYER_ON_FOOT);
     serialize_id(json, "arms", player->arms);
+    serialize_int(json, "money", player->money, 0);
 }
 
 void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
@@ -404,6 +405,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, 
     deserialize_id_array(json, "ammo", player->ammo);
     player->state = deserialize_int(json, "state", player->state);
     deserialize_id(json, "arms", &player->arms);
+    player->money = deserialize_int(json, "money", player->money);
 }
 
 
@@ -546,6 +548,10 @@ void ItemComponent_serialize(cJSON* entity_json, ComponentData* components, int 
     cJSON_AddItemToObject(entity_json, "Item", json);
     cJSON_AddNumberToObject(json, "size", item->size);
     serialize_id_array(json, "attachments", item->attachments, item->size);
+    serialize_int(json, "price", item->price, 0);
+    if (item->name[0] != '\0') {
+        cJSON_AddStringToObject(json, "name", item->name);
+    }
 }
 
 
@@ -554,7 +560,13 @@ void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     if (!json) return;
 
     int size = cJSON_GetObjectItem(json, "size")->valueint;
-    ItemComponent* item = ItemComponent_add(components, entity, size);
+    int price = deserialize_int(json, "price", 0);
+    char* name = "";
+    cJSON* name_json = cJSON_GetObjectItem(json, "name");
+    if (name_json) {
+        name = name_json->valuestring;
+    }
+    ItemComponent* item = ItemComponent_add(components, entity, size, price, name);
     deserialize_id_array(json, "attachments", item->attachments);
 }
 

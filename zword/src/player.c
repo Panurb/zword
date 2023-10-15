@@ -148,9 +148,6 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
             case PLAYER_ON_FOOT:;
                 sfVector2f pos = get_position(components, i);
 
-                if (player->target != -1) {
-                    ImageComponent_get(components, player->target)->outline = 0.0;
-                }
                 player->target = -1;
 
                 float min_dist = 9999.0;
@@ -169,10 +166,6 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                     }
                 }
                 List_delete(list);
-
-                if (player->target != -1) {
-                    ImageComponent_get(components, player->target)->outline = 0.05f;
-                }
 
                 if (!weapon && light) {
                     light->enabled = true;

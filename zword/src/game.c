@@ -24,6 +24,7 @@
 #include "door.h"
 #include "menu.h"
 #include "serialize.h"
+#include "item.h"
 
 
 static float game_over_timer = 0.0f;
@@ -205,7 +206,7 @@ void draw_game(GameData data, sfRenderWindow* window) {
     sfRenderWindow_drawSprite(window, data.light_sprite, &state);
 
     draw_roofs(data.components, window, data.camera, data.textures);
-    draw_outlines(data.components, window, data.camera);
+    draw_items(&data, window);
 }
 
 

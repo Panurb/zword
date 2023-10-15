@@ -86,7 +86,6 @@ void CoordinateComponent_remove(ComponentData* components, int entity) {
 ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, Layer layer) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
     image->texture_changed = true;
-    image->outline = 0.0;
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
@@ -239,6 +238,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
         player->ammo[i] = -1;
     }
     player->arms = -1;
+    player->money = 0;
 
     player->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(player->shape, 4);
@@ -514,12 +514,14 @@ void WeaponComponent_remove(ComponentData* components, int entity) {
 }
 
 
-ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size) {
+ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size, int price, ButtonText name) {
     ItemComponent* item = malloc(sizeof(ItemComponent));
     item->size = size;
     for (int i = 0; i < size; i++) {
         item->attachments[i]= -1;
     }
+    item->price = price;
+    strcpy(item->name, name);
 
     components->item[entity] = item;
     return item;
