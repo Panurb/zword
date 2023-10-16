@@ -399,7 +399,7 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
         WidgetComponent* widget = WidgetComponent_get(components, i);
         if (!widget->enabled) continue;
 
-        sfVector2f pos = sum(get_position(components, camera), get_position(components, i));
+        sfVector2f pos = get_position(components, i);
         CoordinateComponent* coord = CoordinateComponent_get(components, i);
         ColliderComponent* collider = ColliderComponent_get(components, i);
 

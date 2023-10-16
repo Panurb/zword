@@ -1,6 +1,6 @@
 uniform sampler2D texture;
 
-uniform float offset = 1.0 / 32;
+float offset = 1.0 / 32;
 
 void main()
 {

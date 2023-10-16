@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 set(CMAKE_C_FLAGS "-g -Wall -Wextra --pedantic -Wno-deprecated-declarations")
 
-project(zword)
+project(zword C)
 
 include_directories(CSFML/include)
 
@@ -70,7 +70,8 @@ set(DLLS
 target_link_libraries(zword ${DLLS})
 
 install(FILES ${DLLS}
-    DESTINATION ${CMAKE_SOURCE_DIR}/build)
+    DESTINATION ${CMAKE_SOURCE_DIR}/build
+)
 
 install(DIRECTORY zword/data
     DESTINATION ${CMAKE_SOURCE_DIR}/build
