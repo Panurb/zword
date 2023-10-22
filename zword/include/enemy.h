@@ -11,15 +11,15 @@
 
 void update_enemies(ComponentData* component, ColliderGrid* grid, float time_step);
 
-void create_zombie(ComponentData* component, sfVector2f pos, float angle);
+int create_zombie(ComponentData* component, sfVector2f pos, float angle);
 
-void create_farmer(ComponentData* component, sfVector2f pos, float angle);
+int create_farmer(ComponentData* component, sfVector2f pos, float angle);
 
-void create_priest(ComponentData* components, sfVector2f pos, float angle);
+int create_priest(ComponentData* components, sfVector2f pos, float angle);
 
-void create_big_boy(ComponentData* components, sfVector2f pos, float angle);
+int create_big_boy(ComponentData* components, sfVector2f pos, float angle);
 
-void create_boss(ComponentData* components, sfVector2f pos, float angle);
+int create_boss(ComponentData* components, sfVector2f pos, float angle);
 
 void draw_enemies(ComponentData* component, sfRenderWindow* window, int camera);
 

@@ -168,6 +168,9 @@ void select_object(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     strcpy(selected_object_name, widget->string);
     tool = TOOL_OBJECT;
+
+    components->added_entities = List_create();
+
     int i = create_object(components, selected_object_name, zeros(), 0.0f);
     ColliderComponent* collider = ColliderComponent_get(components, i);
     if (collider) {
@@ -177,7 +180,12 @@ void select_object(ComponentData* components, int entity) {
         selected_object_width = 1.0f;
         selected_object_height = 1.0f;
     }
-    destroy_entity_recursive(components, i);
+
+    ListNode* node;
+    FOREACH(node, components->added_entities) {
+      destroy_entity(components, node->value);
+    }
+    List_delete(components->added_entities);
 }
 
 

@@ -4,7 +4,7 @@
 #include "grid.h"
 
 
-void create_car(ComponentData* component, sfVector2f pos, float angle);
+int create_car(ComponentData* component, sfVector2f pos, float angle);
 
 bool enter_vehicle(ComponentData* component, ColliderGrid* grid, int i);
 

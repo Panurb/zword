@@ -8,7 +8,7 @@
 #include "game.h"
 
 
-void create_flashlight(ComponentData* components, sfVector2f position) {
+int create_flashlight(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     float angle = rand_angle();
@@ -18,10 +18,12 @@ void create_flashlight(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
     ItemComponent_add(components, i, 0, 100, "Flashlight");
     LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
+
+    return i;
 }
 
 
-void create_gas(ComponentData* components, sfVector2f position) {
+int create_gas(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     float angle = rand_angle();
@@ -30,6 +32,8 @@ void create_gas(ComponentData* components, sfVector2f position) {
     PhysicsComponent_add(components, i, 0.5f);
     ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
     ItemComponent_add(components, i, 0, 0, "");
+
+    return i;
 }
 
 

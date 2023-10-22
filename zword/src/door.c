@@ -9,7 +9,7 @@
 #include "navigation.h"
 
 
-void create_door(ComponentData* components, sfVector2f pos, float angle) {
+int create_door(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
     ImageComponent_add(components, i, "door", 2.0f, 1.0f, LAYER_ITEMS);
@@ -24,6 +24,8 @@ void create_door(ComponentData* components, sfVector2f pos, float angle) {
 
     create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle + 0.5f * M_PI)));
     create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle + 0.5f * M_PI)));
+
+    return i;
 }
 
 

@@ -99,7 +99,7 @@ int main() {
                     if (game_state == STATE_EDITOR) {
                         input_editor(&data, window, event);
                     }
-                    if (game_state == STATE_MENU || game_state == STATE_PAUSE) {
+                    if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
                         input_menu(data.components, data.menu_camera, event);
                     }
                     break;

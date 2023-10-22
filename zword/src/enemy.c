@@ -43,7 +43,7 @@ int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-void create_farmer(ComponentData* components, sfVector2f pos, float angle) {
+int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
     angle = rand_angle();
@@ -68,10 +68,12 @@ void create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     CoordinateComponent_get(components, j)->angle = 0.0f;
     add_child(components, i, j);
     enemy->weapon = j;
+
+    return i;
 }
 
 
-void create_priest(ComponentData* components, sfVector2f pos, float angle) {
+int create_priest(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
     angle = rand_angle();
@@ -98,10 +100,12 @@ void create_priest(ComponentData* components, sfVector2f pos, float angle) {
     SoundComponent_add(components, j, "");
     add_child(components, i, j);
     enemy->weapon = j;
+
+    return i;
 }
 
 
-void create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
+int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
     angle = rand_angle();
@@ -127,10 +131,12 @@ void create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     WeaponComponent_add(components, j, 0.5f, 100, 7, 0.5f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
     add_child(components, i, j);
     enemy->weapon = j;
+
+    return i;
 }
 
 
-void create_boss(ComponentData* components, sfVector2f pos, float angle) {
+int create_boss(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     
     CoordinateComponent_add(components, i, pos, angle);
@@ -159,6 +165,7 @@ void create_boss(ComponentData* components, sfVector2f pos, float angle) {
     add_child(components, i, j);
     enemy->weapon = j;
 
+    int parent = i;
     for (int k = 0; k < 5; k++) {
         j = create_entity(components);
         pos = sum(pos, polar_to_cartesian(3.0f, angle));
@@ -167,11 +174,13 @@ void create_boss(ComponentData* components, sfVector2f pos, float angle) {
         ColliderComponent_add_rectangle(components, j, 3.0f, 1.5f, GROUP_ENEMIES);
         ImageComponent_add(components, j, "boss_body", 6.0f, 4.0f, LAYER_ENEMIES);
         AnimationComponent_add(components, j, 4)->current_frame = 2 * (k % 2);
-        JointComponent_add(components, j, i, 3.0f, 3.0f, 1.0f);
-        ParticleComponent_add_type(components, i, PARTICLE_SPARKS, 0.0f);
+        JointComponent_add(components, j, parent, 3.0f, 3.0f, 1.0f);
+        ParticleComponent_add_type(components, parent, PARTICLE_SPARKS, 0.0f);
         SoundComponent_add(components, j, "stone_hit");
-        i = j;
+        parent = j;
     }
+
+    return i;
 }
 
 

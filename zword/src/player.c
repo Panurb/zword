@@ -25,7 +25,7 @@
 #include "health.h"
 
 
-void create_player(ComponentData* components, sfVector2f pos, float angle) {
+int create_player(ComponentData* components, sfVector2f pos, float angle) {
     int joystick = -1;
     int i = create_entity(components);
 
@@ -60,6 +60,8 @@ void create_player(ComponentData* components, sfVector2f pos, float angle) {
     //     ImageComponent_get(components, j)->alpha = 0.0f;
     //     AmmoComponent_get(components, j)->size = 0;
     // }
+
+    return i;
 }
 
 

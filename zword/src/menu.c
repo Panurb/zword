@@ -46,6 +46,7 @@ void get_map_name(GameData* data, ButtonText buffer) {
 
 
 void change_state_end(ComponentData* components, int entity) {
+    printf("End");
     UNUSED(components);
     UNUSED(entity);
     game_state = STATE_END;

@@ -9,7 +9,7 @@
 #include "navigation.h"
 
 
-void create_car(ComponentData* components, sfVector2f pos, float angle) {
+int create_car(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
@@ -49,6 +49,8 @@ void create_car(ComponentData* components, sfVector2f pos, float angle) {
 
     k = create_waypoint(components, (sfVector2f) { -2.0f, -2.5f });
     add_child(components, j, k);
+
+    return i;
 }
 
 

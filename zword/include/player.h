@@ -7,7 +7,7 @@
 
 void input(ComponentData* component, sfRenderWindow* window, int camera);
 
-void create_player(ComponentData* components, sfVector2f pos, float angle);
+int create_player(ComponentData* components, sfVector2f pos, float angle);
 
 int get_slot(ComponentData* components, int i, int size);
 

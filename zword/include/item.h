@@ -5,9 +5,9 @@
 #include "game.h"
 
 
-void create_flashlight(ComponentData* components, sfVector2f position);
+int create_flashlight(ComponentData* components, sfVector2f position);
 
-void create_gas(ComponentData* components, sfVector2f position);
+int create_gas(ComponentData* components, sfVector2f position);
 
 void create_item(ComponentData* components, sfVector2f position, int tier);
 
