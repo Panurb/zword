@@ -179,7 +179,7 @@ void update_game(GameData data, sfRenderWindow* window, float time_step) {
     update_waypoints(data.components, data.grid, data.camera);
     update_doors(data.components);
 
-    update_players(data.components, data.grid);
+    update_players(data.components, data.grid, time_step);
     update_weapons(data.components, time_step);
     update_enemies(data.components, data.grid, time_step);
     update_energy(data.components, data.grid);

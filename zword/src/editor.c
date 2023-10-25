@@ -76,6 +76,7 @@ static ButtonText selected_object_name = "";
 static float selected_object_width = 1.0f;
 static float selected_object_height = 1.0f;
 static ButtonText object_names[] = {
+    "bandage",
     "bed",
     "bench",
     "big boy",
@@ -85,6 +86,7 @@ static ButtonText object_names[] = {
     "desk",
     "door",
     "farmer",
+    "fire",
     "flashlight",
     "gas",
     "hay bale",
@@ -92,7 +94,10 @@ static ButtonText object_names[] = {
     "player",
     "priest",
     "rock",
+    "stove",
+    "sink",
     "table",
+    "toilet",
     "tree",
     "waypoint",
     "zombie"
@@ -516,14 +521,6 @@ void input_tool_select(GameData* data, sfEvent event) {
             case sfKeyUp:
                 move_selections(data, vec(0.0f, grid_sizes[grid_size_index]));
                 break;
-            case sfKeyNum1:
-            case sfKeyNum2:
-            case sfKeyNum3:
-            case sfKeyNum4:
-            case sfKeyNum5:
-            case sfKeyNum6:
-                selected_categories[event.key.code - 27] = !selected_categories[event.key.code - 27];
-                break;
             default:
                 break;
             }
@@ -635,6 +632,14 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
         }
     } else if (event.type == sfEvtKeyPressed) {
         switch (event.key.code) {
+            case sfKeyNum1:
+            case sfKeyNum2:
+            case sfKeyNum3:
+            case sfKeyNum4:
+            case sfKeyNum5:
+            case sfKeyNum6:
+                selected_categories[event.key.code - 27] = !selected_categories[event.key.code - 27];
+                break;
             case sfKeyO:
                 toggle_objects(data->components, -1);
                 break;

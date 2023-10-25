@@ -5,7 +5,7 @@
 #include "util.h"
 #include "image.h"
 #include "weapon.h"
-#include "game.h"
+#include "game.h" 
 
 
 int create_flashlight(ComponentData* components, sfVector2f position) {
@@ -15,7 +15,7 @@ int create_flashlight(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
-    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, 3);
+    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent_add(components, i, 0, 100, "Flashlight");
     LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
 
@@ -30,8 +30,24 @@ int create_gas(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
-    ImageComponent_add(components, i, "gas", 1.0, 1.0, 3);
+    ImageComponent_add(components, i, "gas", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent_add(components, i, 0, 0, "");
+
+    return i;
+}
+
+
+int create_bandage(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    float angle = rand_angle();
+    CoordinateComponent_add(components, i, position, angle);
+    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    PhysicsComponent_add(components, i, 0.5f);
+    ImageComponent_add(components, i, "bandage", 1.0, 1.0, LAYER_ITEMS);
+    ItemComponent* item = ItemComponent_add(components, i, 0, 0, "");
+    item->use_time = 2.0f;
+    item->value = 20;
 
     return i;
 }
@@ -154,6 +170,52 @@ void drop_item(ComponentData* components, int entity) {
         change_layer(components, i, LAYER_ITEMS);
         ImageComponent_get(components, i)->alpha = 1.0f;
         ColliderComponent_get(components, i)->enabled = true;
+    }
+}
+
+
+void heal(ComponentData* components, ColliderGrid* grid, int entity) {
+    int parent = CoordinateComponent_get(components, entity)->parent;
+
+    ItemComponent* item = ItemComponent_get(components, entity);
+
+    HealthComponent* player_health = HealthComponent_get(components, parent);
+
+    player_health->health += item->value;
+
+    drop_item(components, parent);
+    clear_grid(components, grid, entity);
+    destroy_entity(components, entity);
+}
+
+
+void switch_light(ComponentData* components, int entity) {
+    LightComponent* light = LightComponent_get(components, entity);
+    if (light) {
+        light->enabled = true;
+    }
+}
+
+
+void use_item(ComponentData* components, ColliderGrid* grid, int entity, float time_step) {
+    int parent = CoordinateComponent_get(components, entity)->parent;
+
+    PlayerComponent* player = PlayerComponent_get(components, parent);
+    ItemComponent* item = ItemComponent_get(components, entity);
+
+    if (player->use_timer >= item->use_time) {
+        switch (item->type) {
+            case ITEM_HEAL:
+                heal(components, grid, entity);
+                break;
+            case ITEM_LIGHT:
+                switch_light(components, entity);
+                break;
+            default:
+                break;
+        }
+    } else {
+        player->use_timer += time_step;
     }
 }
 

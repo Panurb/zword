@@ -26,6 +26,7 @@ static const char* IMAGES[] = {
     "arms_shotgun",
     "assault_rifle",
     "axe",
+    "bandage",
     "beach_corner",
     "beach_tile",
     "bed",

@@ -239,6 +239,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     }
     player->arms = -1;
     player->money = 0;
+    player->use_timer = 0.0f;
 
     player->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(player->shape, 4);
@@ -522,6 +523,9 @@ ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size
     }
     item->price = price;
     strcpy(item->name, name);
+    item->use_time = 0.0f;
+    item->type = ITEM_HEAL;
+    item->value = 0;
 
     components->item[entity] = item;
     return item;

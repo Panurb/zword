@@ -2,28 +2,6 @@
 
 #include "component.h"
 
-typedef enum {
-    OBJECT_BED,
-    OBJECT_BENCH,
-    OBJECT_BIG_BOY,
-    OBJECT_BOSS,
-    OBJECT_CANDLE,
-    OBJECT_CAR,
-    OBJECT_DESK,
-    OBJECT_DOOR,
-    OBJECT_FARMER,
-    OBJECT_FLASHLIGHT,
-    OBJECT_GAS,
-    OBJECT_HAY_BALE,
-    OBJECT_LAMP,
-    OBJECT_PLAYER,
-    OBJECT_PRIEST,
-    OBJECT_ROCK,
-    OBJECT_TABLE,
-    OBJECT_TREE,
-    OBJECT_WAYPOINT,
-    OBJECT_ZOMBIE
-} Object;
 
 int create_bench(ComponentData* components, sfVector2f position, float angle);
 

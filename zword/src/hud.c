@@ -118,6 +118,18 @@ void draw_ammo_menu(ComponentData* components, sfRenderWindow* window, int camer
 }
 
 
+void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+    sfVector2f position = get_position(components, entity);
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+    int i = player->inventory[player->item];
+    ItemComponent* item = ItemComponent_get(components, i);
+    if (!item) return;
+
+    float x = 2.0f * M_PI * player->use_timer / item->use_time;
+    draw_slice(window, components, camera, NULL, 50, position, 1.0f, 1.2f, -0.5f * x + M_PI_2, x, sfWhite);
+}
+
+
 void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
@@ -161,6 +173,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_PICK_UP:
                 break;
             case PLAYER_SHOOT:
+                draw_item_use(components, window, camera, i);
                 break;
             case PLAYER_RELOAD:
                 sfConvexShape_setFillColor(player->shape, sfWhite);

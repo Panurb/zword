@@ -222,7 +222,7 @@ void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, s
     sfVector2f start = polar_to_cartesian(min_range, angle - 0.5 * spread);
     sfVector2f end = polar_to_cartesian(max_range, angle - 0.5 * spread);
 
-    Matrix2f rot = rotation_matrix(2.0 * spread / verts_size);
+    Matrix2f rot = rotation_matrix(spread / (verts_size / 2.0f - 1));
 
     for (int k = 0; k < verts_size / 2; k += 1) {
         sfVertex* v = sfVertexArray_getVertex(verts, 2 * k);

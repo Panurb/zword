@@ -96,7 +96,7 @@ int get_attachment(ComponentData* components, int i) {
 }
 
 
-void update_players(ComponentData* components, ColliderGrid* grid) {
+void update_players(ComponentData* components, ColliderGrid* grid, float time_step) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
@@ -182,6 +182,7 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                     }
                 }
 
+                player->use_timer = 0.0f;
                 break;
             case PLAYER_PICK_UP:
                 pick_up_item(components, grid, i);
@@ -196,6 +197,8 @@ void update_players(ComponentData* components, ColliderGrid* grid) {
                     } else if (!weapon->automatic) {
                         player->state = PLAYER_ON_FOOT;
                     }
+                } else if (itco) {
+                    use_item(components, grid, item, time_step);
                 }
 
                 break;

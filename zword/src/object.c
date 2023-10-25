@@ -202,7 +202,7 @@ int create_fire(ComponentData* components, sfVector2f pos) {
     LightComponent_add(components, i, 18.0f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
     ParticleComponent_add_type(components, i, PARTICLE_FIRE, 0.6f);
     ColliderComponent_add_circle(components, i, 0.35, GROUP_BARRIERS);
-    ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_PARTICLES);
+    ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_ITEMS);
 
     return i;
 }
@@ -233,6 +233,7 @@ int create_rock(ComponentData* components, sfVector2f position) {
 int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
+    MATCH("bandage") return create_bandage(components, position);
     MATCH("bed") return create_bed(components, position, angle);
     MATCH("bench") return create_bench(components, position, angle);
     MATCH("big boy") return create_big_boy(components, position, angle);
@@ -242,6 +243,7 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("desk") return create_desk(components, position, angle);
     MATCH("door") return create_door(components, position, angle);
     MATCH("farmer") return create_farmer(components, position, angle);
+    MATCH("fire") return create_fire(components, position);
     MATCH("flashlight") return create_flashlight(components, position);
     MATCH("gas") return create_gas(components, position);
     MATCH("hay bale") return create_hay_bale(components, position, angle);
@@ -249,7 +251,10 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("player") return create_player(components, position, angle);
     MATCH("priest") return create_priest(components, position, angle);
     MATCH("rock") return create_rock(components, position);
+    MATCH("stove") return create_stove(components, position, angle);
+    MATCH("sink") return create_sink(components, position, angle);
     MATCH("table") return create_table(components, position);
+    MATCH("toilet") return create_toilet(components, position, angle);
     MATCH("tree") return create_tree(components, position);
     MATCH("waypoint") return create_waypoint(components, position);
     MATCH("zombie") return create_zombie(components, position, angle);

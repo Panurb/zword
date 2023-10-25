@@ -155,6 +155,7 @@ typedef struct {
     sfCircleShape* crosshair;
     int arms;
     int money;
+    float use_timer;
 } PlayerComponent;
 
 typedef struct {
@@ -278,11 +279,19 @@ typedef struct {
     Filename sound;
 } WeaponComponent;
 
+typedef enum ItemType {
+    ITEM_HEAL,
+    ITEM_LIGHT
+} ItemType;
+
 typedef struct {
     int attachments[5];
     int size;
     int price;
     ButtonText name;
+    float use_time;
+    ItemType type;
+    int value;
 } ItemComponent;
 
 typedef struct {

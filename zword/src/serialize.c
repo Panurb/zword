@@ -30,6 +30,8 @@ void serialize_id(cJSON* json, char* name, int id) {
 
 
 void serialize_id_array(cJSON* json, char* name, int* array, int size) {
+    if (size == 0) return;
+
     cJSON* array_json = cJSON_AddArrayToObject(json, name);
     for (int i = 0; i < size; i++) {
         cJSON* item = cJSON_CreateNumber(array[i]);
@@ -45,9 +47,12 @@ void serialize_id_array(cJSON* json, char* name, int* array, int size) {
 
 
 void deserialize_id_array(cJSON* json, char* name, int* array) {
+    cJSON* json_array = cJSON_GetObjectItem(json, name);
+    if (!json_array) return;
+
     int i = 0;
     cJSON* item;
-    cJSON_ArrayForEach(item, cJSON_GetObjectItem(json, name)) {
+    cJSON_ArrayForEach(item, json_array) {
         array[i] = item->valueint;
         for (int j = 0; j < MAX_ENTITIES; j++) {
             if (!deserialized_ids[j]) {
@@ -552,6 +557,8 @@ void ItemComponent_serialize(cJSON* entity_json, ComponentData* components, int 
     if (item->name[0] != '\0') {
         cJSON_AddStringToObject(json, "name", item->name);
     }
+    cJSON_AddNumberToObject(json, "type", item->type);
+    serialize_int(json, "value", item->value, 0);
 }
 
 
@@ -568,6 +575,8 @@ void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     }
     ItemComponent* item = ItemComponent_add(components, entity, size, price, name);
     deserialize_id_array(json, "attachments", item->attachments);
+    deserialize_int(json, "type", item->type);
+    deserialize_int(json, "value", item->value);
 }
 
 
