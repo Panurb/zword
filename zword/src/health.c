@@ -101,6 +101,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
 void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f pos, sfVector2f dir, int dmg, 
         int dealer) {
     HealthComponent* health = components->health[entity];
+    EnemyComponent* enemy = components->enemy[entity];
     if (health) {
         int prev_health = health->health;
         health->health = max(0, health->health - dmg);
@@ -116,17 +117,16 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 
         if (prev_health > 0 && health->health == 0) {
             die(components, grid, entity);
+
+            PlayerComponent* player = PlayerComponent_get(components, dealer);
+            if (player && enemy) {
+                player->money += enemy->bounty;
+            }
         }
     }
-
-    EnemyComponent* enemy = components->enemy[entity];
+    
     if (enemy) {
         enemy->desired_angle = polar_angle(mult(-1.0f, dir));
-
-        PlayerComponent* player = PlayerComponent_get(components, dealer);
-        if (player) {
-            player->money += enemy->bounty;
-        }
     }
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);

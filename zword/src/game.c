@@ -33,6 +33,8 @@ static float game_over_timer = 0.0f;
 static int wave = 1;
 static int enemies = 0;
 static float wave_delay = 5.0f;
+static List* spawners = NULL;
+static float spawn_delay = 2.0f;
 
 
 
@@ -82,6 +84,22 @@ void resize_game(GameData* data, sfVideoMode mode) {
 }
 
 
+void init_survival(GameData* data) {
+    wave = 1;
+    enemies = 0;
+    wave_delay = 5.0f;
+    spawn_delay = 2.0f;
+
+    spawners = List_create();
+    for (int i = 0; i < data->components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(data->components, i);
+        if (enemy && enemy->spawner) {
+            List_add(spawners, i);
+        }
+    }
+}
+
+
 void start_game(GameData* data, Filename map_name) {
     ColliderGrid_clear(data->grid);
     CameraComponent* cam = CameraComponent_get(data->components, data->camera);
@@ -94,6 +112,7 @@ void start_game(GameData* data, Filename map_name) {
     // test(data->components, data->grid);
     load_game(data, map_name);
     init_grid(data->components, data->grid);
+    init_survival(data);
 }
 
 
@@ -107,7 +126,91 @@ void end_game(GameData* data) {
     create_menu(*data);
 }
 
-void update_survival(GameData data, float time_step) {    
+
+int spawn_enemy(ComponentData* components, ColliderGrid* grid, sfVector2f position, float probs[4]) {
+    UNUSED(grid);
+    int j = -1;
+    float angle = rand_angle();
+    switch (rand_choice(probs, 4)) {
+        case 0:
+            j = create_zombie(components, position, angle);
+            break;
+        case 1:
+            j = create_farmer(components, position, angle);
+            break;
+        case 2:
+            j = create_big_boy(components, position, angle);
+            break;
+        case 3:
+            j = create_priest(components, position, angle);
+            break;
+    }
+    int p = components->player.order->head->value;
+    EnemyComponent* enemy = EnemyComponent_get(components, j);
+    if (enemy) {
+        enemy->target = p;
+        enemy->state = ENEMY_CHASE;
+        spawn_delay = 2.0f;
+        // TODO: update grid?
+    }
+
+    return j;
+}
+
+
+float spawn_prob(float min_wave, float max_prob, float rate) {
+    if (wave + rate - min_wave == 0.0f) return 0.0f;
+    return fmaxf(0.0f, max_prob * (1 - rate / (wave + rate - min_wave)));
+}
+
+
+int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int max_enemies) {
+    if (spawners && spawners->size == 0) {
+        return 0;
+    }
+
+    static float delay = 0.0f;
+    if (delay > 0.0f) {
+        delay -= time_step;
+    }
+
+    int count = 0;
+    for (int i = 0; i < components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(components, i);
+        if (enemy && !enemy->spawner && enemy->state != ENEMY_DEAD) {
+            count++;
+        }
+    }
+
+    if (count < max_enemies && delay <= 0.0f) {
+        int i = randi(0, spawners->size - 1);
+        int spawner = List_get(spawners, i)->value;
+
+        float x = randf(-1.0f, 1.0f);
+        float y = randf(-1.0f, 1.0f);
+
+        sfVector2f pos = get_position(components, spawner);
+        pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
+
+        if (on_screen(components, camera, pos, 2.0f, 2.0f)) {
+            return 0;
+        }
+
+        float f = spawn_prob(1.0f, 0.1f, 1.0f);
+        float b = spawn_prob(2.0f, 0.1f, 2.0f);
+        float p = spawn_prob(3.0f, 0.1f, 3.0f);
+        float probs[4] = {1.0f - f - b - p, f, b, p};
+        
+        spawn_enemy(components, grid, pos, probs);
+        delay = 2.0f;
+        return 1;
+    }
+
+    return 0;
+}
+
+
+void update_survival(GameData data, float time_step) {  
     bool players_alive = false;
     ListNode* node;
     FOREACH(node, data.components->player.order) {
@@ -118,6 +221,9 @@ void update_survival(GameData data, float time_step) {
     }
     if (!players_alive) {
         change_state_game_over(data);
+        List_delete(spawners);
+        spawners = NULL;
+        return;
     }
 
     if (wave_delay > 0.0f) {
@@ -136,6 +242,7 @@ void update_survival(GameData data, float time_step) {
                 break;
             }
         }
+        PRINT(enemies_alive);
         if (!enemies_alive) {
             wave++;
             wave_delay = 5.0f;

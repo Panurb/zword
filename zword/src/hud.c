@@ -165,8 +165,15 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             } else {
                 draw_circle(window, components, camera, player->crosshair, pos, 0.1f, sfWhite);
             }
+
+            HealthComponent* health = HealthComponent_get(components, i);
+            float x = 2.0f * M_PI * (health->max_health - health->health) / health->max_health;
+            if (health->health != health->max_health) {
+                draw_slice(window, components, camera, NULL, 50, position, 0.5f, 0.6f, M_PI_2 - 0.5f * x, x, sfRed);
+            }
         }
 
+        char buffer[128];
         switch (player->state) {
             case PLAYER_ON_FOOT:
                 break;
@@ -196,6 +203,9 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_MENU:
             case PLAYER_MENU_DROP:
             case PLAYER_MENU_GRAB:
+                snprintf(buffer, 128, "%d", player->money);
+                draw_text(window, components, camera, NULL, position, buffer, sfYellow);
+
                 for (int j = 0; j < player->inventory_size; j++) {
                     float offset = 0.0;
                     float alpha = 0.5;
@@ -231,8 +241,10 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
 
                 break;
             case PLAYER_AMMO_MENU:
+                snprintf(buffer, 128, "%d", player->money);
+                draw_text(window, components, camera, NULL, position, buffer, sfYellow);
+                
                 draw_ammo_menu(components, window, camera, i);
-
                 break;
             case PLAYER_DEAD:
                 break;

@@ -49,18 +49,6 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
     animation->framerate = 0.0f;
     player->arms = j;
 
-    // TODO: why?
-    // JointComponent_add(components, i, -1, 0.0f, 0.0f, INFINITY);
-
-    // for (AmmoType type = AMMO_PISTOL; type <= AMMO_SHOTGUN; type++) {
-    //     int j = create_ammo(components, zeros(), type);
-    //     player->ammo[type] = j;
-    //     CoordinateComponent_get(components, j)->parent = i;
-    //     ColliderComponent_remove(components, j);
-    //     ImageComponent_get(components, j)->alpha = 0.0f;
-    //     AmmoComponent_get(components, j)->size = 0;
-    // }
-
     return i;
 }
 

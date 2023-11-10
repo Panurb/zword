@@ -134,6 +134,18 @@ sfVector2f rand_vector() {
     return polar_to_cartesian(1.0, rand_angle());
 }
 
+int rand_choice(float* probs, int size) {
+    float x = randf(0.0f, 1.0f);
+    float total = 0.0f;
+    for (int i = 0; i < size; i++) {
+        total += probs[i];
+        if (total >= x) {
+            return i;
+        }
+    }
+    return size - 1;
+}
+
 int find(int value, int* array, int size) {
     for (int i = 0; i < size; i++) {
         if (array[i] == value) {

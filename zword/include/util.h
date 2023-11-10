@@ -76,6 +76,8 @@ float rand_angle();
 
 sfVector2f rand_vector();
 
+int rand_choice(float* probs, int size);
+
 int find(int value, int* array, int size);
 
 int replace(int old, int new, int* array, int size);

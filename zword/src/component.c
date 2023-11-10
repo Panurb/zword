@@ -248,7 +248,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->controller.joystick = joystick;
 
     if (joystick == -1) {
-        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeyLShift, -1, sfKeyEscape, -1, sfKeySpace, -1, -1, -1 };
+        int buttons[12] = { sfKeyE, sfKeyQ, sfKeyR, sfKeyF, sfKeyLShift, -1, sfKeyEscape, -1, sfKeyLAlt, -1, -1, -1 };
         memcpy(player->controller.buttons, buttons, sizeof(buttons));
         int axes[8] = { sfKeyA, sfKeyD, sfKeyS, sfKeyW, -1, -1, -1, -1 };
         memcpy(player->controller.axes, axes, sizeof(axes));
@@ -358,6 +358,7 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     enemy->attack_timer = enemy->attack_delay;
     enemy->turn_speed = 5.0f;
     enemy->spawner = false;
+    enemy->bounty = 100;
 
     components->enemy[entity] = enemy;
 
@@ -587,6 +588,7 @@ void WaypointComponent_remove(ComponentData* components, int entity) {
 HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename dead_image, Filename decal, Filename die_sound) {
     HealthComponent* comp = malloc(sizeof(HealthComponent));
     comp->health = health;
+    comp->max_health = health;
     strcpy(comp->dead_image, dead_image);
     strcpy(comp->decal, decal);
     strcpy(comp->die_sound, die_sound);

@@ -276,11 +276,6 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
                 enemy->desired_angle = polar_angle(v);
 
-                if (d > 2.0f * enemy->vision_range) {
-                    enemy->state = ENEMY_IDLE;
-                    break;
-                }
-
                 r = polar_to_cartesian(1.0f, get_angle(components, i));
                 info = raycast(components, grid, pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
                 if (info.entity == enemy->target) {
@@ -373,68 +368,6 @@ void create_spawner(ComponentData* components, sfVector2f position, float angle,
     CoordinateComponent_add(components, i, position, angle);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
     EnemyComponent_add(components, i)->spawner = true;
-}
-
-
-int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int max_enemies) {
-    static List* spawners = NULL;
-    if (!spawners) {
-        spawners = List_create();
-        for (int i = 0; i < components->entities; i++) {
-            EnemyComponent* enemy = EnemyComponent_get(components, i);
-            if (enemy && enemy->spawner) {
-                List_add(spawners, i);
-            }
-        }
-    }
-
-    if (spawners && spawners->size == 0) {
-        return 0;
-    }
-
-    static float delay = 2.0f;
-    if (delay > 0.0f) {
-        delay -= time_step;
-    }
-
-    int count = 0;
-    for (int i = 0; i < components->entities; i++) {
-        EnemyComponent* enemy = EnemyComponent_get(components, i);
-        if (enemy && !enemy->spawner && enemy->state != ENEMY_DEAD) {
-            count++;
-        }
-    }
-
-    if (count < max_enemies && delay <= 0.0f) {
-        int i = randi(0, spawners->size - 1);
-        int spawner = List_get(spawners, i)->value;
-
-        // TODO: check that not on screen
-        float x = randf(-1.0f, 1.0f);
-        float y = randf(-1.0f, 1.0f);
-
-        sfVector2f pos = get_position(components, spawner);
-        pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
-
-        if (on_screen(components, camera, pos, 2.0f, 2.0f)) {
-            return 0;
-        }
-
-        // TODO: update grid?
-        i = create_zombie(components, pos, 0.0f);
-        int p = components->player.order->head->value;
-        EnemyComponent* enemy = EnemyComponent_get(components, i);
-        enemy->target = p;
-        // TODO: more aggresive on higher waves
-        enemy->state = ENEMY_INVESTIGATE;
-        if (randf(0.0f, 1.0f) < 0.5f) {
-            enemy->state = ENEMY_CHASE;
-        }
-        delay = 2.0f;
-        return 1;
-    }
-
-    return 0;
 }
 
 

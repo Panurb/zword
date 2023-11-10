@@ -181,7 +181,7 @@ void heal(ComponentData* components, ColliderGrid* grid, int entity) {
 
     HealthComponent* player_health = HealthComponent_get(components, parent);
 
-    player_health->health += item->value;
+    player_health->health = min(player_health->health + item->value, player_health->max_health);
 
     drop_item(components, parent);
     clear_grid(components, grid, entity);

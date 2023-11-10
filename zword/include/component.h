@@ -304,6 +304,7 @@ typedef struct {
 
 typedef struct {
     int health;
+    int max_health;
     Filename dead_image;
     Filename decal;
     Filename die_sound;

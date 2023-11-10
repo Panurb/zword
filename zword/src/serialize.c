@@ -559,6 +559,7 @@ void ItemComponent_serialize(cJSON* entity_json, ComponentData* components, int 
     }
     cJSON_AddNumberToObject(json, "type", item->type);
     serialize_int(json, "value", item->value, 0);
+    serialize_float(json, "use_time", item->use_time, 0.0f);
 }
 
 
@@ -575,8 +576,9 @@ void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     }
     ItemComponent* item = ItemComponent_add(components, entity, size, price, name);
     deserialize_id_array(json, "attachments", item->attachments);
-    deserialize_int(json, "type", item->type);
-    deserialize_int(json, "value", item->value);
+    item->type = deserialize_int(json, "type", item->type);
+    item->value = deserialize_int(json, "value", item->value);
+    item->use_time = deserialize_float(json, "use_time", item->use_time);
 }
 
 
