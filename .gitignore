@@ -360,3 +360,5 @@ CMakeSettings.json
 
 build/
 .VSCodeCounter/
+*.bak
+*.a

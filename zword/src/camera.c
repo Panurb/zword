@@ -157,8 +157,6 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
 
 void draw_rectangle_outline(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, 
         sfVector2f position, float width, float height, float angle, float line_width, sfColor color) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
-
     bool created = false;
     if (!shape) {
         shape = sfRectangleShape_create();

@@ -279,7 +279,6 @@ bool point_inside_rectangle(sfVector2f position, float angle, float width, float
     sfVector2f c = diff(b, mult(2, hw));
     sfVector2f d = sum(c, mult(2, hh));
 
-    sfVector2f w = polar_to_cartesian(0.5f * width, angle);
     sfVector2f am = diff(point, a);
     sfVector2f ab = diff(b, a);
     sfVector2f ad = diff(d, a);

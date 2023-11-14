@@ -204,7 +204,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 }
 
 
-void test(ComponentData* components, ColliderGrid* grid) {
+void test(ComponentData* components) {
     Permutation perm;
     init_perlin(perm);
 

@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include "component.h"
 #include "animation.h"

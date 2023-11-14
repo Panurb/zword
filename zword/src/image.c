@@ -12,6 +12,7 @@
 #include "perlin.h"
 #include "particle.h"
 #include "road.h"
+#include "animation.h"
 
 
 static const char* IMAGES[] = {

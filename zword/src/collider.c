@@ -233,7 +233,7 @@ sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j) {
                                    image_axis_half_width, b, axes[k]);
 
         if (fabs(overlaps[k]) < 1e-6) {
-            return (sfVector2f) zeros();
+            return zeros();
         }
     }
 

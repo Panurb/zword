@@ -68,8 +68,9 @@ void ParticleComponent_add_energy(ComponentData* components, int entity) {
 
 
 void ParticleComponent_add_type(ComponentData* components, int entity, ParticleType type, float size) {
-    ParticleComponent* particle;
     switch (type) {
+        case PARTICLE_NONE:
+            return;
         case PARTICLE_BULLET:
             ParticleComponent_add_bullet(components, entity, size);
             break;

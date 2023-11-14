@@ -386,8 +386,8 @@ void draw_button(sfRenderWindow* window, ComponentData* components, int camera, 
     draw_rectangle(window, components, camera, NULL, position, width, height, 0.0f, COLOR_SHADOW);
     sfVector2f r = sum(position, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
     draw_rectangle(window, components, camera, NULL, r, width - BORDER_WIDTH, height - BORDER_WIDTH, 0.0f, 
-        COLOR_HIGHLIGHT);
-    sfColor color = selected ? COLOR_HIGHLIGHT : COLOR_BUTTON;
+        COLOR_SELECTED);
+    sfColor color = selected ? COLOR_SELECTED : COLOR_BUTTON;
     draw_rectangle(window, components, camera, NULL, position, width - 2.0f * BORDER_WIDTH, 
         height - 2.0f * BORDER_WIDTH, 0.0f, color);
 }

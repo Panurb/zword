@@ -266,4 +266,6 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("axe") return create_axe(components, position);
     MATCH("pistol") return create_pistol(components, position);
     MATCH("shotgun") return create_shotgun(components, position);
+
+    return -1;
 }
