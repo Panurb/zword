@@ -100,7 +100,7 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
 
         char buffer[20];
         snprintf(buffer, 20, "%i", AmmoComponent_get(components, i)->size);
-        draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice + 0.1f * M_PI)), buffer, sfWhite);
+        draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice + 0.1f * M_PI)), buffer, 20, sfWhite);
     }
 }
 
@@ -204,7 +204,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_MENU_DROP:
             case PLAYER_MENU_GRAB:
                 snprintf(buffer, 128, "%d", player->money);
-                draw_text(window, components, camera, NULL, position, buffer, sfYellow);
+                draw_text(window, components, camera, NULL, position, buffer, 20, sfYellow);
 
                 for (int j = 0; j < player->inventory_size; j++) {
                     float offset = 0.0;
@@ -242,7 +242,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 break;
             case PLAYER_AMMO_MENU:
                 snprintf(buffer, 128, "%d", player->money);
-                draw_text(window, components, camera, NULL, position, buffer, sfYellow);
+                draw_text(window, components, camera, NULL, position, buffer, 20, sfYellow);
                 
                 draw_ammo_menu(components, window, camera, i);
                 break;

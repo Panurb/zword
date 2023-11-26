@@ -380,7 +380,7 @@ void draw_spawners(sfRenderWindow* window, GameData data) {
             sfVector2f pos = get_position(data.components, i);
             float angle = get_angle(data.components, i);
             draw_rectangle(window, data.components, data.camera, NULL, pos, col->width, col->height, angle, color);
-            draw_text(window, data.components, data.camera, NULL, pos, "spawner", sfMagenta);
+            draw_text(window, data.components, data.camera, NULL, pos, "spawner", 20, sfMagenta);
         }
     }
 }

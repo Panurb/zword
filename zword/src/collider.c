@@ -368,7 +368,7 @@ void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRender
                 if (grid->array[i][j]->size > 0) {
                     char size[10];
                     snprintf(size, 10, "%i", grid->array[i][j]->size);
-                    draw_text(window, components, camera, text, r, size, sfWhite);
+                    draw_text(window, components, camera, text, r, size, 20, sfWhite);
                 }
             }
         }

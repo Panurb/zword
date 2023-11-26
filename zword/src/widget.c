@@ -434,9 +434,9 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
 
             r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
             if (CoordinateComponent_get(components, i)->children->size == 0) {
-                draw_text(window, components, camera, NULL, r, "v", sfWhite);
+                draw_text(window, components, camera, NULL, r, "v", 20, sfWhite);
             } else {
-                draw_text(window, components, camera, NULL, r, "^", sfWhite);
+                draw_text(window, components, camera, NULL, r, "^", 20, sfWhite);
             }
             break;
         case WIDGET_SLIDER:
@@ -446,7 +446,7 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
                 0.0f, COLOR_BUTTON);
             char buffer[256];
             sprintf(buffer, "%d", widget->value);
-            draw_text(window, components, camera, NULL, pos, buffer, COLOR_TEXT);
+            draw_text(window, components, camera, NULL, pos, buffer, 20, COLOR_TEXT);
             break;
         case WIDGET_SCROLLBAR:
             draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_CONTAINER);
@@ -458,16 +458,16 @@ void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera)
             break;
         case WIDGET_TEXTBOX:
             draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
-            draw_text(window, components, camera, widget->text, pos, widget->string, sfWhite);
+            draw_text(window, components, camera, widget->text, pos, widget->string, 20, sfWhite);
             break;
         default:
             draw_rectangle(window, components, camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
         }
 
         if (widget->strings) {
-            draw_text(window, components, camera, widget->text, pos, widget->strings[widget->value], COLOR_TEXT);
+            draw_text(window, components, camera, widget->text, pos, widget->strings[widget->value], 20, COLOR_TEXT);
         } else {
-            draw_text(window, components, camera, widget->text, pos, widget->string, COLOR_TEXT);
+            draw_text(window, components, camera, widget->text, pos, widget->string, 20, COLOR_TEXT);
         }
     }
 }

@@ -125,7 +125,8 @@ int main() {
                         break;
                     case STATE_GAME:
                         input(data.components, window, data.camera);
-                        update_game(data, window, time_step);
+                        update_game(data, time_step);
+                        update_game_mode(data, time_step);
                         break;
                     case STATE_PAUSE:
                         update_menu(data, window);
@@ -182,7 +183,7 @@ int main() {
                 break;
             case STATE_START:
             case STATE_END:
-                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", sfWhite);
+                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_GAME:
                 draw_game(data, window);
@@ -195,7 +196,7 @@ int main() {
                 draw_menu(data, window);
                 break;
             case STATE_LOAD:
-                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", sfWhite);
+                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_EDITOR:
                 data.ambient_light = 0.8f;

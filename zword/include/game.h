@@ -41,7 +41,9 @@ void end_game(GameData* data);
 
 void reset_game(GameData data);
 
-void update_game(GameData data, sfRenderWindow* window, float time_step);
+void update_game(GameData data, float time_step);
+
+void update_game_mode(GameData data, float time_step);
 
 void draw_game(GameData data, sfRenderWindow* window);
 

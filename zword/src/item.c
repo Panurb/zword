@@ -238,10 +238,10 @@ void draw_items(GameData* data, sfRenderWindow* window) {
             pos = sum(pos, vec(0.0f, 1.0f));
             char buffer[256];
             snprintf(buffer, 256, "%d", item->price);
-            draw_text(window, data->components, data->camera, text, pos, buffer, sfYellow);
+            draw_text(window, data->components, data->camera, text, pos, buffer, 20, sfYellow);
 
             pos = sum(pos, vec(0.0f, 1.0f));
-            draw_text(window, data->components, data->camera, text, pos, item->name, sfYellow);
+            draw_text(window, data->components, data->camera, text, pos, item->name, 20, sfYellow);
         }
     }
     sfText_destroy(text);

@@ -686,7 +686,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
                 sfColor color = selected_categories[i] ? sfWhite : get_color(0.6f, 0.6f, 0.6f, 1.0f);
                 char buffer[128];
                 snprintf(buffer, 128, "%d %s", i + 1, category_names[i]);
-                draw_text(window, data.components, data.menu_camera, NULL, vec(-23, i), buffer, color);
+                draw_text(window, data.components, data.menu_camera, NULL, vec(-23, i), buffer, 20, color);
             }
             break;
         case TOOL_TILE:

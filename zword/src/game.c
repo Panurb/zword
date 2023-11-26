@@ -89,6 +89,7 @@ void init_survival(GameData* data) {
     enemies = 0;
     wave_delay = 5.0f;
     spawn_delay = 2.0f;
+    game_over_timer = 0.0f;
 
     spawners = List_create();
     for (int i = 0; i < data->components->entities; i++) {
@@ -252,9 +253,7 @@ void update_survival(GameData data, float time_step) {
 }
 
 
-void update_game_mode(GameData data, sfRenderWindow* window, float time_step) {
-    UNUSED(window);
-
+void update_game_mode(GameData data, float time_step) {
     switch (data.game_mode) {
         case MODE_SURVIVAL:
             update_survival(data, time_step);
@@ -271,7 +270,7 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
             if (wave_delay > 0.0f) {
                 char buffer[256];
                 snprintf(buffer, 256, "WAVE %d", wave);
-                draw_text(window, data.components, data.menu_camera, NULL, zeros(), buffer, sfWhite);
+                draw_text(window, data.components, data.menu_camera, NULL, zeros(), buffer, 300, sfWhite);
             }
             break;
         default:
@@ -280,7 +279,7 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
 }
 
 
-void update_game(GameData data, sfRenderWindow* window, float time_step) {
+void update_game(GameData data, float time_step) {
     update(data.components, time_step, data.grid);
     collide(data.components, data.grid);
     update_waypoints(data.components, data.grid, data.camera);
@@ -299,8 +298,6 @@ void update_game(GameData data, sfRenderWindow* window, float time_step) {
     draw_lights(data.components, data.grid, data.light_texture, data.camera, data.ambient_light);
 
     animate(data.components, time_step);
-
-    update_game_mode(data, window, time_step);
 }
 
 
@@ -336,7 +333,7 @@ void draw_entities(GameData data, sfRenderWindow* window) {
         if (!coord) continue;
 
         snprintf(buffer, 10, "%d", i);
-        draw_text(window, data.components, data.camera, NULL, coord->position, buffer, sfWhite);
+        draw_text(window, data.components, data.camera, NULL, coord->position, buffer, 20, sfWhite);
     }
 }
 
@@ -356,6 +353,9 @@ void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
 
 
 void update_game_over(GameData data, sfRenderWindow* window, float time_step) {
+    if (game_over_timer > 0.0f) {
+        update_game(data, time_step);
+    }
     update_menu(data, window);
     game_over_timer = fmaxf(game_over_timer - time_step, 0.0f);
 }
@@ -366,8 +366,8 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
     float alpha = 1.0f - game_over_timer / 2.0f;
     draw_overlay(window, data.components, data.menu_camera, alpha);
     sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
-    draw_text(window, data.components, data.menu_camera, NULL, zeros(), "GAME OVER", color);
     if (alpha == 1.0f) {
+        draw_text(window, data.components, data.menu_camera, NULL, vec(0.0f, 5.0f), "GAME OVER", 300, color);
         draw_menu(data, window);
     }
 }

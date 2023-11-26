@@ -294,7 +294,7 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
 }
 
 
-void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100], sfColor color) {
+void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100], int size, sfColor color) {
     bool created = false;
     if (!text) {
         text = sfText_create();
@@ -302,7 +302,7 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
     }
 
     sfText_setFont(text, CameraComponent_get(components, camera)->fonts[0]);
-    sfText_setCharacterSize(text, 20);
+    sfText_setCharacterSize(text, size);
     sfText_setColor(text, color);
 
     sfText_setString(text, string);
