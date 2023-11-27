@@ -79,15 +79,13 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
         if (!on_screen(components, camera, start, 2.0f * radius, 2.0f * radius)) {
             continue;
         }
-
-        float brightness = 0.5f;
-
+        
         switch (collider->type) {
             case COLLIDER_CIRCLE: {
                 sfVertex* v = sfVertexArray_getVertex(collider->verts, 0);
                 v->position = world_to_texture(components, camera, start);
                 sfColor color = sfBlack;
-                color.a = 255 * brightness;
+                color.a = 128;
                 v->color = color;
 
                 sfVector2f velocity = polar_to_cartesian(radius, 0.0f);
@@ -107,22 +105,23 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                 }
                 break;
             } case COLLIDER_RECTANGLE: {
-                sfVertex* v = sfVertexArray_getVertex(collider->verts, 0);
-                v->position = world_to_texture(components, camera, start);
-                sfColor color = sfBlack;
-                color.a = 255 * brightness;
-                v->color = color;
-
-                sfVector2f corners[4];
+                sfVector2f corners[8];
                 get_corners(components, i, corners);
 
-                color.a = 0;
-                for (int j = 0; j < 5; j++) {
-                    sfVector2f corner = corners[j % 4];
-                    sfVector2f end = sum(corner, polar_to_cartesian(fminf(0.5f * radius, 1.0f), get_angle(components, i) + (0.25f - j * 0.5f) * M_PI));
+                for (int j = 0; j < 4; j++) {
+                    sfVector2f corner = corners[j];
+                    corners[j + 4] = sum(corner, polar_to_cartesian(fminf(0.5f * radius, 1.0f), get_angle(components, i) + (0.25f - j * 0.5f) * M_PI));
+                }
 
-                    v = sfVertexArray_getVertex(collider->verts, j + 1);
-                    v->position = world_to_texture(components, camera, end);
+                sfColor color = sfBlack;
+                int quads[16] = { 2, 3, 7, 6,
+                                  3, 0, 4, 7,
+                                  0, 1, 5, 4,
+                                  1, 2, 6, 5 };
+                for (int j = 0; j < collider->verts_size; j++) {
+                    sfVertex* v = sfVertexArray_getVertex(collider->verts, j);
+                    v->position = world_to_texture(components, camera, corners[quads[j]]);
+                    color.a = j % 4 < 2 ? 64 : 0;
                     v->color = color;
                 }
 

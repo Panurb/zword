@@ -195,9 +195,9 @@ ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, in
     col->width = width;
     col->height = height;
 
-    col->verts_size = 6;
+    col->verts_size = 16;
     col->verts = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(col->verts, sfTriangleFan);
+    sfVertexArray_setPrimitiveType(col->verts, sfQuads);
     sfVertexArray_resize(col->verts, col->verts_size);
 
     components->collider[entity] = col;
@@ -240,6 +240,8 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->arms = -1;
     player->money = 0;
     player->use_timer = 0.0f;
+    player->money_increment = 0;
+    player->money_timer = 0.0f;
 
     player->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(player->shape, 4);
@@ -614,11 +616,11 @@ void HealthComponent_remove(ComponentData* components, int entity) {
 }
 
 
-CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution) {
+CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution, float zoom) {
     CameraComponent* camera = malloc(sizeof(CameraComponent));
 
     camera->resolution = resolution;
-    camera->zoom_target = 25.0f;
+    camera->zoom_target = zoom;
     camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
 
     camera->shaders[0] = NULL;

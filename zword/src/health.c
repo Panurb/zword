@@ -62,8 +62,25 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             enemy->weapon = -1;
             WaypointComponent_remove(components, entity);
 
-            if (randi(0, 1)) {
-                int j = create_ammo(components, zeros(), randi(1, 3));
+            float probs[5] = { 0.1f, 0.1f, 0.05f, 0.05f, 0.7f };
+            int j = -1;
+            switch (rand_choice(probs, 5)) {
+                case 0:
+                    j = create_bandage(components, zeros());
+                    break;
+                case 1:
+                    j = create_ammo(components, zeros(), AMMO_PISTOL);
+                    break;
+                case 2:
+                    j = create_ammo(components, zeros(), AMMO_RIFLE);
+                    break;
+                case 3:
+                    j = create_ammo(components, zeros(), AMMO_SHOTGUN);
+                    break;
+                default:
+                    break;
+            }
+            if (j != -1) {
                 add_child(components, entity, j);
             }
         }
@@ -120,7 +137,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 
             PlayerComponent* player = PlayerComponent_get(components, dealer);
             if (player && enemy) {
-                player->money += enemy->bounty;
+                add_money(components, dealer, enemy->bounty);
             }
         }
     }
@@ -131,7 +148,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
     
     PhysicsComponent* physics = PhysicsComponent_get(components, entity);
     if (physics) {
-        apply_force(components, entity, mult(5.0f * min(dmg, 50), normalized(dir)));
+        apply_force(components, entity, mult(fminf(10.0f * dmg, 500.0f), normalized(dir)));
     }
 
     ParticleComponent* particle = ParticleComponent_get(components, entity);

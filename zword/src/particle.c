@@ -123,7 +123,10 @@ void update_particles(ComponentData* components, int camera, float delta_time) {
         if (!part) continue;
 
         float w = 3.0f * part->max_time * part->speed;
-        if (!on_screen(components, camera, get_position(components, i), w, w)) {
+        bool visible = on_screen(components, camera, 
+            get_position(components, i), w, w);
+        if (part->loop && !visible) {
+            
             continue;
         }
 

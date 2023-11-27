@@ -232,7 +232,9 @@ void draw_items(GameData* data, sfRenderWindow* window) {
         sfShader_setFloatUniform(CameraComponent_get(data->components, data->camera)->shaders[1], "offset", 0.05f);
         sfVector2f pos = get_position(data->components, player->target);
         float angle = get_angle(data->components, player->target);
-        draw_sprite(window, data->components, data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
+        if (image->alpha != 0.0f) {
+            draw_sprite(window, data->components, data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
+        }
 
         if (item && item->price != 0) {
             pos = sum(pos, vec(0.0f, 1.0f));

@@ -52,7 +52,7 @@ GameData create_game(sfVideoMode mode) {
     float ambient_light = 0.4f;
     int seed = time(NULL);
     int camera = create_camera(components, mode);
-    int menu_camera = create_camera(components, mode);
+    int menu_camera = create_menu_camera(components, mode);
 
     sfTexture** textures = load_textures();
     sfSoundBuffer** sounds = load_sounds();
@@ -107,7 +107,8 @@ void start_game(GameData* data, Filename map_name) {
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear(data->components);
     data->camera = create_camera(data->components, mode);
-    data->menu_camera = create_camera(data->components, mode);
+    data->menu_camera = create_menu_camera(data->components, mode);
+    data->ambient_light = 0.4f;
     create_pause_menu(data);
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);
@@ -123,7 +124,7 @@ void end_game(GameData* data) {
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear(data->components);
     data->camera = create_camera(data->components, mode);
-    data->menu_camera = create_camera(data->components, mode);
+    data->menu_camera = create_menu_camera(data->components, mode);
     create_menu(*data);
 }
 
@@ -367,7 +368,12 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
     draw_overlay(window, data.components, data.menu_camera, alpha);
     sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
-        draw_text(window, data.components, data.menu_camera, NULL, vec(0.0f, 5.0f), "GAME OVER", 300, color);
+        draw_text(window, data.components, data.menu_camera, NULL, 
+            vec(0.0f, 5.0f), "GAME OVER", 300, color);
+        char buffer[256];
+        snprintf(buffer, 256, "You survived until wave %d", wave);
+        draw_text(window, data.components, data.menu_camera, NULL, 
+            vec(0.0f, 1.0f), buffer, 40, sfWhite);
         draw_menu(data, window);
     }
 }

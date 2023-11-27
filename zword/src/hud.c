@@ -130,6 +130,19 @@ void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera
 }
 
 
+void draw_money(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+    sfVector2f position = sum(get_position(components, entity), vec(0.0f, 1.0f - player->money_timer));
+
+    char buffer[256];
+    snprintf(buffer, 256, "%d", player->money_increment);
+    if (player->money_timer > 0.0f) {
+        sfColor color = get_color(1.0f, 1.0f, 0.0f, player->money_timer);
+        draw_text(window, components, camera, NULL, position, buffer, 20, color);
+    }
+}
+
+
 void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(components, i);
@@ -171,6 +184,8 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             if (health->health != health->max_health) {
                 draw_slice(window, components, camera, NULL, 50, position, 0.5f, 0.6f, M_PI_2 - 0.5f * x, x, sfRed);
             }
+
+            draw_money(components, window, camera, i);
         }
 
         char buffer[128];

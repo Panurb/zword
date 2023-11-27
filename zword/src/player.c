@@ -109,6 +109,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     coord->angle -= get_angle(components, coord->parent);
                 }
             }
+
+            player->money_timer = fmaxf(player->money_timer - time_step, 0.0f);
         }
 
         if (weapon) {
@@ -327,4 +329,12 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
         }
     }
+}
+
+
+void add_money(ComponentData* components, int entity, int amount) {
+    PlayerComponent* player = PlayerComponent_get(components, entity);
+    player->money += amount;
+    player->money_increment = amount;
+    player->money_timer = 1.0f;
 }

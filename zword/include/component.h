@@ -156,6 +156,8 @@ typedef struct {
     int arms;
     int money;
     float use_timer;
+    float money_timer;
+    int money_increment;
 } PlayerComponent;
 
 typedef struct {
@@ -348,6 +350,8 @@ typedef struct {
     int size;
     SoundEvent* events[4];
     Filename hit_sound;
+    Filename move_sound;
+    Filename loop_sound;
 } SoundComponent;
 
 typedef struct {
@@ -495,7 +499,7 @@ HealthComponent* HealthComponent_add(ComponentData* components, int entity, int 
 HealthComponent* HealthComponent_get(ComponentData* components, int entity);
 void HealthComponent_remove(ComponentData* components, int entity);
 
-CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution);
+CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution, float zoom);
 CameraComponent* CameraComponent_get(ComponentData* components, int entity);
 void CameraComponent_remove(ComponentData* components, int entity);
 
