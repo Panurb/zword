@@ -46,7 +46,6 @@ void get_map_name(GameData* data, ButtonText buffer) {
 
 
 void change_state_end(ComponentData* components, int entity) {
-    printf("End");
     UNUSED(components);
     UNUSED(entity);
     game_state = STATE_END;
@@ -66,6 +65,14 @@ void change_state_start(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     strcpy(map_name, widget->string);
     game_state = STATE_START;
+    reset_ids();
+}
+
+
+void change_state_reset(ComponentData* components, int entity) {
+    UNUSED(components);
+    UNUSED(entity);
+    game_state = STATE_RESET;
     reset_ids();
 }
 
@@ -267,6 +274,6 @@ void draw_menu(GameData data, sfRenderWindow* window) {
 
 
 void create_game_over_menu(GameData data) {
-    create_button(data.components, "Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_start);
+    create_button(data.components, "Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     create_button(data.components, "Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
 }

@@ -309,8 +309,9 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
         created = true;
     }
 
-    sfText_setFont(text, CameraComponent_get(components, camera)->fonts[0]);
-    sfText_setCharacterSize(text, size);
+    CameraComponent* cam = CameraComponent_get(components, camera);
+    sfText_setFont(text, cam->fonts[0]);
+    sfText_setCharacterSize(text, size * cam->zoom / 40.0f);
     sfText_setColor(text, color);
 
     sfText_setString(text, string);

@@ -70,6 +70,9 @@ void create_uranium(ComponentData* components, ColliderGrid* grid, sfVector2f po
                                                         get_color(0.5, 1.0, 0.0, 1.0), get_color(0.5, 1.0, 0.0, 1.0));
     particle->enabled = true;
     particle->loop = true;
+
+    SoundComponent_add(components, i, "stone_hit");
+    loop_sound(components, i, "geiger", 0.2f, 1.0f);
 }
 
 

@@ -350,8 +350,6 @@ typedef struct {
     int size;
     SoundEvent* events[4];
     Filename hit_sound;
-    Filename move_sound;
-    Filename loop_sound;
 } SoundComponent;
 
 typedef struct {

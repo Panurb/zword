@@ -123,6 +123,10 @@ int main() {
                         end_game(&data);
                         game_state = STATE_MENU;
                         break;
+                    case STATE_RESET:
+                        end_game(&data);
+                        game_state = STATE_START;
+                        break;
                     case STATE_GAME:
                         input(data.components, window, data.camera);
                         update_game(data, time_step);
@@ -183,6 +187,7 @@ int main() {
                 break;
             case STATE_START:
             case STATE_END:
+            case STATE_RESET:
                 draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_GAME:
