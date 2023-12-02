@@ -267,7 +267,10 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("assault rifle") return create_assault_rifle(components, position);
     MATCH("axe") return create_axe(components, position);
     MATCH("pistol") return create_pistol(components, position);
+    MATCH("sawed-off") return create_sawed_off(components, position);
     MATCH("shotgun") return create_shotgun(components, position);
+    MATCH("smg") return create_smg(components, position);
+    MATCH("sword") return create_sword(components, position);
 
     return -1;
 }

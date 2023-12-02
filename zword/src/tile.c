@@ -81,7 +81,7 @@ void create_fence(ComponentData* components, sfVector2f pos, float angle, float 
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, angle);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_BARRIERS);
-    ImageComponent_add(components, i, "wood_tile", width, height, LAYER_WALLS);
+    ImageComponent_add(components, i, "fence_tile", width, height, LAYER_WALLS);
 }
 
 
@@ -129,6 +129,9 @@ void create_tile(ComponentData* components, Tile tile, sfVector2f position, floa
             break;
         case TILE_BRICK:
             create_wall(components, position, angle, width, height, "brick_tile");
+            break;
+        case TILE_FENCE:
+            create_fence(components, position, angle, width, height);
             break;
         case TILE_GRASS:
             create_ground(components, position, width, height, NULL);

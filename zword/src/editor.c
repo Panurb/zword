@@ -63,6 +63,7 @@ static ButtonText tile_names[] = {
     "beach corner",
     "board",
     "brick",
+    "fence",
     "grass",
     "roof",
     "spawner",
@@ -110,7 +111,10 @@ static ButtonText weapon_names[] = {
     "assault rifle",
     "axe",
     "pistol",
-    "shotgun"
+    "sawed-off",
+    "shotgun",
+    "smg",
+    "sword"
 };
 
 
@@ -405,8 +409,8 @@ void create_editor_menu(GameData* data) {
     create_button(data->components, "OBJECTS", pos, toggle_objects);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "WEAPONS", pos, toggle_weapons);
-    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
-    create_button(data->components, "PREFABS", pos, toggle_prefabs);
+    // pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    // create_button(data->components, "PREFABS", pos, toggle_prefabs);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "SAVE", pos, save_map);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));

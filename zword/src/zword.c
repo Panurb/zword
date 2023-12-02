@@ -35,7 +35,7 @@ sfRenderWindow* create_game_window(sfVideoMode* mode) {
     sfRenderWindow_setMouseCursorVisible(window, false);
     sfWindow_setVerticalSyncEnabled((sfWindow*) window, game_settings.vsync);
     if (game_settings.max_fps) {
-        sfWindow_setFramerateLimit((sfWindow*) window, 60);
+        sfWindow_setFramerateLimit((sfWindow*) window, game_settings.max_fps);
     }
     return window;
 }

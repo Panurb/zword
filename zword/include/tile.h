@@ -11,6 +11,7 @@ typedef enum {
     TILE_BEACH_CORNER,
     TILE_BOARD,
     TILE_BRICK,
+    TILE_FENCE,
     TILE_GRASS,
     TILE_ROOF,
     TILE_SPAWNER,

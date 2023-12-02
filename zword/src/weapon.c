@@ -310,6 +310,23 @@ int create_shotgun(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "shotgun", 2.0, 1.0, 3);
     PhysicsComponent_add(components, i, 0.5f);
+    WeaponComponent_add(components, i, 1.0f, 8, 8, 0.05f * M_PI, 6, 0.25f, 25.0f, 5.0f, AMMO_SHOTGUN, "shotgun");
+    ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.1f);
+    ItemComponent_add(components, i, 0, 300, "Shotgun");
+    SoundComponent_add(components, i, "metal");
+    LightComponent_add(components, i, 3.0f, 2.0 * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 5.0f)->enabled = false;
+
+    return i;
+}
+
+
+int create_sawed_off(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, 0.0f);
+    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ImageComponent_add(components, i, "shotgun", 2.0, 1.0, 3);
+    PhysicsComponent_add(components, i, 0.5f);
     WeaponComponent_add(components, i, 10.0f, 10, 10, 0.1f * M_PI, 2, 0.25f, 20.0f, 1.5f, AMMO_SHOTGUN, "shotgun");
     ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.1f);
     ItemComponent_add(components, i, 0, 500, "Sawed-off");
@@ -354,6 +371,23 @@ int create_assault_rifle(ComponentData* components, sfVector2f position) {
 }
 
 
+int create_smg(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, 0.0f);
+    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ImageComponent_add(components, i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
+    PhysicsComponent_add(components, i, 0.5f);
+    WeaponComponent_add(components, i, 20.0f, 10, 1, 0.0f, 20, 0.5f, 30.0f, 2.0f, AMMO_PISTOL, "assault_rifle")->automatic = true;
+    ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.15f);
+    ItemComponent_add(components, i, 1, 500, "SMG");
+    SoundComponent_add(components, i, "metal");
+    LightComponent_add(components, i, 3.0f, 2.0f * M_PI, get_color(1.0, 1.0, 1.0, 1.0), 1.0, 10.0f)->enabled = false;
+
+    return i;
+}
+
+
 int create_axe(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
@@ -363,6 +397,21 @@ int create_axe(ComponentData* components, sfVector2f position) {
     PhysicsComponent_add(components, i, 1.0f);
     WeaponComponent_add(components, i, 2.0f, 50, 7, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
     ItemComponent_add(components, i, 0, 0, "Axe");
+    SoundComponent_add(components, i, "metal");
+
+    return i;
+}
+
+
+int create_sword(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+
+    CoordinateComponent_add(components, i, position, rand_angle());
+    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ImageComponent_add(components, i, "axe", 2.0, 1.0, LAYER_ITEMS);
+    PhysicsComponent_add(components, i, 1.0f);
+    WeaponComponent_add(components, i, 3.0f, 50, 10, 0.6f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
+    ItemComponent_add(components, i, 0, 1000, "Sword");
     SoundComponent_add(components, i, "metal");
 
     return i;
