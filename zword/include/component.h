@@ -367,8 +367,7 @@ typedef struct {
 
 typedef struct {
     bool locked;
-    sfVector2f anchor;
-    sfVector2f direction;
+    int price;
 } DoorComponent;
 
 typedef struct {
@@ -517,7 +516,7 @@ AnimationComponent* AnimationComponent_add(ComponentData* components, int entity
 AnimationComponent* AnimationComponent_get(ComponentData* components, int entity);
 void AnimationComponent_remove(ComponentData* components, int entity);
 
-DoorComponent* DoorComponent_add(ComponentData* components, int entity, sfVector2f anchor);
+DoorComponent* DoorComponent_add(ComponentData* components, int entity, int price);
 DoorComponent* DoorComponent_get(ComponentData* components, int entity);
 void DoorComponent_remove(ComponentData* components, int entity);
 

@@ -16,14 +16,11 @@ int create_door(ComponentData* components, sfVector2f pos, float angle) {
     ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
     ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(components, i, "wood_hit");
-    DoorComponent_add(components, i, sum(pos, polar_to_cartesian(-1.0f, angle)));
+    DoorComponent_add(components, i, 500);
     PhysicsComponent_add(components, i, 1.0f);
     int j = create_entity(components);
     CoordinateComponent_add(components, j, sum(pos, polar_to_cartesian(1.0f, angle + M_PI)), angle + M_PI);
     JointComponent_add(components, i, j, 1.0f, 1.0f, 1.0f)->max_angle = 0.5f * M_PI;
-
-    create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle + 0.5f * M_PI)));
-    create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle + 0.5f * M_PI)));
 
     return i;
 }

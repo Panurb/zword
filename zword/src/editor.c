@@ -80,20 +80,15 @@ static ButtonText object_names[] = {
     "bandage",
     "bed",
     "bench",
-    "big boy",
-    "boss",
     "candle",
     "car",
     "desk",
     "door",
-    "farmer",
     "fire",
     "flashlight",
     "gas",
     "hay bale",
     "lamp",
-    "player",
-    "priest",
     "rock",
     "stove",
     "sink",
@@ -101,6 +96,14 @@ static ButtonText object_names[] = {
     "toilet",
     "tree",
     "waypoint",
+};
+
+static ButtonText creature_names[] = {
+    "big boy",
+    "boss",
+    "farmer",
+    "player",
+    "priest",
     "zombie"
 };
 
@@ -241,6 +244,14 @@ void toggle_objects(ComponentData* components, int entity) {
     UNUSED(entity);
     static int window_id = -1;
     window_id = toggle_list_window(components, window_id, "OBJECTS", toggle_objects, object_names, LENGTH(object_names), 
+        select_object);
+}
+
+
+void toggle_creatures(ComponentData* components, int entity) {
+    UNUSED(entity);
+    static int window_id = -1;
+    window_id = toggle_list_window(components, window_id, "CREATURES", toggle_creatures, creature_names, LENGTH(creature_names), 
         select_object);
 }
 
@@ -407,6 +418,8 @@ void create_editor_menu(GameData* data) {
     create_button(data->components, "TILES", pos, toggle_tiles);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "OBJECTS", pos, toggle_objects);
+    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "CREATURES", pos, toggle_creatures);
     pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     create_button(data->components, "WEAPONS", pos, toggle_weapons);
     // pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));

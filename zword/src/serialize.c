@@ -630,6 +630,27 @@ void AmmoComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
+void DoorComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    DoorComponent* door = DoorComponent_get(components, entity);
+    if (!door) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Door", json);
+    cJSON_AddNumberToObject(json, "price", door->price);
+    serialize_int(json, "locked", door->locked, false);
+}
+
+
+void DoorComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Ammo");
+    if (!json) return;
+
+    int price = cJSON_GetObjectItem(json, "price")->valueint;
+    DoorComponent* door = DoorComponent_add(components, entity, price);
+    door->locked = deserialize_int(json, "locked", door->locked);
+}
+
+
 bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
         sfVector2f offset) {
     if (!CoordinateComponent_get(components, entity)) return false;

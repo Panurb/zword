@@ -780,11 +780,10 @@ void AnimationComponent_remove(ComponentData* components, int entity) {
 }
 
 
-DoorComponent* DoorComponent_add(ComponentData* components, int entity, sfVector2f anchor) {
+DoorComponent* DoorComponent_add(ComponentData* components, int entity, int price) {
     DoorComponent* door = malloc(sizeof(DoorComponent));
-    door->locked = false;
-    door->anchor = anchor;
-    door->direction = diff(get_position(components, entity), anchor);
+    door->locked = true;
+    door->price = price;
 
     components->door[entity] = door;
     return door;
