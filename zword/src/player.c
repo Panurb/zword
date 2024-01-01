@@ -100,6 +100,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         ItemComponent* itco = ItemComponent_get(components, item);
         WeaponComponent* weapon = WeaponComponent_get(components, item);
         LightComponent* light = LightComponent_get(components, item);
+        ImageComponent* image = ImageComponent_get(components, item);
 
         if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
             phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
@@ -114,19 +115,13 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         }
 
         if (weapon) {
-            switch (weapon->ammo_type) {
-                case AMMO_PISTOL:
-                    change_texture(components, player->arms, "arms_pistol", 0.0f, 0.0f);
-                    break;
-                case AMMO_RIFLE:
-                    change_texture(components, player->arms, "arms_assault_rifle", 0.0f, 0.0f);
-                    break;
-                case AMMO_SHOTGUN:
-                    change_texture(components, player->arms, "arms_shotgun", 0.0f, 0.0f);
-                    break;
-                default:
-                    change_texture(components, player->arms, "arms_axe", 2.0f, 2.0f);
-                    break;
+            char buffer[256];
+            snprintf(buffer, 256, "arms_%s", image->filename);
+
+            if (weapon->ammo_type == AMMO_MELEE) {
+                change_texture(components, player->arms, buffer, 2.0f, 2.0f);
+            } else {
+                change_texture(components, player->arms, buffer, 0.0f, 0.0f);
             }
         } else {
             if (itco) {

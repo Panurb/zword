@@ -203,8 +203,8 @@ int create_fire(ComponentData* components, sfVector2f pos) {
     ParticleComponent_add_type(components, i, PARTICLE_FIRE, 0.6f);
     ColliderComponent_add_circle(components, i, 0.35, GROUP_BARRIERS);
     ImageComponent_add(components, i, "fire", 1.0, 1.0, LAYER_ITEMS);
-    SoundComponent_add(components, i, "");
-    loop_sound(components, i, "fire", 1.0f, 1.0f);
+    SoundComponent* sound = SoundComponent_add(components, i, "");
+    strcpy(sound->loop_sound, "fire");
 
     return i;
 }

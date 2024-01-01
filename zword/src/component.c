@@ -694,6 +694,7 @@ SoundComponent* SoundComponent_add(ComponentData* components, int entity, Filena
         sound->events[i] = NULL;
     }
     strcpy(sound->hit_sound, hit_sound);
+    strcpy(sound->loop_sound, "");
     components->sound[entity] = sound;
     return sound;
 }

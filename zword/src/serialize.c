@@ -480,8 +480,11 @@ void SoundComponent_serialize(cJSON* entity_json, ComponentData* components, int
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Sound", json);
-    if (sound->hit_sound != '\0') {
+    if (sound->hit_sound[0] != '\0') {
         cJSON_AddStringToObject(json, "hit_sound", sound->hit_sound);
+    }
+    if (sound->loop_sound[0] != '\0') {
+        cJSON_AddStringToObject(json, "loop_sound", sound->loop_sound);
     }
 }
 
@@ -490,12 +493,18 @@ void SoundComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     cJSON* json = cJSON_GetObjectItem(entity_json, "Sound");
     if (!json) return;
 
-    char hit_sound[] = "";
+    char hit_sound[256] = "";
+    char loop_sound[256] = "";
     cJSON* hit_sound_json = cJSON_GetObjectItem(json, "hit_sound");
     if (hit_sound_json) {
         strcpy(hit_sound, hit_sound_json->valuestring);
     }
-    SoundComponent_add(components, entity, hit_sound);
+    cJSON* loop_sound_json = cJSON_GetObjectItem(json, "loop_sound");
+    if (loop_sound_json) {
+        strcpy(loop_sound, loop_sound_json->valuestring);
+    }
+    SoundComponent* sound = SoundComponent_add(components, entity, hit_sound);
+    strcpy(sound->loop_sound, loop_sound);
 }
 
 

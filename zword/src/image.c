@@ -25,6 +25,7 @@ static const char* IMAGES[] = {
     "arms_axe",
     "arms_pistol",
     "arms_shotgun",
+    "arms_smg",
     "assault_rifle",
     "axe",
     "bandage",
@@ -76,6 +77,7 @@ static const char* IMAGES[] = {
     "rope",
     "shotgun",
     "sink",
+    "smg",
     "stone_tile",
     "stove",
     "table",
@@ -103,7 +105,6 @@ sfTexture** load_textures() {
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
 
     sfTexture** textures = malloc(sizeof(IMAGES) * sizeof(sfTexture*));
-
     for (int i = 0; i < n; i++) {
         char path[100];
         snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");

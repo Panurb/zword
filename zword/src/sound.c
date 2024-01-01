@@ -107,6 +107,12 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
 
         float dist = norm(diff(get_position(components, i), get_position(components, camera)));
 
+        if (scomp->loop_sound[0] != '\0') {
+            if (!scomp->events[0]) {
+                loop_sound(components, i, scomp->loop_sound, 0.5f, 1.0f);
+            }
+        }
+
         for (int j = 0; j < scomp->size; j++) {
             SoundEvent* event = scomp->events[j];
             if (!event) continue;
@@ -126,13 +132,21 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
 
             float vol = event->volume;
             CameraComponent* cam = CameraComponent_get(components, camera);
-            float radius = cam->resolution.x / cam->zoom;
+            float radius = 0.5f * cam->resolution.x / cam->zoom;
             if (dist > radius) {
-                vol = expf(-(dist - radius));
+                vol = expf(-(dist - radius)) * event->volume;
+            }
+
+            if (event->loop) {
+                vol = fmaxf(0.0f, (radius - dist) / radius) * event->volume;
             }
 
             sfSound_setVolume(channel, vol * 100.0f);
             sfSound_setPitch(channel, event->pitch);
+
+            if (event->loop) {
+                printf("%f\n", vol * 100.0f);
+            }
 
             if (event->channel != -1) {
                 if (!event->loop) {
