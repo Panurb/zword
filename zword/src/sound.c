@@ -144,10 +144,6 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
             sfSound_setVolume(channel, vol * 100.0f);
             sfSound_setPitch(channel, event->pitch);
 
-            if (event->loop) {
-                printf("%f\n", vol * 100.0f);
-            }
-
             if (event->channel != -1) {
                 if (!event->loop) {
                     event->volume *= 0.95;

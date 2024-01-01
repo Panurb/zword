@@ -119,7 +119,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             snprintf(buffer, 256, "arms_%s", image->filename);
 
             if (weapon->ammo_type == AMMO_MELEE) {
-                change_texture(components, player->arms, buffer, 2.0f, 2.0f);
+                change_texture(components, player->arms, buffer, 2.0f, 3.0f);
             } else {
                 change_texture(components, player->arms, buffer, 0.0f, 0.0f);
             }
