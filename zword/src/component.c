@@ -195,7 +195,7 @@ ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, in
     col->width = width;
     col->height = height;
 
-    col->verts_size = 16;
+    col->verts_size = 20;
     col->verts = sfVertexArray_create();
     sfVertexArray_setPrimitiveType(col->verts, sfQuads);
     sfVertexArray_resize(col->verts, col->verts_size);

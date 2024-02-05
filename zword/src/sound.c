@@ -10,6 +10,7 @@
 #include "sound.h"
 #include "util.h"
 #include "component.h"
+#include "settings.h"
 
 
 static const char* SOUNDS[] = {
@@ -141,7 +142,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
                 vol = fmaxf(0.0f, (radius - dist) / radius) * event->volume;
             }
 
-            sfSound_setVolume(channel, vol * 100.0f);
+            sfSound_setVolume(channel, vol * game_settings.volume);
             sfSound_setPitch(channel, event->pitch);
 
             if (event->channel != -1) {

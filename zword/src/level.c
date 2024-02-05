@@ -52,30 +52,6 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 }
 
 
-void create_uranium(ComponentData* components, ColliderGrid* grid, sfVector2f position) {
-    int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, rand_angle());
-    float r = randf(0.8, 1.2);
-    ColliderComponent_add_circle(components, i, 0.5 * r, GROUP_TREES);
-
-    if (collides_with(components, grid, i, NULL)) {
-        destroy_entity(components, i);
-        return;
-    }
-
-    ImageComponent_add(components, i, "uranium", r, r, LAYER_DECALS);
-    LightComponent_add(components, i, randf(3.0, 5.0), 2.0 * M_PI, get_color(0.5, 1.0, 0.0, 1.0), 0.5, 1.0)->flicker = 0.25;
-    SoundComponent_add(components, i, "");
-    ParticleComponent* particle = ParticleComponent_add(components, i, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, 
-                                                        get_color(0.5, 1.0, 0.0, 1.0), get_color(0.5, 1.0, 0.0, 1.0));
-    particle->enabled = true;
-    particle->loop = true;
-
-    SoundComponent_add(components, i, "stone_hit");
-    loop_sound(components, i, "geiger", 0.2f, 1.0f);
-}
-
-
 void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     srand(seed);
 

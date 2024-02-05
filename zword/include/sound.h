@@ -20,7 +20,8 @@
 // https://freesound.org/people/MCOcontentcreation/sounds/258289/
 // https://freesound.org/people/aerror/sounds/350757/
 
-#define MAX_SOUNDS 256
+// Max 256
+#define MAX_SOUNDS 255
 
 typedef sfSoundBuffer* SoundArray[100];
 

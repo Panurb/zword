@@ -8,6 +8,7 @@
 #include <SFML/Graphics.h>
 #include <SFML/System/Vector2.h>
 #include <SFML/Window/Keyboard.h>
+#include <SFML/Audio/Music.h>
 
 #include "sound.h"
 #include "game.h"
@@ -69,6 +70,10 @@ int main() {
 
     ButtonText buffer;
 
+    sfMusic* music = sfMusic_createFromFile("data/music/zsong.ogg");
+    bool music_playing = false;
+    sfMusic_setLoop(music, true);
+
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
 
@@ -121,10 +126,12 @@ int main() {
                         break;
                     case STATE_END:
                         end_game(&data);
+                        clear_sounds(channels);
                         game_state = STATE_MENU;
                         break;
                     case STATE_RESET:
                         end_game(&data);
+                        clear_sounds(channels);
                         game_state = STATE_START;
                         break;
                     case STATE_GAME:
@@ -223,6 +230,11 @@ int main() {
         sfRenderWindow_display(window);
 
         play_sounds(data.components, data.camera, data.sounds, channels);
+        sfMusic_setVolume(music, 0.5f * game_settings.music);
+        if (!music_playing) {
+            sfMusic_play(music);
+            music_playing = true;
+        }
     }
 
     sfRenderWindow_destroy(window);

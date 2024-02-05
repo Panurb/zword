@@ -95,6 +95,7 @@ static ButtonText object_names[] = {
     "table",
     "toilet",
     "tree",
+    "uranium",
     "waypoint",
 };
 

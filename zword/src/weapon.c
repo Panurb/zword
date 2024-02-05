@@ -378,7 +378,7 @@ int create_smg(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "smg", 2.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 0.5f);
-    WeaponComponent_add(components, i, 20.0f, 20, 1, 0.0f, 20, 0.5f, 30.0f, 2.0f, AMMO_PISTOL, "pistol")->automatic = true;
+    WeaponComponent_add(components, i, 15.0f, 20, 1, 0.0f, 20, 0.2f, 30.0f, 2.0f, AMMO_PISTOL, "pistol")->automatic = true;
     ParticleComponent_add_type(components, i, PARTICLE_BULLET, 0.15f);
     ItemComponent_add(components, i, 1, 0, "Jatimatic");
     SoundComponent_add(components, i, "metal");

@@ -113,6 +113,9 @@ void start_game(GameData* data, Filename map_name) {
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);
     load_game(data, map_name);
+
+    create_smg(data->components, zeros());
+
     init_grid(data->components, data->grid);
     init_survival(data);
 }

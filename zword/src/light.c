@@ -108,20 +108,31 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                 sfVector2f corners[8];
                 get_corners(components, i, corners);
 
+                float r = fminf(0.5f * radius, 1.0f);
+                float angle = get_angle(components, i);
                 for (int j = 0; j < 4; j++) {
                     sfVector2f corner = corners[j];
-                    corners[j + 4] = sum(corner, polar_to_cartesian(fminf(0.5f * radius, 1.0f), get_angle(components, i) + (0.25f - j * 0.5f) * M_PI));
+                    corners[j + 4] = sum(corner, polar_to_cartesian(r, angle + (0.25f - j * 0.5f) * M_PI));
                 }
 
+                // 7 ----------- 4
+                // |\           /|
+                // |  3 ----- 0  |
+                // |  |       |  |
+                // |  2 ----- 1  |
+                // |/           \|
+                // 6 ----------- 5
+
                 sfColor color = sfBlack;
-                int quads[16] = { 2, 3, 7, 6,
+                int quads[20] = { 2, 3, 7, 6,
                                   3, 0, 4, 7,
                                   0, 1, 5, 4,
-                                  1, 2, 6, 5 };
+                                  1, 2, 6, 5,
+                                  3, 2, 1, 0 };
                 for (int j = 0; j < collider->verts_size; j++) {
                     sfVertex* v = sfVertexArray_getVertex(collider->verts, j);
                     v->position = world_to_texture(components, camera, corners[quads[j]]);
-                    color.a = j % 4 < 2 ? 64 : 0;
+                    color.a = j % 4 < 2 || j > 15 ? 64 : 0;
                     v->color = color;
                 }
 

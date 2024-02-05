@@ -114,6 +114,9 @@ void apply(ComponentData* components, int entity) {
     widget = WidgetComponent_get(components, SOUND_ID);
     game_settings.volume = widget->value;
 
+    widget = WidgetComponent_get(components, MUSIC_ID);
+    game_settings.music = widget->value;
+
     save_settings();
     game_state = STATE_APPLY;
 }
@@ -177,6 +180,19 @@ void toggle_editor(ComponentData* components, int entity) {
 }
 
 
+int get_resolution_index() {
+    char resolution[128];
+    snprintf(resolution, "%dx%d", game_settings.width, game_settings.height);
+    int size = sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]);
+    for (int i = 0; i < size; i++) {
+        if (strcmp(RESOLUTIONS[i], resolution) == 0) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+
 void toggle_settings(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_settings != -1) {
@@ -193,12 +209,16 @@ void toggle_settings(ComponentData* components, int entity) {
 
     int label = create_label(components, "Resolution", zeros());
     RESOLUTION_ID = create_dropdown(components, zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
-    // TODO: show current resolution
+    WidgetComponent_get(components, RESOLUTION_ID)->value = get_resolution_index();
     add_row_to_container(components, container, label, RESOLUTION_ID);
 
     label = create_label(components, "Sound", zeros());
     SOUND_ID = create_slider(components, zeros(), 0, 100, game_settings.volume, NULL);
     add_row_to_container(components, container, label, SOUND_ID);
+
+    label = create_label(components, "Music", zeros());
+    MUSIC_ID = create_slider(components, zeros(), 0, 100, game_settings.music, NULL);
+    add_row_to_container(components, container, label, MUSIC_ID);
 
     add_button_to_container(components, container, "Apply", apply);
 }

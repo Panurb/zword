@@ -47,7 +47,7 @@ int create_bandage(ComponentData* components, sfVector2f position) {
     ImageComponent_add(components, i, "bandage", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent* item = ItemComponent_add(components, i, 0, 0, "");
     item->use_time = 2.0f;
-    item->value = 20;
+    item->value = 100;
 
     return i;
 }

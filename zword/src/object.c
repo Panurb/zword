@@ -232,6 +232,26 @@ int create_rock(ComponentData* components, sfVector2f position) {
 }
 
 
+int create_uranium(ComponentData* components, sfVector2f position) {
+    int i = create_entity(components);
+    CoordinateComponent_add(components, i, position, rand_angle());
+    float r = randf(0.8f, 1.2f);
+    ColliderComponent_add_circle(components, i, 0.5f * r, GROUP_TREES);
+
+    ImageComponent_add(components, i, "uranium", r, r, LAYER_DECALS);
+    LightComponent_add(components, i, randf(3.0, 5.0), 2.0 * M_PI, COLOR_ENERGY, 0.5, 1.0)->flicker = 0.25;
+    ParticleComponent* particle = ParticleComponent_add(components, i, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, 
+                                                        get_color(0.5, 1.0, 0.0, 1.0), get_color(0.5, 1.0, 0.0, 1.0));
+    particle->enabled = true;
+    particle->loop = true;
+
+    SoundComponent* sound = SoundComponent_add(components, i, "stone_hit");
+    strcpy(sound->loop_sound, "geiger");
+
+    return i;
+}
+
+
 int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
@@ -257,6 +277,7 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("sink") return create_sink(components, position, angle);
     MATCH("table") return create_table(components, position);
     MATCH("toilet") return create_toilet(components, position, angle);
+    MATCH("uranium") return create_uranium(components, position);
     MATCH("tree") return create_tree(components, position);
     MATCH("waypoint") return create_waypoint(components, position);
     MATCH("zombie") return create_zombie(components, position, angle);
