@@ -182,7 +182,7 @@ void toggle_editor(ComponentData* components, int entity) {
 
 int get_resolution_index() {
     char resolution[128];
-    snprintf(resolution, "%dx%d", game_settings.width, game_settings.height);
+    snprintf(resolution, 128, "%dx%d", game_settings.width, game_settings.height);
     int size = sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]);
     for (int i = 0; i < size; i++) {
         if (strcmp(RESOLUTIONS[i], resolution) == 0) {

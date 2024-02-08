@@ -118,7 +118,9 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             char buffer[256];
             snprintf(buffer, 256, "arms_%s", image->filename);
 
-            if (weapon->ammo_type == AMMO_MELEE) {
+            if (strcmp(image->filename, "axe") == 0) {
+                change_texture(components, player->arms, buffer, 2.0f, 2.0f);
+            } else if (strcmp(image->filename, "sword") == 0) {
                 change_texture(components, player->arms, buffer, 2.0f, 3.0f);
             } else {
                 change_texture(components, player->arms, buffer, 0.0f, 0.0f);
@@ -328,6 +330,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
 
 void add_money(ComponentData* components, int entity, int amount) {
+    if (amount == 0) return;
+    
     PlayerComponent* player = PlayerComponent_get(components, entity);
     player->money += amount;
     player->money_increment = amount;

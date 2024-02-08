@@ -49,7 +49,7 @@ void change_state_game_over(GameData data) {
 GameData create_game(sfVideoMode mode) {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
-    float ambient_light = 0.4f;
+    float ambient_light = 0.5f;
     int seed = time(NULL);
     int camera = create_camera(components, mode);
     int menu_camera = create_menu_camera(components, mode);
@@ -113,8 +113,6 @@ void start_game(GameData* data, Filename map_name) {
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);
     load_game(data, map_name);
-
-    create_smg(data->components, zeros());
 
     init_grid(data->components, data->grid);
     init_survival(data);

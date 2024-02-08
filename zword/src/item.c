@@ -6,6 +6,7 @@
 #include "image.h"
 #include "weapon.h"
 #include "game.h" 
+#include "player.h"
 
 
 int create_flashlight(ComponentData* components, sfVector2f position) {
@@ -102,7 +103,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     if (item->price > player->money) {
         return;
     }
-    player->money -= item->price;
+    add_money(components, entity, -item->price);
     item->price = 0;
 
     clear_grid(components, grid, player->target);
@@ -236,13 +237,15 @@ void draw_items(GameData* data, sfRenderWindow* window) {
             draw_sprite(window, data->components, data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
         }
 
-        if (item && item->price != 0) {
+        if (item) {
             pos = sum(pos, vec(0.0f, 1.0f));
             char buffer[256];
-            snprintf(buffer, 256, "%d", item->price);
-            draw_text(window, data->components, data->camera, text, pos, buffer, 20, sfYellow);
+            if (item->price > 0) {
+                snprintf(buffer, 256, "%d", item->price);
+                draw_text(window, data->components, data->camera, text, pos, buffer, 20, sfYellow);
+                pos = sum(pos, vec(0.0f, 1.0f));
+            }
 
-            pos = sum(pos, vec(0.0f, 1.0f));
             draw_text(window, data->components, data->camera, text, pos, item->name, 20, sfYellow);
         }
     }

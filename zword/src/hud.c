@@ -132,7 +132,8 @@ void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera
 
 void draw_money(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(components, entity);
-    sfVector2f position = sum(get_position(components, entity), vec(0.0f, 1.0f - player->money_timer));
+    sfVector2f position = sum(get_position(components, entity), 
+        vec(0.0f, (1.0f - player->money_timer) * sign(player->money_increment)));
 
     char buffer[256];
     snprintf(buffer, 256, "%d", player->money_increment);

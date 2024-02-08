@@ -143,9 +143,11 @@ int main() {
                         update_menu(data, window);
                         break;
                     case STATE_APPLY:
-                        sfRenderWindow_destroy(window);
-                        window = create_game_window(&mode);
-                        resize_game(&data, mode);
+                        if (game_settings.width != mode.width || game_settings.height != mode.height) {
+                            sfRenderWindow_destroy(window);
+                            window = create_game_window(&mode);
+                            resize_game(&data, mode);
+                        }
                         game_state = STATE_MENU;
                         break;
                     case STATE_CREATE:

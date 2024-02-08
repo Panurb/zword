@@ -62,7 +62,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             enemy->weapon = -1;
             WaypointComponent_remove(components, entity);
 
-            float probs[5] = { 0.1f, 0.1f, 0.05f, 0.05f, 0.7f };
+            float probs[5] = { 0.1f, 0.15f, 0.15f, 0.1f, 0.5f };
             int j = -1;
             switch (rand_choice(probs, 5)) {
                 case 0:

@@ -720,13 +720,13 @@ AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType
     ammo->type = type;
     switch (type) {
         case AMMO_PISTOL:
-            ammo->size = 12;
+            ammo->size = 24;
             break;
         case AMMO_RIFLE:
-            ammo->size = 30;
+            ammo->size = 60;
             break;
         case AMMO_SHOTGUN:
-            ammo->size = 8;
+            ammo->size = 16;
             break;
         default:
             ammo->size = 0;
