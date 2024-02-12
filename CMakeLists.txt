@@ -80,6 +80,7 @@ install(DIRECTORY zword/data
         PATTERN "*.ttf"
         PATTERN "*.wav"
 		PATTERN "*.json"
+		PATTERN "*.ogg"
 )
 
 set(SHADERS

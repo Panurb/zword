@@ -103,15 +103,13 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     if (item->price > player->money) {
         return;
     }
-    add_money(components, entity, -item->price);
-    item->price = 0;
-
-    clear_grid(components, grid, player->target);
 
     CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
     ImageComponent* image = ImageComponent_get(components, player->target);
     AmmoComponent* ammo = AmmoComponent_get(components, player->target);
     if (ammo) {
+        clear_grid(components, grid, player->target);
+
         int i = player->ammo[ammo->type];
         if (i == -1) {
             coord->parent = entity;
@@ -128,6 +126,10 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     } else {
         int i = find(-1, player->inventory, player->inventory_size);
         if (i != -1) {
+            clear_grid(components, grid, player->target);
+            add_money(components, entity, -item->price);
+            item->price = 0;
+
             player->inventory[i] = player->target;
             coord->parent = entity;
             coord->position = (sfVector2f) { 0.75f, 0.0f };

@@ -108,7 +108,7 @@ void start_game(GameData* data, Filename map_name) {
     ComponentData_clear(data->components);
     data->camera = create_camera(data->components, mode);
     data->menu_camera = create_menu_camera(data->components, mode);
-    data->ambient_light = 0.4f;
+    data->ambient_light = 0.5f;
     create_pause_menu(data);
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);

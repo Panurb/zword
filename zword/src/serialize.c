@@ -515,7 +515,7 @@ void WeaponComponent_serialize(cJSON* entity_json, ComponentData* components, in
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Weapon", json);
     cJSON_AddNumberToObject(json, "fire_rate", weapon->fire_rate);
-    cJSON_AddNumberToObject(json, "recoil", weapon->recoil);
+    cJSON_AddNumberToObject(json, "recoil", weapon->recoil_up);
     cJSON_AddNumberToObject(json, "damage", weapon->damage);
     cJSON_AddNumberToObject(json, "max_magazine", weapon->max_magazine);
     cJSON_AddNumberToObject(json, "magazine", weapon->magazine);

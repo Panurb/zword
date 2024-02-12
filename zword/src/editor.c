@@ -88,6 +88,7 @@ static ButtonText object_names[] = {
     "flashlight",
     "gas",
     "hay bale",
+    "hole",
     "lamp",
     "rock",
     "stove",
@@ -433,8 +434,8 @@ void create_editor_menu(GameData* data) {
 
 
 void update_editor(GameData data, sfRenderWindow* window, float time_step) {
-    update(data.components, time_step, data.grid);
-    collide(data.components, data.grid);
+    // update(data.components, time_step, data.grid);
+    // collide(data.components, data.grid);
     update_waypoints(data.components, data.grid, data.camera);
 
     update_particles(data.components, data.camera, time_step);

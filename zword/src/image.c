@@ -62,8 +62,8 @@ static const char* IMAGES[] = {
     "gas",
     "grass_tile",
     "hay_bale",
+    "hole",
     "lamp",
-    "outhouse",
     "pistol",
     "player",
     "player_dead",
@@ -97,11 +97,13 @@ static const char* IMAGES[] = {
 };
 
 
-void create_decal(ComponentData* components, sfVector2f pos, Filename filename) {
+int create_decal(ComponentData* components, sfVector2f pos, Filename filename) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, pos, rand_angle());
     ImageComponent_add(components, i, filename, 0.0f, 0.0f, LAYER_DECALS);
     PhysicsComponent_add(components, i, 0.0f)->lifetime = INFINITY;
+
+    return i;
 }
 
 

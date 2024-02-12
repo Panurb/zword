@@ -12,7 +12,7 @@
 
 typedef sfTexture* TextureArray[100];
 
-void create_decal(ComponentData* components, sfVector2f pos, Filename filename);
+int create_decal(ComponentData* components, sfVector2f pos, Filename filename);
 
 sfTexture** load_textures();
 
