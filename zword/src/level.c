@@ -168,7 +168,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
             for (int i = 0; i < 2; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                create_uranium(components, grid, sum(pos, r));
+                create_uranium(components, sum(pos, r));
             }
         }
     }

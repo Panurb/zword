@@ -6,6 +6,8 @@
 
 
 extern char* ACTIONS[];
+static int ACTIONS_SIZE = 11;
+extern char* ACTION_BUTTONS_XBOX[];
 
 extern char* BUTTON_NAMES[];
 
@@ -36,12 +38,12 @@ typedef enum {
     ACTION_RELOAD,
     ACTION_ATTACHMENT,
     ACTION_INVENTORY,
-    ACTION_AMMO,
-    ACTION_GRAB,
-    ACTION_DROP
+    ACTION_AMMO
 } PlayerAction;
 
 char* key_to_string(sfKeyCode key);
+
+char* keybind_to_string(int i);
 
 char* key_to_letter(sfKeyCode key);
 

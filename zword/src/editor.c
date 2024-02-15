@@ -80,6 +80,7 @@ static ButtonText object_names[] = {
     "bandage",
     "bed",
     "bench",
+    "blood",
     "candle",
     "car",
     "desk",

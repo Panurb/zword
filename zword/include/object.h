@@ -30,3 +30,5 @@ int create_tree(ComponentData* components, sfVector2f position);
 int create_rock(ComponentData* components, sfVector2f position);
 
 int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle);
+
+int create_uranium(ComponentData* components, sfVector2f position);

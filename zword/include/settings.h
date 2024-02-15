@@ -1,6 +1,12 @@
 #pragma once
 
 
+typedef enum {
+    INPUT_UNBOUND,
+    INPUT_KEYBOARD,
+    INPUT_MOUSE
+} InputDevice;
+
 typedef struct {
     int width;
     int height;
@@ -10,6 +16,8 @@ typedef struct {
     int max_fps;
     int volume;
     int music;
+    int keybinds[16];
+    InputDevice keybinds_device[16];
 } Settings;
 
 typedef struct {

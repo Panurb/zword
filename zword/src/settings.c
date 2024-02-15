@@ -6,9 +6,21 @@
 #include <SFML/Graphics.h>
 
 #include "settings.h"
+#include "input.h"
 
 
-Settings game_settings = { 1920, 1080, 8, 0, 0, 0, 100, 100 };
+Settings game_settings = { 1920, 1080, 8, 0, 0, 0, 100, 100, 
+    {
+        sfKeyW, sfKeyS, sfKeyA, sfKeyD, 
+        sfMouseLeft, sfKeyE, sfMouseRight, sfKeyR,
+        sfKeyF, sfKeySpace, sfKeyLShift
+    },
+    {
+        INPUT_KEYBOARD, INPUT_KEYBOARD, INPUT_KEYBOARD, INPUT_KEYBOARD,
+        INPUT_MOUSE, INPUT_KEYBOARD, INPUT_MOUSE, INPUT_KEYBOARD,
+        INPUT_KEYBOARD, INPUT_KEYBOARD, INPUT_KEYBOARD
+    } 
+};
 
 
 KeyValue parse_line(Line string, char* delim) {
@@ -50,6 +62,21 @@ void load_settings() {
             game_settings.volume = line.value;
         } else if (strcmp(line.key, "MUSIC") == 0) {
             game_settings.music = line.value;
+        } else {
+            for (int i = 0; i < ACTIONS_SIZE; i++) {
+                if (strcmp(line.key, ACTIONS[i]) == 0) {
+                    if (line.value == 0) {
+                        game_settings.keybinds_device[i] = INPUT_UNBOUND;
+                        game_settings.keybinds[i] = 0;
+                    } else if (line.value < 0) {
+                        game_settings.keybinds_device[i] = INPUT_MOUSE;
+                        game_settings.keybinds[i] = -line.value - 1;
+                    } else {
+                        game_settings.keybinds_device[i] = INPUT_KEYBOARD;
+                        game_settings.keybinds[i] = line.value - 1;
+                    }
+                }
+            }
         }
     }
 
@@ -68,6 +95,15 @@ void save_settings() {
     fprintf(file, "MAX_FPS=%i\n", game_settings.max_fps);
     fprintf(file, "VOLUME=%i\n", game_settings.volume);
     fprintf(file, "MUSIC=%i\n", game_settings.music);
+    for (int i = 0; i < ACTIONS_SIZE; i++) {
+        int value = 0;
+        if (game_settings.keybinds_device[i] == INPUT_KEYBOARD) {
+            value = game_settings.keybinds[i] + 1;
+        } else if (game_settings.keybinds_device[i] == INPUT_MOUSE) {
+            value = -game_settings.keybinds[i] - 1;
+        }
+        fprintf(file, "%s=%i\n", ACTIONS[i], value);
+    }
 
     fclose(file);
 }

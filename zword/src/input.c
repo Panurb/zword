@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "vehicle.h"
 #include "item.h"
+#include "settings.h"
 
 
 char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", 
@@ -19,6 +20,9 @@ char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
     "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", 
     "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", 
     "F12", "F13", "F14", "F15", "Pause"};
+
+
+char* MOUSE_NAMES[] = {"Mouse left", "Mouse right", "Mouse middle", "Mouse extra 1", "Mouse extra 2"};
 
 
 char* LETTERS[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", 
@@ -42,23 +46,52 @@ char* BUTTON_NAMES[] = {
 
 
 char* ACTIONS[] = {
+    "Move up",
+    "Move down",
+    "Move left",
+    "Move right",
+    "Attack", 
     "Enter/exit",
-    "Cancel",
+    "Pick up",
     "Reload",
     "Attachment",
-    "Ammo",
-    "Pick up",
-    "Pause",
-    "", 
     "Inventory", 
-    "Attack", 
-    "", 
-    ""
+    "Ammo"
+};
+
+
+char* ACTION_BUTTONS_XBOX[] = {
+    "",
+    "",
+    "",
+    "",
+    "RT",
+    "A",
+    "RB",
+    "X",
+    "Y",
+    "LT",
+    "LB"
 };
 
 
 char* key_to_string(sfKeyCode key) {
     return (0 <= key && key < LENGTH(KEY_NAMES)) ? KEY_NAMES[key] : "unknown";
+}
+
+char* mouse_to_string(sfMouseButton button) {
+    return (0 <= button && button < LENGTH(MOUSE_NAMES)) ? MOUSE_NAMES[button] : "unknown";
+}
+
+
+char* keybind_to_string(int i) {
+    if (game_settings.keybinds_device[i] == INPUT_KEYBOARD) {
+        return key_to_string(game_settings.keybinds[i]);
+    } else if (game_settings.keybinds_device[i] == INPUT_MOUSE) {
+        return mouse_to_string(game_settings.keybinds[i]);
+    } else {
+        return "unknown";
+    }
 }
 
 
@@ -67,26 +100,34 @@ char* key_to_letter(sfKeyCode key) {
 }
 
 
+bool keybind_pressed(PlayerAction i) {
+    if (game_settings.keybinds_device[i] == INPUT_KEYBOARD) {
+        return sfKeyboard_isKeyPressed(game_settings.keybinds[i]);
+    } else if (game_settings.keybinds_device[i] == INPUT_MOUSE) {
+        return sfMouse_isButtonPressed(game_settings.keybinds[i]);
+    } else {
+        return false;
+    }
+}
+
+
 void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(components, i);
     int joystick = player->controller.joystick;
 
-    int* buttons = player->controller.buttons;
-    int* axes = player->controller.axes;
-
     sfVector2f left_stick = zeros();
     sfVector2f right_stick = zeros();
     if (player->controller.joystick == -1) {
-        if (sfKeyboard_isKeyPressed(axes[0])) {
+        if (keybind_pressed(ACTION_LEFT)) {
             left_stick.x -= 1.0f;
         }
-        if (sfKeyboard_isKeyPressed(axes[1])) {
+        if (keybind_pressed(ACTION_RIGHT)) {
             left_stick.x += 1.0f;
         }
-        if (sfKeyboard_isKeyPressed(axes[2])) {
+        if (keybind_pressed(ACTION_DOWN)) {
             left_stick.y -= 1.0f;
         }
-        if (sfKeyboard_isKeyPressed(axes[3])) {
+        if (keybind_pressed(ACTION_UP)) {
             left_stick.y += 1.0f;
         }
         player->controller.left_stick = normalized(left_stick);
@@ -95,17 +136,43 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         right_stick = diff(mouse, get_position(components, i));
         player->controller.right_stick = normalized(right_stick);
 
-        player->controller.left_trigger = sfKeyboard_isKeyPressed(buttons[BUTTON_LT]) ? 1.0f : 0.0f;
-        player->controller.right_trigger = sfMouse_isButtonPressed(sfMouseLeft) ? 1.0f : 0.0f;
+        player->controller.left_trigger = keybind_pressed(ACTION_ATTACK) ? 1.0f : 0.0f;
+        player->controller.right_trigger = keybind_pressed(ACTION_PICKUP) ? 1.0f : 0.0f;
 
-        for (int b = BUTTON_A; b <= BUTTON_RT; b++) {
-            bool down = sfKeyboard_isKeyPressed(buttons[b]);
-            if (b == BUTTON_LT) {
-                down = (player->controller.left_trigger > 0.5f);
-            } else if (b == BUTTON_RT) {
-                down = (player->controller.right_trigger > 0.5f);
-            } else if (b == BUTTON_RB) {
-                down = sfMouse_isButtonPressed(sfMouseRight);
+        for (ControllerButton b = BUTTON_A; b <= BUTTON_R; b++) {
+            bool down = false;
+            switch (b) {
+                case BUTTON_A:
+                    down = keybind_pressed(ACTION_ENTER);
+                    break;
+                case BUTTON_B:
+                    break;
+                case BUTTON_X:
+                    down = keybind_pressed(ACTION_RELOAD);
+                    break;
+                case BUTTON_Y:
+                    down = keybind_pressed(ACTION_ATTACHMENT);
+                    break;
+                case BUTTON_LB:
+                    down = keybind_pressed(ACTION_AMMO);
+                    break;
+                case BUTTON_RB:
+                    down = keybind_pressed(ACTION_PICKUP);
+                    break;
+                case BUTTON_START:
+                    break;
+                case BUTTON_BACK:
+                    break;
+                case BUTTON_LT:
+                    down = keybind_pressed(ACTION_INVENTORY);
+                    break;
+                case BUTTON_RT:
+                    down = keybind_pressed(ACTION_ATTACK);
+                    break;
+                case BUTTON_L:
+                    break;
+                case BUTTON_R:
+                    break;
             }
 
             player->controller.buttons_pressed[b] = (down && !player->controller.buttons_down[b]);

@@ -24,6 +24,8 @@ static int window_new_map = -1;
 static int window_editor = -1;
 static int window_settings = -1;
 static int window_controls = -1;
+static int window_keyboard_controls = -1;
+static int window_xbox_controls = -1;
 
 
 void reset_ids() {
@@ -224,6 +226,52 @@ void toggle_settings(ComponentData* components, int entity) {
 }
 
 
+void toggle_keyboard_controls(ComponentData* components, int entity) {
+    UNUSED(entity);
+    if (window_keyboard_controls != -1) {
+        destroy_entity_recursive(components, window_keyboard_controls);
+        window_keyboard_controls = -1;
+        return;
+    }
+
+    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_keyboard_controls = create_window(components, pos, "KEYBOARD CONTROLS", 2, toggle_keyboard_controls);
+
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    add_child(components, window_keyboard_controls, container);
+
+    for (int i = 0; i < ACTIONS_SIZE; i++) {
+        int label = create_label(components, ACTIONS[i], zeros());
+        int button = create_button(components, keybind_to_string(i), zeros(), NULL);
+        add_row_to_container(components, container, label, button);
+    }
+    add_scrollbar_to_container(components, container);
+}
+
+
+void toggle_xbox_controls(ComponentData* components, int entity) {
+    UNUSED(entity);
+    if (window_xbox_controls != -1) {
+        destroy_entity_recursive(components, window_xbox_controls);
+        window_xbox_controls = -1;
+        return;
+    }
+
+    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_xbox_controls = create_window(components, pos, "CONTROLS", 2, toggle_xbox_controls);
+
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    add_child(components, window_xbox_controls, container);
+
+    for (int i = 0; i < ACTIONS_SIZE; i++) {
+        int label = create_label(components, ACTIONS[i], zeros());
+        int button = create_button(components, ACTION_BUTTONS_XBOX[i], zeros(), NULL);
+        add_row_to_container(components, container, label, button);
+    }
+    add_scrollbar_to_container(components, container);
+}
+
+
 void toggle_controls(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_controls != -1) {
@@ -233,17 +281,13 @@ void toggle_controls(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_controls = create_window(components, pos, "CONTROLS", 2, toggle_controls);
+    window_controls = create_window(components, pos, "CONTROLS", 1, toggle_controls);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
     add_child(components, window_controls, container);
 
-    for (int i = 0; i < 12; i++) {
-        int label = create_label(components, ACTIONS[i], zeros());
-        int button = create_button(components, BUTTON_NAMES[i], zeros(), NULL);
-        add_row_to_container(components, container, label, button);
-    }
-    add_scrollbar_to_container(components, container);
+    add_button_to_container(components, container, "KEYBOARD", toggle_keyboard_controls);
+    add_button_to_container(components, container, "XBOX", toggle_xbox_controls);
 }
 
 
