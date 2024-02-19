@@ -65,6 +65,8 @@ int main() {
     float time_step = 1.0f / 60.0f;
     float elapsed_time = 0.0f;
 
+    sfClock* game_clock = sfClock_create();
+
     GameData data = create_game(mode);
     create_menu(data);
 
@@ -73,6 +75,15 @@ int main() {
     sfMusic* music = sfMusic_createFromFile("data/music/zsong.ogg");
     bool music_playing = false;
     sfMusic_setLoop(music, true);
+
+    sfSprite* menu_sprite = sfSprite_create();
+    sfTexture* menu_texture = sfTexture_createFromFile("data/images/menu.png", NULL);
+    sfSprite_setTexture(menu_sprite, menu_texture, sfTrue);
+
+    sfSprite* title_sprite = sfSprite_create();
+    sfTexture* title_texture = sfTexture_createFromFile("data/images/title.png", NULL);
+    sfSprite_setTexture(title_sprite, title_texture, sfTrue);
+    float title_scale = 2.0f;
 
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
@@ -186,12 +197,18 @@ int main() {
             }
 
             elapsed_time += delta_time;
+
+            title_scale = 2.5f + 0.1f * sinf(2.0f * sfTime_asSeconds(sfClock_getElapsedTime(game_clock)));
         }
 
         sfRenderWindow_clear(window, get_color(0.05f, 0.05f, 0.05f, 1.0f));
 
         switch (game_state) {
             case STATE_MENU:
+                draw_sprite(window, data.components, data.menu_camera, menu_sprite, zeros(), 0.0f, 
+                    mult(3.5f, ones()), 0);
+                draw_sprite(window, data.components, data.menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
+                    vec(title_scale, title_scale), 0);
                 draw_menu(data, window);
                 break;
             case STATE_START:

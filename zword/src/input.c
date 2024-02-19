@@ -47,8 +47,8 @@ char* BUTTON_NAMES[] = {
 
 char* ACTIONS[] = {
     "Move up",
-    "Move down",
     "Move left",
+    "Move down",
     "Move right",
     "Attack", 
     "Enter/exit",

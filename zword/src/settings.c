@@ -11,7 +11,7 @@
 
 Settings game_settings = { 1920, 1080, 8, 0, 0, 0, 100, 100, 
     {
-        sfKeyW, sfKeyS, sfKeyA, sfKeyD, 
+        sfKeyW, sfKeyA, sfKeyS, sfKeyD, 
         sfMouseLeft, sfKeyE, sfMouseRight, sfKeyR,
         sfKeyF, sfKeySpace, sfKeyLShift
     },

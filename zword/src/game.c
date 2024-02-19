@@ -72,11 +72,14 @@ GameData create_game(sfVideoMode mode) {
 
 
 void resize_game(GameData* data, sfVideoMode mode) {
-    CameraComponent* camera = CameraComponent_get(data->components, data->camera);
-    camera->resolution.x = mode.width;
-    camera->resolution.y = mode.height;
-    camera->zoom_target = 25.0f;
-    camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
+    for (int i = 0; i < data->components->entities; i++) {
+        CameraComponent* camera = CameraComponent_get(data->components, i);
+        if (camera) {
+            camera->resolution.x = mode.width;
+            camera->resolution.y = mode.height;
+            camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
+        }
+    }
     sfRenderTexture_destroy(data->light_texture);
     data->light_texture = sfRenderTexture_create(mode.width, mode.height, false);
     sfRenderTexture_destroy(data->shadow_texture);

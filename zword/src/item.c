@@ -127,8 +127,6 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
         int i = find(-1, player->inventory, player->inventory_size);
         if (i != -1) {
             clear_grid(components, grid, player->target);
-            add_money(components, entity, -item->price);
-            item->price = 0;
 
             player->inventory[i] = player->target;
             coord->parent = entity;
@@ -142,7 +140,13 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             WeaponComponent* weapon = WeaponComponent_get(components, player->target);
             if (weapon) {
                 image->alpha = 0.0f;
+                if (item->price != 0) {
+                    player->item = i;
+                }
             }
+
+            add_money(components, entity, -item->price);
+            item->price = 0;
         }
     }
 }
