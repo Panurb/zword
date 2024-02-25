@@ -21,6 +21,8 @@ typedef struct {
     float d;
 } Matrix2f;
 
+typedef char String[1024];
+
 typedef char Filename[128];
 
 #define BUTTON_TEXT_SIZE 128

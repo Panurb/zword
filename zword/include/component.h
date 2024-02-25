@@ -47,6 +47,7 @@ typedef struct {
     Layer layer;
     sfVector2f scale;
     float alpha;
+    String text;
 } ImageComponent;
 
 typedef struct {
@@ -412,6 +413,13 @@ typedef struct {
 } WidgetComponent;
 
 typedef struct {
+    String source_string;
+    String string;
+    int size;
+    sfColor color;
+} TextComponent;
+
+typedef struct {
     void* array[MAX_ENTITIES];
     List* order;
 } OrderedArray;
@@ -440,6 +448,7 @@ struct ComponentData {
     DoorComponent* door[MAX_ENTITIES];
     JointComponent* joint[MAX_ENTITIES];
     OrderedArray widget;
+    TextComponent* text[MAX_ENTITIES];
 };
 
 ComponentData* ComponentData_create();
@@ -528,6 +537,10 @@ void JointComponent_remove(ComponentData* components, int entity);
 WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, ButtonText text, WidgetType type);
 WidgetComponent* WidgetComponent_get(ComponentData* components, int entity);
 void WidgetComponent_remove(ComponentData* components, int entity);
+
+TextComponent* TextComponent_add(ComponentData* components, int entity, String string, int size, sfColor color);
+TextComponent* TextComponent_get(ComponentData* components, int entity);
+void TextComponent_remove(ComponentData* components, int entity);
 
 int create_entity(ComponentData* components);
 void destroy_entity(ComponentData* components, int i);

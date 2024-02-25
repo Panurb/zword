@@ -25,6 +25,7 @@
 #include "menu.h"
 #include "serialize.h"
 #include "item.h"
+#include "widget.h"
 
 
 static float game_over_timer = 0.0f;

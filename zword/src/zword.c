@@ -232,6 +232,7 @@ int main() {
             case STATE_EDITOR:
                 data.ambient_light = 0.8f;
                 draw_editor(data, window);
+                draw_hud(data.components, window, data.camera);
                 break;
             case STATE_GAME_OVER:
                 draw_game_over(data, window);

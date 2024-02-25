@@ -12,6 +12,7 @@
 #include "image.h"
 #include "util.h"
 #include "grid.h"
+#include "input.h"
 
 
 ComponentData* ComponentData_create() {
@@ -40,6 +41,7 @@ ComponentData* ComponentData_create() {
         components->door[i] = NULL;
         components->joint[i] = NULL;
         components->widget.array[i] = NULL;
+        components->text[i] = NULL;
     }
     return components;
 }
@@ -94,6 +96,7 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     image->layer = layer;
     image->scale = ones();
     image->alpha = 1.0;
+    image->text[0] = '\0';
     
     components->image.array[entity] = image;
 
@@ -868,6 +871,55 @@ void WidgetComponent_remove(ComponentData* components, int entity) {
 }
 
 
+void replace_actions(String output, String input) {
+    char* start = strchr(input, '[');
+    char* end = input;
+    while (start) {
+        strncat(output, end, start - end + 1);
+        start++;
+
+        end = strchr(start, ']');
+        *end = '\0';
+        strcat(output, action_to_keybind(start));
+        *end = ']';
+
+        start = end + 1;
+        start = strchr(start, '[');
+    }
+
+    strcat(output, end);
+}
+
+
+TextComponent* TextComponent_add(ComponentData* components, int entity, String string, int size, sfColor color) {
+    TextComponent* text = malloc(sizeof(TextComponent));
+    strcpy(text->source_string, string);
+    text->string[0] = '\0';
+    text->size = size;
+    text->color = color;
+
+    replace_actions(text->string, text->source_string);
+
+    components->text[entity] = text;
+
+    return text;
+}
+
+
+TextComponent* TextComponent_get(ComponentData* components, int entity) {
+    if (entity == -1) return NULL;
+    return components->text[entity];
+}
+
+
+void TextComponent_remove(ComponentData* components, int entity) {
+    TextComponent* text = TextComponent_get(components, entity);
+    if (text) {
+        free(text);
+    }
+}
+
+
 int create_entity(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
         if (!components->coordinate[i]) {
@@ -936,6 +988,7 @@ void destroy_entity(ComponentData* components, int entity) {
     DoorComponent_remove(components, entity);
     JointComponent_remove(components, entity);
     WidgetComponent_remove(components, entity);
+    TextComponent_remove(components, entity);
 
     if (entity == components->entities - 1) {
         components->entities--;

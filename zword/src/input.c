@@ -1,5 +1,6 @@
 #include <math.h>
 #include <ctype.h>
+#include <string.h>
 
 #include <SFML/Window/Keyboard.h>
 
@@ -46,17 +47,17 @@ char* BUTTON_NAMES[] = {
 
 
 char* ACTIONS[] = {
-    "Move up",
-    "Move left",
-    "Move down",
-    "Move right",
-    "Attack", 
-    "Enter/exit",
-    "Pick up",
-    "Reload",
-    "Attachment",
-    "Inventory", 
-    "Ammo"
+    "MOVE_UP",
+    "MOVE_LEFT",
+    "MOVE_DOWN",
+    "MOVE_RIGHT",
+    "ATTACK",
+    "ENTER",
+    "PICK_UP",
+    "RELOAD",
+    "ATTACHMENT",
+    "INVENTORY",
+    "AMMO"
 };
 
 
@@ -94,6 +95,16 @@ char* keybind_to_string(int i) {
     }
 }
 
+
+char* action_to_keybind(char* action) {
+    for (int i = 0; i < LENGTH(ACTIONS); i++) {
+        if (strcmp(action, ACTIONS[i]) == 0) {
+            return keybind_to_string(i);
+        }
+    }
+
+    return "unknown";
+}
 
 char* key_to_letter(sfKeyCode key) {
     return (0 <= key && key < LENGTH(LETTERS)) ? LETTERS[key] : "";

@@ -114,6 +114,22 @@ float deserialize_float(cJSON* json, char* name, float value) {
 }
 
 
+void serialize_string(cJSON* json, char* name, char* value, char* default_value) {
+    if (strcmp(value, default_value) != 0) {
+        cJSON_AddStringToObject(json, name, value);
+    }
+}
+
+
+char* deserialize_string(cJSON* json, char* name, char* value) {
+    cJSON* val = cJSON_GetObjectItem(json, name);
+    if (val) {
+        return val->valuestring;
+    }
+    return value;
+}
+
+
 int updated_id(int id, int ids[MAX_ENTITIES]) {
     if (id == -1) {
         return -1;
@@ -160,6 +176,7 @@ void ImageComponent_serialize(cJSON* entity_json, ComponentData* components, int
     cJSON_AddNumberToObject(json, "layer", image->layer);
     serialize_float(json, "scale_x", image->scale.x, 1.0f);
     serialize_float(json, "scale_y", image->scale.y, 1.0f);
+    serialize_string(json, "text", image->text, "");
 }
 
 
@@ -174,6 +191,7 @@ void ImageComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     ImageComponent* image = ImageComponent_add(components, entity, filename, width, height, layer);
     image->scale.x = deserialize_float(json, "scale_x", image->scale.x);
     image->scale.y = deserialize_float(json, "scale_y", image->scale.y);
+    strcpy(image->text, deserialize_string(json, "text", ""));
 }
 
 
@@ -660,6 +678,34 @@ void DoorComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
+void TextComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+    TextComponent* text = TextComponent_get(components, entity);
+    if (!text) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Text", json);
+    cJSON_AddStringToObject(json, "source_string", text->source_string);
+    cJSON_AddNumberToObject(json, "size", text->size);
+    serialize_int(json, "color_r", text->color.r, 255);
+    serialize_int(json, "color_g", text->color.g, 255);
+    serialize_int(json, "color_b", text->color.b, 255);
+}
+
+
+void TextComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Text");
+    if (!json) return;
+
+    char* source_string = cJSON_GetObjectItem(json, "source_string")->valuestring;
+    int size = cJSON_GetObjectItem(json, "size")->valueint;
+    sfColor color = sfWhite;
+    color.r = deserialize_int(json, "color_r", 255);
+    color.g = deserialize_int(json, "color_g", 255);
+    color.b = deserialize_int(json, "color_b", 255);
+    TextComponent_add(components, entity, source_string, size, color);
+}
+
+
 bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
         sfVector2f offset) {
     if (!CoordinateComponent_get(components, entity)) return false;
@@ -688,6 +734,7 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
     AmmoComponent_serialize(json, components, entity);
     AnimationComponent_serialize(json, components, entity);
     JointComponent_serialize(json, components, entity);
+    TextComponent_serialize(json, components, entity);
 
     return true;
 }
@@ -722,6 +769,7 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
     AmmoComponent_deserialize(entity_json, components, entity);
     AnimationComponent_deserialize(entity_json, components, entity);
     JointComponent_deserialize(entity_json, components, entity);
+    TextComponent_deserialize(entity_json, components, entity);
 
     return entity;
 }

@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <SFML/System.h>
 
@@ -15,6 +16,8 @@
 #include "navigation.h"
 #include "player.h"
 #include "weapon.h"
+#include "settings.h"
+#include "input.h"
 
 
 int create_bench(ComponentData* components, sfVector2f position, float angle) {
@@ -252,6 +255,16 @@ int create_uranium(ComponentData* components, sfVector2f position) {
 }
 
 
+int create_tutorial(ComponentData* components, sfVector2f position) {
+    int entity = create_entity(components);
+    CoordinateComponent_add(components, entity, position, 0.0f);
+    ColliderComponent_add_circle(components, entity, 1.0f, GROUP_WALLS);
+    TextComponent_add(components, entity, "[MOVE_UP] [MOVE_LEFT] [MOVE_DOWN] [MOVE_RIGHT] to move", 30, sfWhite);
+
+    return entity;
+}
+
+
 int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
@@ -281,6 +294,7 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("toilet") return create_toilet(components, position, angle);
     MATCH("uranium") return create_uranium(components, position);
     MATCH("tree") return create_tree(components, position);
+    MATCH("tutorial") create_tutorial(components, position);
     MATCH("waypoint") return create_waypoint(components, position);
     MATCH("zombie") return create_zombie(components, position, angle);
 

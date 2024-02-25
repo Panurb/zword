@@ -92,11 +92,12 @@ static ButtonText object_names[] = {
     "hole",
     "lamp",
     "rock",
-    "stove",
     "sink",
+    "stove",
     "table",
     "toilet",
     "tree",
+    "tutorial",
     "uranium",
     "waypoint",
 };
