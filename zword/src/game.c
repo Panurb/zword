@@ -382,3 +382,23 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
         draw_menu(data, window);
     }
 }
+
+
+int create_tutorial(ComponentData* components, sfVector2f position) {
+    int entity = create_entity(components);
+    CoordinateComponent_add(components, entity, position, 0.0f);
+    ColliderComponent_add_circle(components, entity, 1.0f, GROUP_WALLS);
+    TextComponent_add(components, entity, "", 30, sfWhite);
+
+    return entity;
+}
+
+
+void draw_tutorials(sfRenderWindow* window, GameData data) {
+    for (int i = 0; i < data.components->entities; i++) {
+        TextComponent* text = TextComponent_get(data.components, i);
+        if (text) {
+            draw_text(window, data.components, data.camera, NULL, get_position(data.components, i), "?", 50, sfMagenta);
+        }
+    }
+}

@@ -122,6 +122,32 @@ bool keybind_pressed(PlayerAction i) {
 }
 
 
+void replace_actions(String output, String input) {
+    output[0] = '\0';
+    char* start = strchr(input, '[');
+    char* end = input;
+    while (start) {
+        strncat(output, end, start - end + 1);
+        start++;
+
+        end = strchr(start, ']');
+        if (end == NULL) {
+            strcat(output, start);
+            return;
+        }
+        
+        *end = '\0';
+        strcat(output, action_to_keybind(start));
+        *end = ']';
+
+        start = end + 1;
+        start = strchr(start, '[');
+    }
+
+    strcat(output, end);
+}
+
+
 void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(components, i);
     int joystick = player->controller.joystick;

@@ -871,26 +871,6 @@ void WidgetComponent_remove(ComponentData* components, int entity) {
 }
 
 
-void replace_actions(String output, String input) {
-    char* start = strchr(input, '[');
-    char* end = input;
-    while (start) {
-        strncat(output, end, start - end + 1);
-        start++;
-
-        end = strchr(start, ']');
-        *end = '\0';
-        strcat(output, action_to_keybind(start));
-        *end = ']';
-
-        start = end + 1;
-        start = strchr(start, '[');
-    }
-
-    strcat(output, end);
-}
-
-
 TextComponent* TextComponent_add(ComponentData* components, int entity, String string, int size, sfColor color) {
     TextComponent* text = malloc(sizeof(TextComponent));
     strcpy(text->source_string, string);

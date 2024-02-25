@@ -146,15 +146,16 @@ void draw_money(ComponentData* components, sfRenderWindow* window, int camera, i
 
 void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
-        sfVector2f position = get_position(components, i);
-
         TextComponent* text = TextComponent_get(components, i);
         if (text) {
+            sfVector2f position = get_position(components, i);
             draw_text(window, components, camera, NULL, position, text->string, text->size, text->color);
         }
 
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
+
+        sfVector2f position = get_position(components, i);
 
         int slot = get_slot(components, i, player->inventory_size);
         int atch = get_attachment(components, i);

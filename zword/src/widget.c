@@ -356,7 +356,8 @@ int create_textbox(ComponentData* components, sfVector2f position, int width) {
     ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH * width, 
         BUTTON_HEIGHT, GROUP_WALLS);
     collider->enabled = false;
-    WidgetComponent_add(components, i, "", WIDGET_TEXTBOX);
+    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_TEXTBOX);
+    widget->max_value = width * 18;
 
     return i;
 }
@@ -548,17 +549,23 @@ bool input_widgets(ComponentData* components, int camera, sfEvent event) {
 
     if (top_textbox != -1) {
         WidgetComponent* widget = WidgetComponent_get(components, top_textbox);
-        if (event.type == sfEvtKeyPressed) {
+        if (event.type == sfEvtTextEntered) {
+            char* character = (char*) &event.text.unicode;
             int len = strlen(widget->string);
-            if (event.key.code == sfKeyBackspace) {
+            if (character[0] == '\b') {
                 if (len > 0) {
                     widget->string[len - 1] = '\0';
                 }
             } else {
-                if (len < 18) {
-                    strcat(widget->string, key_to_letter(event.key.code));
+                if (len < widget->max_value - 1) {
+                    strcat(widget->string, character);
                 }
             }
+
+            if (widget->on_change) {
+                widget->on_change(components, top_textbox, event.text.unicode);
+            }
+
             input_detected = true;
         }
     }

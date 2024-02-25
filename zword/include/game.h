@@ -54,3 +54,7 @@ void update_game_over(GameData data, sfRenderWindow* window, float time_step);
 void draw_game_over(GameData data, sfRenderWindow* window);
 
 void draw_game_mode(GameData data, sfRenderWindow* window);
+
+int create_tutorial(ComponentData* components, sfVector2f position);
+
+void draw_tutorials(sfRenderWindow* window, GameData data);

@@ -18,6 +18,8 @@
 #include "animation.h"
 #include "tile.h"
 #include "enemy.h"
+#include "input.h"
+#include "game.h"
 
 
 typedef enum {
@@ -50,7 +52,9 @@ static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
 static ButtonText map_name = "";
-
+static float double_click_time = 0.0f;
+static int entity_settings_id = -1;
+static int entity_settings_entity = -1;
 
 
 char* category_names[] = { "terrain", "floor", "decals", "walls", "objects", "waypoints" };
@@ -268,6 +272,48 @@ void toggle_weapons(ComponentData* components, int entity) {
 }
 
 
+void close_entity_settings(ComponentData* components, int entity) {
+    UNUSED(entity);
+    destroy_entity_recursive(components, entity_settings_id);
+    entity_settings_id = -1;
+    entity_settings_entity = -1;
+}
+
+
+void change_text(ComponentData* components, int textbox, int unicode) {
+    UNUSED(unicode);
+    TextComponent* text = TextComponent_get(components, entity_settings_entity);
+    WidgetComponent* widget = WidgetComponent_get(components, textbox);
+    strcpy(text->source_string, widget->string);
+    replace_actions(text->string, text->source_string);
+}
+
+
+void open_entity_settings(ComponentData* components, int entity) {
+    if (entity_settings_id != -1) {
+        close_entity_settings(components, entity);
+    }
+
+    entity_settings_entity = entity;
+
+    ButtonText buffer;
+    snprintf(buffer, BUTTON_TEXT_SIZE, "ENTITY %d", entity);
+    entity_settings_id = create_window(components, vec(0.0f, 0.0f), buffer, 2, close_entity_settings);
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    add_child(components, entity_settings_id, container);
+
+    TextComponent* text = TextComponent_get(components, entity);
+    if (text) {
+        int i = create_textbox(components, zeros(), 2);
+        add_widget_to_container(components, container, i);
+        WidgetComponent* widget = WidgetComponent_get(components, i);
+        strcpy(widget->string, text->source_string);
+        widget->max_value = 100;
+        widget->on_change = change_text;
+    }
+}
+
+
 void select_prefab(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     strcpy(prefab_name, widget->string);
@@ -454,6 +500,8 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
     if (selection_box != -1) {
         update_selections(data);
     }
+
+    double_click_time = fmaxf(double_click_time - time_step, 0.0f);
 }
 
 
@@ -521,6 +569,12 @@ void input_tool_select(GameData* data, sfEvent event) {
             selection_box = -1;
         }
         grabbed = false;
+        if (double_click_time > 0.0f && selections->size == 1) {
+            open_entity_settings(components, selections->head->value);
+            double_click_time = 0.0f;
+        } else {
+            double_click_time = 0.2f;
+        }
     } else if (event.type == sfEvtKeyPressed) {
         if (selections) {
             switch (event.key.code) {
@@ -652,6 +706,16 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
             tool = TOOL_SELECT;
         }
     } else if (event.type == sfEvtKeyPressed) {
+        if (entity_settings_entity != -1) {
+            switch (event.key.code) {
+            case sfKeyEscape:
+                close_entity_settings(components, entity_settings_id);
+                break;
+            default:
+                return;
+            }
+        }
+
         switch (event.key.code) {
             case sfKeyNum1:
             case sfKeyNum2:
@@ -770,6 +834,8 @@ void draw_editor(GameData data, sfRenderWindow* window) {
     draw_waypoints(data.components, window, data.camera, waypoint_selected);
 
     draw_spawners(window, data);
+
+    draw_tutorials(window, data);
 
     draw_widgets(data.components, window, data.menu_camera);
 

@@ -255,16 +255,6 @@ int create_uranium(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_tutorial(ComponentData* components, sfVector2f position) {
-    int entity = create_entity(components);
-    CoordinateComponent_add(components, entity, position, 0.0f);
-    ColliderComponent_add_circle(components, entity, 1.0f, GROUP_WALLS);
-    TextComponent_add(components, entity, "[MOVE_UP] [MOVE_LEFT] [MOVE_DOWN] [MOVE_RIGHT] to move", 30, sfWhite);
-
-    return entity;
-}
-
-
 int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
