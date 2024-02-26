@@ -105,8 +105,13 @@ char* action_to_keybind(char* action) {
         }
     }
 
-    return "unknown";
+    if (strcmp(action, "AIM") == 0) {
+        return "Mouse";
+    }
+
+    return action;
 }
+
 
 char* key_to_letter(sfKeyCode key) {
     return (0 <= key && key < LENGTH(LETTERS)) ? LETTERS[key] : "";

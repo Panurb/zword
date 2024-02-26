@@ -410,7 +410,7 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
 int create_tutorial(ComponentData* components, sfVector2f position) {
     int entity = create_entity(components);
     CoordinateComponent_add(components, entity, position, 0.0f);
-    ColliderComponent_add_circle(components, entity, 1.0f, GROUP_WALLS);
+    ColliderComponent_add_circle(components, entity, 1.0f, GROUP_CORPSES);
     TextComponent_add(components, entity, "", 30, sfWhite);
 
     return entity;

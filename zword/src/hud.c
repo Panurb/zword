@@ -38,7 +38,10 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
             angle = polar_angle(r) - 0.5f * M_PI;
         }
 
+        float alpha = sfSprite_getColor(sprite).a;
+        sfSprite_setColor(sprite, sfWhite);
         draw_sprite(window, components, camera, sprite, sum(pos, r), angle, ones(), 0);
+        sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
     }
 }
 
@@ -146,16 +149,23 @@ void draw_money(ComponentData* components, sfRenderWindow* window, int camera, i
 
 void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
+        if (!CoordinateComponent_get(components, i)) continue;
+
+        sfVector2f position = get_position(components, i);
+
         TextComponent* text = TextComponent_get(components, i);
         if (text) {
-            sfVector2f position = get_position(components, i);
-            draw_text(window, components, camera, NULL, position, text->string, text->size, text->color);
+            float r = norm(diff(position, get_position(components, camera)));
+            if (r < 8.0f) {
+                float alpha = 1.0f - 0.125f * r;
+                sfColor color = text->color;
+                color.a = alpha * 255;
+                draw_text(window, components, camera, NULL, position, text->string, text->size, color);
+            }
         }
 
         PlayerComponent* player = PlayerComponent_get(components, i);
         if (!player) continue;
-
-        sfVector2f position = get_position(components, i);
 
         int slot = get_slot(components, i, player->inventory_size);
         int atch = get_attachment(components, i);

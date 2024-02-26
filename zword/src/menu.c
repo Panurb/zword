@@ -133,7 +133,7 @@ void toggle_play(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_play = create_window(components, pos, "SURVIVAL", 1, toggle_play);
+    window_play = create_window(components, pos, "PLAY", 1, toggle_play);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
     add_child(components, window_play, container);
@@ -292,8 +292,8 @@ void toggle_controls(ComponentData* components, int entity) {
 
 
 void create_menu(GameData data) {
-    int container = create_container(data.components, vec(-20.0f, 0.0f), 1, 4);
-    add_button_to_container(data.components, container, "SURVIVAL", toggle_play);
+    int container = create_container(data.components, vec(-18.0f, -2.0f), 1, 4);
+    add_button_to_container(data.components, container, "PLAY", toggle_play);
     add_button_to_container(data.components, container, "EDITOR", toggle_editor);
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);

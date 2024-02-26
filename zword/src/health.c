@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include "component.h"
 #include "level.h"
@@ -160,6 +161,13 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
     SoundComponent* scomp = SoundComponent_get(components, entity);
     if (scomp && scomp->hit_sound[0] != '\0') {
         add_sound(components, entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
+    }
+
+    ImageComponent* image = ImageComponent_get(components, entity);
+    if (image) {
+        if (!strstr(image->filename, "tile")) {
+            image->stretch_speed = randf(-1.0f, 1.0f) * 0.05f * dmg;
+        }
     }
 }
 

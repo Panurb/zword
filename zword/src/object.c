@@ -228,7 +228,7 @@ int create_rock(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, rand_angle());
     float size = randf(0.75f, 2.0f);
-    ColliderComponent_add_circle(components, i, 1.4 * size, GROUP_TREES);
+    ColliderComponent_add_circle(components, i, 1.4 * size, GROUP_WALLS);
     ImageComponent_add(components, i, "rock", 3.0, 3.0, LAYER_DECALS)->scale = (sfVector2f) { size, size };
 
     return i;

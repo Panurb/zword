@@ -195,6 +195,9 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
         image->texture_changed = false;
     }
 
+    image->scale.x = 1.0f - image->stretch;
+    image->scale.y = 1.0f + image->stretch;
+
     sfVector2f pos = get_position(components, entity);
     float w = image->scale.x * image->width;
     float h = image->scale.y * image->height;
@@ -203,8 +206,8 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
         return;
     }
 
+    sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
     if (image->alpha > 0.0f) {
-        sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
         draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, entity), image->scale, 0);
     }
 }

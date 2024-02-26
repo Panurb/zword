@@ -23,6 +23,12 @@ int animation_frames(Filename image) {
 
 void animate(ComponentData* components, float time_step) {
     for (int i = 0; i < components->entities; i++) {
+        ImageComponent* image = ImageComponent_get(components, i);
+        if (!image) continue;
+
+        image->stretch_speed -= 5.0f * image->stretch + 0.1f * image->stretch_speed;
+        image->stretch += image->stretch_speed * time_step;
+
         AnimationComponent* animation = AnimationComponent_get(components, i);
         if (!animation) continue;
 
@@ -51,7 +57,6 @@ void animate(ComponentData* components, float time_step) {
             }
         }
 
-        ImageComponent* image = ImageComponent_get(components, i);
         int width = PIXELS_PER_UNIT * image->width;
         int height = PIXELS_PER_UNIT * image->height;
         sfIntRect rect = { animation->current_frame * width, 0, width, height };

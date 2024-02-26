@@ -47,7 +47,8 @@ typedef struct {
     Layer layer;
     sfVector2f scale;
     float alpha;
-    String text;
+    float stretch;
+    float stretch_speed;
 } ImageComponent;
 
 typedef struct {

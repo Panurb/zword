@@ -31,7 +31,7 @@ void create_water(ComponentData* components, sfVector2f position, float width, f
     int i = create_entity(components);
     CoordinateComponent_add(components, i, position, 0.0f);
     ImageComponent_add(components, i, "water_tile", width, height, LAYER_GROUND);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_BARRIERS);
+    ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
 
     if (noise_texture) {
         i = create_entity(components);

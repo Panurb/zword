@@ -176,7 +176,7 @@ void ImageComponent_serialize(cJSON* entity_json, ComponentData* components, int
     cJSON_AddNumberToObject(json, "layer", image->layer);
     serialize_float(json, "scale_x", image->scale.x, 1.0f);
     serialize_float(json, "scale_y", image->scale.y, 1.0f);
-    serialize_string(json, "text", image->text, "");
+    serialize_float(json, "alpha", image->alpha, 1.0f);
 }
 
 
@@ -191,7 +191,7 @@ void ImageComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     ImageComponent* image = ImageComponent_add(components, entity, filename, width, height, layer);
     image->scale.x = deserialize_float(json, "scale_x", image->scale.x);
     image->scale.y = deserialize_float(json, "scale_y", image->scale.y);
-    strcpy(image->text, deserialize_string(json, "text", ""));
+    image->alpha = deserialize_float(json, "alpha", 1.0f);
 }
 
 
@@ -441,14 +441,15 @@ void EnemyComponent_serialize(cJSON* entity_json, ComponentData* components, int
     serialize_int(json, "state", enemy->state, ENEMY_IDLE);
     serialize_id(json, "target", enemy->target);
     serialize_float(json, "fov", enemy->fov, 0.5f * M_PI);
+    serialize_float(json, "idle_speed", enemy->idle_speed, 1.0f);
     serialize_float(json, "walk_speed", enemy->walk_speed, 2.0f);
     serialize_float(json, "run_speed", enemy->run_speed, 6.0f);
-    serialize_int(json, "weapon", enemy->weapon, -1);
     serialize_id(json, "weapon", enemy->weapon);
     serialize_float(json, "attack_delay", enemy->attack_delay, 0.1f);
     serialize_float(json, "turn_speed", enemy->turn_speed, 5.0f);
     serialize_int(json, "spawner", enemy->spawner, false);
 }
+
 
 void EnemyComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Enemy");
@@ -458,9 +459,10 @@ void EnemyComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     enemy->state = deserialize_int(json, "state", enemy->state);
     deserialize_id(json, "target", &enemy->target);
     enemy->fov = deserialize_float(json, "fov", enemy->fov);
+    enemy->idle_speed = deserialize_float(json, "idle_speed", enemy->idle_speed);
     enemy->walk_speed = deserialize_float(json, "walk_speed", enemy->walk_speed);
     enemy->run_speed = deserialize_float(json, "run_speed", enemy->run_speed);
-    enemy->weapon = deserialize_int(json, "weapon", enemy->weapon);
+    deserialize_id(json, "weapon", &enemy->weapon);
     enemy->attack_delay = deserialize_float(json, "attack_delay", enemy->attack_delay);
     enemy->turn_speed = deserialize_float(json, "turn_speed", enemy->turn_speed);
     enemy->spawner = deserialize_int(json, "spawner", enemy->spawner);

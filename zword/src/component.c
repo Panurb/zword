@@ -96,7 +96,8 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     image->layer = layer;
     image->scale = ones();
     image->alpha = 1.0;
-    image->text[0] = '\0';
+    image->stretch = 0.0f;
+    image->stretch_speed = 0.0f;
     
     components->image.array[entity] = image;
 
