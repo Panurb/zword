@@ -896,6 +896,7 @@ void TextComponent_remove(ComponentData* components, int entity) {
     TextComponent* text = TextComponent_get(components, entity);
     if (text) {
         free(text);
+        components->text[entity] = NULL;
     }
 }
 

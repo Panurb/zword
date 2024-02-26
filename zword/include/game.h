@@ -8,8 +8,13 @@
 
 
 typedef enum {
-    MODE_SURVIVAL
+    MODE_SURVIVAL,
+    MODE_CAMPAIGN,
+    MODE_TUTORIAL
 } GameMode;
+
+
+extern ButtonText GAME_MODES[];
 
 
 typedef struct {
@@ -31,7 +36,9 @@ typedef struct {
 } GameData;
 
 
-GameData create_game(sfVideoMode mode);
+extern GameData* game_data;
+
+void create_game(sfVideoMode mode);
 
 void resize_game(GameData* data, sfVideoMode mode);
 

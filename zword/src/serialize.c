@@ -787,6 +787,16 @@ void update_serialized_ids(int ids[MAX_ENTITIES]) {
 }
 
 
+void update_deserialized_ids(int ids[MAX_ENTITIES]) {
+    for (int i = 0; i < LENGTH(deserialized_ids); i++) {
+        int* id_ptr = deserialized_ids[i];
+        if (!id_ptr) break;
+        printf("%d -> %d\n", *id_ptr, updated_id(*id_ptr, ids));
+        *id_ptr = updated_id(*id_ptr, ids);
+    }
+}
+
+
 cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         serialized_ids[i] = NULL;
@@ -842,22 +852,49 @@ void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
 }
 
 
-cJSON* serialize_game(GameData* data, bool preserve_id) {
-    cJSON* json = cJSON_CreateObject();
-    serialize_map(json, data->components, preserve_id);
-    // TODO: ambient light etc.
+void deserialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        deserialized_ids[i] = NULL;
+    }
 
-    return json;
+    cJSON* entities = cJSON_GetObjectItem(json, "entities");
+    cJSON* entity;
+    int ids[MAX_ENTITIES];
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        ids[i] = -1;
+    }
+    int i = 0;
+    sfVector2f offset = zeros();
+    cJSON_ArrayForEach(entity, entities) {
+        if (!preserve_id) {
+            i = cJSON_GetObjectItem(entity, "id")->valueint;
+        }
+        ids[i] = deserialize_entity(entity, components, preserve_id, offset, 0.0f);
+    }
+
+    if (!preserve_id) {
+        update_deserialized_ids(ids);
+    }
+
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        if (!coord) continue;
+        if (coord->parent != -1) {
+            add_child(components, coord->parent, i);
+        }
+    }
 }
 
 
-void update_deserialized_ids(int ids[MAX_ENTITIES]) {
-    for (int i = 0; i < LENGTH(deserialized_ids); i++) {
-        int* id_ptr = deserialized_ids[i];
-        if (!id_ptr) break;
-        printf("%d -> %d\n", *id_ptr, updated_id(*id_ptr, ids));
-        *id_ptr = updated_id(*id_ptr, ids);
-    }
+cJSON* serialize_game(GameData* data, bool preserve_id) {
+    cJSON* json = cJSON_CreateObject();
+
+    cJSON_AddNumberToObject(json, "game_mode", data->game_mode);
+    cJSON_AddNumberToObject(json, "ambient_light", data->ambient_light);
+
+    serialize_map(json, data->components, preserve_id);
+
+    return json;
 }
 
 
@@ -881,36 +918,9 @@ void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float 
 
 
 void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
-        deserialized_ids[i] = NULL;
-    }
-
-    cJSON* entities = cJSON_GetObjectItem(json, "entities");
-    cJSON* entity;
-    int ids[MAX_ENTITIES];
-    for (int i = 0; i < MAX_ENTITIES; i++) {
-        ids[i] = -1;
-    }
-    int i = 0;
-    sfVector2f offset = zeros();
-    cJSON_ArrayForEach(entity, entities) {
-        if (!preserve_id) {
-            i = cJSON_GetObjectItem(entity, "id")->valueint;
-        }
-        ids[i] = deserialize_entity(entity, data->components, preserve_id, offset, 0.0f);
-    }
-
-    if (!preserve_id) {
-        update_deserialized_ids(ids);
-    }
-
-    for (int i = 0; i < MAX_ENTITIES; i++) {
-        CoordinateComponent* coord = CoordinateComponent_get(data->components, i);
-        if (!coord) continue;
-        if (coord->parent != -1) {
-            add_child(data->components, coord->parent, i);
-        }
-    }
+    data->game_mode = deserialize_int(json, "game_mode", data->game_mode);
+    data->ambient_light = deserialize_int(json, "ambient_light", data->ambient_light);
+    deserialize_map(json, data->components, preserve_id);
 }
 
 

@@ -204,8 +204,11 @@ void add_files_to_container(ComponentData* components, int container, Filename d
 
 void close_dropdown(ComponentData* components, int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    destroy_entity_recursive(components, coord->children->head->value);
-    destroy_entity_recursive(components, coord->children->head->next->value);
+    ListNode* node;
+    FOREACH (node, coord->children) {
+        int i = node->value;
+        destroy_entity_recursive(components, i);
+    }
     List_clear(coord->children);
 }
 
@@ -216,6 +219,11 @@ void set_dropdown(ComponentData* components, int entity) {
     WidgetComponent* widget = WidgetComponent_get(components, entity);
     WidgetComponent* widget_dropdown = WidgetComponent_get(components, dropdown);
     widget_dropdown->value = widget->value;
+
+    if (widget_dropdown->on_change) {
+        widget_dropdown->on_change(components, dropdown, 0);
+    }
+
     close_dropdown(components, dropdown);
 }
 
@@ -264,7 +272,7 @@ void toggle_dropdown(ComponentData* components, int entity) {
     if (coord->children->size > 0) {
         close_dropdown(components, entity);
     } else {
-        int height = min(3, widget->max_value);
+        int height = min(3, widget->max_value + 1);
 
         int container = create_container(components, vec(0.0f, -2.0f * BUTTON_HEIGHT), 1, height);
         add_child(components, entity, container);

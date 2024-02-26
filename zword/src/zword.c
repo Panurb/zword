@@ -67,8 +67,8 @@ int main() {
 
     sfClock* game_clock = sfClock_create();
 
-    GameData data = create_game(mode);
-    create_menu(data);
+    create_game(mode);
+    create_menu(*game_data);
 
     ButtonText buffer;
 
@@ -87,6 +87,7 @@ int main() {
 
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
+        GameData data = *game_data;
 
         sfEvent event;
         while (sfRenderWindow_pollEvent(window, &event)) {

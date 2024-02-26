@@ -28,6 +28,14 @@
 #include "widget.h"
 
 
+ButtonText GAME_MODES[] = {
+    "SURVIVAL",
+    "CAMPAIGN",
+    "TUTORIAL"
+};
+
+GameData* game_data;
+
 static float game_over_timer = 0.0f;
 
 // Survival
@@ -47,7 +55,7 @@ void change_state_game_over(GameData data) {
 }
 
 
-GameData create_game(sfVideoMode mode) {
+void create_game(sfVideoMode mode) {
     ComponentData* components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
     float ambient_light = 0.5f;
@@ -66,9 +74,24 @@ GameData create_game(sfVideoMode mode) {
     sfSprite* shadow_sprite = sfSprite_create();
     sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
 
-    GameData data = { textures, sounds, components, grid, ambient_light, seed, camera, menu_camera,
-        light_texture, light_sprite, shadow_texture, shadow_sprite, mode, "", MODE_SURVIVAL };
-    return data;
+    game_data = malloc(sizeof(GameData));
+    game_data->components = components;
+    game_data->grid = grid;
+    game_data->ambient_light = ambient_light;
+    game_data->seed = seed;
+    game_data->camera = camera;
+    game_data->menu_camera = menu_camera;
+
+    game_data->light_texture = light_texture;
+    game_data->light_sprite = light_sprite;
+
+    game_data->shadow_texture = shadow_texture;
+    game_data->shadow_sprite = shadow_sprite;
+
+    game_data->textures = textures;
+    game_data->sounds = sounds;
+
+    game_data->mode = mode;
 }
 
 

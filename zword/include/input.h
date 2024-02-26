@@ -6,7 +6,7 @@
 
 
 extern char* ACTIONS[];
-static int ACTIONS_SIZE = 11;
+extern int ACTIONS_SIZE;
 extern char* ACTION_BUTTONS_XBOX[];
 
 extern char* BUTTON_NAMES[];

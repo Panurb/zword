@@ -158,6 +158,7 @@ bool category_selected(ComponentData* components, int entity) {
             return false;
         }
     }
+
     return true;
 }
 
@@ -269,6 +270,50 @@ void toggle_weapons(ComponentData* components, int entity) {
     static int window_id = -1;
     window_id = toggle_list_window(components, window_id, "WEAPONS", toggle_weapons, weapon_names, LENGTH(weapon_names), 
         select_object);
+}
+
+
+void set_game_mode(ComponentData* components, int entity, int delta) {
+    UNUSED(delta);
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    game_data->game_mode = widget->value;
+}
+
+
+void set_ambient_light(ComponentData* components, int entity, int delta) {
+    UNUSED(delta);
+    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    game_data->ambient_light = widget->value / 100.0f;
+}
+
+
+void toggle_editor_settings(ComponentData* components, int entity) {
+    UNUSED(entity);
+    static int window_id = -1;
+
+    if (window_id != -1) {
+        destroy_entity_recursive(components, window_id);
+        window_id = -1;
+        return;
+    }
+   
+    window_id = create_window(components, vec(0.0f, 0.0f), "SETTINGS", 1, toggle_editor_settings);
+    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    add_child(components, window_id, container);
+
+    int i = create_label(components, "Game mode", zeros());
+    add_widget_to_container(components, container, i);
+
+    i = create_dropdown(components, zeros(), GAME_MODES, 3);
+    add_widget_to_container(components, container, i);
+    WidgetComponent* widget = WidgetComponent_get(components, i);
+    widget->on_change = set_game_mode;
+
+    i = create_label(components, "Ambient light", zeros());
+    add_widget_to_container(components, container, i);
+
+    i = create_slider(components, zeros(), 0, 100, 50, set_ambient_light);
+    add_widget_to_container(components, container, i);
 }
 
 
@@ -448,9 +493,7 @@ void update_selections(GameData data) {
 
 void save_map(ComponentData* components, int entity) {
     UNUSED(entity);
-    cJSON* json = cJSON_CreateObject();
-    serialize_map(json, components, false);
-    save_json(json, "maps", map_name);
+    save_game(game_data, map_name);
 }
 
 
@@ -466,17 +509,19 @@ void create_editor_menu(GameData* data) {
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
     destroy_widgets(data->components);
     create_button(data->components, "TILES", pos, toggle_tiles);
-    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button(data->components, "OBJECTS", pos, toggle_objects);
-    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button(data->components, "CREATURES", pos, toggle_creatures);
-    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button(data->components, "WEAPONS", pos, toggle_weapons);
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     // pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
     // create_button(data->components, "PREFABS", pos, toggle_prefabs);
-    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    create_button(data->components, "SETTINGS", pos, toggle_editor_settings);
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button(data->components, "SAVE", pos, save_map);
-    pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button(data->components, "QUIT", pos, quit);
 }
 

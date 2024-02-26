@@ -62,6 +62,7 @@ static const char* IMAGES[] = {
     "gas",
     "grass_tile",
     "hay_bale",
+    "hinge",
     "hole",
     "lamp",
     "menu",

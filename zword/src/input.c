@@ -60,6 +60,8 @@ char* ACTIONS[] = {
     "AMMO"
 };
 
+int ACTIONS_SIZE = LENGTH(ACTIONS);
+
 
 char* ACTION_BUTTONS_XBOX[] = {
     "",
