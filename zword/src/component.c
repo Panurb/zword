@@ -171,6 +171,7 @@ void PhysicsComponent_remove(ComponentData* components, int entity) {
 ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group) {
     ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
+    col->trigger_type = TRIGGER_NONE;
     col->type = COLLIDER_CIRCLE;
     col->group = group;
     col->last_collision = -1;
@@ -246,6 +247,7 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->use_timer = 0.0f;
     player->money_increment = 0;
     player->money_timer = 0.0f;
+    player->won = false;
 
     player->shape = sfConvexShape_create();
     sfConvexShape_setPointCount(player->shape, 4);

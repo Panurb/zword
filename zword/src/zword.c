@@ -14,13 +14,13 @@
 #include "game.h"
 #include "interface.h"
 #include "menu.h"
-#include "globals.h"
 #include "settings.h"
 #include "hud.h"
 #include "input.h"
 #include "serialize.h"
 #include "editor.h"
 #include "widget.h"
+#include "game.h"
 
 
 sfRenderWindow* create_game_window(sfVideoMode* mode) {
@@ -87,7 +87,6 @@ int main() {
 
     while (sfRenderWindow_isOpen(window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
-        GameData data = *game_data;
 
         sfEvent event;
         while (sfRenderWindow_pollEvent(window, &event)) {
@@ -114,10 +113,10 @@ int main() {
                     }
                 default:
                     if (game_state == STATE_EDITOR) {
-                        input_editor(&data, window, event);
+                        input_editor(game_data, window, event);
                     }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
-                        input_menu(data.components, data.menu_camera, event);
+                        input_menu(game_data->components, game_data->menu_camera, event);
                     }
                     break;
             }
@@ -128,68 +127,69 @@ int main() {
                 elapsed_time -= time_step;
                 switch (game_state) {
                     case STATE_MENU:
-                        update_menu(data, window);
+                        update_menu(*game_data, window);
                         break;
                     case STATE_START:
-                        get_map_name(&data, buffer);
+                        get_map_name(game_data, buffer);
                         set_map_name(buffer);
-                        start_game(&data, buffer);
+                        start_game(game_data, buffer);
                         game_state = STATE_GAME;
                         break;
                     case STATE_END:
-                        end_game(&data);
+                        end_game(game_data);
                         clear_sounds(channels);
                         game_state = STATE_MENU;
                         break;
                     case STATE_RESET:
-                        end_game(&data);
+                        end_game(game_data);
                         clear_sounds(channels);
                         game_state = STATE_START;
                         break;
                     case STATE_GAME:
-                        input(data.components, window, data.camera);
-                        update_game(data, time_step);
-                        update_game_mode(data, time_step);
+                        input(game_data->components, window, game_data->camera);
+                        update_game(*game_data, time_step);
+                        update_game_mode(*game_data, time_step);
                         break;
                     case STATE_PAUSE:
-                        update_menu(data, window);
+                        update_menu(*game_data, window);
                         break;
                     case STATE_APPLY:
                         if (game_settings.width != (int)mode.width || game_settings.height != (int)mode.height) {
                             sfRenderWindow_destroy(window);
                             window = create_game_window(&mode);
-                            resize_game(&data, mode);
+                            resize_game(game_data, mode);
                         }
                         game_state = STATE_MENU;
                         break;
                     case STATE_CREATE:
-                        get_map_name(&data, buffer);
+                        get_map_name(game_data, buffer);
                         set_map_name(buffer);
                         if (buffer[0] == '\0') {
                             game_state = STATE_MENU;
                         } else {
-                            destroy_menu(data);
-                            create_editor_menu(&data);
+                            destroy_menu(*game_data);
+                            create_editor_menu(game_data);
                             game_state = STATE_EDITOR;
                         }
                         break;
                     case STATE_LOAD:
-                        get_map_name(&data, buffer);
+                        get_map_name(game_data, buffer);
                         set_map_name(buffer);
                         if (buffer[0] == '\0') {
                             game_state = STATE_MENU;
                         } else {
-                            destroy_menu(data);
-                            create_editor_menu(&data);
-                            load_game(&data, buffer);
+                            destroy_menu(*game_data);
+                            create_editor_menu(game_data);
+                            load_game(game_data, buffer);
                             game_state = STATE_EDITOR;
                         }
                         break;
                     case STATE_EDITOR:
-                        update_editor(data, window, time_step);
+                        update_editor(*game_data, window, time_step);
                         break;
                     case STATE_GAME_OVER:
-                        update_game_over(data, window, time_step);
+                    case STATE_WIN:
+                        update_game_over(*game_data, window, time_step);
                         break;
                     case STATE_QUIT:
                         sfRenderWindow_close(window);
@@ -206,51 +206,51 @@ int main() {
 
         switch (game_state) {
             case STATE_MENU:
-                draw_sprite(window, data.components, data.menu_camera, menu_sprite, zeros(), 0.0f, 
+                draw_sprite(window, game_data->components, game_data->menu_camera, menu_sprite, zeros(), 0.0f, 
                     mult(3.5f, ones()), 0);
-                draw_sprite(window, data.components, data.menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
+                draw_sprite(window, game_data->components, game_data->menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
                     vec(title_scale, title_scale), 0);
-                draw_menu(data, window);
+                draw_menu(*game_data, window);
                 break;
             case STATE_START:
             case STATE_END:
             case STATE_RESET:
-                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
+                draw_text(window, game_data->components, game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_GAME:
-                draw_game(data, window);
-                draw_hud(data.components, window, data.camera);
-                draw_game_mode(data, window);
+                draw_game(*game_data, window);
+                draw_hud(game_data->components, window, game_data->camera);
+                draw_game_mode(*game_data, window);
                 break;
             case STATE_PAUSE:
-                draw_game(data, window);
-                draw_overlay(window, data.components, data.camera, 0.4f);
-                draw_menu(data, window);
+                draw_game(*game_data, window);
+                draw_overlay(window, game_data->components, game_data->camera, 0.4f);
+                draw_menu(*game_data, window);
                 break;
             case STATE_LOAD:
-                draw_text(window, data.components, data.menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
+                draw_text(window, game_data->components, game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_EDITOR:
-                data.ambient_light = 0.8f;
-                draw_editor(data, window);
-                draw_hud(data.components, window, data.camera);
+                draw_editor(*game_data, window);
+                draw_hud(game_data->components, window, game_data->camera);
                 break;
             case STATE_GAME_OVER:
-                draw_game_over(data, window);
+            case STATE_WIN:
+                draw_game_over(*game_data, window);
                 break;
             default:
                 break;
         }
 
         if (debug_level) {
-            draw_debug(data, window, debug_level);
+            draw_debug(*game_data, window, debug_level);
         }
 
         draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);
 
-        play_sounds(data.components, data.camera, data.sounds, channels);
+        play_sounds(game_data->components, game_data->camera, game_data->sounds, channels);
         sfMusic_setVolume(music, 0.5f * game_settings.music);
         if (!music_playing) {
             sfMusic_play(music);

@@ -28,6 +28,8 @@
 #include "widget.h"
 
 
+GameState game_state = STATE_MENU;
+
 ButtonText GAME_MODES[] = {
     "SURVIVAL",
     "CAMPAIGN",
@@ -52,6 +54,14 @@ void change_state_game_over(GameData data) {
     game_state = STATE_GAME_OVER;
     destroy_menu(data);
     create_game_over_menu(data);
+}
+
+
+void change_state_win() {
+    game_over_timer = 2.0f;
+    game_state = STATE_WIN;
+    destroy_menu(*game_data);
+    create_win_menu(*game_data);
 }
 
 
@@ -91,7 +101,7 @@ void create_game(sfVideoMode mode) {
     game_data->textures = textures;
     game_data->sounds = sounds;
 
-    game_data->mode = mode;
+    game_data->game_mode = MODE_SURVIVAL;
 }
 
 
@@ -128,6 +138,11 @@ void init_survival(GameData* data) {
 }
 
 
+void init_tutorial(GameData* data) {
+    game_over_timer = 0.0f;
+}
+
+
 void start_game(GameData* data, Filename map_name) {
     ColliderGrid_clear(data->grid);
     CameraComponent* cam = CameraComponent_get(data->components, data->camera);
@@ -142,7 +157,17 @@ void start_game(GameData* data, Filename map_name) {
     load_game(data, map_name);
 
     init_grid(data->components, data->grid);
-    init_survival(data);
+
+    switch (data->game_mode) {
+        case MODE_SURVIVAL:
+            init_survival(data);
+            break;
+        case MODE_TUTORIAL:
+            init_tutorial(data);
+            break;
+        default:
+            break;
+    }
 }
 
 
@@ -272,7 +297,7 @@ void update_survival(GameData data, float time_step) {
                 break;
             }
         }
-        PRINT(enemies_alive);
+
         if (!enemies_alive) {
             wave++;
             wave_delay = 5.0f;
@@ -282,10 +307,45 @@ void update_survival(GameData data, float time_step) {
 }
 
 
+void update_tutorial(GameData data, float time_step) {
+    UNUSED(time_step);
+
+    bool players_alive = false;
+    bool players_won = true;
+
+    ListNode* node;
+    FOREACH(node, data.components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(data.components, node->value);
+        if (player->state != PLAYER_DEAD) {
+            players_alive = true;
+            
+            if (!player->won) {
+                players_won = false;
+            }
+        }
+        player->won = false;
+    }
+
+    if (!players_alive) {
+        change_state_game_over(data);
+        return;
+    }
+
+    if (players_won) {
+        change_state_win();
+        return;
+    }
+}
+
+
 void update_game_mode(GameData data, float time_step) {
+    printf("game_mode: %d\n", data.game_mode);
     switch (data.game_mode) {
         case MODE_SURVIVAL:
             update_survival(data, time_step);
+            break;
+        case MODE_TUTORIAL:
+            update_tutorial(data, time_step);
             break;
         default:
             break;
@@ -304,6 +364,16 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
             break;
         default:
             break;
+    }
+
+    for (int i = 0; i < data.components->entities; i++) {
+        PlayerComponent* player = PlayerComponent_get(data.components, i);
+        if (!player) continue;
+
+        sfVector2f pos = get_position(data.components, i);
+        char buffer[256];
+        snprintf(buffer, 256, "%d", player->won);
+        draw_text(window, data.components, data.camera, NULL, pos, buffer, 20, sfWhite);
     }
 }
 
@@ -396,12 +466,19 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
     draw_overlay(window, data.components, data.menu_camera, alpha);
     sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
-        draw_text(window, data.components, data.menu_camera, NULL, 
-            vec(0.0f, 5.0f), "GAME OVER", 300, color);
-        char buffer[256];
-        snprintf(buffer, 256, "You survived until wave %d", wave);
-        draw_text(window, data.components, data.menu_camera, NULL, 
-            vec(0.0f, 1.0f), buffer, 40, sfWhite);
+        if (game_state == STATE_WIN) {
+            draw_text(window, data.components, data.menu_camera, NULL, 
+                vec(0.0f, 5.0f), "YOU WON", 300, color);
+        } else {
+            draw_text(window, data.components, data.menu_camera, NULL, 
+                vec(0.0f, 5.0f), "GAME OVER", 300, color);
+        }
+        if (data.game_mode == MODE_SURVIVAL) {
+            char buffer[256];
+            snprintf(buffer, 256, "You survived until wave %d", wave - 1);
+            draw_text(window, data.components, data.menu_camera, NULL, 
+                vec(0.0f, 1.0f), buffer, 40, color);
+        }
         draw_menu(data, window);
     }
 }
@@ -417,11 +494,31 @@ int create_tutorial(ComponentData* components, sfVector2f position) {
 }
 
 
+int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height) {
+    int entity = create_entity(components);
+    CoordinateComponent_add(components, entity, position, angle);
+    ColliderComponent* collider = ColliderComponent_add_rectangle(components, entity, width, height, GROUP_WALLS);
+    collider->trigger_type = TRIGGER_WIN;
+
+    return entity;
+}
+
+
 void draw_tutorials(sfRenderWindow* window, GameData data) {
     for (int i = 0; i < data.components->entities; i++) {
         TextComponent* text = TextComponent_get(data.components, i);
         if (text) {
             draw_text(window, data.components, data.camera, NULL, get_position(data.components, i), "?", 50, sfMagenta);
+        }
+
+        ColliderComponent* collider = ColliderComponent_get(data.components, i);
+        if (collider && collider->trigger_type == TRIGGER_WIN) {
+            sfVector2f pos = get_position(data.components, i);
+            sfColor color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
+            float angle = get_angle(data.components, i);
+            draw_rectangle(window, data.components, data.camera, NULL, pos, collider->width, collider->height, angle, 
+                color);
+            draw_text(window, data.components, data.camera, NULL, pos, "level_end", 20, sfGreen);
         }
     }
 }

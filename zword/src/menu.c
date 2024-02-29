@@ -6,7 +6,6 @@
 #include "menu.h"
 #include "game.h"
 #include "component.h"
-#include "globals.h"
 #include "settings.h"
 #include "widget.h"
 #include "light.h"
@@ -340,4 +339,9 @@ void draw_menu(GameData data, sfRenderWindow* window) {
 void create_game_over_menu(GameData data) {
     create_button(data.components, "Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     create_button(data.components, "Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+}
+
+
+void create_win_menu(GameData data) {
+    create_button(data.components, "Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
 }

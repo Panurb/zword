@@ -99,6 +99,11 @@ typedef enum {
     GROUP_ENERGY
 } ColliderGroup;
 
+typedef enum {
+    TRIGGER_NONE,
+    TRIGGER_WIN
+} TriggerType;
+
 typedef struct {
     bool enabled;
     ColliderGroup group;
@@ -109,6 +114,7 @@ typedef struct {
     float height;
     sfVertexArray* verts;
     int verts_size;
+    TriggerType trigger_type;
 } ColliderComponent;
 
 typedef enum {
@@ -160,6 +166,7 @@ typedef struct {
     float use_timer;
     float money_timer;
     int money_increment;
+    bool won;
 } PlayerComponent;
 
 typedef struct {

@@ -19,6 +19,7 @@
 #include "particle.h"
 #include "image.h"
 #include "health.h"
+#include "game.h"
 
 
 bool point_inside_collider(ComponentData* components, int i, sfVector2f point) {
@@ -281,6 +282,21 @@ bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* e
 }
 
 
+void apply_trigger(ComponentData* components, int trigger, int target) {
+    ColliderComponent* collider = ColliderComponent_get(components, trigger);
+    PlayerComponent* player = PlayerComponent_get(components, target);
+    switch (collider->trigger_type) {
+        case TRIGGER_NONE:
+            break;
+        case TRIGGER_WIN:
+            if (player) {
+                player->won = true;
+            }
+            break;
+    }
+}
+
+
 void collide(ComponentData* components, ColliderGrid* grid) {
     // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
 
@@ -292,7 +308,8 @@ void collide(ComponentData* components, ColliderGrid* grid) {
     }
 
     for (int i = 0; i < components->entities; i++) {
-        if (!ColliderComponent_get(components, i)) continue;
+        ColliderComponent* collider = ColliderComponent_get(components, i);
+        if (!collider) continue;
 
         PhysicsComponent* physics = components->physics[i];
         if (!physics) continue;
@@ -304,10 +321,19 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                 for (ListNode* current = grid->array[j][k]->head; current; current = current->next) {
                     int n = current->value;
                     if (n == i) continue;
-                    ColliderComponent* collider = ColliderComponent_get(components, n);
-                    if (collider->last_collision == i) continue;
+                    ColliderComponent* collider_other = ColliderComponent_get(components, n);
+                    if (collider_other->last_collision == i) continue;
 
-                    collider->last_collision = i;
+                    collider_other->last_collision = i;
+
+                    int collision_type = COLLISION_MATRIX[collider->group][collider_other->group];
+
+                    if (collision_type == 0) continue;
+
+                    if (collider_other->trigger_type != TRIGGER_NONE) {
+                        apply_trigger(components, n, i);
+                        continue;
+                    }
 
                     sfVector2f ol = overlap_collider_collider(components, i, n);
 
@@ -318,15 +344,15 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
                     float m = 1.0f;
 
-                    PhysicsComponent* other = PhysicsComponent_get(components, n);
-                    if (other) {
-                        dv = diff(dv, other->velocity);
-                        m = other->mass / (physics->mass + other->mass);
+                    PhysicsComponent* physics_other = PhysicsComponent_get(components, n);
+                    if (physics_other) {
+                        dv = diff(dv, physics_other->velocity);
+                        m = physics_other->mass / (physics->mass + physics_other->mass);
                     }
 
                     sfVector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
 
-                    switch (COLLISION_MATRIX[ColliderComponent_get(components, i)->group][collider->group]) {
+                    switch (collision_type) {
                         case 0:
                             break;
                         case 1:

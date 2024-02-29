@@ -69,6 +69,7 @@ static ButtonText tile_names[] = {
     "brick",
     "fence",
     "grass",
+    "level_end",
     "roof",
     "spawner",
     "stone",

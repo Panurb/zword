@@ -4,7 +4,26 @@
 #include "collider.h"
 #include "image.h"
 #include "sound.h"
-#include "globals.h"
+
+
+typedef enum {
+    STATE_MENU,
+    STATE_START,
+    STATE_END,
+    STATE_RESET,
+    STATE_GAME,
+    STATE_PAUSE,
+    STATE_APPLY,
+    STATE_CREATE,
+    STATE_LOAD,
+    STATE_EDITOR,
+    STATE_QUIT,
+    STATE_GAME_OVER,
+    STATE_WIN
+} GameState;
+
+
+extern GameState game_state;
 
 
 typedef enum {
@@ -38,6 +57,8 @@ typedef struct {
 
 extern GameData* game_data;
 
+void change_state_win();
+
 void create_game(sfVideoMode mode);
 
 void resize_game(GameData* data, sfVideoMode mode);
@@ -63,5 +84,7 @@ void draw_game_over(GameData data, sfRenderWindow* window);
 void draw_game_mode(GameData data, sfRenderWindow* window);
 
 int create_tutorial(ComponentData* components, sfVector2f position);
+
+int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height);
 
 void draw_tutorials(sfRenderWindow* window, GameData data);

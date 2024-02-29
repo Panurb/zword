@@ -13,6 +13,7 @@ typedef enum {
     TILE_BRICK,
     TILE_FENCE,
     TILE_GRASS,
+    TILE_LEVEL_END,
     TILE_ROOF,
     TILE_SPAWNER,
     TILE_STONE,

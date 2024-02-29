@@ -241,6 +241,7 @@ void ColliderComponent_serialize(cJSON* entity_json, ComponentData* components, 
     cJSON_AddNumberToObject(json, "height", collider->height);
     cJSON_AddNumberToObject(json, "group", collider->group);
     serialize_int(json, "enabled", collider->enabled, true);
+    serialize_int(json, "trigger_type", collider->trigger_type, TRIGGER_NONE);
 }
 
 
@@ -259,6 +260,7 @@ void ColliderComponent_deserialize(cJSON* entity_json, ComponentData* components
         collider = ColliderComponent_add_rectangle(components, entity, width, height, group);
     }
     collider->enabled = deserialize_int(json, "enabled", collider->enabled);
+    collider->trigger_type = deserialize_int(json, "trigger_type", collider->trigger_type);
 }
 
 
@@ -920,8 +922,10 @@ void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float 
 
 
 void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
-    data->game_mode = deserialize_int(json, "game_mode", data->game_mode);
-    data->ambient_light = deserialize_int(json, "ambient_light", data->ambient_light);
+    game_data->game_mode = deserialize_int(json, "game_mode", game_data->game_mode);
+    printf("Game mode: %d\n", game_data->game_mode);
+    game_data->ambient_light = deserialize_float(json, "ambient_light", game_data->ambient_light);
+    printf("Ambient light: %f\n", game_data->ambient_light);
     deserialize_map(json, data->components, preserve_id);
 }
 

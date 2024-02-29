@@ -136,6 +136,9 @@ void create_tile(ComponentData* components, Tile tile, sfVector2f position, floa
         case TILE_GRASS:
             create_ground(components, position, width, height, NULL);
             break;
+        case TILE_LEVEL_END:
+            create_level_end(components, position, angle, width, height);
+            break;
         case TILE_ROOF:
             create_roof(components, position, width, height, angle);
             break;

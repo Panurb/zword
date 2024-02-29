@@ -24,3 +24,5 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
 void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera);
 
 void create_game_over_menu(GameData data);
+
+void create_win_menu(GameData data);

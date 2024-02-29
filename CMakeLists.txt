@@ -21,7 +21,6 @@ set(SOURCES
     zword/src/editor.c
     zword/src/enemy.c
     zword/src/game.c
-    zword/src/globals.c
     zword/src/grid.c
     zword/src/health.c
     zword/src/heap.c
