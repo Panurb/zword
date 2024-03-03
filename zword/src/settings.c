@@ -9,7 +9,7 @@
 #include "input.h"
 
 
-Settings game_settings = { 1920, 1080, 8, 0, 0, 0, 100, 100, 
+Settings game_settings = { 1920, 1080, 8, 0, 0, 0, 100, 100, false,
     {
         sfKeyW, sfKeyA, sfKeyS, sfKeyD, 
         sfMouseLeft, sfKeyE, sfMouseRight, sfKeyR,

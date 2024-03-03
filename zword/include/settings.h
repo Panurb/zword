@@ -17,6 +17,7 @@ typedef struct {
     int volume;
     int music;
     int keybinds[16];
+    bool debug;
     InputDevice keybinds_device[16];
 } Settings;
 

@@ -109,7 +109,9 @@ int main() {
                             game_state = STATE_GAME;
                         }
                     } else if (event.key.code == sfKeyF1) {
-                        debug_level = (debug_level + 1) % 4; 
+                        if (game_settings.debug) {
+                            debug_level = (debug_level + 1) % 4;
+                        }
                     }
                 default:
                     if (game_state == STATE_EDITOR) {
@@ -188,7 +190,6 @@ int main() {
                         update_editor(*game_data, window, time_step);
                         break;
                     case STATE_GAME_OVER:
-                    case STATE_WIN:
                         update_game_over(*game_data, window, time_step);
                         break;
                     case STATE_QUIT:
@@ -235,7 +236,6 @@ int main() {
                 draw_hud(game_data->components, window, game_data->camera);
                 break;
             case STATE_GAME_OVER:
-            case STATE_WIN:
                 draw_game_over(*game_data, window);
                 break;
             default:

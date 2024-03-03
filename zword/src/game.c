@@ -39,6 +39,7 @@ ButtonText GAME_MODES[] = {
 GameData* game_data;
 
 static float game_over_timer = 0.0f;
+static bool level_won = false;
 
 // Survival
 static int wave = 1;
@@ -52,6 +53,7 @@ static float spawn_delay = 2.0f;
 void change_state_game_over(GameData data) {
     game_over_timer = 2.0f;
     game_state = STATE_GAME_OVER;
+    level_won = false;
     destroy_menu(data);
     create_game_over_menu(data);
 }
@@ -59,7 +61,8 @@ void change_state_game_over(GameData data) {
 
 void change_state_win() {
     game_over_timer = 2.0f;
-    game_state = STATE_WIN;
+    game_state = STATE_GAME_OVER;
+    level_won = true;
     destroy_menu(*game_data);
     create_win_menu(*game_data);
 }
@@ -365,16 +368,6 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
         default:
             break;
     }
-
-    for (int i = 0; i < data.components->entities; i++) {
-        PlayerComponent* player = PlayerComponent_get(data.components, i);
-        if (!player) continue;
-
-        sfVector2f pos = get_position(data.components, i);
-        char buffer[256];
-        snprintf(buffer, 256, "%d", player->won);
-        draw_text(window, data.components, data.camera, NULL, pos, buffer, 20, sfWhite);
-    }
 }
 
 
@@ -466,7 +459,7 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
     draw_overlay(window, data.components, data.menu_camera, alpha);
     sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
-        if (game_state == STATE_WIN) {
+        if (level_won) {
             draw_text(window, data.components, data.menu_camera, NULL, 
                 vec(0.0f, 5.0f), "YOU WON", 300, color);
         } else {

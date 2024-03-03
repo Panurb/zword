@@ -53,7 +53,8 @@ set(SOURCES
     zword/src/outline.frag
 )
 
-add_executable(zword ${SOURCES})
+# Enable console by removing WIN32 flag
+add_executable(zword WIN32 ${SOURCES})
 
 install(TARGETS zword
     DESTINATION ${CMAKE_SOURCE_DIR}/build)
@@ -61,7 +62,7 @@ install(TARGETS zword
 set(DLLS
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-audio-2.dll
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-graphics-2.dll
-	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-network-2.dll
+	# ${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-network-2.dll
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-system-2.dll
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-window-2.dll
 )

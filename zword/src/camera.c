@@ -18,7 +18,7 @@
 int create_camera(ComponentData* components, sfVideoMode mode) {
     int i = create_entity(components);
     CoordinateComponent_add(components, i, zeros(), 0.0);
-    CameraComponent_add(components, i, (sfVector2i) { mode.width, mode.height }, 35.0f);
+    CameraComponent_add(components, i, (sfVector2i) { mode.width, mode.height }, 40.0f);
     // ParticleComponent* part = ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, sfWhite, sfWhite);
     // part->enabled = true;
     // part->loop = true;

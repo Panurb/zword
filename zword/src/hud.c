@@ -99,7 +99,10 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
     int i = player->ammo[slot + 1];
     if (i != -1) {
         sfSprite* sprite = ImageComponent_get(components, i)->sprite;
+        float alpha = sfSprite_getColor(sprite).a;
+        sfSprite_setColor(sprite, sfWhite);
         draw_sprite(window, components, camera, sprite, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 0);
+        sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
 
         char buffer[20];
         snprintf(buffer, 20, "%i", AmmoComponent_get(components, i)->size);
