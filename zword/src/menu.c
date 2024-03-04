@@ -134,10 +134,12 @@ void toggle_play(ComponentData* components, int entity) {
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_play = create_window(components, pos, "PLAY", 1, toggle_play);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
     add_child(components, window_play, container);
 
-    add_files_to_container(components, container, "maps", change_state_start);
+    add_button_to_container(components, container, "Tutorial", change_state_start);
+    add_button_to_container(components, container, "Survival", change_state_start);
+    // add_files_to_container(components, container, "maps", change_state_start);
 }
 
 

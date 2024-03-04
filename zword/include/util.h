@@ -21,7 +21,8 @@ typedef struct {
     float d;
 } Matrix2f;
 
-typedef char String[1024];
+#define STRING_SIZE 1024
+typedef char String[STRING_SIZE];
 
 typedef char Filename[128];
 

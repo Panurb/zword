@@ -16,8 +16,8 @@ typedef struct {
     int max_fps;
     int volume;
     int music;
-    int keybinds[16];
     bool debug;
+    int keybinds[16];
     InputDevice keybinds_device[16];
 } Settings;
 

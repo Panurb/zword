@@ -23,6 +23,9 @@
 #include "game.h"
 
 
+static String version = "0.1";
+
+
 sfRenderWindow* create_game_window(sfVideoMode* mode) {
     mode->width = game_settings.width;
     mode->height = game_settings.height;
@@ -75,6 +78,7 @@ int main() {
     sfMusic* music = sfMusic_createFromFile("data/music/zsong.ogg");
     bool music_playing = false;
     sfMusic_setLoop(music, true);
+    float music_fade = 0.0f;
 
     sfSprite* menu_sprite = sfSprite_create();
     sfTexture* menu_texture = sfTexture_createFromFile("data/images/menu.png", NULL);
@@ -201,6 +205,8 @@ int main() {
             elapsed_time += delta_time;
 
             title_scale = 2.5f + 0.1f * sinf(2.0f * sfTime_asSeconds(sfClock_getElapsedTime(game_clock)));
+
+            music_fade = fminf(1.0f, music_fade + 0.0001f);
         }
 
         sfRenderWindow_clear(window, get_color(0.05f, 0.05f, 0.05f, 1.0f));
@@ -212,6 +218,11 @@ int main() {
                 draw_sprite(window, game_data->components, game_data->menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
                     vec(title_scale, title_scale), 0);
                 draw_menu(*game_data, window);
+
+                String buffer;
+                snprintf(buffer, STRING_SIZE, "v%s", version);
+                sfColor color = get_color(1.0f, 1.0f, 0.0f, 0.5f);
+                draw_text(window, game_data->components, game_data->menu_camera, NULL, vec(24.5f, -13.5f), buffer, 20, color);
                 break;
             case STATE_START:
             case STATE_END:
@@ -251,9 +262,10 @@ int main() {
         sfRenderWindow_display(window);
 
         play_sounds(game_data->components, game_data->camera, game_data->sounds, channels);
-        sfMusic_setVolume(music, 0.5f * game_settings.music);
+        sfMusic_setVolume(music, 0.5f * game_settings.music * music_fade);
         if (!music_playing) {
             sfMusic_play(music);
+            sfMusic_setVolume(music, 0.0f);
             music_playing = true;
         }
     }

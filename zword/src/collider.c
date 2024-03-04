@@ -331,6 +331,8 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                     if (collision_type == 0) continue;
 
                     if (collider_other->trigger_type != TRIGGER_NONE) {
+                        // print trigger type
+                        // printf("trigger type: %i\n", collider_other->trigger_type);
                         apply_trigger(components, n, i);
                         continue;
                     }

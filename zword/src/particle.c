@@ -22,7 +22,7 @@ void ParticleComponent_add_bullet(ComponentData* components, int entity, float s
 void ParticleComponent_add_blood(ComponentData* components, int entity) {
     sfColor color = get_color(0.78, 0.0, 0.0, 1.0);
     sfColor inner_color = color_lerp(color, sfWhite, 0.25f);
-    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.25, 0.0, 5.0, 10.0, color, inner_color);
+    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.3f, 0.0, 3.0, 10.0, color, inner_color);
 }
 
 

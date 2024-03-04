@@ -130,6 +130,7 @@ void init_survival(GameData* data) {
     wave_delay = 5.0f;
     spawn_delay = 2.0f;
     game_over_timer = 0.0f;
+    level_won = false;
 
     spawners = List_create();
     for (int i = 0; i < data->components->entities; i++) {
@@ -142,7 +143,9 @@ void init_survival(GameData* data) {
 
 
 void init_tutorial(GameData* data) {
+    UNUSED(data);
     game_over_timer = 0.0f;
+    level_won = false;
 }
 
 
@@ -342,7 +345,6 @@ void update_tutorial(GameData data, float time_step) {
 
 
 void update_game_mode(GameData data, float time_step) {
-    printf("game_mode: %d\n", data.game_mode);
     switch (data.game_mode) {
         case MODE_SURVIVAL:
             update_survival(data, time_step);
@@ -468,7 +470,7 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
         }
         if (data.game_mode == MODE_SURVIVAL) {
             char buffer[256];
-            snprintf(buffer, 256, "You survived until wave %d", wave - 1);
+            snprintf(buffer, 256, "You survived until wave %d", wave);
             draw_text(window, data.components, data.menu_camera, NULL, 
                 vec(0.0f, 1.0f), buffer, 40, color);
         }

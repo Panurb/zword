@@ -91,6 +91,12 @@ install(FILES ${SHADERS}
     DESTINATION ${CMAKE_SOURCE_DIR}/build
 )
 
+set(EXTERNAL_DLLS ${CMAKE_SOURCE_DIR}/OpenAL32.dll)
+
+install(FILES ${EXTERNAL_DLLS}
+    DESTINATION ${CMAKE_SOURCE_DIR}/build
+)
+
 set(CONFIG 
     ${CMAKE_SOURCE_DIR}/zword/config.cfg
 )
