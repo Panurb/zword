@@ -55,6 +55,8 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         WaypointComponent_remove(components, entity);
     } else {
         if (enemy) {
+            coord->lifetime = 30.0f;
+
             enemy->state = ENEMY_DEAD;
             List_clear(enemy->path);
             LightComponent_remove(components, entity);
@@ -128,9 +130,9 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
             // TODO: use decal
             sfVector2f pos = sum(get_position(components, entity), mult(0.5f, rand_vector()));
             if (dmg < 40) {
-                create_decal(components, pos, "blood");
+                create_decal(components, pos, "blood", 60.0f);
             } else {
-                create_decal(components, pos, "blood_large");
+                create_decal(components, pos, "blood_large", 60.0f);
             }
         }
 

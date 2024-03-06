@@ -100,11 +100,11 @@ static const char* IMAGES[] = {
 };
 
 
-int create_decal(ComponentData* components, sfVector2f pos, Filename filename) {
+int create_decal(ComponentData* components, sfVector2f pos, Filename filename, float lifetime) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, rand_angle());
+    CoordinateComponent_add(components, i, pos, rand_angle())->lifetime = 60.0f;
     ImageComponent_add(components, i, filename, 0.0f, 0.0f, LAYER_DECALS);
-    PhysicsComponent_add(components, i, 0.0f)->lifetime = INFINITY;
+    PhysicsComponent_add(components, i, 0.0f)->lifetime = lifetime;
 
     return i;
 }

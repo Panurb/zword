@@ -53,6 +53,7 @@ CoordinateComponent* CoordinateComponent_add(ComponentData* components, int enti
     coord->angle = mod(angle, 2.0f * M_PI);
     coord->parent = -1;
     coord->children = List_create();
+    coord->lifetime = -1.0f;
 
     components->coordinate[entity] = coord;
 

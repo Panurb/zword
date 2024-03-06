@@ -192,13 +192,15 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
         PlayerComponent* player = PlayerComponent_get(components, j);
         if (player->state == PLAYER_DEAD) continue;
 
-        sfVector2f r = diff(get_position(components, j), get_position(components, entity));
+        sfVector2f pos = get_position(components, entity);
+
+        sfVector2f r = diff(get_position(components, j), pos);
         sfVector2f s = polar_to_cartesian(1.0f, get_angle(components, entity));
         float angle = fabs(signed_angle(r, s));
 
         float d = norm(r);
         if (d < min_dist && angle < 0.5f * enemy->fov) {
-            HitInfo info = raycast(components, grid, get_position(components, entity), r, enemy->vision_range, GROUP_BULLETS);
+            HitInfo info = raycast(components, grid, pos, r, enemy->vision_range, GROUP_RAYS);
             if (info.entity == j) {
                 enemy->target = j;
                 enemy->state = ENEMY_CHASE;

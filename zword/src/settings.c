@@ -67,6 +67,8 @@ void load_settings() {
             game_settings.volume = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "MUSIC") == 0) {
             game_settings.music = strtol(line.value, NULL, 10);
+        } else if (strcmp(line.key, "DEBUG") == 0) {
+            game_settings.debug = strtol(line.value, NULL, 10);
         } else {
             for (int i = 0; i < ACTIONS_SIZE; i++) {
                 if (strcmp(line.key, ACTIONS[i]) == 0) {

@@ -295,7 +295,9 @@ void toggle_controls(ComponentData* components, int entity) {
 void create_menu(GameData data) {
     int container = create_container(data.components, vec(-18.0f, -2.0f), 1, 4);
     add_button_to_container(data.components, container, "PLAY", toggle_play);
-    // add_button_to_container(data.components, container, "EDITOR", toggle_editor);
+    if (game_settings.debug) {
+        add_button_to_container(data.components, container, "EDITOR", toggle_editor);
+    }
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
     add_button_to_container(data.components, container, "QUIT", change_state_quit);

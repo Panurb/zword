@@ -404,7 +404,7 @@ void create_school(ComponentData* components, sfVector2f pos) {
 
     for (int i = 0; i < 10; i++) {
         sfVector2f r = { randf(-14.0f, 14.0f), randf(-11.0f, 11.0f) };
-        create_decal(components, sum(pos, lin_comb(r.x, w, r.y, h)), "blood_large");
+        create_decal(components, sum(pos, lin_comb(r.x, w, r.y, h)), "blood_large", -1);
     }
     
     create_door(components, sum(pos, mult(15.5f, w)), angle + 0.5f * M_PI);

@@ -262,7 +262,7 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("bed") return create_bed(components, position, angle);
     MATCH("bench") return create_bench(components, position, angle);
     MATCH("big boy") return create_big_boy(components, position, angle);
-    MATCH("blood") return create_decal(components, position, "blood");
+    MATCH("blood") return create_decal(components, position, "blood", -1);
     MATCH("boss") return create_boss(components, position, angle);
     MATCH("candle") return create_candle(components, position);
     MATCH("car") return create_car(components, position, angle);
@@ -273,7 +273,7 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("flashlight") return create_flashlight(components, position);
     MATCH("gas") return create_gas(components, position);
     MATCH("hay bale") return create_hay_bale(components, position, angle);
-    MATCH("hole") return create_decal(components, position, "hole");
+    MATCH("hole") return create_decal(components, position, "hole", -1);
     MATCH("lamp") return create_lamp(components, position);
     MATCH("player") return create_player(components, position, angle);
     MATCH("priest") return create_priest(components, position, angle);

@@ -373,7 +373,29 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
 }
 
 
+void update_lifetimes(ComponentData* components, float time_step) {
+    for (int i = 0; i < components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        if (!coord) continue;
+
+        if (coord->lifetime > 0.0f) {
+            coord->lifetime = fmaxf(0.0f, coord->lifetime - time_step);
+
+            ImageComponent* image = ImageComponent_get(components, i);
+            if (image && coord->lifetime < 1.0f) {
+                image->alpha = coord->lifetime;
+            }
+
+            if (coord->lifetime == 0.0f) {
+                destroy_entity_recursive(components, i);
+            }
+        }
+    }
+}
+
+
 void update_game(GameData data, float time_step) {
+    update_lifetimes(data.components, time_step);
     update(data.components, time_step, data.grid);
     collide(data.components, data.grid);
     update_waypoints(data.components, data.grid, data.camera);

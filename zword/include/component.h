@@ -16,6 +16,7 @@ typedef struct {
     float angle;
     int parent;
     List* children;
+    float lifetime;
 } CoordinateComponent;
 
 typedef enum {
