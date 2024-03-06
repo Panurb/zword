@@ -87,21 +87,43 @@ char* mouse_to_string(sfMouseButton button) {
 }
 
 
-char* keybind_to_string(int i) {
-    if (game_settings.keybinds_device[i] == INPUT_KEYBOARD) {
-        return key_to_string(game_settings.keybinds[i]);
-    } else if (game_settings.keybinds_device[i] == INPUT_MOUSE) {
-        return mouse_to_string(game_settings.keybinds[i]);
+char* keybind_to_string(Keybind keybind) {
+    if (keybind.device == DEVICE_KEYBOARD) {
+        return key_to_string(keybind.key);
+    } else if (keybind.device == DEVICE_MOUSE) {
+        return mouse_to_string(keybind.key);
     } else {
         return "unknown";
     }
 }
 
 
+Keybind string_to_keybind(String string) {
+    Keybind keybind = {DEVICE_UNBOUND, 0};
+
+    for (int i = 0; i < LENGTH(KEY_NAMES); i++) {
+        if (strcmp(string, KEY_NAMES[i]) == 0) {
+            keybind.device = DEVICE_KEYBOARD;
+            keybind.key = i;
+            printf("Keybind: %s\n", string);
+        }
+    }
+
+    for (int i = 0; i < LENGTH(MOUSE_NAMES); i++) {
+        if (strcmp(string, MOUSE_NAMES[i]) == 0) {
+            keybind.device = DEVICE_MOUSE;
+            keybind.key = i;
+        }
+    }
+
+    return keybind;
+}
+
+
 char* action_to_keybind(char* action) {
     for (int i = 0; i < LENGTH(ACTIONS); i++) {
         if (strcmp(action, ACTIONS[i]) == 0) {
-            return keybind_to_string(i);
+            return keybind_to_string(game_settings.keybinds[i]);
         }
     }
 
@@ -119,10 +141,11 @@ char* key_to_letter(sfKeyCode key) {
 
 
 bool keybind_pressed(PlayerAction i) {
-    if (game_settings.keybinds_device[i] == INPUT_KEYBOARD) {
-        return sfKeyboard_isKeyPressed(game_settings.keybinds[i]);
-    } else if (game_settings.keybinds_device[i] == INPUT_MOUSE) {
-        return sfMouse_isButtonPressed(game_settings.keybinds[i]);
+    Keybind keybind = game_settings.keybinds[i];
+    if (keybind.device == DEVICE_KEYBOARD) {
+        return sfKeyboard_isKeyPressed(keybind.key);
+    } else if (keybind.device == DEVICE_MOUSE) {
+        return sfMouse_isButtonPressed(keybind.key);
     } else {
         return false;
     }

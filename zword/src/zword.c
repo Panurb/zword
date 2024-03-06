@@ -206,7 +206,7 @@ int main() {
 
             title_scale = 2.5f + 0.1f * sinf(2.0f * sfTime_asSeconds(sfClock_getElapsedTime(game_clock)));
 
-            music_fade = fminf(1.0f, music_fade + 0.0001f);
+            music_fade = fminf(1.0f, music_fade + 0.01f);
         }
 
         sfRenderWindow_clear(window, get_color(0.05f, 0.05f, 0.05f, 1.0f));

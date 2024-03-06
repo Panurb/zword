@@ -2,10 +2,15 @@
 
 
 typedef enum {
-    INPUT_UNBOUND,
-    INPUT_KEYBOARD,
-    INPUT_MOUSE
+    DEVICE_UNBOUND,
+    DEVICE_KEYBOARD,
+    DEVICE_MOUSE
 } InputDevice;
+
+typedef struct {
+    InputDevice device;
+    int key;
+} Keybind;
 
 typedef struct {
     int width;
@@ -17,13 +22,12 @@ typedef struct {
     int volume;
     int music;
     bool debug;
-    int keybinds[16];
-    InputDevice keybinds_device[16];
+    Keybind keybinds[16];
 } Settings;
 
 typedef struct {
     char* key;
-    int value;
+    char* value;
 } KeyValue;
 
 typedef char Line[255];

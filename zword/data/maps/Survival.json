@@ -1,4 +1,6 @@
 {
+	"game_mode":	0,
+	"ambient_light":	0.5,
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
@@ -1075,9 +1077,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.2570269107818604,
-				"scale_y":	1.2570269107818604
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -1319,7 +1319,7 @@
 			},
 			"Particle":	{
 				"type":	2,
-				"start_size":	0.25
+				"start_size":	0.300000011920929
 			},
 			"Waypoint":	{
 			},
@@ -3750,9 +3750,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.3173619508743286,
-				"scale_y":	1.3173619508743286
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3771,9 +3769,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.0772881507873535,
-				"scale_y":	1.0772881507873535
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3792,9 +3788,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.3199102878570557,
-				"scale_y":	1.3199102878570557
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3813,9 +3807,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.36996066570282,
-				"scale_y":	1.36996066570282
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3834,9 +3826,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.43305766582489,
-				"scale_y":	1.43305766582489
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3855,9 +3845,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.037827730178833,
-				"scale_y":	1.037827730178833
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3876,9 +3864,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.156926155090332,
-				"scale_y":	1.156926155090332
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3897,9 +3883,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.1864986419677734,
-				"scale_y":	1.1864986419677734
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3918,9 +3902,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.1258888244628906,
-				"scale_y":	1.1258888244628906
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3939,9 +3921,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.0051728487014771,
-				"scale_y":	1.0051728487014771
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -3960,9 +3940,7 @@
 				"filename":	"tree",
 				"width":	3,
 				"height":	3,
-				"layer":	12,
-				"scale_x":	1.4436018466949463,
-				"scale_y":	1.4436018466949463
+				"layer":	12
 			},
 			"Collider":	{
 				"type":	0,
@@ -4007,11 +3985,11 @@
 			},
 			"Weapon":	{
 				"fire_rate":	10,
-				"recoil":	0,
+				"recoil":	0.10000000149011612,
 				"damage":	20,
 				"max_magazine":	12,
 				"magazine":	12,
-				"max_recoil":	0,
+				"max_recoil":	0.31415927410125732,
 				"reload_time":	2,
 				"range":	25,
 				"sound_range":	25,
@@ -4034,7 +4012,7 @@
 		}, {
 			"id":	190,
 			"Coordinate":	{
-				"x":	-15,
+				"x":	-15.5,
 				"y":	-11.5
 			},
 			"Image":	{
@@ -4068,7 +4046,7 @@
 			},
 			"Weapon":	{
 				"fire_rate":	10,
-				"recoil":	0,
+				"recoil":	0.05000000074505806,
 				"damage":	40,
 				"max_magazine":	30,
 				"magazine":	30,
@@ -4129,11 +4107,11 @@
 			},
 			"Weapon":	{
 				"fire_rate":	15,
-				"recoil":	0,
+				"recoil":	0.15000000596046448,
 				"damage":	20,
 				"max_magazine":	20,
 				"magazine":	20,
-				"max_recoil":	0,
+				"max_recoil":	0.471238911151886,
 				"reload_time":	2,
 				"range":	30,
 				"sound_range":	30,
@@ -4263,7 +4241,25 @@
 			"id":	194,
 			"Coordinate":	{
 				"x":	-25.5,
-				"y":	-39
+				"y":	-40
+			},
+			"Image":	{
+				"filename":	"fence_tile",
+				"width":	5,
+				"height":	1,
+				"layer":	5
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	5,
+				"height":	1,
+				"group":	8
+			}
+		}, {
+			"id":	195,
+			"Coordinate":	{
+				"x":	-25.5,
+				"y":	-38.5
 			},
 			"Image":	{
 				"filename":	"combat_shotgun",
@@ -4295,13 +4291,13 @@
 				"start_size":	0.10000000149011612
 			},
 			"Weapon":	{
-				"fire_rate":	1,
-				"recoil":	0,
-				"damage":	8,
+				"fire_rate":	0.800000011920929,
+				"recoil":	0.25,
+				"damage":	10,
 				"max_magazine":	6,
 				"magazine":	6,
 				"max_recoil":	0.78539818525314331,
-				"reload_time":	5,
+				"reload_time":	3,
 				"range":	25,
 				"sound_range":	25,
 				"spread":	0.15707963705062866,
@@ -4318,24 +4314,6 @@
 			},
 			"Sound":	{
 				"hit_sound":	"metal"
-			}
-		}, {
-			"id":	195,
-			"Coordinate":	{
-				"x":	-25.5,
-				"y":	-40
-			},
-			"Image":	{
-				"filename":	"fence_tile",
-				"width":	5,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	5,
-				"height":	1,
-				"group":	8
 			}
 		}]
 }

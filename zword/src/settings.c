@@ -11,15 +11,18 @@
 
 Settings game_settings = { 1920, 1080, 8, false, true, 0, 100, 100, false,
     {
-        sfKeyW, sfKeyA, sfKeyS, sfKeyD, 
-        sfMouseLeft, sfKeyE, sfMouseRight, sfKeyR,
-        sfKeyF, sfKeySpace, sfKeyLShift
-    },
-    {
-        INPUT_KEYBOARD, INPUT_KEYBOARD, INPUT_KEYBOARD, INPUT_KEYBOARD,
-        INPUT_MOUSE, INPUT_KEYBOARD, INPUT_MOUSE, INPUT_KEYBOARD,
-        INPUT_KEYBOARD, INPUT_KEYBOARD, INPUT_KEYBOARD
-    } 
+        { DEVICE_KEYBOARD, sfKeyW },
+        { DEVICE_KEYBOARD, sfKeyA },
+        { DEVICE_KEYBOARD, sfKeyS },
+        { DEVICE_KEYBOARD, sfKeyD },
+        { DEVICE_MOUSE, sfMouseLeft },
+        { DEVICE_KEYBOARD, sfKeyE },
+        { DEVICE_MOUSE, sfMouseRight },
+        { DEVICE_KEYBOARD, sfKeyR },
+        { DEVICE_KEYBOARD, sfKeyF },
+        { DEVICE_KEYBOARD, sfKeySpace },
+        { DEVICE_KEYBOARD, sfKeyLShift }
+    }
 };
 
 
@@ -27,7 +30,11 @@ KeyValue parse_line(Line string, char* delim) {
     char* token = strtok(string, delim);
     char* key = token;
     token = strtok(NULL, delim);
-    int value = strtol(token, NULL, 10);
+    char* value = token;
+
+    if (value[strlen(value) - 1] == '\n') {
+        value[strlen(value) - 1] = '\0';
+    }
 
     return (KeyValue) { key, value };
 }
@@ -44,37 +51,26 @@ void load_settings() {
     while (fgets(buffer, 255, file)) {
         KeyValue line = parse_line(buffer, "=");
 
-        printf("%s = %i\n", line.key, line.value);
-
         if (strcmp(line.key, "WIDTH") == 0) {
-            game_settings.width = line.value;
+            game_settings.width = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "HEIGHT") == 0) {
-            game_settings.height = line.value;
+            game_settings.height = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "ANTIALIASING") == 0) {
-            game_settings.antialiasing = line.value;
+            game_settings.antialiasing = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "FULLSCREEN") == 0) {
-            game_settings.fullscreen = line.value;
+            game_settings.fullscreen = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "VSYNC") == 0) {
-            game_settings.vsync = line.value;
+            game_settings.vsync = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "MAX_FPS") == 0) {
-            game_settings.max_fps = line.value;
+            game_settings.max_fps = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "VOLUME") == 0) {
-            game_settings.volume = line.value;
+            game_settings.volume = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "MUSIC") == 0) {
-            game_settings.music = line.value;
+            game_settings.music = strtol(line.value, NULL, 10);
         } else {
             for (int i = 0; i < ACTIONS_SIZE; i++) {
                 if (strcmp(line.key, ACTIONS[i]) == 0) {
-                    if (line.value == 0) {
-                        game_settings.keybinds_device[i] = INPUT_UNBOUND;
-                        game_settings.keybinds[i] = 0;
-                    } else if (line.value < 0) {
-                        game_settings.keybinds_device[i] = INPUT_MOUSE;
-                        game_settings.keybinds[i] = -line.value - 1;
-                    } else {
-                        game_settings.keybinds_device[i] = INPUT_KEYBOARD;
-                        game_settings.keybinds[i] = line.value - 1;
-                    }
+                    game_settings.keybinds[i] = string_to_keybind(line.value);
                 }
             }
         }
@@ -96,13 +92,7 @@ void save_settings() {
     fprintf(file, "VOLUME=%i\n", game_settings.volume);
     fprintf(file, "MUSIC=%i\n", game_settings.music);
     for (int i = 0; i < ACTIONS_SIZE; i++) {
-        int value = 0;
-        if (game_settings.keybinds_device[i] == INPUT_KEYBOARD) {
-            value = game_settings.keybinds[i] + 1;
-        } else if (game_settings.keybinds_device[i] == INPUT_MOUSE) {
-            value = -game_settings.keybinds[i] - 1;
-        }
-        fprintf(file, "%s=%i\n", ACTIONS[i], value);
+        fprintf(file, "%s=%s\n", ACTIONS[i], keybind_to_string(game_settings.keybinds[i]));
     }
 
     fclose(file);

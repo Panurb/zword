@@ -243,7 +243,7 @@ void toggle_keyboard_controls(ComponentData* components, int entity) {
 
     for (int i = 0; i < ACTIONS_SIZE; i++) {
         int label = create_label(components, ACTIONS[i], zeros());
-        int button = create_button(components, keybind_to_string(i), zeros(), NULL);
+        int button = create_button(components, keybind_to_string(game_settings.keybinds[i]), zeros(), NULL);
         add_row_to_container(components, container, label, button);
     }
     add_scrollbar_to_container(components, container);
@@ -295,7 +295,7 @@ void toggle_controls(ComponentData* components, int entity) {
 void create_menu(GameData data) {
     int container = create_container(data.components, vec(-18.0f, -2.0f), 1, 4);
     add_button_to_container(data.components, container, "PLAY", toggle_play);
-    add_button_to_container(data.components, container, "EDITOR", toggle_editor);
+    // add_button_to_container(data.components, container, "EDITOR", toggle_editor);
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
     add_button_to_container(data.components, container, "QUIT", change_state_quit);

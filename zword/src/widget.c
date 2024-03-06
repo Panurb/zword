@@ -542,11 +542,13 @@ bool input_widgets(ComponentData* components, int camera, sfEvent event) {
             if (widget->type == WIDGET_CONTAINER || widget->type == WIDGET_SPINBOX 
                     || widget->type == WIDGET_SCROLLBAR) {
                 increment_value(components, i, delta);
+                return true;
             } else {
                 if (coord->parent) {
                     WidgetComponent* parent = WidgetComponent_get(components, coord->parent);
                     if (parent && parent->type == WIDGET_CONTAINER) {
                         increment_value(components, coord->parent, delta);
+                        return true;
                     }
                 }
             }

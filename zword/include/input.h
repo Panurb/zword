@@ -3,6 +3,7 @@
 #include "util.h"
 #include "component.h"
 #include "camera.h"
+#include "settings.h"
 
 
 extern char* ACTIONS[];
@@ -43,7 +44,9 @@ typedef enum {
 
 char* key_to_string(sfKeyCode key);
 
-char* keybind_to_string(int i);
+char* keybind_to_string(Keybind keybind);
+
+Keybind string_to_keybind(String string);
 
 char* key_to_letter(sfKeyCode key);
 
