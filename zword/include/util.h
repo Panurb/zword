@@ -55,6 +55,8 @@ sfVector2f polar_to_cartesian(float length, float angle);
 
 int abs_argmin(float* a, int n);
 
+int argmax(float* a, int n);
+
 float mean(float* array, int size);
 
 sfVector2f perp(sfVector2f v);

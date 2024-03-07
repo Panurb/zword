@@ -8,7 +8,7 @@ int get_akimbo(ComponentData* components, int entity);
 
 void update_energy(ComponentData* components, ColliderGrid* grid);
 
-void shoot(ComponentData* component, ColliderGrid* grid, int i);
+void attack(ComponentData* component, ColliderGrid* grid, int i);
 
 void reload(ComponentData* component, int i);
 

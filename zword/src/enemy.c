@@ -56,6 +56,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     enemy->walk_speed = 3.0f;
     enemy->run_speed = 3.0f;
     enemy->fov = 0.25f * M_PI;
+    enemy->bounty = 200;
     ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 100, "farmer_dead", "blood", "");
@@ -87,6 +88,7 @@ int create_priest(ComponentData* components, sfVector2f pos, float angle) {
     enemy->walk_speed = 2.0f;
     enemy->run_speed = 2.0f;
     enemy->fov = 2.0f * M_PI;
+    enemy->bounty = 500;
     ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 200, "priest_dead", "blood", "");
@@ -120,6 +122,7 @@ int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     enemy->idle_speed = 0.0f;
     enemy->walk_speed = 4.0f;
     enemy->run_speed = 8.0f;
+    enemy->bounty = 1000;
     ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(components, i);
     HealthComponent_add(components, i, 500, "big_boy_dead", "blood", "");
@@ -310,7 +313,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
             } case ENEMY_ATTACK: {
                 if (enemy->attack_timer <= 0.0f) {
-                    shoot(components, grid, enemy->weapon);
+                    attack(components, grid, enemy->weapon);
                     enemy->state = ENEMY_CHASE;
                 } else {
                     enemy->attack_timer -= time_step;

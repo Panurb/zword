@@ -471,8 +471,9 @@ void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
 void update_game_over(GameData data, sfRenderWindow* window, float time_step) {
     if (game_over_timer > 0.0f) {
         update_game(data, time_step);
+    } else {
+        update_menu(data, window);
     }
-    update_menu(data, window);
     game_over_timer = fmaxf(game_over_timer - time_step, 0.0f);
 }
 

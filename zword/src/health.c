@@ -75,10 +75,10 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
                     j = create_ammo(components, zeros(), AMMO_PISTOL);
                     break;
                 case 2:
-                    j = create_ammo(components, zeros(), AMMO_RIFLE);
+                    j = create_ammo(components, zeros(), AMMO_SHOTGUN);
                     break;
                 case 3:
-                    j = create_ammo(components, zeros(), AMMO_SHOTGUN);
+                    j = create_ammo(components, zeros(), AMMO_RIFLE);
                     break;
                 default:
                     break;

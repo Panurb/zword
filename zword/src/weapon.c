@@ -136,7 +136,7 @@ int rope_root(ComponentData* components, int rope) {
 }
 
 
-void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
+void attack(ComponentData* components, ColliderGrid* grid, int entity) {
     WeaponComponent* weapon = WeaponComponent_get(components, entity);
     int parent = CoordinateComponent_get(components, entity)->parent;
 
@@ -164,28 +164,49 @@ void shoot(ComponentData* components, ColliderGrid* grid, int entity) {
 
     switch (weapon->ammo_type) {
         case AMMO_MELEE: {
-            HitInfo min_info;
-            float min_dist = INFINITY;
+            HitInfo min_info[weapon->shots];
+            float min_dist[weapon->shots];
             for (int i = 0; i < weapon->shots; i++) {
-                float angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
+                min_info[i].entity = -1;
+                min_dist[i] = INFINITY;
+            }
+
+            int rays = 7;
+            for (int i = 0; i < rays; i++) {
+                float angle = i * weapon->spread / (rays - 1) - 0.5f * weapon->spread;
                 sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
                 HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
                 float d = dist(info.position, pos);
-                if (d < min_dist) {
-                    min_info = info;
-                    min_dist = d;
+
+                int max_index = -1;
+                for (int j = 0; j < weapon->shots; j++) {
+                    if (min_info[j].entity == info.entity) {
+                        max_index = j;
+                        break;
+                    }
+                }
+
+                if (max_index == -1) {
+                    max_index = argmax(min_dist, weapon->shots);
+                }
+                
+                if (d < min_dist[max_index]) {
+                    min_info[max_index] = info;
+                    min_dist[max_index] = d;
                 }
             }
 
             int dmg = weapon->damage;
-            EnemyComponent* enemy = EnemyComponent_get(components, min_info.entity);
-            if (enemy && enemy->state == ENEMY_IDLE) {
-                dmg = 100;
-            }
-            sfVector2f dir = normalized(diff(min_info.position, pos));
-            damage(components, grid, min_info.entity, min_info.position, dir, dmg, parent);
-            if (min_info.entity != -1) {
+            for (int i = 0; i < weapon->shots; i++) {
+                if (min_info[i].entity == -1) continue;
+
+                EnemyComponent* enemy = EnemyComponent_get(components, min_info[i].entity);
+                if (enemy && enemy->state == ENEMY_IDLE) {
+                    dmg *= 2;
+                }
+                sfVector2f dir = normalized(diff(min_info[i].position, pos));
+                damage(components, grid, min_info[i].entity, min_info[i].position, dir, dmg, parent);
                 shake_camera(components, 0.0125f * weapon->damage);
             }
             break;
@@ -399,7 +420,7 @@ int create_axe(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "axe", 2.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 1.0f);
-    WeaponComponent_add(components, i, 2.0f, 50, 7, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
+    WeaponComponent_add(components, i, 2.0f, 50, 1, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
     ItemComponent_add(components, i, 0, 0, "Axe");
     SoundComponent_add(components, i, "metal");
 
@@ -414,7 +435,7 @@ int create_sword(ComponentData* components, sfVector2f position) {
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(components, i, "sword", 3.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(components, i, 1.0f);
-    WeaponComponent_add(components, i, 3.0f, 100, 10, 1.0f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
+    WeaponComponent_add(components, i, 3.0f, 100, 5, 1.0f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
     ItemComponent_add(components, i, 0, 10000, "Fiskalibur");
     SoundComponent_add(components, i, "metal");
 
