@@ -223,6 +223,7 @@ void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, s
         verts = sfVertexArray_create();
         sfVertexArray_setPrimitiveType(verts, sfTriangleStrip);
         sfVertexArray_resize(verts, verts_size);
+        created = true;
     }
 
     sfVector2f start = polar_to_cartesian(min_range, angle - 0.5 * spread);

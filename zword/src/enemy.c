@@ -203,7 +203,7 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
 
         float d = norm(r);
         if (d < min_dist && angle < 0.5f * enemy->fov) {
-            HitInfo info = raycast(components, grid, pos, r, enemy->vision_range, GROUP_RAYS);
+            HitInfo info = raycast(components, grid, pos, r, enemy->vision_range, GROUP_VISION);
             if (info.entity == j) {
                 enemy->target = j;
                 enemy->state = ENEMY_CHASE;

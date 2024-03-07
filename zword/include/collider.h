@@ -8,15 +8,14 @@
 #include "raycast.h"
 
 
-//                                                                                     W
-//                                                             V        B              A
-//                                                       P  E  E        A  B     C     Y
-//                                                       L  N  H        R  U  L  O  F  P     D     E
-//                                                 W  I  A  E  I  T  R  R  L  I  R  L  O     E  D  N
-//                                                 A  T  Y  M  C  R  O  I  L  G  P  O  I  R  B  O  E
-//                                              A  L  E  E  I  L  E  A  E  E  H  S  O  N  A  R  O  R
-//                                              L  L  M  R  E  E  E  D  R  T  T  E  R  T  Y  I  R  G
-//                                              L  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  Y
+//                                                             V        B              
+//                                                       P  E  E        A  B     C     
+//                                                       L  N  H        R  U  L  O  F  V     D     E
+//                                                 W  I  A  E  I  T  R  R  L  I  R  L  I     E  D  N
+//                                                 A  T  Y  M  C  R  O  I  L  G  P  O  S  R  B  O  E
+//                                              A  L  E  E  I  L  E  A  E  E  H  S  O  I  A  R  O  R
+//                                              L  L  M  R  E  E  E  D  R  T  T  E  R  O  Y  I  R  G
+//                                              L  S  S  S  S  S  S  S  S  S  S  S  S  N  S  S  S  Y
 static const int COLLISION_MATRIX[18][18] = { { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },     // ALL
                                               { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // WALLS
                                               { 1, 1, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },     // ITEMS
@@ -30,7 +29,7 @@ static const int COLLISION_MATRIX[18][18] = { { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                               { 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },     // LIGHTS
                                               { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // CORPSES
                                               { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // FLOORS
-                                              { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },     // WAYPOINTS
+                                              { 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // VISION
                                               { 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // RAYS
                                               { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // DEBRIS
                                               { 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // DOORS

@@ -191,6 +191,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
             case PLAYER_RELOAD:
                 if (weapon) {
+                    player->target = -1;
                     reload(components, item);
 
                     if (!weapon->reloading) {
