@@ -61,6 +61,7 @@ bool a_star(ComponentData* components, int start, int goal, List* path) {
 
         if (current == goal) {
             reconstruct_path(components, current, path);
+            Heap_destroy(open_set);
             return true;
         }
 
@@ -87,6 +88,7 @@ bool a_star(ComponentData* components, int start, int goal, List* path) {
         }
     }
 
+    Heap_destroy(open_set);
     return false;
 }
 

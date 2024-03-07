@@ -60,6 +60,11 @@ Heap* Heap_create(ComponentData* component) {
 }
 
 
+void Heap_destroy(Heap* heap) {
+    free(heap);
+}
+
+
 void Heap_insert(Heap* heap, int key) {
     heap->size++;
 

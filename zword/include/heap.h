@@ -16,6 +16,8 @@ typedef struct {
 
 Heap* Heap_create(ComponentData* component);
 
+void Heap_destroy(Heap* heap);
+
 void Heap_insert(Heap* heap, int key);
 
 int Heap_extract(Heap* heap);
