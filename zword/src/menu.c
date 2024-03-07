@@ -23,6 +23,7 @@ static int window_new_map = -1;
 static int window_editor = -1;
 static int window_settings = -1;
 static int window_controls = -1;
+static int window_credits = -1;
 static int window_keyboard_controls = -1;
 static int window_xbox_controls = -1;
 
@@ -207,7 +208,7 @@ void toggle_settings(ComponentData* components, int entity) {
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_settings = create_window(components, pos, "SETTINGS", 2, toggle_settings);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    int container = create_container(components, vec(0.0f, -2.5f * BUTTON_HEIGHT), 2, 4);
     add_child(components, window_settings, container);
 
     int label = create_label(components, "Resolution", zeros());
@@ -292,14 +293,39 @@ void toggle_controls(ComponentData* components, int entity) {
 }
 
 
+void toggle_credits(ComponentData* components, int entity) {
+    UNUSED(entity);
+    if (window_credits != -1) {
+        destroy_entity_recursive(components, window_credits);
+        window_credits = -1;
+        return;
+    }
+
+    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_credits = create_window(components, pos, "CREDITS", 2, toggle_credits);
+
+    int container = create_container(components, vec(0.0f, -3.5f * BUTTON_HEIGHT), 2, 6);
+    add_child(components, window_credits, container);
+
+    add_row_to_container(components, container, create_label(components, "Programming, art, music", zeros()), create_label(components, "Panu Keskinen", zeros()));
+    add_row_to_container(components, container, create_label(components, "Made with", zeros()), create_label(components, "C, CSFML, cJSON", zeros()));
+    add_row_to_container(components, container, create_label(components, "Software used", zeros()), create_label(components, "Visual Studio Code", zeros()));
+    add_row_to_container(components, container, create_label(components, "", zeros()), create_label(components, "Gimp", zeros()));
+    add_row_to_container(components, container, create_label(components, "", zeros()), create_label(components, "Ableton Live Lite", zeros()));
+    add_row_to_container(components, container, create_label(components, "", zeros()), create_label(components, "Audacity", zeros()));
+}
+
+
 void create_menu(GameData data) {
-    int container = create_container(data.components, vec(-18.0f, -2.0f), 1, 4);
+    int height = game_settings.debug ? 6 : 5;
+    int container = create_container(data.components, vec(-18.0f, -2.0f), 1, height);
     add_button_to_container(data.components, container, "PLAY", toggle_play);
     if (game_settings.debug) {
         add_button_to_container(data.components, container, "EDITOR", toggle_editor);
     }
     add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
     add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
+    add_button_to_container(data.components, container, "CREDITS", toggle_credits);
     add_button_to_container(data.components, container, "QUIT", change_state_quit);
 }
 
