@@ -237,7 +237,7 @@ int main() {
                 break;
             case STATE_PAUSE:
                 draw_game(*game_data, game_window);
-                draw_overlay(game_window, game_data->components, game_data->camera, 0.4f);
+                draw_overlay(game_data->camera, 0.4f);
                 draw_menu(*game_data, game_window);
                 break;
             case STATE_LOAD:

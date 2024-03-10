@@ -331,7 +331,7 @@ void draw_text(int camera, sfText* text, sfVector2f position, char string[100], 
 }
 
 
-void update_camera(ComponentData* components, int camera, float time_step, bool follow_players) {
+void update_camera(int camera, float time_step, bool follow_players) {
     CoordinateComponent* coord = CoordinateComponent_get(camera);
     CameraComponent* cam = CameraComponent_get(camera);
 
@@ -339,7 +339,8 @@ void update_camera(ComponentData* components, int camera, float time_step, bool 
 
     if (follow_players) {
         int n = 0;
-        for (ListNode* node = components->player.order->head; node; node = node->next) {
+        ListNode* node;
+        FOREACH (node, game_data->components->player.order) {
             int i = node->value;
             PlayerComponent* player = PlayerComponent_get(i);
             if (player->state != PLAYER_DEAD) {
@@ -359,7 +360,7 @@ void update_camera(ComponentData* components, int camera, float time_step, bool 
 }
 
 
-bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height) {
+bool on_screen(int camera, sfVector2f position, float width, float height) {
     sfVector2f pos = get_position(camera);
     CameraComponent* cam = CameraComponent_get(camera);
 
@@ -372,8 +373,8 @@ bool on_screen(ComponentData* components, int camera, sfVector2f position, float
 }
 
 
-void shake_camera(ComponentData* components, float speed) {
-    for (int i = 0; i < components->entities; i++) {
+void shake_camera(float speed) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         CameraComponent* cam = CameraComponent_get(i);
         if (cam) {
             cam->shake.velocity = sum(cam->shake.velocity, mult(speed, rand_vector()));
@@ -382,7 +383,7 @@ void shake_camera(ComponentData* components, float speed) {
 }
 
 
-void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera, float alpha) {
+void draw_overlay(int camera, float alpha) {
     CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;

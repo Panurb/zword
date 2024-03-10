@@ -45,10 +45,10 @@ void draw_sprite(int camera, sfSprite* sprite, sfVector2f position, float angle,
 
 void draw_text(int camera, sfText* text, sfVector2f position, char string[100], int size, sfColor color);
 
-void update_camera(ComponentData* components, int camera, float time_step, bool follow_players);
+void update_camera(int camera, float time_step, bool follow_players);
 
-bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height);
+bool on_screen(int camera, sfVector2f position, float width, float height);
 
-void shake_camera(ComponentData* components, float speed);
+void shake_camera(float speed);
 
-void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera, float alpha);
+void draw_overlay(int camera, float alpha);

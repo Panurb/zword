@@ -175,7 +175,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
         // TODO: check if on screen
         draw_road(components, window, camera, textures, i);
 
-        if (!on_screen(components, camera, pos, r, r)) {
+        if (!on_screen(camera, pos, r, r)) {
             continue;
         }
 
@@ -202,7 +202,7 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
     float w = image->scale.x * image->width;
     float h = image->scale.y * image->height;
     float r = sqrtf(w * w + h * h);
-    if (!on_screen(components, camera, pos, r, r)) {
+    if (!on_screen(camera, pos, r, r)) {
         return;
     }
 

@@ -76,7 +76,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
         sfVector2f start = get_position(i);
 
         float radius = 1.5f * collider->radius;
-        if (!on_screen(components, camera, start, 2.0f * radius, 2.0f * radius)) {
+        if (!on_screen(camera, start, 2.0f * radius, 2.0f * radius)) {
             continue;
         }
         
@@ -156,7 +156,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
 
         sfVector2f start = get_position(i);
 
-        if (!on_screen(components, camera, start, 2.0f * light->range, 2.0f * light->range)) {
+        if (!on_screen(camera, start, 2.0f * light->range, 2.0f * light->range)) {
             continue;
         }
 

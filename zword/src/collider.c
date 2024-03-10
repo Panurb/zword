@@ -388,7 +388,7 @@ void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRender
     for (int i = 0; i < grid->width; i++) {
         for (int j = 0; j < grid->height; j++) {
             sfVector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
-            if (on_screen(components, camera, r, grid->tile_width, grid->tile_height)) {
+            if (on_screen(camera, r, grid->tile_width, grid->tile_height)) {
                 draw_line(camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
                 draw_line(camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
                 draw_line(camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);

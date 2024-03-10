@@ -207,7 +207,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                 }
                 sfVector2f dir = normalized(diff(min_info[i].position, pos));
                 damage(components, grid, min_info[i].entity, min_info[i].position, dir, dmg, parent);
-                shake_camera(components, 0.0125f * weapon->damage);
+                shake_camera(0.0125f * weapon->damage);
             }
             break;
         } case AMMO_ENERGY: {
@@ -272,7 +272,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                 light->brightness = light->max_brightness;
             }
 
-            shake_camera(components, 0.025f * weapon->shots * weapon->damage);
+            shake_camera(0.025f * weapon->shots * weapon->damage);
         }
     }
 

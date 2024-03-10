@@ -254,7 +254,7 @@ int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, flo
         sfVector2f pos = get_position(spawner);
         pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
 
-        if (on_screen(components, camera, pos, 2.0f, 2.0f)) {
+        if (on_screen(camera, pos, 2.0f, 2.0f)) {
             return 0;
         }
 
@@ -409,7 +409,7 @@ void update_game(GameData data, float time_step) {
 
     update_particles(data.components, data.camera, time_step);
     update_lights(data.components, time_step);
-    update_camera(data.components, data.camera, time_step, true);
+    update_camera(data.camera, time_step, true);
 
     draw_shadows(data.components, data.shadow_texture, data.camera);
     draw_lights(data.components, data.grid, data.light_texture, data.camera, data.ambient_light);
@@ -482,7 +482,7 @@ void update_game_over(GameData data, sfRenderWindow* window, float time_step) {
 void draw_game_over(GameData data, sfRenderWindow* window) {
     draw_game(data, window);
     float alpha = 1.0f - game_over_timer / 2.0f;
-    draw_overlay(window, data.components, data.menu_camera, alpha);
+    draw_overlay(data.menu_camera, alpha);
     sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
         if (level_won) {
