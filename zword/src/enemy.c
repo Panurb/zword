@@ -346,7 +346,7 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
             if (current->next) {
                 sfVector2f start = get_position(current->value);
                 sfVector2f end = get_position(current->next->value);
-                draw_line(window, components, camera, NULL, start, end, 0.05, sfRed);
+                draw_line(camera, NULL, start, end, 0.05, sfRed);
             }
         }
     }
@@ -384,8 +384,8 @@ void draw_spawners(sfRenderWindow* window, GameData data) {
             sfColor color = get_color(1.0f, 0.0f, 1.0f, 0.25f);
             sfVector2f pos = get_position(i);
             float angle = get_angle(i);
-            draw_rectangle(window, data.components, data.camera, NULL, pos, col->width, col->height, angle, color);
-            draw_text(window, data.components, data.camera, NULL, pos, "spawner", 20, sfMagenta);
+            draw_rectangle(data.camera, NULL, pos, col->width, col->height, angle, color);
+            draw_text(data.camera, NULL, pos, "spawner", 20, sfMagenta);
         }
     }
 }

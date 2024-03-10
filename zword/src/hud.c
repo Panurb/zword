@@ -19,9 +19,9 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
     sfConvexShape_setFillColor(player->shape, color);
 
     if (alpha == 0.0) {
-        draw_slice_outline(window, components, camera, player->line, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
+        draw_slice_outline(camera, player->line, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
     } else {
-        draw_slice(window, components, camera, NULL, 50, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap, color);
+        draw_slice(camera, NULL, 50, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap, color);
     }
 
     int i = player->inventory[slot];
@@ -40,7 +40,7 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
 
         float alpha = sfSprite_getColor(sprite).a;
         sfSprite_setColor(sprite, sfWhite);
-        draw_sprite(window, components, camera, sprite, sum(pos, r), angle, ones(), 0);
+        draw_sprite(camera, sprite, sum(pos, r), angle, ones(), 0);
         sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
     }
 }
@@ -56,7 +56,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
 
     float spread = (slice - 2 * gap - 0.5 * item->size * gap) / (item->size + 1);
     float angle = (slot - 0.5) * slice + (atch + 1.5) * spread + (0.5 * atch + 1.5) * gap;
-    draw_slice_outline(window, components, camera, player->line, pos, 1.2 + offset, 1.8 + offset, angle, spread);
+    draw_slice_outline(camera, player->line, pos, 1.2 + offset, 1.8 + offset, angle, spread);
 
     int a = item->attachments[atch];
     if (a != -1) {
@@ -64,7 +64,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
         color.a = alpha * 255;
         sfConvexShape_setFillColor(player->shape, color);
 
-        draw_slice(window, components, camera, NULL, 50, pos, 1.2 + offset, 1.8 + offset, angle, spread, color);
+        draw_slice(camera, NULL, 50, pos, 1.2 + offset, 1.8 + offset, angle, spread, color);
 
         sfSprite* sprite = ImageComponent_get(a)->sprite;
 
@@ -74,7 +74,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
             r = mult(2.5, player->controller.right_stick);
         }
 
-        draw_sprite(window, components, camera, sprite, sum(pos, r), (slot - 1) * 0.5f * M_PI, mult(0.75, ones()), 0);
+        draw_sprite(camera, sprite, sum(pos, r), (slot - 1) * 0.5f * M_PI, mult(0.75, ones()), 0);
     }
 }
 
@@ -91,9 +91,9 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
     sfConvexShape_setFillColor(player->shape, color);
 
     if (alpha == 0.0f) {
-        draw_slice_outline(window, components, camera, player->line, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap);
+        draw_slice_outline(camera, player->line, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap);
     } else {
-        draw_slice(window, components, camera, NULL, 50, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap, color);
+        draw_slice(camera, NULL, 50, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap, color);
     }
 
     int i = player->ammo[slot + 1];
@@ -101,12 +101,12 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
         sfSprite* sprite = ImageComponent_get(i)->sprite;
         float alpha = sfSprite_getColor(sprite).a;
         sfSprite_setColor(sprite, sfWhite);
-        draw_sprite(window, components, camera, sprite, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 0);
+        draw_sprite(camera, sprite, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 0);
         sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
 
         char buffer[20];
         snprintf(buffer, 20, "%i", AmmoComponent_get(i)->size);
-        draw_text(window, components, camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice + 0.1f * M_PI)), buffer, 20, sfWhite);
+        draw_text(camera, NULL, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice + 0.1f * M_PI)), buffer, 20, sfWhite);
     }
 }
 
@@ -132,7 +132,7 @@ void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera
     if (!item) return;
 
     float x = 2.0f * M_PI * player->use_timer / item->use_time;
-    draw_slice(window, components, camera, NULL, 50, position, 1.0f, 1.2f, -0.5f * x + M_PI_2, x, sfWhite);
+    draw_slice(camera, NULL, 50, position, 1.0f, 1.2f, -0.5f * x + M_PI_2, x, sfWhite);
 }
 
 
@@ -145,7 +145,7 @@ void draw_money(ComponentData* components, sfRenderWindow* window, int camera, i
     snprintf(buffer, 256, "%d", player->money_increment);
     if (player->money_timer > 0.0f) {
         sfColor color = get_color(1.0f, 1.0f, 0.0f, player->money_timer);
-        draw_text(window, components, camera, NULL, position, buffer, 20, color);
+        draw_text(camera, NULL, position, buffer, 20, color);
     }
 }
 
@@ -163,7 +163,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 float alpha = 1.0f - 0.125f * r;
                 sfColor color = text->color;
                 color.a = alpha * 255;
-                draw_text(window, components, camera, NULL, position, text->string, text->size, color);
+                draw_text(camera, NULL, position, text->string, text->size, color);
             }
         }
 
@@ -194,15 +194,15 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                     r = 0.1f;
                 }
                 sfColor color = (r == 0.1f) ? sfWhite : sfTransparent;
-                draw_circle(window, components, camera, player->crosshair, pos, r, color);
+                draw_circle(camera, player->crosshair, pos, r, color);
             } else {
-                draw_circle(window, components, camera, player->crosshair, pos, 0.1f, sfWhite);
+                draw_circle(camera, player->crosshair, pos, 0.1f, sfWhite);
             }
 
             HealthComponent* health = HealthComponent_get(i);
             float x = 2.0f * M_PI * (health->max_health - health->health) / health->max_health;
             if (health->health != health->max_health) {
-                draw_slice(window, components, camera, NULL, 50, position, 0.5f, 0.6f, M_PI_2 - 0.5f * x, x, sfRed);
+                draw_slice(camera, NULL, 50, position, 0.5f, 0.6f, M_PI_2 - 0.5f * x, x, sfRed);
             }
 
             draw_money(components, window, camera, i);
@@ -221,7 +221,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 sfConvexShape_setFillColor(player->shape, sfWhite);
                 int akimbo = get_akimbo(components, item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
-                draw_slice(window, components, camera, NULL, 50, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
+                draw_slice(camera, NULL, 50, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
 
                 break;
             case PLAYER_ENTER:
@@ -229,7 +229,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_DRIVE:
                 // VehicleComponent* vehicle = VehicleComponent_get(player->vehicle);
                 // if (vehicle) {
-                //     draw_slice(window, components, camera, NULL, 50, get_position(player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
+                //     draw_slice(camera, NULL, 50, get_position(player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
                 // }
 
                 break;
@@ -239,7 +239,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_MENU_DROP:
             case PLAYER_MENU_GRAB:
                 snprintf(buffer, 128, "%d", player->money);
-                draw_text(window, components, camera, NULL, position, buffer, 20, sfYellow);
+                draw_text(camera, NULL, position, buffer, 20, sfYellow);
 
                 for (int j = 0; j < player->inventory_size; j++) {
                     float offset = 0.0;
@@ -277,7 +277,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 break;
             case PLAYER_AMMO_MENU:
                 snprintf(buffer, 128, "%d", player->money);
-                draw_text(window, components, camera, NULL, position, buffer, 20, sfYellow);
+                draw_text(camera, NULL, position, buffer, 20, sfYellow);
                 
                 draw_ammo_menu(components, window, camera, i);
                 break;

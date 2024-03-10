@@ -389,14 +389,14 @@ void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRender
         for (int j = 0; j < grid->height; j++) {
             sfVector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
             if (on_screen(components, camera, r, grid->tile_width, grid->tile_height)) {
-                draw_line(window, components, camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
-                draw_line(window, components, camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
-                draw_line(window, components, camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);
-                draw_line(window, components, camera, shape, diff(sum(r, w), h), sum(sum(r, w), h), linewidth, color);
+                draw_line(camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
+                draw_line(camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
+                draw_line(camera, shape, diff(diff(r, w), h), diff(sum(r, w), h), linewidth, color);
+                draw_line(camera, shape, diff(sum(r, w), h), sum(sum(r, w), h), linewidth, color);
                 if (grid->array[i][j]->size > 0) {
                     char size[10];
                     snprintf(size, 10, "%i", grid->array[i][j]->size);
-                    draw_text(window, components, camera, text, r, size, 20, sfWhite);
+                    draw_text(camera, text, r, size, 20, sfWhite);
                 }
             }
         }
@@ -413,11 +413,11 @@ void draw_colliders(ComponentData* components, sfRenderWindow* window, int camer
 
         sfVector2f pos = get_position(i);
         if (col->type == COLLIDER_CIRCLE) {
-            draw_circle(window, components, camera, NULL, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
-            draw_line(window, components, camera, NULL, pos, sum(pos, half_width(components, i)), 0.05f, sfWhite);
+            draw_circle(camera, NULL, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
+            draw_line(camera, NULL, pos, sum(pos, half_width(components, i)), 0.05f, sfWhite);
         } else {
             sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
-            draw_rectangle(window, components, camera, NULL, get_position(i), col->width, col->height, get_angle(i), color);
+            draw_rectangle(camera, NULL, get_position(i), col->width, col->height, get_angle(i), color);
         }
     }
 }

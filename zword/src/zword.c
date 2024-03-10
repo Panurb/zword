@@ -214,21 +214,21 @@ int main() {
 
         switch (game_state) {
             case STATE_MENU:
-                draw_sprite(game_window, game_data->components, game_data->menu_camera, menu_sprite, zeros(), 0.0f, 
+                draw_sprite(game_data->menu_camera, menu_sprite, zeros(), 0.0f, 
                     mult(3.5f, ones()), 0);
-                draw_sprite(game_window, game_data->components, game_data->menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
+                draw_sprite(game_data->menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
                     vec(title_scale, title_scale), 0);
                 draw_menu(*game_data, game_window);
 
                 String buffer;
                 snprintf(buffer, STRING_SIZE, "v%s", version);
                 sfColor color = get_color(1.0f, 1.0f, 0.0f, 0.5f);
-                draw_text(game_window, game_data->components, game_data->menu_camera, NULL, vec(24.5f, -13.5f), buffer, 20, color);
+                draw_text(game_data->menu_camera, NULL, vec(24.5f, -13.5f), buffer, 20, color);
                 break;
             case STATE_START:
             case STATE_END:
             case STATE_RESET:
-                draw_text(game_window, game_data->components, game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
+                draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_GAME:
                 draw_game(*game_data, game_window);
@@ -241,7 +241,7 @@ int main() {
                 draw_menu(*game_data, game_window);
                 break;
             case STATE_LOAD:
-                draw_text(game_window, game_data->components, game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
+                draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_EDITOR:
                 draw_editor(*game_data, game_window);

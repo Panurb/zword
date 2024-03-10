@@ -13,6 +13,7 @@
 #include "component.h"
 #include "util.h"
 #include "image.h"
+#include "game.h"
 
 
 int create_camera(sfVideoMode mode) {
@@ -72,7 +73,7 @@ sfVector2f world_to_texture(int camera, sfVector2f a) {
 }
 
 
-void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* line, sfVector2f start, sfVector2f end, float width, sfColor color) {
+void draw_line(int camera, sfRectangleShape* line, sfVector2f start, sfVector2f end, float width, sfColor color) {
     CameraComponent* cam = CameraComponent_get(camera);
     
     bool created = false;
@@ -87,7 +88,7 @@ void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sf
     sfRectangleShape_setFillColor(line, color);
     sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * cam->zoom, width * cam->zoom });
     sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));
-    sfRenderWindow_drawRectangleShape(window, line, NULL);
+    sfRenderWindow_drawRectangleShape(game_window, line, NULL);
 
     if (created) {
         sfRectangleShape_destroy(line);
@@ -95,7 +96,7 @@ void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sf
 }
 
 
-void draw_circle(sfRenderWindow* window, ComponentData* components, int camera, sfCircleShape* shape, sfVector2f position, float radius, sfColor color) {
+void draw_circle(int camera, sfCircleShape* shape, sfVector2f position, float radius, sfColor color) {
     CameraComponent* cam = CameraComponent_get(camera);
 
     bool created = false;
@@ -108,7 +109,7 @@ void draw_circle(sfRenderWindow* window, ComponentData* components, int camera, 
     sfCircleShape_setPosition(shape, world_to_screen(camera, position));
     sfCircleShape_setRadius(shape, radius * cam->zoom);
     sfCircleShape_setFillColor(shape, color);
-    sfRenderWindow_drawCircleShape(window, shape, NULL);
+    sfRenderWindow_drawCircleShape(game_window, shape, NULL);
 
     if (created) {
         sfCircleShape_destroy(shape);
@@ -116,7 +117,7 @@ void draw_circle(sfRenderWindow* window, ComponentData* components, int camera, 
 }
 
 
-void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera, sfCircleShape* shape, sfVector2f position, float major, float minor, float angle, sfColor color) {
+void draw_ellipse(int camera, sfCircleShape* shape, sfVector2f position, float major, float minor, float angle, sfColor color) {
     CameraComponent* cam = CameraComponent_get(camera);
 
     bool created = false;
@@ -131,7 +132,7 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
     sfCircleShape_setScale(shape, (sfVector2f) { 1.0, minor / major });
     sfCircleShape_setFillColor(shape, color);
     sfCircleShape_setRotation(shape, -to_degrees(angle));
-    sfRenderWindow_drawCircleShape(window, shape, NULL);
+    sfRenderWindow_drawCircleShape(game_window, shape, NULL);
 
     if (created) {
         sfCircleShape_destroy(shape);
@@ -139,7 +140,7 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
 }
 
 
-void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color) {
+void draw_rectangle(int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color) {
     CameraComponent* cam = CameraComponent_get(camera);
 
     bool created = false;
@@ -154,7 +155,7 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
     sfRectangleShape_setSize(shape, size);
     sfRectangleShape_setRotation(shape, -to_degrees(angle));
     sfRectangleShape_setFillColor(shape, color);
-    sfRenderWindow_drawRectangleShape(window, shape, NULL);
+    sfRenderWindow_drawRectangleShape(game_window, shape, NULL);
 
     if (created) {
         sfRectangleShape_destroy(shape);
@@ -163,8 +164,8 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
 
 
 
-void draw_rectangle_outline(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, 
-        sfVector2f position, float width, float height, float angle, float line_width, sfColor color) {
+void draw_rectangle_outline(int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, 
+        float angle, float line_width, sfColor color) {
     bool created = false;
     if (!shape) {
         shape = sfRectangleShape_create();
@@ -181,7 +182,7 @@ void draw_rectangle_outline(sfRenderWindow* window, ComponentData* components, i
     corners[3] = sum(corners[2], mult(2, hh));
 
     for (int i = 0; i < 4; i++) {
-        draw_line(window, components, camera, shape, corners[i], corners[(i + 1) % 4], line_width, color);
+        draw_line(camera, shape, corners[i], corners[(i + 1) % 4], line_width, color);
     }
 
     if (created) {
@@ -190,7 +191,7 @@ void draw_rectangle_outline(sfRenderWindow* window, ComponentData* components, i
 }
 
 
-void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread) {
+void draw_cone(int camera, sfConvexShape* shape, int n, sfVector2f position, float range, float angle, float spread) {
     bool created = false;
     if (!shape) {
         shape = sfConvexShape_create();
@@ -209,7 +210,7 @@ void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sf
         angle += spread / (n - 3);
     }
 
-    sfRenderWindow_drawConvexShape(window, shape, NULL);
+    sfRenderWindow_drawConvexShape(game_window, shape, NULL);
 
     if (created) {
         sfConvexShape_destroy(shape);
@@ -217,7 +218,8 @@ void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sf
 }
 
 
-void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, sfVertexArray* verts, int verts_size, sfVector2f position, float min_range, float max_range, float angle, float spread, sfColor color) {
+void draw_slice(int camera, sfVertexArray* verts, int verts_size, sfVector2f position, float min_range, float max_range, 
+        float angle, float spread, sfColor color) {
     bool created = false;
     if (!verts) {
         verts = sfVertexArray_create();
@@ -244,7 +246,7 @@ void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, s
         end = matrix_mult(rot, end);
     }
 
-    sfRenderWindow_drawVertexArray(window, verts, NULL);
+    sfRenderWindow_drawVertexArray(game_window, verts, NULL);
 
     if (created) {
         sfVertexArray_destroy(verts);
@@ -252,7 +254,7 @@ void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, s
 }
 
 
-void draw_arc(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float range, float angle, float spread) {
+void draw_arc(int camera, sfRectangleShape* shape, sfVector2f position, float range, float angle, float spread) {
     int n = 5 * ceil(range * spread);
 
     Matrix2f rot = rotation_matrix(spread / n);
@@ -262,30 +264,30 @@ void draw_arc(sfRenderWindow* window, ComponentData* components, int camera, sfR
 
     for (int k = 0; k < n; k++) {
         end = matrix_mult(rot, end);
-        draw_line(window, components, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+        draw_line(camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
         start = end;
     }
 }
 
 
-void draw_slice_outline(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
+void draw_slice_outline(int camera, sfRectangleShape* shape, sfVector2f position, float min_range, float max_range, float angle, float spread) {
     sfVector2f start = polar_to_cartesian(max_range, angle - 0.5 * spread);
     sfVector2f end = mult(min_range / max_range, start);
 
-    draw_line(window, components, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+    draw_line(camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
 
-    draw_arc(window, components, camera, shape, position, min_range, angle, spread);
+    draw_arc(camera, shape, position, min_range, angle, spread);
 
-    draw_arc(window, components, camera, shape, position, max_range, angle, spread);
+    draw_arc(camera, shape, position, max_range, angle, spread);
 
     start = polar_to_cartesian(min_range, angle + 0.5 * spread);
     end = mult(max_range / min_range, start);    
     
-    draw_line(window, components, camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
+    draw_line(camera, shape, sum(position, start), sum(position, end), 0.05, sfWhite);
 }
 
 
-void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index) {
+void draw_sprite(int camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index) {
     CameraComponent* cam = CameraComponent_get(camera);
 
     sfSprite_setPosition(sprite, world_to_screen(camera, position));
@@ -299,11 +301,11 @@ void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, 
     sfShader* shader = cam->shaders[shader_index];
 
     sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, shader };
-    sfRenderWindow_drawSprite(window, sprite, &state);
+    sfRenderWindow_drawSprite(game_window, sprite, &state);
 }
 
 
-void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sfText* text, sfVector2f position, char string[100], int size, sfColor color) {
+void draw_text(int camera, sfText* text, sfVector2f position, char string[100], int size, sfColor color) {
     bool created = false;
     if (!text) {
         text = sfText_create();
@@ -321,7 +323,7 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
     sfFloatRect bounds = sfText_getLocalBounds(text);
     sfText_setOrigin(text, (sfVector2f) { bounds.left + 0.5f * bounds.width, bounds.top + 0.5f * bounds.height });
 
-    sfRenderWindow_drawText(window, text, NULL);
+    sfRenderWindow_drawText(game_window, text, NULL);
 
     if (created) {
         sfText_destroy(text);
@@ -386,5 +388,5 @@ void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera,
     float height = cam->resolution.y / cam->zoom;
     sfVector2f pos = get_position(camera);
     sfColor color = get_color(0.0f, 0.0f, 0.0f, alpha);
-    draw_rectangle(window, components, camera, NULL, pos, width, height, 0.0f, color);
+    draw_rectangle(camera, NULL, pos, width, height, 0.0f, color);
 }

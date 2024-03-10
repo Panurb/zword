@@ -812,14 +812,14 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             if (selection_box != -1) {
                 sfVector2f pos = get_position(selection_box);
                 ColliderComponent* collider = ColliderComponent_get(selection_box);
-                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
+                draw_rectangle_outline(data.camera, NULL, pos, collider->width, 
                     collider->height, 0.0f, 0.05f, sfWhite);
             }
             for (int i = 0; i < LENGTH(category_names); i++) {
                 sfColor color = selected_categories[i] ? sfWhite : get_color(0.6f, 0.6f, 0.6f, 1.0f);
                 char buffer[128];
                 snprintf(buffer, 128, "%d %s", i + 1, category_names[i]);
-                draw_text(window, data.components, data.menu_camera, NULL, vec(i * 5 - 15, 14), buffer, 20, color);
+                draw_text(data.menu_camera, NULL, vec(i * 5 - 15, 14), buffer, 20, color);
             }
             break;
         case TOOL_TILE:
@@ -828,22 +828,22 @@ void draw_editor(GameData data, sfRenderWindow* window) {
                 float width = fabsf(end.x - tile_start.x);
                 float height = fabsf(end.y - tile_start.y);
                 sfVector2f pos = mult(0.5f, sum(end, tile_start));
-                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, width, height, 0.0f, 0.05f, 
+                draw_rectangle_outline(data.camera, NULL, pos, width, height, 0.0f, 0.05f, 
                     sfWhite);
             } else {
                 sfVector2f pos = mouse_grid;
-                draw_line(window, data.components, data.camera, NULL, vec(pos.x - 0.2f, pos.y), 
+                draw_line(data.camera, NULL, vec(pos.x - 0.2f, pos.y), 
                     vec(pos.x + 0.2f, pos.y), 0.05f, sfWhite);
-                draw_line(window, data.components, data.camera, NULL, vec(pos.x, pos.y - 0.2f), 
+                draw_line(data.camera, NULL, vec(pos.x, pos.y - 0.2f), 
                     vec(pos.x, pos.y + 0.2f), 0.05f, sfWhite);
             }
             break;
         case TOOL_OBJECT: {
-            draw_rectangle_outline(window, data.components, data.camera, NULL, mouse_grid,
+            draw_rectangle_outline(data.camera, NULL, mouse_grid,
                 selected_object_width, selected_object_height, 0.0f, 0.05f, sfWhite);
             break;
         } case TOOL_PREFAB:
-            draw_rectangle_outline(window, data.components, data.camera, NULL, mouse_grid_center,
+            draw_rectangle_outline(data.camera, NULL, mouse_grid_center,
                 1.0f, 1.0f, 0.0f, 0.05f, sfWhite);
             break;
     }
@@ -860,17 +860,17 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             ColliderComponent* collider = ColliderComponent_get(i);
             if (image) {
                 if (image->layer > LAYER_WALLS) {
-                    draw_sprite(window, data.components, data.camera, image->sprite, pos, angle, image->scale, 
+                    draw_sprite(data.camera, image->sprite, pos, angle, image->scale, 
                         SHADER_OUTLINE);
                 } else {
-                    draw_rectangle_outline(window, data.components, data.camera, NULL, pos, image->width, 
+                    draw_rectangle_outline(data.camera, NULL, pos, image->width, 
                         image->height, angle, 0.05f, sfWhite);
                 }
             } else if (collider) {
-                draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
+                draw_rectangle_outline(data.camera, NULL, pos, collider->width, 
                     collider->height, angle, 0.05f, sfWhite);
             } else {
-                draw_circle(window, data.components, data.camera, NULL, pos, 0.1f, sfWhite);
+                draw_circle(data.camera, NULL, pos, 0.1f, sfWhite);
             }
 
             if (WaypointComponent_get(i)) {
@@ -887,5 +887,5 @@ void draw_editor(GameData data, sfRenderWindow* window) {
 
     draw_widgets(data.components, window, data.menu_camera);
 
-    draw_circle(window, data.components, data.camera, NULL, mouse_pos, 0.1f, sfWhite);
+    draw_circle(data.camera, NULL, mouse_pos, 0.1f, sfWhite);
 }

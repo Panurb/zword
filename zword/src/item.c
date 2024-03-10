@@ -240,7 +240,7 @@ void draw_items(GameData* data, sfRenderWindow* window) {
         sfVector2f pos = get_position(player->target);
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
-            draw_sprite(window, data->components, data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
+            draw_sprite(data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
         }
 
         if (item) {
@@ -248,11 +248,11 @@ void draw_items(GameData* data, sfRenderWindow* window) {
             char buffer[256];
             if (item->price > 0) {
                 snprintf(buffer, 256, "%d", item->price);
-                draw_text(window, data->components, data->camera, text, pos, buffer, 20, sfYellow);
+                draw_text(data->camera, text, pos, buffer, 20, sfYellow);
                 pos = sum(pos, vec(0.0f, 1.0f));
             }
 
-            draw_text(window, data->components, data->camera, text, pos, item->name, 20, sfYellow);
+            draw_text(data->camera, text, pos, item->name, 20, sfYellow);
         }
     }
     sfText_destroy(text);

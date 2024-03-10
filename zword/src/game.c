@@ -365,7 +365,7 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
             if (wave_delay > 0.0f) {
                 char buffer[256];
                 snprintf(buffer, 256, "WAVE %d", wave);
-                draw_text(window, data.components, data.menu_camera, NULL, zeros(), buffer, 300, sfWhite);
+                draw_text(data.menu_camera, NULL, zeros(), buffer, 300, sfWhite);
             }
             break;
         default:
@@ -437,7 +437,7 @@ void draw_parents(GameData data, sfRenderWindow* window) {
         if (coord && coord->parent != -1) {
             sfVector2f start = get_position(i);
             sfVector2f end = get_position(coord->parent);
-            draw_line(window, data.components, data.camera, NULL, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
+            draw_line(data.camera, NULL, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
         }
     }
 }
@@ -450,7 +450,7 @@ void draw_entities(GameData data, sfRenderWindow* window) {
         if (!coord) continue;
 
         snprintf(buffer, 10, "%d", i);
-        draw_text(window, data.components, data.camera, NULL, coord->position, buffer, 20, sfWhite);
+        draw_text(data.camera, NULL, coord->position, buffer, 20, sfWhite);
     }
 }
 
@@ -486,16 +486,16 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
     sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
         if (level_won) {
-            draw_text(window, data.components, data.menu_camera, NULL, 
+            draw_text(data.menu_camera, NULL, 
                 vec(0.0f, 5.0f), "YOU WON", 300, color);
         } else {
-            draw_text(window, data.components, data.menu_camera, NULL, 
+            draw_text(data.menu_camera, NULL, 
                 vec(0.0f, 5.0f), "GAME OVER", 300, color);
         }
         if (data.game_mode == MODE_SURVIVAL) {
             char buffer[256];
             snprintf(buffer, 256, "You survived until wave %d", wave);
-            draw_text(window, data.components, data.menu_camera, NULL, 
+            draw_text(data.menu_camera, NULL, 
                 vec(0.0f, 1.0f), buffer, 40, color);
         }
         draw_menu(data, window);
@@ -527,7 +527,7 @@ void draw_tutorials(sfRenderWindow* window, GameData data) {
     for (int i = 0; i < data.components->entities; i++) {
         TextComponent* text = TextComponent_get(i);
         if (text) {
-            draw_text(window, data.components, data.camera, NULL, get_position(i), "?", 50, sfMagenta);
+            draw_text(data.camera, NULL, get_position(i), "?", 50, sfMagenta);
         }
 
         ColliderComponent* collider = ColliderComponent_get(i);
@@ -535,9 +535,9 @@ void draw_tutorials(sfRenderWindow* window, GameData data) {
             sfVector2f pos = get_position(i);
             sfColor color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
             float angle = get_angle(i);
-            draw_rectangle(window, data.components, data.camera, NULL, pos, collider->width, collider->height, angle, 
+            draw_rectangle(data.camera, NULL, pos, collider->width, collider->height, angle, 
                 color);
-            draw_text(window, data.components, data.camera, NULL, pos, "level_end", 20, sfGreen);
+            draw_text(data.camera, NULL, pos, "level_end", 20, sfGreen);
         }
     }
 }

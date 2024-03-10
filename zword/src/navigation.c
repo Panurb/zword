@@ -167,14 +167,14 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
 
         sfVector2f pos = get_position(i);
         float radius = ColliderComponent_get(i)->radius;
-        draw_circle(window, components, camera, shape, pos, radius, sfWhite);
+        draw_circle(camera, shape, pos, radius, sfWhite);
 
         if (draw_neighbors) {
             for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
                 int k = node->value;
                 sfColor color = sfWhite;
                 color.a = 64;
-                draw_line(window, components, camera, line, pos, get_position(k), 0.04f, color);
+                draw_line(camera, line, pos, get_position(k), 0.04f, color);
             }
         }
     }

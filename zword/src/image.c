@@ -181,7 +181,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
 
         if (image->alpha > 0.0f) {
             sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
-            draw_sprite(window, components, camera, image->sprite, pos, get_angle(i), image->scale, 0);
+            draw_sprite(camera, image->sprite, pos, get_angle(i), image->scale, 0);
         }
     }
 }
@@ -208,7 +208,7 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
 
     sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
     if (image->alpha > 0.0f) {
-        draw_sprite(window, components, camera, image->sprite, pos, get_angle(entity), image->scale, 0);
+        draw_sprite(camera, image->sprite, pos, get_angle(entity), image->scale, 0);
     }
 }
 

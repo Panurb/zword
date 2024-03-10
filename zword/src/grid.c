@@ -171,12 +171,12 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
     
     for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
         float linewidth = mod(x, major_lines) == 0.0f ? 0.05f : 0.01f;
-        draw_line(window, components, camera, shape, vec(x, bottom), vec(x, top), linewidth, color);
+        draw_line(camera, shape, vec(x, bottom), vec(x, top), linewidth, color);
     }
 
     for (float y = bottom - mod(bottom, tile_height); y < top; y += tile_height) {
         float linewidth = mod(y, major_lines) == 0.0f ? 0.05f : 0.01f;
-        draw_line(window, components, camera, shape, vec(left, y), vec(right, y), linewidth, color);
+        draw_line(camera, shape, vec(left, y), vec(right, y), linewidth, color);
     }
     
     sfRectangleShape_destroy(shape);
