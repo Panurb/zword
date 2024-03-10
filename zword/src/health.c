@@ -100,7 +100,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             if (!non_zero(r)) {
                 r = rand_vector();
             }
-            apply_force(components, i, mult(150.0f, r));
+            apply_force(i, mult(150.0f, r));
             PhysicsComponent_get(i)->angular_velocity = randf(-5.0f, 5.0f);
             ColliderComponent_get(i)->enabled = true;
         }
@@ -152,7 +152,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
     
     PhysicsComponent* physics = PhysicsComponent_get(entity);
     if (physics) {
-        apply_force(components, entity, mult(fminf(10.0f * dmg, 500.0f), normalized(dir)));
+        apply_force(entity, mult(fminf(10.0f * dmg, 500.0f), normalized(dir)));
     }
 
     ParticleComponent* particle = ParticleComponent_get(entity);

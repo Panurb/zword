@@ -13,7 +13,7 @@
 #include "health.h"
 
 
-void apply_force(ComponentData* components, int entity, sfVector2f force) {
+void apply_force(int entity, sfVector2f force) {
     PhysicsComponent* physics = PhysicsComponent_get(entity);
 
     sfVector2f a = mult(1.0f / physics->mass, force);
@@ -21,8 +21,8 @@ void apply_force(ComponentData* components, int entity, sfVector2f force) {
 }
 
 
-void update(ComponentData* components, float time_step, ColliderGrid* grid) {
-    for (int i = 0; i < components->entities; i++) {
+void update_physics(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         PhysicsComponent* physics = PhysicsComponent_get(i);
         if (!physics) continue;
 
@@ -53,7 +53,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             sfVector2f v_t = diff(physics->velocity, v_n);
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0f - physics->friction, v_t));
 
-            blunt_damage(components, grid, i, v_n);
+            blunt_damage(game_data->components, game_data->grid, i, v_n);
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));

@@ -363,7 +363,7 @@ void collide() {
                             List_add(physics->collision.entities, n);
                             break;
                         case 2:
-                            apply_force(game_data->components, i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
+                            apply_force(i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
                             break;
                         case 3:
                             if (VehicleComponent_get(i)) {

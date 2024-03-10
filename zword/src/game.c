@@ -397,7 +397,7 @@ void update_lifetimes(ComponentData* components, float time_step) {
 
 void update_game(GameData data, float time_step) {
     update_lifetimes(data.components, time_step);
-    update(data.components, time_step, data.grid);
+    update_physics(time_step);
     collide(data.components, data.grid);
     update_waypoints(data.components, data.grid, data.camera);
     update_doors(data.components);
