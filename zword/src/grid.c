@@ -82,7 +82,7 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
             for (ListNode* node = grid->array[i][j]->head; node; node = node->next) {
                 int n = node->value;
 
-                ColliderComponent* col = ColliderComponent_get(components, n);
+                ColliderComponent* col = ColliderComponent_get(n);
                 if (col->last_collision == id) continue;
 
                 if (dist(origin, get_position(components, n)) <= radius) {
@@ -111,7 +111,7 @@ void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
 
 void init_grid(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* collider = ColliderComponent_get(components, i);
+        ColliderComponent* collider = ColliderComponent_get(i);
         if (collider && collider->enabled) {
             update_grid(components, grid, i);
         }
@@ -142,7 +142,7 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
                 int n = current->value;
                 if (n == -1 || n == entity) continue;
 
-                ColliderComponent* col = ColliderComponent_get(components, n);
+                ColliderComponent* col = ColliderComponent_get(n);
                 if (col->last_collision == id) continue;
 
                 entities[l] = n;
@@ -156,7 +156,7 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 
 
 void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, float tile_width, float tile_height) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
     sfVector2f pos = get_position(components, camera);

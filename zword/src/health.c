@@ -18,16 +18,16 @@
 void die(ComponentData* components, ColliderGrid* grid, int entity) {
     HealthComponent* health = components->health[entity];
 
-    if (AnimationComponent_get(components, entity)) {
+    if (AnimationComponent_get(entity)) {
         stop_animation(components, entity);
     }
 
     change_texture(components, entity, health->dead_image, 0.0f, 0.0f);
     change_layer(components, entity, LAYER_CORPSES);
 
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
-    EnemyComponent* enemy = EnemyComponent_get(components, entity);
-    PlayerComponent* player = PlayerComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    EnemyComponent* enemy = EnemyComponent_get(entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
 
     if (player) {
         float angle = coord->angle;
@@ -40,12 +40,12 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         coord->angle = angle;
 
         for (int j = 1; j < player->ammo_size; j++) {
-            AmmoComponent* ammo = AmmoComponent_get(components, player->ammo[j]);
+            AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
             while (ammo && ammo->size > 0) {
                 sfVector2f pos = get_position(components, entity);
                 int k = create_ammo(components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
-                int size = min(AmmoComponent_get(components, k)->size, ammo->size);
-                AmmoComponent* drop = AmmoComponent_get(components, k);
+                int size = min(AmmoComponent_get(k)->size, ammo->size);
+                AmmoComponent* drop = AmmoComponent_get(k);
                 drop->size = size;
                 ammo->size -= size;
             }
@@ -90,8 +90,8 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
 
         for (ListNode* node = coord->children->head; node; node = node->next) {
             int i = node->value;
-            CoordinateComponent* co = CoordinateComponent_get(components, i);
-            ImageComponent_get(components, i)->alpha = 1.0f;
+            CoordinateComponent* co = CoordinateComponent_get(i);
+            ImageComponent_get(i)->alpha = 1.0f;
 
             co->position = get_position(components, i);
             co->angle = get_angle(components, i);
@@ -101,8 +101,8 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
                 r = rand_vector();
             }
             apply_force(components, i, mult(150.0f, r));
-            PhysicsComponent_get(components, i)->angular_velocity = randf(-5.0f, 5.0f);
-            ColliderComponent_get(components, i)->enabled = true;
+            PhysicsComponent_get(i)->angular_velocity = randf(-5.0f, 5.0f);
+            ColliderComponent_get(i)->enabled = true;
         }
         remove_children(components, entity);
 
@@ -112,7 +112,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         }
     }
 
-    if (SoundComponent_get(components, entity) && health->die_sound[0] != '\0') {
+    if (SoundComponent_get(entity) && health->die_sound[0] != '\0') {
         add_sound(components, entity, health->die_sound, 1.0f, randf(0.9f, 1.1f));
     }
 }
@@ -139,7 +139,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         if (prev_health > 0 && health->health == 0) {
             die(components, grid, entity);
 
-            PlayerComponent* player = PlayerComponent_get(components, dealer);
+            PlayerComponent* player = PlayerComponent_get(dealer);
             if (player && enemy) {
                 add_money(components, dealer, enemy->bounty);
             }
@@ -150,23 +150,23 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         enemy->desired_angle = polar_angle(mult(-1.0f, dir));
     }
     
-    PhysicsComponent* physics = PhysicsComponent_get(components, entity);
+    PhysicsComponent* physics = PhysicsComponent_get(entity);
     if (physics) {
         apply_force(components, entity, mult(fminf(10.0f * dmg, 500.0f), normalized(dir)));
     }
 
-    ParticleComponent* particle = ParticleComponent_get(components, entity);
+    ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
         particle->origin = diff(pos, get_position(components, entity));
         add_particles(components, entity, particle->rate / 50.0f * dmg);
     }
 
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+    SoundComponent* scomp = SoundComponent_get(entity);
     if (scomp && scomp->hit_sound[0] != '\0') {
         add_sound(components, entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
     }
 
-    ImageComponent* image = ImageComponent_get(components, entity);
+    ImageComponent* image = ImageComponent_get(entity);
     if (image) {
         if (!strstr(image->filename, "tile")) {
             image->stretch_speed = randf(-1.0f, 1.0f) * 0.05f * dmg;
@@ -181,7 +181,7 @@ void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfV
     if (health) {
         if (v > 10.0f) {
             if (health->health > 0) {
-                SoundComponent* sound = SoundComponent_get(components, entity);
+                SoundComponent* sound = SoundComponent_get(entity);
                 if (sound) {
                     add_sound(components, entity, sound->hit_sound, 1.0, 0.8);
                 }
@@ -190,7 +190,7 @@ void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfV
         }
     }
 
-    SoundComponent* sound = SoundComponent_get(components, entity);
+    SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
         if (v > 5.0f) {
             // add_sound(components, entity, sound->hit_sound, 0.5f, 1.0f);

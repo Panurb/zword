@@ -1,6 +1,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <SFML/Window/Keyboard.h>
 
@@ -179,7 +180,7 @@ void replace_actions(String output, String input) {
 
 
 void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i) {
-    PlayerComponent* player = PlayerComponent_get(components, i);
+    PlayerComponent* player = PlayerComponent_get(i);
     int joystick = player->controller.joystick;
 
     sfVector2f left_stick = zeros();
@@ -311,13 +312,13 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
     sfJoystick_update();
 
     for (int i = 0; i < components->entities; i++) {
-        PlayerComponent* player = PlayerComponent_get(components, i);
+        PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;
 
         update_controller(components, window, camera, i);
         Controller controller = player->controller;
 
-        WeaponComponent* weapon = WeaponComponent_get(components, player->inventory[player->item]);
+        WeaponComponent* weapon = WeaponComponent_get(player->inventory[player->item]);
 
         switch (player->state) {
             case PLAYER_ON_FOOT:
@@ -339,10 +340,10 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                     }
 
                     if (controller.buttons_pressed[BUTTON_Y]) {
-                        ItemComponent* item = ItemComponent_get(components, player->inventory[player->item]);
+                        ItemComponent* item = ItemComponent_get(player->inventory[player->item]);
                         for (int j = 0; j < item->size; j++) {
                             int k = item->attachments[j];
-                            LightComponent* light = LightComponent_get(components, k);
+                            LightComponent* light = LightComponent_get(k);
                             if (light) {
                                 light->enabled = !light->enabled;
                             }

@@ -96,12 +96,12 @@ void ParticleComponent_add_type(ComponentData* components, int entity, ParticleT
             ParticleComponent_add_energy(components, entity);
             break;
     }
-    ParticleComponent_get(components, entity)->type = type;
+    ParticleComponent_get(entity)->type = type;
 }
 
 
 void add_particles(ComponentData* components, int entity, int n) {
-    ParticleComponent* part = ParticleComponent_get(components, entity);
+    ParticleComponent* part = ParticleComponent_get(entity);
 
     for (int i = 0; i < n; i++) {
         part->position[part->iterator] = sum(get_position(components, entity), part->origin);
@@ -119,7 +119,7 @@ void add_particles(ComponentData* components, int entity, int n) {
 
 void update_particles(ComponentData* components, int camera, float delta_time) {
     for (int i = 0; i < components->entities; i++) {
-        ParticleComponent* part = ParticleComponent_get(components, i);
+        ParticleComponent* part = ParticleComponent_get(i);
         if (!part) continue;
 
         float w = 3.0f * part->max_time * part->speed;

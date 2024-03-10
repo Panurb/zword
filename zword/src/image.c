@@ -158,7 +158,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
     for (ListNode* node = components->image.order->head; node; node = node->next) {
         int i = node->value;
 
-        ImageComponent* image = ImageComponent_get(components, i);
+        ImageComponent* image = ImageComponent_get(i);
 
         if (image->layer > LAYER_DECALS) break;
 
@@ -188,7 +188,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
 
 
 void draw_image(ComponentData* components, int entity, sfRenderWindow* window, int camera, TextureArray textures) {
-    ImageComponent* image = ImageComponent_get(components, entity);
+    ImageComponent* image = ImageComponent_get(entity);
 
     if (image->texture_changed) {
         set_texture(image, textures);
@@ -217,7 +217,7 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
     for (ListNode* node = components->image.order->head; node; node = node->next) {
         int i = node->value;
 
-        ImageComponent* image = ImageComponent_get(components, i);
+        ImageComponent* image = ImageComponent_get(i);
 
         if (image->layer <= LAYER_DECALS) continue;
         if (image->layer >= LAYER_ROOFS) break;
@@ -235,7 +235,7 @@ void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, T
     for (ListNode* node = components->image.order->head; node; node = node->next) {
         int i = node->value;
 
-        ImageComponent* image = ImageComponent_get(components, i);
+        ImageComponent* image = ImageComponent_get(i);
 
         if (image->layer < LAYER_ROOFS) continue;
 
@@ -245,7 +245,7 @@ void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, T
 
 
 void change_texture(ComponentData* components, int entity, Filename filename, float width, float height) {
-    ImageComponent* image = ImageComponent_get(components, entity);
+    ImageComponent* image = ImageComponent_get(entity);
     if (strcmp(image->filename, filename) == 0) {
         return;
     }
@@ -259,7 +259,7 @@ void change_texture(ComponentData* components, int entity, Filename filename, fl
         image->alpha = 1.0f;
     }
 
-    AnimationComponent* animation = AnimationComponent_get(components, entity);
+    AnimationComponent* animation = AnimationComponent_get(entity);
     if (animation) {
         animation->frames = animation_frames(filename);
     }
@@ -269,18 +269,18 @@ void change_texture(ComponentData* components, int entity, Filename filename, fl
 void change_layer(ComponentData* components, int entity, Layer layer) {
     List_remove(components->image.order, entity);
 
-    if (components->image.order->size == 0 || ImageComponent_get(components, components->image.order->head->value)->layer > layer) {
+    if (components->image.order->size == 0 || ImageComponent_get(components->image.order->head->value)->layer > layer) {
         List_add(components->image.order, entity);
     } else {
         for (ListNode* node = components->image.order->head; node; node = node->next) {
-            if (!node->next || ImageComponent_get(components, node->next->value)->layer > layer) {
+            if (!node->next || ImageComponent_get(node->next->value)->layer > layer) {
                 List_insert(components->image.order, node, entity);
                 break;
             }
         }
     }
 
-    ImageComponent_get(components, entity)->layer = layer;
+    ImageComponent_get(entity)->layer = layer;
 }
 
 
@@ -314,6 +314,6 @@ void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfC
 bool point_inside_image(ComponentData* components, int entity, sfVector2f point) {
     sfVector2f position = get_position(components, entity);
     float angle = get_angle(components, entity);
-    ImageComponent* image = ImageComponent_get(components, entity);
+    ImageComponent* image = ImageComponent_get(entity);
     return point_inside_rectangle(position, angle, image->width, image->height, point);
 }

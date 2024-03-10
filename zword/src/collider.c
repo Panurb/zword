@@ -24,7 +24,7 @@
 
 bool point_inside_collider(ComponentData* components, int i, sfVector2f point) {
     // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
-    ColliderComponent* col = ColliderComponent_get(components, i);
+    ColliderComponent* col = ColliderComponent_get(i);
     if (col->type == COLLIDER_RECTANGLE) {
         sfVector2f pos = get_position(components, i);
         float angle = get_angle(components, i);
@@ -52,19 +52,19 @@ void get_corners(ComponentData* components, int i, sfVector2f* corners) {
 
 
 sfVector2f half_width(ComponentData* components, int i) {
-    ColliderComponent* col = ColliderComponent_get(components, i);
+    ColliderComponent* col = ColliderComponent_get(i);
     return polar_to_cartesian(0.5 * col->width, get_angle(components, i));
 }
 
 
 sfVector2f half_height(ComponentData* components, int i) {
-    ColliderComponent* col = ColliderComponent_get(components, i);
+    ColliderComponent* col = ColliderComponent_get(i);
     return polar_to_cartesian(0.5 * col->height, get_angle(components, i) + 0.5 * M_PI);
 }
 
 
 float axis_half_width(ComponentData* components, int i, sfVector2f axis) {
-    ColliderComponent* col = ColliderComponent_get(components, i);
+    ColliderComponent* col = ColliderComponent_get(i);
 
     if (col->type == COLLIDER_RECTANGLE) {
         sfVector2f hw = half_width(components, i);
@@ -97,7 +97,7 @@ sfVector2f overlap_circle_circle(ComponentData* components, int i, int j) {
     sfVector2f b = get_position(components, j);
 
     float d = dist(a, b);
-    float r = ColliderComponent_get(components, i)->radius + ColliderComponent_get(components, j)->radius;
+    float r = ColliderComponent_get(i)->radius + ColliderComponent_get(j)->radius;
 
     if (d > r) {
         return (sfVector2f) { 0.0, 0.0 };
@@ -121,7 +121,7 @@ sfVector2f overlap_rectangle_circle(ComponentData* components, int i, int j) {
 
     sfVector2f a = get_position(components, i);
     sfVector2f b = get_position(components, j);
-    float radius = ColliderComponent_get(components, j)->radius;
+    float radius = ColliderComponent_get(j)->radius;
 
     for (int k = 0; k < 2; k++) {
         overlaps[k] = axis_overlap(axis_half_width(components, i, axes[k]), a, radius, b, axes[k]);
@@ -188,8 +188,8 @@ sfVector2f overlap_rectangle_rectangle(ComponentData* components, int i, int j) 
 sfVector2f overlap_collider_collider(ComponentData* components, int i, int j) {
     sfVector2f ol = zeros();
 
-    ColliderComponent* a = ColliderComponent_get(components, i);
-    ColliderComponent* b = ColliderComponent_get(components, j);
+    ColliderComponent* a = ColliderComponent_get(i);
+    ColliderComponent* b = ColliderComponent_get(j);
 
     if (!a->enabled || !b->enabled) {
         return ol;
@@ -214,7 +214,7 @@ sfVector2f overlap_collider_collider(ComponentData* components, int i, int j) {
 
 
 sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j) {
-    ImageComponent* image = ImageComponent_get(components, j);
+    ImageComponent* image = ImageComponent_get(j);
 
     sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(components, i));
     sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(components, j));
@@ -245,7 +245,7 @@ sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j) {
 
 
 bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* entities) {
-    ColliderGroup group = ColliderComponent_get(components, i)->group;
+    ColliderGroup group = ColliderComponent_get(i)->group;
     Bounds bounds = get_bounds(components, grid, i);
 
     for (int j = bounds.left; j <= bounds.right; j++) {
@@ -254,7 +254,7 @@ bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* e
                 int n = current->value;
                 if (n == i) continue;
 
-                ColliderComponent* collider = ColliderComponent_get(components, n);
+                ColliderComponent* collider = ColliderComponent_get(n);
 
                 if (!COLLISION_MATRIX[group][collider->group]) {
                     continue;
@@ -283,8 +283,8 @@ bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* e
 
 
 void apply_trigger(ComponentData* components, int trigger, int target) {
-    ColliderComponent* collider = ColliderComponent_get(components, trigger);
-    PlayerComponent* player = PlayerComponent_get(components, target);
+    ColliderComponent* collider = ColliderComponent_get(trigger);
+    PlayerComponent* player = PlayerComponent_get(target);
     switch (collider->trigger_type) {
         case TRIGGER_NONE:
             break;
@@ -301,14 +301,14 @@ void collide(ComponentData* components, ColliderGrid* grid) {
     // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
 
     for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* collider = ColliderComponent_get(components, i);
+        ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
 
         collider->last_collision = -1;
     }
 
     for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* collider = ColliderComponent_get(components, i);
+        ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
 
         PhysicsComponent* physics = components->physics[i];
@@ -321,7 +321,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                 for (ListNode* current = grid->array[j][k]->head; current; current = current->next) {
                     int n = current->value;
                     if (n == i) continue;
-                    ColliderComponent* collider_other = ColliderComponent_get(components, n);
+                    ColliderComponent* collider_other = ColliderComponent_get(n);
                     if (collider_other->last_collision == i) continue;
 
                     collider_other->last_collision = i;
@@ -346,7 +346,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
 
                     float m = 1.0f;
 
-                    PhysicsComponent* physics_other = PhysicsComponent_get(components, n);
+                    PhysicsComponent* physics_other = PhysicsComponent_get(n);
                     if (physics_other) {
                         dv = diff(dv, physics_other->velocity);
                         m = physics_other->mass / (physics->mass + physics_other->mass);
@@ -366,8 +366,8 @@ void collide(ComponentData* components, ColliderGrid* grid) {
                             apply_force(components, i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
                             break;
                         case 3:
-                            if (VehicleComponent_get(components, i)) {
-                                VehicleComponent_get(components, i)->on_road = true;
+                            if (VehicleComponent_get(i)) {
+                                VehicleComponent_get(i)->on_road = true;
                             }
                             break;
                     }

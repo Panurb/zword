@@ -93,20 +93,20 @@ void create_item(ComponentData* components, sfVector2f position, int tier) {
 
 
 void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
-    PlayerComponent* player = PlayerComponent_get(components, entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
 
     if (player->target == -1) {
         return;
     }
     
-    ItemComponent* item = ItemComponent_get(components, player->target);
+    ItemComponent* item = ItemComponent_get(player->target);
     if (item->price > player->money) {
         return;
     }
 
-    CoordinateComponent* coord = CoordinateComponent_get(components, player->target);
-    ImageComponent* image = ImageComponent_get(components, player->target);
-    AmmoComponent* ammo = AmmoComponent_get(components, player->target);
+    CoordinateComponent* coord = CoordinateComponent_get(player->target);
+    ImageComponent* image = ImageComponent_get(player->target);
+    AmmoComponent* ammo = AmmoComponent_get(player->target);
     if (ammo) {
         clear_grid(components, grid, player->target);
 
@@ -117,9 +117,9 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             coord->angle = 0.0f;
             player->ammo[ammo->type] = player->target;
             image->alpha = 0.0f;
-            ColliderComponent_get(components, player->target)->enabled = false;
+            ColliderComponent_get(player->target)->enabled = false;
         } else {
-            AmmoComponent_get(components, i)->size += ammo->size;
+            AmmoComponent_get(i)->size += ammo->size;
             destroy_entity(components, player->target);
             player->target = -1;
         }
@@ -132,12 +132,12 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             coord->parent = entity;
             coord->position = (sfVector2f) { 0.75f, 0.0f };
             coord->angle = 0.0f;
-            ColliderComponent_get(components, player->target)->enabled = false;
+            ColliderComponent_get(player->target)->enabled = false;
             change_layer(components, player->target, LAYER_WEAPONS);
             if (player->item != i) {
                 image->alpha = 0.0f;
             }
-            WeaponComponent* weapon = WeaponComponent_get(components, player->target);
+            WeaponComponent* weapon = WeaponComponent_get(player->target);
             if (weapon) {
                 image->alpha = 0.0f;
                 if (item->price != 0) {
@@ -153,14 +153,14 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
 
 
 void drop_item(ComponentData* components, int entity) {
-    PlayerComponent* player = PlayerComponent_get(components, entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
 
     int i = player->inventory[player->item];
     if (i != -1) {
-        PhysicsComponent* physics = PhysicsComponent_get(components, i);
+        PhysicsComponent* physics = PhysicsComponent_get(i);
         player->inventory[player->item] = -1;
 
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         coord->parent = -1;
 
         sfVector2f r = polar_to_cartesian(1.0, get_angle(components, entity));
@@ -169,24 +169,24 @@ void drop_item(ComponentData* components, int entity) {
         physics->velocity = mult(7.0, r);
         physics->angular_velocity = 3.0;
 
-        LightComponent* light = LightComponent_get(components, entity);
+        LightComponent* light = LightComponent_get(entity);
         if (light) {
             light->enabled = false;
         }
 
         change_layer(components, i, LAYER_ITEMS);
-        ImageComponent_get(components, i)->alpha = 1.0f;
-        ColliderComponent_get(components, i)->enabled = true;
+        ImageComponent_get(i)->alpha = 1.0f;
+        ColliderComponent_get(i)->enabled = true;
     }
 }
 
 
 void heal(ComponentData* components, ColliderGrid* grid, int entity) {
-    int parent = CoordinateComponent_get(components, entity)->parent;
+    int parent = CoordinateComponent_get(entity)->parent;
 
-    ItemComponent* item = ItemComponent_get(components, entity);
+    ItemComponent* item = ItemComponent_get(entity);
 
-    HealthComponent* player_health = HealthComponent_get(components, parent);
+    HealthComponent* player_health = HealthComponent_get(parent);
 
     player_health->health = min(player_health->health + item->value, player_health->max_health);
 
@@ -197,7 +197,7 @@ void heal(ComponentData* components, ColliderGrid* grid, int entity) {
 
 
 void switch_light(ComponentData* components, int entity) {
-    LightComponent* light = LightComponent_get(components, entity);
+    LightComponent* light = LightComponent_get(entity);
     if (light) {
         light->enabled = true;
     }
@@ -205,10 +205,10 @@ void switch_light(ComponentData* components, int entity) {
 
 
 void use_item(ComponentData* components, ColliderGrid* grid, int entity, float time_step) {
-    int parent = CoordinateComponent_get(components, entity)->parent;
+    int parent = CoordinateComponent_get(entity)->parent;
 
-    PlayerComponent* player = PlayerComponent_get(components, parent);
-    ItemComponent* item = ItemComponent_get(components, entity);
+    PlayerComponent* player = PlayerComponent_get(parent);
+    ItemComponent* item = ItemComponent_get(entity);
 
     if (player->use_timer >= item->use_time) {
         switch (item->type) {
@@ -231,12 +231,12 @@ void draw_items(GameData* data, sfRenderWindow* window) {
     sfText* text = sfText_create();
     ListNode* node;
     FOREACH(node, data->components->player.order) {
-        PlayerComponent* player = PlayerComponent_get(data->components, node->value);
+        PlayerComponent* player = PlayerComponent_get(node->value);
         if (player->target == -1) continue;
-        ItemComponent* item = ItemComponent_get(data->components, player->target);
-        ImageComponent* image = ImageComponent_get(data->components, player->target);
+        ItemComponent* item = ItemComponent_get(player->target);
+        ImageComponent* image = ImageComponent_get(player->target);
 
-        sfShader_setFloatUniform(CameraComponent_get(data->components, data->camera)->shaders[1], "offset", 0.05f);
+        sfShader_setFloatUniform(CameraComponent_get(data->camera)->shaders[1], "offset", 0.05f);
         sfVector2f pos = get_position(data->components, player->target);
         float angle = get_angle(data->components, player->target);
         if (image->alpha != 0.0f) {

@@ -17,7 +17,7 @@
 
 
 int get_akimbo(ComponentData* components, int entity) {
-    ItemComponent* item = ItemComponent_get(components, entity);
+    ItemComponent* item = ItemComponent_get(entity);
 
     if (item && item->size > 0) {
         if (item->attachments[0] != -1 && components->weapon[item->attachments[0]]) {
@@ -34,8 +34,8 @@ void reload(ComponentData* components, int i) {
         return;
     }
 
-    PlayerComponent* player = PlayerComponent_get(components, CoordinateComponent_get(components, i)->parent);
-    AmmoComponent* ammo = AmmoComponent_get(components, player->ammo[weapon->ammo_type]);
+    PlayerComponent* player = PlayerComponent_get(CoordinateComponent_get(i)->parent);
+    AmmoComponent* ammo = AmmoComponent_get(player->ammo[weapon->ammo_type]);
     if (!ammo || ammo->size == 0) {
         return;
     }
@@ -76,11 +76,11 @@ void create_energy(ComponentData* components, sfVector2f position, sfVector2f ve
 
 void update_energy(ComponentData* components, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* col = ColliderComponent_get(components, i);
+        ColliderComponent* col = ColliderComponent_get(i);
         if (!col) continue;
         if (col->group == GROUP_ENERGY) {
-            PhysicsComponent* phys = PhysicsComponent_get(components, i);
-            LightComponent* light = LightComponent_get(components, i);
+            PhysicsComponent* phys = PhysicsComponent_get(i);
+            LightComponent* light = LightComponent_get(i);
 
             for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
                 int j = node->value;
@@ -91,7 +91,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
                 light->brightness = 0.5f;
                 add_particles(components, i, 10);
                 clear_grid(components, grid, i);
-                ColliderComponent_get(components, i)->enabled = false;
+                ColliderComponent_get(i)->enabled = false;
                 ImageComponent_remove(components, i);
                 add_sound(components, i, "energy", 0.5f, randf(1.2f, 1.5f));
                 phys->lifetime = 1.0f;
@@ -127,7 +127,7 @@ int create_rope(ComponentData* components, sfVector2f start, sfVector2f end) {
 int rope_root(ComponentData* components, int rope) {
     int j = rope;
     while (true) {
-        int p = JointComponent_get(components, j)->parent;
+        int p = JointComponent_get(j)->parent;
         if (p == -1) break;
         j = p;
     }
@@ -137,8 +137,8 @@ int rope_root(ComponentData* components, int rope) {
 
 
 void attack(ComponentData* components, ColliderGrid* grid, int entity) {
-    WeaponComponent* weapon = WeaponComponent_get(components, entity);
-    int parent = CoordinateComponent_get(components, entity)->parent;
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    int parent = CoordinateComponent_get(entity)->parent;
 
     if (weapon->magazine == 0) {
         reload(components, entity);
@@ -155,9 +155,9 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
         weapon->magazine--;
     }
 
-    PlayerComponent* player = PlayerComponent_get(components, parent);
+    PlayerComponent* player = PlayerComponent_get(parent);
     if (player) {
-        AnimationComponent_get(components, player->arms)->framerate = 20.0f;
+        AnimationComponent_get(player->arms)->framerate = 20.0f;
     }
 
     sfVector2f pos = get_position(components, parent);
@@ -201,7 +201,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             for (int i = 0; i < weapon->shots; i++) {
                 if (min_info[i].entity == -1) continue;
 
-                EnemyComponent* enemy = EnemyComponent_get(components, min_info[i].entity);
+                EnemyComponent* enemy = EnemyComponent_get(min_info[i].entity);
                 if (enemy && enemy->state == ENEMY_IDLE) {
                     dmg *= 2;
                 }
@@ -228,8 +228,8 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             int i = create_rope(components, info.position, get_position(components, parent));
 
             int j = rope_root(components, i);
-            JointComponent_get(components, j)->parent = info.entity;
-            // CoordinateComponent* coord = CoordinateComponent_get(components, j);
+            JointComponent_get(j)->parent = info.entity;
+            // CoordinateComponent* coord = CoordinateComponent_get(j);
             // coord->parent = j;
             // coord->
             // PhysicsComponent_remove(components, j);
@@ -238,7 +238,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
 
             break;
         } default: {
-            ParticleComponent* particle = ParticleComponent_get(components, entity);
+            ParticleComponent* particle = ParticleComponent_get(entity);
             for (int i = 0; i < weapon->shots; i++) {
                 float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
                 if (weapon->spread > 0.0f) {
@@ -263,11 +263,11 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             }
 
             weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-            if (PlayerComponent_get(components, parent)) {
+            if (PlayerComponent_get(parent)) {
                 alert_enemies(components, grid, parent, weapon->sound_range);
             }
 
-            LightComponent* light = LightComponent_get(components, entity);
+            LightComponent* light = LightComponent_get(entity);
             if (light) {
                 light->brightness = light->max_brightness;
             }
@@ -276,7 +276,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
         }
     }
 
-    SoundComponent* sound = SoundComponent_get(components, entity);
+    SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
         add_sound(components, entity, weapon->sound, 1.0f, 1.0f);
     }
@@ -289,15 +289,15 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
 
 void update_weapons(ComponentData* components, float time_step) {
     for (int i = 0; i < components->entities; i++) {
-        WeaponComponent* weapon = WeaponComponent_get(components, i);
+        WeaponComponent* weapon = WeaponComponent_get(i);
         if (!weapon) continue;
 
         weapon->cooldown = fmaxf(0.0f, weapon->cooldown - time_step);
 
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         int parent = coord->parent;
         if (parent != -1) {
-            PhysicsComponent* phys = PhysicsComponent_get(components, parent);
+            PhysicsComponent* phys = PhysicsComponent_get(parent);
             weapon->recoil -= time_step * weapon->recoil_down;
             weapon->recoil = fmaxf(weapon->recoil_up * phys->speed / phys->max_speed, weapon->recoil);
 

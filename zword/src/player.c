@@ -54,7 +54,7 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
 
 
 int get_slot(ComponentData* components, int i, int size) {
-    PlayerComponent* player = PlayerComponent_get(components, i);
+    PlayerComponent* player = PlayerComponent_get(i);
 
     sfVector2f rs = player->controller.right_stick;
     float angle = mod(polar_angle(rs) + 0.25 * M_PI, 2 * M_PI);
@@ -64,7 +64,7 @@ int get_slot(ComponentData* components, int i, int size) {
 
 
 int get_attachment(ComponentData* components, int i) {
-    PlayerComponent* player = PlayerComponent_get(components, i);
+    PlayerComponent* player = PlayerComponent_get(i);
     int slot = get_slot(components, i, player->inventory_size);
     int item = player->inventory[slot];
 
@@ -86,21 +86,21 @@ int get_attachment(ComponentData* components, int i) {
 
 void update_players(ComponentData* components, ColliderGrid* grid, float time_step) {
     for (int i = 0; i < components->entities; i++) {
-        PlayerComponent* player = PlayerComponent_get(components, i);
+        PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;
 
         PhysicsComponent* phys = components->physics[i];
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         sfVector2f left_stick = player->controller.left_stick;
         sfVector2f right_stick = player->controller.right_stick;
         int slot = get_slot(components, i, player->inventory_size);
         int atch = get_attachment(components, i);
 
         int item = player->inventory[player->item];
-        ItemComponent* itco = ItemComponent_get(components, item);
-        WeaponComponent* weapon = WeaponComponent_get(components, item);
-        LightComponent* light = LightComponent_get(components, item);
-        ImageComponent* image = ImageComponent_get(components, item);
+        ItemComponent* itco = ItemComponent_get(item);
+        WeaponComponent* weapon = WeaponComponent_get(item);
+        LightComponent* light = LightComponent_get(item);
+        ImageComponent* image = ImageComponent_get(item);
 
         if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
             phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
@@ -145,8 +145,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 for (ListNode* current = list->head; current; current = current->next) {
                     int k = current->value;
                     if (k == -1) break;
-                    if (!ItemComponent_get(components, k)) continue;
-                    if (CoordinateComponent_get(components, k)->parent != -1) continue;
+                    if (!ItemComponent_get(k)) continue;
+                    if (CoordinateComponent_get(k)->parent != -1) continue;
 
                     float d = dist(pos, get_position(components, k));
                     if (d < min_dist) {
@@ -162,7 +162,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 if (itco) {
                     for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        LightComponent* a = LightComponent_get(itco->attachments[j]);
                         if (a) {
                             a->enabled = true;
                         }
@@ -223,7 +223,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 if (itco) {
                     for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        LightComponent* a = LightComponent_get(itco->attachments[j]);
                         if (a) {
                             a->enabled = true;
                         }
@@ -244,7 +244,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 if (itco) {
                     for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(components, itco->attachments[j]);
+                        LightComponent* a = LightComponent_get(itco->attachments[j]);
                         if (a) {
                             a->enabled = false;
                         }
@@ -257,18 +257,18 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 if (new_item != item) {
                     if (item != -1) {
-                        ImageComponent_get(components, item)->alpha = 0.0f;
+                        ImageComponent_get(item)->alpha = 0.0f;
                     }
                     if (new_item != -1) {
-                        itco = ItemComponent_get(components, new_item);
+                        itco = ItemComponent_get(new_item);
 
-                        if (!WeaponComponent_get(components, new_item)) {
-                            ImageComponent_get(components, new_item)->alpha = 1.0f;
+                        if (!WeaponComponent_get(new_item)) {
+                            ImageComponent_get(new_item)->alpha = 1.0f;
                         }
                         for (int j = 0; j < itco->size; j++) {
                             int k = itco->attachments[j];
                             if (k != -1) {
-                                ImageComponent_get(components, k)->alpha = 0.0f;
+                                ImageComponent_get(k)->alpha = 0.0f;
                             }
                         }
                     }
@@ -315,7 +315,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             case PLAYER_AMMO_MENU:
                 break;
             case PLAYER_DEAD:;
-                ColliderComponent* col = ColliderComponent_get(components, i);
+                ColliderComponent* col = ColliderComponent_get(i);
                 if (col) {
                     col->group = GROUP_ITEMS;
                     if (phys->speed == 0.0) {
@@ -333,7 +333,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 void add_money(ComponentData* components, int entity, int amount) {
     if (amount == 0) return;
     
-    PlayerComponent* player = PlayerComponent_get(components, entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
     player->money += amount;
     player->money_increment = amount;
     player->money_timer = 1.0f;

@@ -55,7 +55,7 @@ int sound_index(Filename filename) {
 
 
 void add_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch) {
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+    SoundComponent* scomp = SoundComponent_get(entity);
     for (int i = 0; i < scomp->size; i++) {
         if (!scomp->events[i]) {
             SoundEvent* event = malloc(sizeof(SoundEvent));
@@ -72,7 +72,7 @@ void add_sound(ComponentData* components, int entity, Filename filename, float v
 
 
 void loop_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch) {
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+    SoundComponent* scomp = SoundComponent_get(entity);
     for (int i = 0; i < scomp->size; i++) {
         if (!scomp->events[i]) {
             SoundEvent* event = malloc(sizeof(SoundEvent));
@@ -89,7 +89,7 @@ void loop_sound(ComponentData* components, int entity, Filename filename, float 
 
 
 void stop_loop(ComponentData* components, int entity) {
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+    SoundComponent* scomp = SoundComponent_get(entity);
     for (int i = 0; i < scomp->size; i++) {
         SoundEvent* event = scomp->events[i];
         if (event) {
@@ -103,7 +103,7 @@ void stop_loop(ComponentData* components, int entity) {
 
 void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSound* channels[MAX_SOUNDS]) {
     for (int i = 0; i < components->entities; i++) {
-        SoundComponent* scomp = SoundComponent_get(components, i);
+        SoundComponent* scomp = SoundComponent_get(i);
         if (!scomp) continue;
 
         float dist = norm(diff(get_position(components, i), get_position(components, camera)));
@@ -132,7 +132,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
             sfSound* channel = channels[chan];
 
             float vol = event->volume;
-            CameraComponent* cam = CameraComponent_get(components, camera);
+            CameraComponent* cam = CameraComponent_get(camera);
             float radius = 0.5f * cam->resolution.x / cam->zoom;
             if (dist > radius) {
                 vol = expf(-(dist - radius)) * event->volume;

@@ -13,6 +13,7 @@
 #include "util.h"
 #include "grid.h"
 #include "input.h"
+#include "game.h"
 
 
 ComponentData* ComponentData_create() {
@@ -55,33 +56,33 @@ CoordinateComponent* CoordinateComponent_add(ComponentData* components, int enti
     coord->children = List_create();
     coord->lifetime = -1.0f;
 
-    components->coordinate[entity] = coord;
+    game_data->components->coordinate[entity] = coord;
 
     return coord;
 }
 
 
-CoordinateComponent* CoordinateComponent_get(ComponentData* components, int entity) {
+CoordinateComponent* CoordinateComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->coordinate[entity];
+    return game_data->components->coordinate[entity];
 }
 
 
 void CoordinateComponent_remove(ComponentData* components, int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord) {
         // if (coord->parent != -1) {
-        //     List_remove(CoordinateComponent_get(components, coord->parent)->children, entity);
+        //     List_remove(CoordinateComponent_get(coord->parent)->children, entity);
         // }
         for (ListNode* node = coord->children->head; node; node = node->next) {
-            CoordinateComponent* child = CoordinateComponent_get(components, node->value);
+            CoordinateComponent* child = CoordinateComponent_get(node->value);
             if (child) {
                 child->parent = -1;
             }
         }
         List_delete(coord->children);
         free(coord);
-        components->coordinate[entity] = NULL;
+        game_data->components->coordinate[entity] = NULL;
     }
 }
 
@@ -100,7 +101,7 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
     image->stretch = 0.0f;
     image->stretch_speed = 0.0f;
     
-    components->image.array[entity] = image;
+    game_data->components->image.array[entity] = image;
 
     change_layer(components, entity, image->layer);
 
@@ -108,21 +109,21 @@ ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filena
 }
 
 
-ImageComponent* ImageComponent_get(ComponentData* components, int entity) {
+ImageComponent* ImageComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->image.array[entity];
+    return game_data->components->image.array[entity];
 }
 
 
 void ImageComponent_remove(ComponentData* components, int entity) {
-    ImageComponent* image = ImageComponent_get(components, entity);
+    ImageComponent* image = ImageComponent_get(entity);
     if (image) {
         sfSprite_destroy(image->sprite);
 
         free(image);
-        components->image.array[entity] = NULL;
+        game_data->components->image.array[entity] = NULL;
 
-        List_remove(components->image.order, entity);
+        List_remove(game_data->components->image.order, entity);
     }
 }
 
@@ -147,24 +148,24 @@ PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, fl
     phys->max_angular_speed = 20.0 * M_PI;
     phys->lifetime = INFINITY;
 
-    components->physics[entity] = phys;
+    game_data->components->physics[entity] = phys;
 
     return phys;
 }
 
 
-PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity) {
+PhysicsComponent* PhysicsComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->physics[entity];
+    return game_data->components->physics[entity];
 }
 
 
 void PhysicsComponent_remove(ComponentData* components, int entity) {
-    PhysicsComponent* phys = PhysicsComponent_get(components, entity);
+    PhysicsComponent* phys = PhysicsComponent_get(entity);
     if (phys) {
         List_delete(phys->collision.entities);
         free(phys);
-        components->physics[entity] = NULL;
+        game_data->components->physics[entity] = NULL;
     }
 }
 
@@ -185,7 +186,7 @@ ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int e
     sfVertexArray_setPrimitiveType(col->verts, sfTriangleFan);
     sfVertexArray_resize(col->verts, col->verts_size);
 
-    components->collider[entity] = col;
+    game_data->components->collider[entity] = col;
 
     return col;
 }
@@ -207,23 +208,23 @@ ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, in
     sfVertexArray_setPrimitiveType(col->verts, sfQuads);
     sfVertexArray_resize(col->verts, col->verts_size);
 
-    components->collider[entity] = col;
+    game_data->components->collider[entity] = col;
 
     return col;
 }
 
 
-ColliderComponent* ColliderComponent_get(ComponentData* components, int entity) {
+ColliderComponent* ColliderComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->collider[entity];
+    return game_data->components->collider[entity];
 }
 
 
 void ColliderComponent_remove(ComponentData* components, int entity) {
-    ColliderComponent* col = ColliderComponent_get(components, entity);
+    ColliderComponent* col = ColliderComponent_get(entity);
     if (col) {
         free(col);
-        components->collider[entity] = NULL;
+        game_data->components->collider[entity] = NULL;
     }
 }
 
@@ -280,27 +281,27 @@ PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int 
     player->crosshair = sfCircleShape_create();
     sfCircleShape_setOutlineThickness(player->crosshair, 1.0f);
 
-    components->player.array[entity] = player;
-    List_add(components->player.order, entity);
+    game_data->components->player.array[entity] = player;
+    List_add(game_data->components->player.order, entity);
 
     return player;
 }
 
 
-PlayerComponent* PlayerComponent_get(ComponentData* components, int entity) {
+PlayerComponent* PlayerComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->player.array[entity];
+    return game_data->components->player.array[entity];
 }
 
 
 void PlayerComponent_remove(ComponentData* components, int entity) {
-    PlayerComponent* player = PlayerComponent_get(components, entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
     if (player) {
         sfConvexShape_destroy(player->shape);
         sfRectangleShape_destroy(player->line);
         free(player);
-        components->player.array[entity] = NULL;
-        List_remove(components->player.order, entity);
+        game_data->components->player.array[entity] = NULL;
+        List_remove(game_data->components->player.order, entity);
     }
 }
 
@@ -325,25 +326,25 @@ LightComponent* LightComponent_add(ComponentData* components, int entity, float 
     light->speed = speed;
     light->time = randf(0.0, 1.0);
 
-    components->light[entity] = light;
+    game_data->components->light[entity] = light;
 
     return light;
 }
 
 
-LightComponent* LightComponent_get(ComponentData* components, int entity) {
+LightComponent* LightComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->light[entity];
+    return game_data->components->light[entity];
 }
 
 
 void LightComponent_remove(ComponentData* components, int entity) {
-    LightComponent* light = LightComponent_get(components, entity);
+    LightComponent* light = LightComponent_get(entity);
     if (light) {
         sfVertexArray_destroy(light->verts);
         sfCircleShape_destroy(light->shine);
         free(light);
-        components->light[entity] = NULL;
+        game_data->components->light[entity] = NULL;
     }
 }
 
@@ -367,24 +368,24 @@ EnemyComponent* EnemyComponent_add(ComponentData* components, int entity) {
     enemy->spawner = false;
     enemy->bounty = 100;
 
-    components->enemy[entity] = enemy;
+    game_data->components->enemy[entity] = enemy;
 
     return enemy;
 }
 
 
-EnemyComponent* EnemyComponent_get(ComponentData* components, int entity) {
+EnemyComponent* EnemyComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->enemy[entity];
+    return game_data->components->enemy[entity];
 }
 
 
 void EnemyComponent_remove(ComponentData* components, int entity) {
-    EnemyComponent* enemy = EnemyComponent_get(components, entity);
+    EnemyComponent* enemy = EnemyComponent_get(entity);
     if (enemy) {
         List_delete(enemy->path);
         free(enemy);
-        components->enemy[entity] = NULL;
+        game_data->components->enemy[entity] = NULL;
     }
 }
 
@@ -417,24 +418,24 @@ ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, 
     particle->inner_color = inner_color;
     particle->origin = zeros();
 
-    components->particle[entity] = particle;
+    game_data->components->particle[entity] = particle;
 
     return particle;
 }
 
 
-ParticleComponent* ParticleComponent_get(ComponentData* components, int entity) {
+ParticleComponent* ParticleComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->particle[entity];
+    return game_data->components->particle[entity];
 }
 
 
 void ParticleComponent_remove(ComponentData* components, int entity) {
-    ParticleComponent* particle = ParticleComponent_get(components, entity);
+    ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
         sfCircleShape_destroy(particle->shape);
         free(particle);
-        components->particle[entity] = NULL;
+        game_data->components->particle[entity] = NULL;
     }
 }
 
@@ -456,23 +457,23 @@ VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, fl
     vehicle->seats[2] = (sfVector2f) { 0.0f, 0.75f };
     vehicle->seats[3] = (sfVector2f) { 0.0f, -0.75f };
 
-    components->vehicle[entity] = vehicle;
+    game_data->components->vehicle[entity] = vehicle;
 
     return vehicle;
 }
 
 
-VehicleComponent* VehicleComponent_get(ComponentData* components, int entity) {
+VehicleComponent* VehicleComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->vehicle[entity];
+    return game_data->components->vehicle[entity];
 }
 
 
 void VehicleComponent_remove(ComponentData* components, int entity) {
-    VehicleComponent* vehicle = VehicleComponent_get(components, entity);
+    VehicleComponent* vehicle = VehicleComponent_get(entity);
     if (vehicle) {
         free(vehicle);
-        components->vehicle[entity] = NULL;
+        game_data->components->vehicle[entity] = NULL;
     }
 }
 
@@ -503,22 +504,22 @@ WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, floa
     strcpy(weapon->sound, sound);
     weapon->automatic = false;
 
-    components->weapon[entity] = weapon;
+    game_data->components->weapon[entity] = weapon;
     return weapon;
 }
 
 
-WeaponComponent* WeaponComponent_get(ComponentData* components, int entity) {
+WeaponComponent* WeaponComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->weapon[entity];
+    return game_data->components->weapon[entity];
 }
 
 
 void WeaponComponent_remove(ComponentData* components, int entity) {
-    WeaponComponent* weapon = WeaponComponent_get(components, entity);
+    WeaponComponent* weapon = WeaponComponent_get(entity);
     if (weapon) {
         free(weapon);
-        components->weapon[entity] = NULL;
+        game_data->components->weapon[entity] = NULL;
     }
 }
 
@@ -535,22 +536,22 @@ ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size
     item->type = ITEM_HEAL;
     item->value = 0;
 
-    components->item[entity] = item;
+    game_data->components->item[entity] = item;
     return item;
 }
 
 
-ItemComponent* ItemComponent_get(ComponentData* components, int entity) {
+ItemComponent* ItemComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->item[entity];
+    return game_data->components->item[entity];
 }
 
 
 void ItemComponent_remove(ComponentData* components, int entity) {
-    ItemComponent* item = ItemComponent_get(components, entity);
+    ItemComponent* item = ItemComponent_get(entity);
     if (item) {
         free(item);
-        components->item[entity] = NULL;
+        game_data->components->item[entity] = NULL;
     }
 }
 
@@ -563,31 +564,31 @@ WaypointComponent* WaypointComponent_add(ComponentData* components, int entity) 
     waypoint->neighbors = List_create();
     waypoint->range = 16.0f;
 
-    components->waypoint[entity] = waypoint;
+    game_data->components->waypoint[entity] = waypoint;
 
     return waypoint;
 }
 
 
-WaypointComponent* WaypointComponent_get(ComponentData* components, int entity) {
+WaypointComponent* WaypointComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->waypoint[entity];
+    return game_data->components->waypoint[entity];
 }
 
 
 void WaypointComponent_remove(ComponentData* components, int entity) {
-    WaypointComponent* waypoint = WaypointComponent_get(components, entity);
+    WaypointComponent* waypoint = WaypointComponent_get(entity);
     if (waypoint) {
         for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
             int n = node->value;
-            WaypointComponent* neighbor = WaypointComponent_get(components, n);
+            WaypointComponent* neighbor = WaypointComponent_get(n);
             if (neighbor) {
                 List_remove(neighbor->neighbors, entity);
             }
         }
         List_delete(waypoint->neighbors);
         free(waypoint);
-        components->waypoint[entity] = NULL;
+        game_data->components->waypoint[entity] = NULL;
     }
 }
 
@@ -600,23 +601,23 @@ HealthComponent* HealthComponent_add(ComponentData* components, int entity, int 
     strcpy(comp->decal, decal);
     strcpy(comp->die_sound, die_sound);
 
-    components->health[entity] = comp;
+    game_data->components->health[entity] = comp;
 
     return comp;
 }
 
 
-HealthComponent* HealthComponent_get(ComponentData* components, int entity) {
+HealthComponent* HealthComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->health[entity];
+    return game_data->components->health[entity];
 }
 
 
 void HealthComponent_remove(ComponentData* components, int entity) {
-    HealthComponent* health = HealthComponent_get(components, entity);
+    HealthComponent* health = HealthComponent_get(entity);
     if (health) {
         free(health);
-        components->health[entity] = NULL;
+        game_data->components->health[entity] = NULL;
     }
 }
 
@@ -639,22 +640,22 @@ CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVe
     camera->shake.position = zeros();
     camera->shake.velocity = rand_vector();
 
-    components->camera[entity] = camera;
+    game_data->components->camera[entity] = camera;
     return camera;
 }
 
 
-CameraComponent* CameraComponent_get(ComponentData* components, int entity) {
+CameraComponent* CameraComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->camera[entity];
+    return game_data->components->camera[entity];
 }
 
 
 void CameraComponent_remove(ComponentData* components, int entity) {
-    CameraComponent* camera = CameraComponent_get(components, entity);
+    CameraComponent* camera = CameraComponent_get(entity);
     if (camera) {
         free(camera);
-        components->camera[entity] = NULL;
+        game_data->components->camera[entity] = NULL;
     }
 }
 
@@ -671,23 +672,23 @@ RoadComponent* RoadComponent_add(ComponentData* components, int entity, float wi
     strcpy(road->filename, filename);
     road->texture_changed = true;
 
-    components->road[entity] = road;
+    game_data->components->road[entity] = road;
     return road;
 }
 
 
-RoadComponent* RoadComponent_get(ComponentData* components, int entity) {
+RoadComponent* RoadComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->road[entity];
+    return game_data->components->road[entity];
 }
 
 
 void RoadComponent_remove(ComponentData* components, int entity) {
-    RoadComponent* road = RoadComponent_get(components, entity);
+    RoadComponent* road = RoadComponent_get(entity);
     if (road) {
         sfConvexShape_destroy(road->shape);
         free(road);
-        components->road[entity] = NULL;
+        game_data->components->road[entity] = NULL;
     }
 }
 
@@ -700,22 +701,22 @@ SoundComponent* SoundComponent_add(ComponentData* components, int entity, Filena
     }
     strcpy(sound->hit_sound, hit_sound);
     strcpy(sound->loop_sound, "");
-    components->sound[entity] = sound;
+    game_data->components->sound[entity] = sound;
     return sound;
 }
 
 
-SoundComponent* SoundComponent_get(ComponentData* components, int entity) {
+SoundComponent* SoundComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->sound[entity];
+    return game_data->components->sound[entity];
 }
 
 
 void SoundComponent_remove(ComponentData* components, int entity) {
-    SoundComponent* sound = SoundComponent_get(components, entity);
+    SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
         free(sound);
-        components->sound[entity] = NULL;
+        game_data->components->sound[entity] = NULL;
     }
 }
 
@@ -738,22 +739,22 @@ AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType
             break;
     }
 
-    components->ammo[entity] = ammo;
+    game_data->components->ammo[entity] = ammo;
     return ammo;
 }
 
 
-AmmoComponent* AmmoComponent_get(ComponentData* components, int entity) {
+AmmoComponent* AmmoComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->ammo[entity];
+    return game_data->components->ammo[entity];
 }
 
 
 void AmmoComponent_remove(ComponentData* components, int entity) {
-    AmmoComponent* ammo = AmmoComponent_get(components, entity);
+    AmmoComponent* ammo = AmmoComponent_get(entity);
     if (ammo) {
         free(ammo);
-        components->ammo[entity] = NULL;
+        game_data->components->ammo[entity] = NULL;
     }
 }
 
@@ -766,22 +767,22 @@ AnimationComponent* AnimationComponent_add(ComponentData* components, int entity
     anim->timer = 0.0f;
     anim->play_once = false;
 
-    components->animation[entity] = anim;
+    game_data->components->animation[entity] = anim;
     return anim;
 }
 
 
-AnimationComponent* AnimationComponent_get(ComponentData* components, int entity) {
+AnimationComponent* AnimationComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->animation[entity];
+    return game_data->components->animation[entity];
 }
 
 
 void AnimationComponent_remove(ComponentData* components, int entity) {
-    AnimationComponent* anim = AnimationComponent_get(components, entity);
+    AnimationComponent* anim = AnimationComponent_get(entity);
     if (anim) {
         free(anim);
-        components->animation[entity] = NULL;
+        game_data->components->animation[entity] = NULL;
     }
 }
 
@@ -791,22 +792,22 @@ DoorComponent* DoorComponent_add(ComponentData* components, int entity, int pric
     door->locked = true;
     door->price = price;
 
-    components->door[entity] = door;
+    game_data->components->door[entity] = door;
     return door;
 }
 
 
-DoorComponent* DoorComponent_get(ComponentData* components, int entity) {
+DoorComponent* DoorComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->door[entity];
+    return game_data->components->door[entity];
 }
 
 
 void DoorComponent_remove(ComponentData* components, int entity) {
-    DoorComponent* door = DoorComponent_get(components, entity);
+    DoorComponent* door = DoorComponent_get(entity);
     if (door) {
         free(door);
-        components->door[entity] = NULL;
+        game_data->components->door[entity] = NULL;
     }
 }
 
@@ -819,22 +820,22 @@ JointComponent* JointComponent_add(ComponentData* components, int entity, int pa
     joint->strength = strength;
     joint->max_angle = M_PI;
 
-    components->joint[entity] = joint;
+    game_data->components->joint[entity] = joint;
     return joint;
 }
 
 
-JointComponent* JointComponent_get(ComponentData* components, int entity) {
+JointComponent* JointComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->joint[entity];
+    return game_data->components->joint[entity];
 }
 
 
 void JointComponent_remove(ComponentData* components, int entity) {
-    JointComponent* joint = JointComponent_get(components, entity);
+    JointComponent* joint = JointComponent_get(entity);
     if (joint) {
         free(joint);
-        components->joint[entity] = NULL;
+        game_data->components->joint[entity] = NULL;
     }
 }
 
@@ -854,24 +855,24 @@ WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, Butt
     widget->cyclic = false;
     widget->strings = NULL;
     
-    components->widget.array[entity] = widget;
-    List_append(components->widget.order, entity);
+    game_data->components->widget.array[entity] = widget;
+    List_append(game_data->components->widget.order, entity);
     return widget;
 }
 
 
-WidgetComponent* WidgetComponent_get(ComponentData* components, int entity) {
+WidgetComponent* WidgetComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->widget.array[entity];
+    return game_data->components->widget.array[entity];
 }
 
 
 void WidgetComponent_remove(ComponentData* components, int entity) {
-    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    WidgetComponent* widget = WidgetComponent_get(entity);
     if (widget) {
         free(widget);
-        components->widget.array[entity] = NULL;
-        List_remove(components->widget.order, entity);
+        game_data->components->widget.array[entity] = NULL;
+        List_remove(game_data->components->widget.order, entity);
     }
 }
 
@@ -885,66 +886,66 @@ TextComponent* TextComponent_add(ComponentData* components, int entity, String s
 
     replace_actions(text->string, text->source_string);
 
-    components->text[entity] = text;
+    game_data->components->text[entity] = text;
 
     return text;
 }
 
 
-TextComponent* TextComponent_get(ComponentData* components, int entity) {
+TextComponent* TextComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return components->text[entity];
+    return game_data->components->text[entity];
 }
 
 
 void TextComponent_remove(ComponentData* components, int entity) {
-    TextComponent* text = TextComponent_get(components, entity);
+    TextComponent* text = TextComponent_get(entity);
     if (text) {
         free(text);
-        components->text[entity] = NULL;
+        game_data->components->text[entity] = NULL;
     }
 }
 
 
 int create_entity(ComponentData* components) {
-    for (int i = 0; i < components->entities; i++) {
-        if (!components->coordinate[i]) {
-            if (components->added_entities) {
-                List_add(components->added_entities, i);
+    for (int i = 0; i < game_data->components->entities; i++) {
+        if (!game_data->components->coordinate[i]) {
+            if (game_data->components->added_entities) {
+                List_add(game_data->components->added_entities, i);
             }
             return i;
         }
     }
 
-    components->entities++;
-    if (components->added_entities) {
-        List_add(components->added_entities, components->entities - 1);
+    game_data->components->entities++;
+    if (game_data->components->added_entities) {
+        List_add(game_data->components->added_entities, game_data->components->entities - 1);
     }
-    return components->entities - 1;
+    return game_data->components->entities - 1;
 }
 
 
 int get_root(ComponentData* components, int entity) {
     int root = entity;
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
     while (coord->parent != -1) {
         root = coord->parent;
-        coord = CoordinateComponent_get(components, coord->parent);
+        coord = CoordinateComponent_get(coord->parent);
     }
     return root;
 }
 
 
 void add_child(ComponentData* components, int parent, int child) {
-    CoordinateComponent_get(components, child)->parent = parent;
-    List_append(CoordinateComponent_get(components, parent)->children, child);
+    CoordinateComponent_get(child)->parent = parent;
+    List_append(CoordinateComponent_get(parent)->children, child);
 }
 
 
 void remove_children(ComponentData* components, int parent) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, parent);
+    CoordinateComponent* coord = CoordinateComponent_get(parent);
     for (ListNode* node = coord->children->head; node; node = node->next) {
-        CoordinateComponent_get(components, node->value)->parent = -1;
+        CoordinateComponent_get(node->value)->parent = -1;
     }
     List_clear(coord->children);
 }
@@ -976,14 +977,14 @@ void destroy_entity(ComponentData* components, int entity) {
     WidgetComponent_remove(components, entity);
     TextComponent_remove(components, entity);
 
-    if (entity == components->entities - 1) {
-        components->entities--;
+    if (entity == game_data->components->entities - 1) {
+        game_data->components->entities--;
     }
 }
 
 
 void destroy_entity_recursive(ComponentData* components, int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
         destroy_entity_recursive(components, node->value);
     }
@@ -993,15 +994,15 @@ void destroy_entity_recursive(ComponentData* components, int entity) {
 
 
 void ComponentData_clear(ComponentData* components) {
-    for (int i = 0; i < components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         destroy_entity(components, i);
     }
-    components->entities = 0;
+    game_data->components->entities = 0;
 }
 
 
 sfVector2f get_position(ComponentData* components, int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
     sfVector2f position = coord->position;
 
     int parent = coord->parent;
@@ -1013,7 +1014,7 @@ sfVector2f get_position(ComponentData* components, int entity) {
 
 
 float get_angle(ComponentData* components, int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
     float angle = coord->angle;
 
     int parent = coord->parent;
@@ -1026,7 +1027,7 @@ float get_angle(ComponentData* components, int entity) {
 
 
 bool entity_exists(ComponentData* components, int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord) {
         return false;
     }

@@ -30,11 +30,11 @@ int create_door(ComponentData* components, sfVector2f pos, float angle) {
 
 void update_doors(ComponentData* components) {
     for (int i = 0; i < components->entities; i++) {
-        DoorComponent* door = DoorComponent_get(components, i);
+        DoorComponent* door = DoorComponent_get(i);
         if (!door) continue;
 
-        ColliderComponent* col = ColliderComponent_get(components, i);
-        PhysicsComponent* phys = PhysicsComponent_get(components, i);
+        ColliderComponent* col = ColliderComponent_get(i);
+        PhysicsComponent* phys = PhysicsComponent_get(i);
 
         if (!col) continue;
 

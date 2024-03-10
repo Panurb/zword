@@ -69,7 +69,7 @@ void end_game(GameData* data);
 
 void reset_game(GameData data);
 
-void update_game(float time_step);
+void update_game(GameData data, float time_step);
 
 void update_game_mode(GameData data, float time_step);
 

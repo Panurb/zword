@@ -35,7 +35,7 @@ int create_menu_camera(ComponentData* components, sfVideoMode mode) {
 
 
 sfVector2f camera_size(ComponentData* components, int camera) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     sfVector2i res = cam->resolution;
     float zoom = cam->zoom;
     return (sfVector2f) { res.x / zoom, res.y / zoom };
@@ -43,7 +43,7 @@ sfVector2f camera_size(ComponentData* components, int camera) {
 
 
 sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
@@ -53,7 +53,7 @@ sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) 
 
 
 sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + pos.x;
@@ -63,7 +63,7 @@ sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) 
 
 
 sfVector2f world_to_texture(ComponentData* components, int camera, sfVector2f a) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
@@ -73,7 +73,7 @@ sfVector2f world_to_texture(ComponentData* components, int camera, sfVector2f a)
 
 
 void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* line, sfVector2f start, sfVector2f end, float width, sfColor color) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     
     bool created = false;
     if (!line) {
@@ -96,7 +96,7 @@ void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sf
 
 
 void draw_circle(sfRenderWindow* window, ComponentData* components, int camera, sfCircleShape* shape, sfVector2f position, float radius, sfColor color) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
 
     bool created = false;
     if (!shape) {
@@ -117,7 +117,7 @@ void draw_circle(sfRenderWindow* window, ComponentData* components, int camera, 
 
 
 void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera, sfCircleShape* shape, sfVector2f position, float major, float minor, float angle, sfColor color) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
 
     bool created = false;
     if (!shape) {
@@ -140,7 +140,7 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
 
 
 void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* shape, sfVector2f position, float width, float height, float angle, sfColor color) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
 
     bool created = false;
     if (!shape) {
@@ -286,7 +286,7 @@ void draw_slice_outline(sfRenderWindow* window, ComponentData* components, int c
 
 
 void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
 
     sfSprite_setPosition(sprite, world_to_screen(components, camera, position));
     sfSprite_setScale(sprite, mult(cam->zoom / PIXELS_PER_UNIT, scale));
@@ -310,7 +310,7 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
         created = true;
     }
 
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     sfText_setFont(text, cam->fonts[0]);
     sfText_setCharacterSize(text, size * cam->zoom / 40.0f);
     sfText_setColor(text, color);
@@ -330,8 +330,8 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
 
 
 void update_camera(ComponentData* components, int camera, float time_step, bool follow_players) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, camera);
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CoordinateComponent* coord = CoordinateComponent_get(camera);
+    CameraComponent* cam = CameraComponent_get(camera);
 
     sfVector2f pos = zeros();
 
@@ -339,7 +339,7 @@ void update_camera(ComponentData* components, int camera, float time_step, bool 
         int n = 0;
         for (ListNode* node = components->player.order->head; node; node = node->next) {
             int i = node->value;
-            PlayerComponent* player = PlayerComponent_get(components, i);
+            PlayerComponent* player = PlayerComponent_get(i);
             if (player->state != PLAYER_DEAD) {
                 n += 1;
                 pos = sum(pos, get_position(components, i));
@@ -359,7 +359,7 @@ void update_camera(ComponentData* components, int camera, float time_step, bool 
 
 bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height) {
     sfVector2f pos = get_position(components, camera);
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
 
     if (fabsf(position.x - pos.x) < 0.5f * (width + cam->resolution.x / cam->zoom)) {
         if (fabsf(position.y - pos.y) < 0.5f * (height + cam->resolution.y / cam->zoom)) {
@@ -372,7 +372,7 @@ bool on_screen(ComponentData* components, int camera, sfVector2f position, float
 
 void shake_camera(ComponentData* components, float speed) {
     for (int i = 0; i < components->entities; i++) {
-        CameraComponent* cam = CameraComponent_get(components, i);
+        CameraComponent* cam = CameraComponent_get(i);
         if (cam) {
             cam->shake.velocity = sum(cam->shake.velocity, mult(speed, rand_vector()));
         }
@@ -381,7 +381,7 @@ void shake_camera(ComponentData* components, float speed) {
 
 
 void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera, float alpha) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+    CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
     sfVector2f pos = get_position(components, camera);

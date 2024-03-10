@@ -55,7 +55,7 @@ int create_car(ComponentData* components, sfVector2f pos, float angle) {
 
 
 bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
-    CoordinateComponent* coord = CoordinateComponent_get(components, i);
+    CoordinateComponent* coord = CoordinateComponent_get(i);
 
     for (int j = 0; j < components->entities; j++) {
         VehicleComponent* vehicle = components->vehicle[j];
@@ -74,9 +74,9 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
         }
 
         if (min_d < 3.0) {
-            PlayerComponent* player = PlayerComponent_get(components, i);
+            PlayerComponent* player = PlayerComponent_get(i);
             int item = player->inventory[player->item];
-            LightComponent* light = LightComponent_get(components, item);
+            LightComponent* light = LightComponent_get(item);
             if (light) {
                 light->enabled = false;
             }
@@ -86,7 +86,7 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
             coord->position = vehicle->seats[closest];
             coord->angle = 0.0;
             coord->parent = j;
-            ColliderComponent_get(components, i)->enabled = false;
+            ColliderComponent_get(i)->enabled = false;
 
             vehicle->riders[closest] = i;
 
@@ -98,7 +98,7 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
             }
             add_sound(components, j, "car_door", 0.75, 1.0);
 
-            PhysicsComponent_get(components, i)->velocity = zeros();
+            PhysicsComponent_get(i)->velocity = zeros();
             return true;
         }
     }
@@ -108,9 +108,9 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
 
 
 void exit_vehicle(ComponentData* components, int i) {
-    PlayerComponent* player = PlayerComponent_get(components, i);
+    PlayerComponent* player = PlayerComponent_get(i);
     int j = player->vehicle;
-    VehicleComponent* vehicle = VehicleComponent_get(components, j);
+    VehicleComponent* vehicle = VehicleComponent_get(j);
 
     int k = find(i, vehicle->riders, vehicle->size);
 
@@ -133,10 +133,10 @@ void exit_vehicle(ComponentData* components, int i) {
 
 
 void drive_vehicle(ComponentData* components, int p, float gas, float steering) {
-    PlayerComponent* player = PlayerComponent_get(components, p);
-    VehicleComponent* vehicle = VehicleComponent_get(components, player->vehicle);
-    int i = JointComponent_get(components, player->vehicle)->parent;
-    PhysicsComponent* phys = PhysicsComponent_get(components, i);
+    PlayerComponent* player = PlayerComponent_get(p);
+    VehicleComponent* vehicle = VehicleComponent_get(player->vehicle);
+    int i = JointComponent_get(player->vehicle)->parent;
+    PhysicsComponent* phys = PhysicsComponent_get(i);
 
     float front_angle = get_angle(components, i);
 
@@ -162,7 +162,7 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering) 
 
     vehicle->on_road = false;
 
-    SoundComponent* scomp = SoundComponent_get(components, player->vehicle);
+    SoundComponent* scomp = SoundComponent_get(player->vehicle);
     for (int j = 0; j < scomp->size; j++) {
         SoundEvent* event = scomp->events[j];
         if (event && event->loop) {

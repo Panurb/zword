@@ -14,7 +14,7 @@
 
 
 void apply_force(ComponentData* components, int entity, sfVector2f force) {
-    PhysicsComponent* physics = PhysicsComponent_get(components, entity);
+    PhysicsComponent* physics = PhysicsComponent_get(entity);
 
     sfVector2f a = mult(1.0f / physics->mass, force);
     physics->acceleration = sum(physics->acceleration, a);
@@ -23,10 +23,10 @@ void apply_force(ComponentData* components, int entity, sfVector2f force) {
 
 void update(ComponentData* components, float time_step, ColliderGrid* grid) {
     for (int i = 0; i < components->entities; i++) {
-        PhysicsComponent* physics = PhysicsComponent_get(components, i);
+        PhysicsComponent* physics = PhysicsComponent_get(i);
         if (!physics) continue;
 
-        ColliderComponent* col = ColliderComponent_get(components, i);
+        ColliderComponent* col = ColliderComponent_get(i);
 
         physics->lifetime -= time_step;
         if (physics->lifetime <= 0.0f) {
@@ -37,13 +37,13 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             destroy_entity(components, i);
             continue;
         } else if (physics->lifetime <= 1.0f) {
-            ImageComponent* image = ImageComponent_get(components, i);
+            ImageComponent* image = ImageComponent_get(i);
             if (image) {
                 image->alpha = physics->lifetime;
             }
         }
 
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         if (coord->parent != -1) continue;
 
         if (physics->collision.entities->size > 0) {
@@ -59,7 +59,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
         float delta_angle = time_step * physics->angular_velocity;
 
-        JointComponent* joint = JointComponent_get(components, i);
+        JointComponent* joint = JointComponent_get(i);
         if (joint && joint->parent != -1) {
             sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
             float d = norm(r);

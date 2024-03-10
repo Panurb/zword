@@ -39,7 +39,7 @@ void update_lights(ComponentData* components, float delta_time) {
 
 
 void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, int entity, HitInfo info, sfVector2f velocity) {
-    ImageComponent* image = ImageComponent_get(components, info.entity);
+    ImageComponent* image = ImageComponent_get(info.entity);
     if (!image) return;
 
     LightComponent* light = components->light[entity];
@@ -52,7 +52,7 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, i
             sfColor color = sfWhite;
             color.a = (1 - 50 * (1 + vn)) * 128;
             sfCircleShape_setFillColor(light->shine, color);
-            float radius = 0.05 * (1 - 5 * (1 + vn)) * CameraComponent_get(components, camera)->zoom;
+            float radius = 0.05 * (1 - 5 * (1 + vn)) * CameraComponent_get(camera)->zoom;
             sfCircleShape_setRadius(light->shine, radius);
             sfCircleShape_setOrigin(light->shine, (sfVector2f) { radius, radius });
             sfRenderWindow_drawCircleShape(window, light->shine, NULL);
@@ -63,14 +63,14 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, i
 
 void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camera) {
     sfRenderTexture_clear(texture, sfWhite);
-    if (CameraComponent_get(components, camera)->zoom < 10.0f) return;
+    if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
     sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
     for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* collider = ColliderComponent_get(components, i);
+        ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
 
-        ImageComponent* image = ImageComponent_get(components, i);
+        ImageComponent* image = ImageComponent_get(i);
         if (!image || image->alpha == 0.0f || image->layer <= LAYER_DECALS) continue;
 
         sfVector2f start = get_position(components, i);
@@ -147,11 +147,11 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
 
 void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture* texture, int camera, float ambient_light) {
     sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0f));
-    if (CameraComponent_get(components, camera)->zoom < 10.0f) return;
+    if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
     sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
     for (int i = 0; i < components->entities; i++) {
-        LightComponent* light = LightComponent_get(components, i);
+        LightComponent* light = LightComponent_get(i);
         if (!light) continue;
 
         sfVector2f start = get_position(components, i);

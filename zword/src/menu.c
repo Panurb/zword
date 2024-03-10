@@ -38,7 +38,7 @@ void reset_ids() {
 
 
 void get_map_name(GameData* data, ButtonText buffer) {
-    WidgetComponent* widget = WidgetComponent_get(data->components, MAP_NAME_ID);
+    WidgetComponent* widget = WidgetComponent_get(MAP_NAME_ID);
     if (widget) {
         strcpy(buffer, widget->string);
     } else {
@@ -64,7 +64,7 @@ void change_state_create(ComponentData* components, int entity) {
 
 
 void change_state_start(ComponentData* components, int entity) {
-    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(map_name, widget->string);
     game_state = STATE_START;
     reset_ids();
@@ -88,7 +88,7 @@ void change_state_game(ComponentData* components, int entity) {
 
 
 void change_state_load(ComponentData* components, int entity) {
-    WidgetComponent* widget = WidgetComponent_get(components, entity);
+    WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(map_name, widget->string);
     game_state = STATE_LOAD;
     reset_ids();
@@ -105,7 +105,7 @@ void change_state_quit(ComponentData* components, int entity) {
 void apply(ComponentData* components, int entity) {
     UNUSED(entity);
 
-    WidgetComponent* widget = WidgetComponent_get(components, RESOLUTION_ID);
+    WidgetComponent* widget = WidgetComponent_get(RESOLUTION_ID);
     ButtonText text;
     strcpy(text, widget->strings[widget->value]);
     char* width = strtok(text, "x");
@@ -113,10 +113,10 @@ void apply(ComponentData* components, int entity) {
     game_settings.width = strtol(width, NULL, 10);
     game_settings.height = strtol(height, NULL, 10);
 
-    widget = WidgetComponent_get(components, SOUND_ID);
+    widget = WidgetComponent_get(SOUND_ID);
     game_settings.volume = widget->value;
 
-    widget = WidgetComponent_get(components, MUSIC_ID);
+    widget = WidgetComponent_get(MUSIC_ID);
     game_settings.music = widget->value;
 
     save_settings();
@@ -213,7 +213,7 @@ void toggle_settings(ComponentData* components, int entity) {
 
     int label = create_label(components, "Resolution", zeros());
     RESOLUTION_ID = create_dropdown(components, zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
-    WidgetComponent_get(components, RESOLUTION_ID)->value = get_resolution_index();
+    WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
     add_row_to_container(components, container, label, RESOLUTION_ID);
 
     label = create_label(components, "Sound", zeros());
@@ -332,7 +332,7 @@ void create_menu(GameData data) {
 
 void destroy_menu(GameData data) {
     for (int i = 0; i < data.components->entities; i++) {
-        WidgetComponent* widget = WidgetComponent_get(data.components, i);
+        WidgetComponent* widget = WidgetComponent_get(i);
         if (widget) {
             destroy_entity(data.components, i);
         }

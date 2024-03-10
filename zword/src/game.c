@@ -70,12 +70,14 @@ void change_state_win() {
 
 
 void create_game(sfVideoMode mode) {
-    ComponentData* components = ComponentData_create();
+    game_data = malloc(sizeof(GameData));
+    
+    game_data->components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
     float ambient_light = 0.5f;
     int seed = time(NULL);
-    int camera = create_camera(components, mode);
-    int menu_camera = create_menu_camera(components, mode);
+    int camera = create_camera(game_data->components, mode);
+    int menu_camera = create_menu_camera(game_data->components, mode);
 
     sfTexture** textures = load_textures();
     sfSoundBuffer** sounds = load_sounds();
@@ -88,8 +90,6 @@ void create_game(sfVideoMode mode) {
     sfSprite* shadow_sprite = sfSprite_create();
     sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
 
-    game_data = malloc(sizeof(GameData));
-    game_data->components = components;
     game_data->grid = grid;
     game_data->ambient_light = ambient_light;
     game_data->seed = seed;
@@ -111,7 +111,7 @@ void create_game(sfVideoMode mode) {
 
 void resize_game(GameData* data, sfVideoMode mode) {
     for (int i = 0; i < data->components->entities; i++) {
-        CameraComponent* camera = CameraComponent_get(data->components, i);
+        CameraComponent* camera = CameraComponent_get(i);
         if (camera) {
             camera->resolution.x = mode.width;
             camera->resolution.y = mode.height;
@@ -135,7 +135,7 @@ void init_survival(GameData* data) {
 
     spawners = List_create();
     for (int i = 0; i < data->components->entities; i++) {
-        EnemyComponent* enemy = EnemyComponent_get(data->components, i);
+        EnemyComponent* enemy = EnemyComponent_get(i);
         if (enemy && enemy->spawner) {
             List_add(spawners, i);
         }
@@ -152,7 +152,7 @@ void init_tutorial(GameData* data) {
 
 void start_game(GameData* data, Filename map_name) {
     ColliderGrid_clear(data->grid);
-    CameraComponent* cam = CameraComponent_get(data->components, data->camera);
+    CameraComponent* cam = CameraComponent_get(data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear(data->components);
     data->camera = create_camera(data->components, mode);
@@ -180,7 +180,7 @@ void start_game(GameData* data, Filename map_name) {
 
 void end_game(GameData* data) {
     ColliderGrid_clear(data->grid);
-    CameraComponent* cam = CameraComponent_get(data->components, data->camera);
+    CameraComponent* cam = CameraComponent_get(data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear(data->components);
     data->camera = create_camera(data->components, mode);
@@ -208,7 +208,7 @@ int spawn_enemy(ComponentData* components, ColliderGrid* grid, sfVector2f positi
             break;
     }
     int p = components->player.order->head->value;
-    EnemyComponent* enemy = EnemyComponent_get(components, j);
+    EnemyComponent* enemy = EnemyComponent_get(j);
     if (enemy) {
         enemy->target = p;
         enemy->state = ENEMY_CHASE;
@@ -238,7 +238,7 @@ int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, flo
 
     int count = 0;
     for (int i = 0; i < components->entities; i++) {
-        EnemyComponent* enemy = EnemyComponent_get(components, i);
+        EnemyComponent* enemy = EnemyComponent_get(i);
         if (enemy && !enemy->spawner && enemy->state != ENEMY_DEAD) {
             count++;
         }
@@ -276,7 +276,7 @@ void update_survival(GameData data, float time_step) {
     bool players_alive = false;
     ListNode* node;
     FOREACH(node, data.components->player.order) {
-        if (PlayerComponent_get(data.components, node->value)->state != PLAYER_DEAD) {
+        if (PlayerComponent_get(node->value)->state != PLAYER_DEAD) {
             players_alive = true;
             break;
         }
@@ -298,7 +298,7 @@ void update_survival(GameData data, float time_step) {
     } else {
         bool enemies_alive = false;
         for (int i = 0; i < data.components->entities; i++) {
-            EnemyComponent* enemy = EnemyComponent_get(data.components, i);
+            EnemyComponent* enemy = EnemyComponent_get(i);
             if (enemy && !enemy->spawner && enemy->state != ENEMY_DEAD) {
                 enemies_alive = true;
                 break;
@@ -322,7 +322,7 @@ void update_tutorial(GameData data, float time_step) {
 
     ListNode* node;
     FOREACH(node, data.components->player.order) {
-        PlayerComponent* player = PlayerComponent_get(data.components, node->value);
+        PlayerComponent* player = PlayerComponent_get(node->value);
         if (player->state != PLAYER_DEAD) {
             players_alive = true;
             
@@ -376,13 +376,13 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
 
 void update_lifetimes(ComponentData* components, float time_step) {
     for (int i = 0; i < components->entities; i++) {
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         if (!coord) continue;
 
         if (coord->lifetime > 0.0f) {
             coord->lifetime = fmaxf(0.0f, coord->lifetime - time_step);
 
-            ImageComponent* image = ImageComponent_get(components, i);
+            ImageComponent* image = ImageComponent_get(i);
             if (image && coord->lifetime < 1.0f) {
                 image->alpha = coord->lifetime;
             }
@@ -433,7 +433,7 @@ void draw_game(GameData data, sfRenderWindow* window) {
 
 void draw_parents(GameData data, sfRenderWindow* window) {
     for (int i = 0; i < data.components->entities; i++) {
-        CoordinateComponent* coord = CoordinateComponent_get(data.components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         if (coord && coord->parent != -1) {
             sfVector2f start = get_position(data.components, i);
             sfVector2f end = get_position(data.components, coord->parent);
@@ -446,7 +446,7 @@ void draw_parents(GameData data, sfRenderWindow* window) {
 void draw_entities(GameData data, sfRenderWindow* window) {
     char buffer[10];
     for (int i = 0; i < data.components->entities; i++) {
-        CoordinateComponent* coord = CoordinateComponent_get(data.components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         if (!coord) continue;
 
         snprintf(buffer, 10, "%d", i);
@@ -525,12 +525,12 @@ int create_level_end(ComponentData* components, sfVector2f position, float angle
 
 void draw_tutorials(sfRenderWindow* window, GameData data) {
     for (int i = 0; i < data.components->entities; i++) {
-        TextComponent* text = TextComponent_get(data.components, i);
+        TextComponent* text = TextComponent_get(i);
         if (text) {
             draw_text(window, data.components, data.camera, NULL, get_position(data.components, i), "?", 50, sfMagenta);
         }
 
-        ColliderComponent* collider = ColliderComponent_get(data.components, i);
+        ColliderComponent* collider = ColliderComponent_get(i);
         if (collider && collider->trigger_type == TRIGGER_WIN) {
             sfVector2f pos = get_position(data.components, i);
             sfColor color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
