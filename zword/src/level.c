@@ -42,7 +42,7 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
                 }
                 ListNode* node;
                 FOREACH(node, components->added_entities) {
-                    if (collides_with(components, grid, node->value, NULL)) {
+                    if (collides_with(node->value, NULL)) {
                         destroy_entity(node->value);
                     }
                 }

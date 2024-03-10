@@ -252,7 +252,7 @@ int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, flo
         float y = randf(-1.0f, 1.0f);
 
         sfVector2f pos = get_position(spawner);
-        pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
+        pos = sum(pos, lin_comb(x, half_width(spawner), y, half_height(spawner)));
 
         if (on_screen(camera, pos, 2.0f, 2.0f)) {
             return 0;
@@ -456,7 +456,7 @@ void draw_entities(GameData data, sfRenderWindow* window) {
 
 
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
-    draw_colliders(data.components, window, data.camera);
+    draw_colliders(data.camera);
     draw_waypoints(data.components, window, data.camera, true);
     draw_enemies(data.components, window, data.camera);
     draw_parents(data, window);
@@ -464,7 +464,7 @@ void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
         draw_entities(data, window);
     }
     if (debug_level > 2) {
-        draw_occupied_tiles(data.components, data.grid, window, data.camera);
+        draw_occupied_tiles(data.camera);
     }
 }
 

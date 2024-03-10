@@ -27,7 +27,7 @@ Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVecto
         // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
 
         sfVector2f corners[4];
-        get_corners(components, i, corners);
+        get_corners(i, corners);
 
         int n = 0;
         for (int k = 0; k < 4; k++) {

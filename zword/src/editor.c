@@ -478,11 +478,11 @@ void update_selections(GameData data) {
         ImageComponent* image = ImageComponent_get(i);
         sfVector2f overlap = zeros();
         if (collider) {
-            overlap = overlap_collider_collider(data.components, selection_box, i);
+            overlap = overlap_collider_collider(selection_box, i);
         } else if (image) {
-            overlap = overlap_rectangle_image(data.components, selection_box, i);
+            overlap = overlap_rectangle_image(selection_box, i);
         } else {
-            if (point_inside_collider(data.components, selection_box, get_position(i))) {
+            if (point_inside_collider(selection_box, get_position(i))) {
                 overlap = ones();
             }
         }
@@ -587,7 +587,7 @@ void input_tool_select(GameData* data, sfEvent event) {
                 ListNode* node;
                 FOREACH (node, selections) {
                     if (ColliderComponent_get(node->value)) {
-                        if (point_inside_collider(components, node->value, mouse_world)) {
+                        if (point_inside_collider(node->value, mouse_world)) {
                             grabbed = true;
                             break;
                         }

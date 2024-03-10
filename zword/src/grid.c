@@ -55,8 +55,8 @@ Bounds get_bounds(int i) {
     float x = (pos.x + 0.5 * game_data->grid->width) / game_data->grid->tile_width;
     float y = (pos.y + 0.5 * game_data->grid->height) / game_data->grid->tile_height;
 
-    float w = axis_half_width(game_data->components, i, (sfVector2f) { 1.0, 0.0 }) / game_data->grid->tile_width;
-    float h = axis_half_width(game_data->components, i, (sfVector2f) { 0.0, 1.0 }) / game_data->grid->tile_height;
+    float w = axis_half_width(i, (sfVector2f) { 1.0, 0.0 }) / game_data->grid->tile_width;
+    float h = axis_half_width(i, (sfVector2f) { 0.0, 1.0 }) / game_data->grid->tile_height;
 
     Bounds bounds;
     bounds.left = max(0, floorf(x - w));

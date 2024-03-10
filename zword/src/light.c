@@ -106,7 +106,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                 break;
             } case COLLIDER_RECTANGLE: {
                 sfVector2f corners[8];
-                get_corners(components, i, corners);
+                get_corners(i, corners);
 
                 float r = fminf(0.5f * radius, 1.0f);
                 float angle = get_angle(i);
