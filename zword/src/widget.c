@@ -31,9 +31,9 @@ void bring_to_top(ComponentData* components, int entity) {
 
 int create_window(ComponentData* components, sfVector2f position, ButtonText text, int width, OnClick on_close) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, width * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    WidgetComponent_add(components, i, text, WIDGET_WINDOW);
+    WidgetComponent_add(i, text, WIDGET_WINDOW);
 
     int j = create_button_small(components, "X", vec(0.5 * (width * BUTTON_WIDTH - BUTTON_HEIGHT), 0.0f), on_close);
     add_child(components, i, j);
@@ -44,9 +44,9 @@ int create_window(ComponentData* components, sfVector2f position, ButtonText tex
 
 int create_label(ComponentData* components, ButtonText text, sfVector2f position) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    WidgetComponent_add(components, i, text, WIDGET_LABEL);
+    WidgetComponent_add(i, text, WIDGET_LABEL);
 
     return i;
 }
@@ -54,9 +54,9 @@ int create_label(ComponentData* components, ButtonText text, sfVector2f position
 
 int create_button(ComponentData* components, ButtonText text, sfVector2f position, OnClick on_click) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    WidgetComponent_add(components, i, text, WIDGET_BUTTON)->on_click = on_click;
+    WidgetComponent_add(i, text, WIDGET_BUTTON)->on_click = on_click;
 
     return i;
 }
@@ -64,10 +64,10 @@ int create_button(ComponentData* components, ButtonText text, sfVector2f positio
 
 int create_button_small(ComponentData* components, ButtonText text, sfVector2f position, OnClick on_click) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, sum(position, vec(0.0f, 0.25f * BORDER_WIDTH)), 0.0f);
+    CoordinateComponent_add(i, sum(position, vec(0.0f, 0.25f * BORDER_WIDTH)), 0.0f);
     float height = BUTTON_HEIGHT - 0.5f * BORDER_WIDTH;
     ColliderComponent_add_rectangle(components, i, BUTTON_HEIGHT, height, GROUP_WALLS)->enabled = false;
-    WidgetComponent_add(components, i, text, WIDGET_BUTTON)->on_click = on_click;
+    WidgetComponent_add(i, text, WIDGET_BUTTON)->on_click = on_click;
 
     return i;
 }
@@ -75,9 +75,9 @@ int create_button_small(ComponentData* components, ButtonText text, sfVector2f p
 
 int create_container(ComponentData* components, sfVector2f position, int width, int height) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, width * BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_CONTAINER);
+    WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_CONTAINER);
     widget->type = WIDGET_CONTAINER;
 
     return i;
@@ -318,9 +318,9 @@ void set_slider(ComponentData* components, int entity, sfVector2f mouse_position
 int create_slider(ComponentData* components, sfVector2f position, int min_value, int max_value, int value, 
         OnChange on_change) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
-    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_SLIDER);
+    WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_SLIDER);
     widget->min_value = min_value;
     widget->max_value = max_value;
     widget->value = value;
@@ -346,11 +346,11 @@ void set_scrollbar(ComponentData* components, int entity, sfVector2f mouse_posit
 
 int create_scrollbar(ComponentData* components, sfVector2f position, int height, int max_value, OnChange on_change) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, SCROLLBAR_WIDTH, 
         BUTTON_HEIGHT * height, GROUP_WALLS);
     collider->enabled = false;
-    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_SCROLLBAR);
+    WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_SCROLLBAR);
     widget->max_value = max_value;
     widget->on_change = on_change;
 
@@ -360,11 +360,11 @@ int create_scrollbar(ComponentData* components, sfVector2f position, int height,
 
 int create_textbox(ComponentData* components, sfVector2f position, int width) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, position, 0.0f);
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH * width, 
         BUTTON_HEIGHT, GROUP_WALLS);
     collider->enabled = false;
-    WidgetComponent* widget = WidgetComponent_add(components, i, "", WIDGET_TEXTBOX);
+    WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_TEXTBOX);
     widget->max_value = width * 18;
 
     return i;

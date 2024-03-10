@@ -29,22 +29,22 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
     int joystick = -1;
     int i = create_entity(components);
 
-    CoordinateComponent_add(components, i, pos, angle);
-    ImageComponent_add(components, i, "player", 1.0, 1.0, LAYER_PLAYERS);
-    PhysicsComponent* phys = PhysicsComponent_add(components, i, 1.0f);
+    CoordinateComponent_add(i, pos, angle);
+    ImageComponent_add(i, "player", 1.0, 1.0, LAYER_PLAYERS);
+    PhysicsComponent* phys = PhysicsComponent_add(i, 1.0f);
     phys->bounce = 0.0f;
     phys->max_speed = 5.0;
     ColliderComponent_add_circle(components, i, 0.5, GROUP_PLAYERS);
-    PlayerComponent* player = PlayerComponent_add(components, i, joystick);
+    PlayerComponent* player = PlayerComponent_add(i, joystick);
     ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
-    WaypointComponent_add(components, i);
-    HealthComponent_add(components, i, 100, "player_dead", "blood", "");
-    SoundComponent_add(components, i, "squish");
+    WaypointComponent_add(i);
+    HealthComponent_add(i, 100, "player_dead", "blood", "");
+    SoundComponent_add(i, "squish");
 
     int j = create_entity(components);
-    CoordinateComponent_add(components, j, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
-    ImageComponent_add(components, j, "", 0.0f, 0.0f, LAYER_WEAPONS);
-    AnimationComponent* animation = AnimationComponent_add(components, j, 1);
+    CoordinateComponent_add(j, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
+    ImageComponent_add(j, "", 0.0f, 0.0f, LAYER_WEAPONS);
+    AnimationComponent* animation = AnimationComponent_add(j, 1);
     animation->play_once = true;
     animation->framerate = 0.0f;
     player->arms = j;
@@ -320,7 +320,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     col->group = GROUP_ITEMS;
                     if (phys->speed == 0.0) {
                         clear_grid(components, grid, i);
-                        // ColliderComponent_remove(components, i);
+                        // ColliderComponent_remove(i);
                     }
                 }
 

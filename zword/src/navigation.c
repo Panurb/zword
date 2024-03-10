@@ -17,8 +17,8 @@
 
 int create_waypoint(ComponentData* components, sfVector2f pos) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, 0.0);
-    WaypointComponent_add(components, i);
+    CoordinateComponent_add(i, pos, 0.0);
+    WaypointComponent_add(i);
     ColliderComponent_add_circle(components, i, 0.25f, GROUP_ALL)->enabled = false;
 
     return i;

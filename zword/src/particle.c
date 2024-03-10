@@ -15,47 +15,47 @@ sfColor color_lerp(sfColor s, sfColor e, float t) {
 
 
 void ParticleComponent_add_bullet(ComponentData* components, int entity, float size) {
-    ParticleComponent_add(components, entity, 0.0f, 0.0f, size, size, 200.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite)->speed_spread = 0.0f;
+    ParticleComponent_add(entity, 0.0f, 0.0f, size, size, 200.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite)->speed_spread = 0.0f;
 }
 
 
 void ParticleComponent_add_blood(ComponentData* components, int entity) {
     sfColor color = get_color(0.78, 0.0, 0.0, 1.0);
     sfColor inner_color = color_lerp(color, sfWhite, 0.25f);
-    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.3f, 0.0, 3.0, 10.0, color, inner_color);
+    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.3f, 0.0, 3.0, 10.0, color, inner_color);
 }
 
 
 void ParticleComponent_add_sparks(ComponentData* components, int entity) {
-    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.15, 0.0, 5.0, 5.0, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite);
+    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.15, 0.0, 5.0, 5.0, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite);
 }
 
 
 void ParticleComponent_add_dirt(ComponentData* components, int entity) {
     sfColor color = get_color(0.4, 0.25, 0.13, 0.5f);
     sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
-    ParticleComponent_add(components, entity, 0.0, 2 * M_PI, 0.25, 0.0, 2.5, 10.0, color, inner_color);
+    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.25, 0.0, 2.5, 10.0, color, inner_color);
 }
 
 
 void ParticleComponent_add_rock(ComponentData* components, int entity) {
     sfColor color = get_color(0.4f, 0.4f, 0.4f, 1.0f);
     sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
-    ParticleComponent_add(components, entity, 0.0f, 2.0f * M_PI, 0.3f, 0.0f, 1.5f, 5.0f, color, inner_color);
+    ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.3f, 0.0f, 1.5f, 5.0f, color, inner_color);
 }
 
 
 void ParticleComponent_add_splinter(ComponentData* components, int entity) {
     sfColor color = get_color(0.5f, 0.4f, 0.3f, 1.0f);
     sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
-    ParticleComponent_add(components, entity, 0.0f, 2.0f * M_PI, 0.15f, 0.0f, 5.0f, 10.0f, color, inner_color);
+    ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.15f, 0.0f, 5.0f, 10.0f, color, inner_color);
 }
 
 
 void ParticleComponent_add_fire(ComponentData* components, int entity, float size) {
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     float angle = 0.5f * M_PI - get_angle(components, entity);
-    ParticleComponent* particle = ParticleComponent_add(components, entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, sfYellow);
+    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, sfYellow);
     particle->loop = true;
     particle->enabled = true;
 }
@@ -63,7 +63,7 @@ void ParticleComponent_add_fire(ComponentData* components, int entity, float siz
 
 void ParticleComponent_add_energy(ComponentData* components, int entity) {
     sfColor green = get_color(0.5f, 1.0f, 0.0f, 1.0f);
-    ParticleComponent_add(components, entity, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, green, green);
+    ParticleComponent_add(entity, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, green, green);
 }
 
 

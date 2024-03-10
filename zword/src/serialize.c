@@ -159,7 +159,7 @@ void CoordinateComponent_deserialize(cJSON* entity_json, ComponentData* componen
     pos.x = cJSON_GetObjectItem(coord_json, "x")->valuedouble + offset.x;
     pos.y = cJSON_GetObjectItem(coord_json, "y")->valuedouble + offset.y;
     float angle = deserialize_float(coord_json, "angle", 0.0f) + rotation;
-    CoordinateComponent* coord = CoordinateComponent_add(components, entity, pos, angle);
+    CoordinateComponent* coord = CoordinateComponent_add(entity, pos, angle);
     deserialize_id(coord_json, "parent", &coord->parent);
 }
 
@@ -188,7 +188,7 @@ void ImageComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     float width = cJSON_GetObjectItem(json, "width")->valuedouble;
     float height = cJSON_GetObjectItem(json, "height")->valuedouble;
     float layer = cJSON_GetObjectItem(json, "layer")->valueint;
-    ImageComponent* image = ImageComponent_add(components, entity, filename, width, height, layer);
+    ImageComponent* image = ImageComponent_add(entity, filename, width, height, layer);
     image->scale.x = deserialize_float(json, "scale_x", image->scale.x);
     image->scale.y = deserialize_float(json, "scale_y", image->scale.y);
     image->alpha = deserialize_float(json, "alpha", 1.0f);
@@ -218,7 +218,7 @@ void PhysicsComponent_deserialize(cJSON* entity_json, ComponentData* components,
     if (!json) return;
 
     float mass = cJSON_GetObjectItem(json, "mass")->valuedouble;
-    PhysicsComponent* physics = PhysicsComponent_add(components, entity, mass);
+    PhysicsComponent* physics = PhysicsComponent_add(entity, mass);
     physics->velocity.x = deserialize_float(json, "vx", physics->velocity.x);
     physics->velocity.y = deserialize_float(json, "vy", physics->velocity.y);
     physics->acceleration.x = deserialize_float(json, "ax", physics->acceleration.x);
@@ -294,7 +294,7 @@ void LightComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     color.b = cJSON_GetObjectItem(json, "color_b")->valuedouble;
     float brightness = cJSON_GetObjectItem(json, "brightness")->valuedouble;
     float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
-    LightComponent* light = LightComponent_add(components, entity, range, angle, color, brightness, speed);
+    LightComponent* light = LightComponent_add(entity, range, angle, color, brightness, speed);
     light->enabled = deserialize_int(json, "enabled", light->enabled);
     light->flicker = deserialize_float(json, "flicker", light->flicker);
 }
@@ -347,7 +347,7 @@ void ParticleComponent_deserialize(cJSON* entity_json, ComponentData* components
         inner_color.r = cJSON_GetObjectItem(json, "inner_r")->valueint;
         inner_color.g = cJSON_GetObjectItem(json, "inner_g")->valueint;
         inner_color.b = cJSON_GetObjectItem(json, "inner_b")->valueint;
-        ParticleComponent* particle = ParticleComponent_add(components, entity, angle, spread, start_size, end_size, speed, 
+        ParticleComponent* particle = ParticleComponent_add(entity, angle, spread, start_size, end_size, speed, 
             rate, outer_color, inner_color);
         particle->loop = deserialize_int(json, "loop", particle->loop);
         if (particle->loop) {
@@ -382,7 +382,7 @@ void JointComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     float max_length = cJSON_GetObjectItem(json, "max_length")->valuedouble;
     // FIXME: strength INFINITY -> null
     float strength = cJSON_GetObjectItem(json, "strength")->valuedouble;
-    JointComponent* joint = JointComponent_add(components, entity, -1, min_length, max_length, strength);
+    JointComponent* joint = JointComponent_add(entity, -1, min_length, max_length, strength);
     deserialize_id(json, "parent", &joint->parent);
     joint->max_angle = deserialize_float(json, "max_angle", joint->max_angle);
 }
@@ -401,7 +401,7 @@ void WaypointComponent_deserialize(cJSON* entity_json, ComponentData* components
     cJSON* json = cJSON_GetObjectItem(entity_json, "Waypoint");
     if (!json) return;
 
-    WaypointComponent_add(components, entity);
+    WaypointComponent_add(entity);
 }
 
 void PlayerComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
@@ -423,7 +423,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, 
     cJSON* json = cJSON_GetObjectItem(entity_json, "Player");
     if (!json) return;
 
-    PlayerComponent* player = PlayerComponent_add(components, entity, -1);
+    PlayerComponent* player = PlayerComponent_add(entity, -1);
     player->vehicle = deserialize_int(json, "vehicle", player->vehicle);
     player->item = deserialize_int(json, "item", player->item);
     deserialize_id_array(json, "inventory", player->inventory);
@@ -457,7 +457,7 @@ void EnemyComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     cJSON* json = cJSON_GetObjectItem(entity_json, "Enemy");
     if (!json) return;
 
-    EnemyComponent* enemy = EnemyComponent_add(components, entity);
+    EnemyComponent* enemy = EnemyComponent_add(entity);
     enemy->state = deserialize_int(json, "state", enemy->state);
     deserialize_id(json, "target", &enemy->target);
     enemy->fov = deserialize_float(json, "fov", enemy->fov);
@@ -492,7 +492,7 @@ void HealthComponent_deserialize(cJSON* entity_json, ComponentData* components, 
     char* dead_image = cJSON_GetObjectItem(json, "dead_image")->valuestring;
     char* decal = cJSON_GetObjectItem(json, "decal")->valuestring;
     char* die_sound = cJSON_GetObjectItem(json, "die_sound")->valuestring;
-    HealthComponent_add(components, entity, hp, dead_image, decal, die_sound);
+    HealthComponent_add(entity, hp, dead_image, decal, die_sound);
 }
 
 
@@ -525,7 +525,7 @@ void SoundComponent_deserialize(cJSON* entity_json, ComponentData* components, i
     if (loop_sound_json) {
         strcpy(loop_sound, loop_sound_json->valuestring);
     }
-    SoundComponent* sound = SoundComponent_add(components, entity, hit_sound);
+    SoundComponent* sound = SoundComponent_add(entity, hit_sound);
     strcpy(sound->loop_sound, loop_sound);
 }
 
@@ -569,7 +569,7 @@ void WeaponComponent_deserialize(cJSON* entity_json, ComponentData* components, 
     int ammo_type = cJSON_GetObjectItem(json, "ammo_type")->valueint;
     char* sound = cJSON_GetObjectItem(json, "sound")->valuestring;
     bool automatic = cJSON_GetObjectItem(json, "automatic")->valueint;
-    WeaponComponent* weapon = WeaponComponent_add(components, entity, fire_rate, damage, shots, spread, max_magazine, 
+    WeaponComponent* weapon = WeaponComponent_add(entity, fire_rate, damage, shots, spread, max_magazine, 
         recoil, range, reload_time, ammo_type, sound);
     weapon->magazine = magazine;
     weapon->automatic = automatic;
@@ -605,7 +605,7 @@ void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     if (name_json) {
         name = name_json->valuestring;
     }
-    ItemComponent* item = ItemComponent_add(components, entity, size, price, name);
+    ItemComponent* item = ItemComponent_add(entity, size, price, name);
     deserialize_id_array(json, "attachments", item->attachments);
     item->type = deserialize_int(json, "type", item->type);
     item->value = deserialize_int(json, "value", item->value);
@@ -632,7 +632,7 @@ void AnimationComponent_deserialize(cJSON* entity_json, ComponentData* component
     if (!json) return;
 
     int frames = cJSON_GetObjectItem(json, "frames")->valueint;
-    AnimationComponent* animation = AnimationComponent_add(components, entity, frames);
+    AnimationComponent* animation = AnimationComponent_add(entity, frames);
     animation->current_frame = deserialize_int(json, "current_frame", animation->current_frame);
     animation->framerate = deserialize_float(json, "framerate", animation->framerate);
     animation->timer = deserialize_float(json, "timer", animation->timer);
@@ -656,7 +656,7 @@ void AmmoComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     if (!json) return;
 
     AmmoType type = cJSON_GetObjectItem(json, "type")->valueint;
-    AmmoComponent* ammo = AmmoComponent_add(components, entity, type);
+    AmmoComponent* ammo = AmmoComponent_add(entity, type);
     ammo->size = cJSON_GetObjectItem(json, "size")->valueint;
 }
 
@@ -677,7 +677,7 @@ void DoorComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     if (!json) return;
 
     int price = cJSON_GetObjectItem(json, "price")->valueint;
-    DoorComponent* door = DoorComponent_add(components, entity, price);
+    DoorComponent* door = DoorComponent_add(entity, price);
     door->locked = deserialize_int(json, "locked", door->locked);
 }
 
@@ -706,7 +706,7 @@ void TextComponent_deserialize(cJSON* entity_json, ComponentData* components, in
     color.r = deserialize_int(json, "color_r", 255);
     color.g = deserialize_int(json, "color_g", 255);
     color.b = deserialize_int(json, "color_b", 255);
-    TextComponent_add(components, entity, source_string, size, color);
+    TextComponent_add(entity, source_string, size, color);
 }
 
 

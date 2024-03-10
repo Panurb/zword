@@ -71,7 +71,7 @@ void change_state_win() {
 
 void create_game(sfVideoMode mode) {
     game_data = malloc(sizeof(GameData));
-    
+
     game_data->components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
     float ambient_light = 0.5f;
@@ -505,9 +505,9 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
 
 int create_tutorial(ComponentData* components, sfVector2f position) {
     int entity = create_entity(components);
-    CoordinateComponent_add(components, entity, position, 0.0f);
+    CoordinateComponent_add(entity, position, 0.0f);
     ColliderComponent_add_circle(components, entity, 1.0f, GROUP_CORPSES);
-    TextComponent_add(components, entity, "", 30, sfWhite);
+    TextComponent_add(entity, "", 30, sfWhite);
 
     return entity;
 }
@@ -515,7 +515,7 @@ int create_tutorial(ComponentData* components, sfVector2f position) {
 
 int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height) {
     int entity = create_entity(components);
-    CoordinateComponent_add(components, entity, position, angle);
+    CoordinateComponent_add(entity, position, angle);
     ColliderComponent* collider = ColliderComponent_add_rectangle(components, entity, width, height, GROUP_WALLS);
     collider->trigger_type = TRIGGER_WIN;
 

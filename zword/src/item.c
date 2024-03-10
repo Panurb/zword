@@ -13,12 +13,12 @@ int create_flashlight(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     float angle = rand_angle();
-    CoordinateComponent_add(components, i, position, angle);
+    CoordinateComponent_add(i, position, angle);
     ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
-    PhysicsComponent_add(components, i, 0.5f);
-    ImageComponent_add(components, i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
-    ItemComponent_add(components, i, 0, 100, "Flashlight");
-    LightComponent_add(components, i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
+    PhysicsComponent_add(i, 0.5f);
+    ImageComponent_add(i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
+    ItemComponent_add(i, 0, 100, "Flashlight");
+    LightComponent_add(i, 15.0f, 1.0, get_color(1.0, 1.0, 0.8, 1.0), 0.75, 10.0)->enabled = false;
 
     return i;
 }
@@ -28,11 +28,11 @@ int create_gas(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     float angle = rand_angle();
-    CoordinateComponent_add(components, i, position, angle);
+    CoordinateComponent_add(i, position, angle);
     ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
-    PhysicsComponent_add(components, i, 0.5f);
-    ImageComponent_add(components, i, "gas", 1.0, 1.0, LAYER_ITEMS);
-    ItemComponent_add(components, i, 0, 0, "");
+    PhysicsComponent_add(i, 0.5f);
+    ImageComponent_add(i, "gas", 1.0, 1.0, LAYER_ITEMS);
+    ItemComponent_add(i, 0, 0, "");
 
     return i;
 }
@@ -42,11 +42,11 @@ int create_bandage(ComponentData* components, sfVector2f position) {
     int i = create_entity(components);
 
     float angle = rand_angle();
-    CoordinateComponent_add(components, i, position, angle);
+    CoordinateComponent_add(i, position, angle);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
-    PhysicsComponent_add(components, i, 0.5f);
-    ImageComponent_add(components, i, "bandage", 1.0, 1.0, LAYER_ITEMS);
-    ItemComponent* item = ItemComponent_add(components, i, 0, 0, "");
+    PhysicsComponent_add(i, 0.5f);
+    ImageComponent_add(i, "bandage", 1.0, 1.0, LAYER_ITEMS);
+    ItemComponent* item = ItemComponent_add(i, 0, 0, "");
     item->use_time = 2.0f;
     item->value = 100;
 

@@ -11,31 +11,31 @@
 
 int create_car(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, angle);
+    CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
-    PhysicsComponent_add(components, i, 10.0f);
+    PhysicsComponent_add(i, 10.0f);
 
     int j = create_entity(components);
-    CoordinateComponent_add(components, j, sum(pos, polar_to_cartesian(-3.0f, angle)), 0.0f);
+    CoordinateComponent_add(j, sum(pos, polar_to_cartesian(-3.0f, angle)), 0.0f);
     ColliderComponent_add_rectangle(components, j, 3.0f, 3.0f, GROUP_VEHICLES);
-    PhysicsComponent_add(components, j, 10.0f);
-    SoundComponent_add(components, j, "metal_hit");
-    VehicleComponent_add(components, j, 100.0f);
-    JointComponent_add(components, j, i, 3.0f, 3.0f, 1.0f);
+    PhysicsComponent_add(j, 10.0f);
+    SoundComponent_add(j, "metal_hit");
+    VehicleComponent_add(j, 100.0f);
+    JointComponent_add(j, i, 3.0f, 3.0f, 1.0f);
 
     int k = create_entity(components);
-    CoordinateComponent_add(components, k, (sfVector2f) {1.5f, 0.0f }, 0.0f);
-    ImageComponent_add(components, k, "car", 6.0f, 3.0f, LAYER_VEHICLES);
+    CoordinateComponent_add(k, (sfVector2f) {1.5f, 0.0f }, 0.0f);
+    ImageComponent_add(k, "car", 6.0f, 3.0f, LAYER_VEHICLES);
     add_child(components, j, k);
 
     k = create_entity(components);
-    CoordinateComponent_add(components, k, (sfVector2f) { 3.8f, 1.0f }, 0.0f);
-    LightComponent_add(components, k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    CoordinateComponent_add(k, (sfVector2f) { 3.8f, 1.0f }, 0.0f);
+    LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(components, j, k);
 
     k = create_entity(components);
-    CoordinateComponent_add(components, k, (sfVector2f) { 3.8f, -1.0f }, 0.0f);
-    LightComponent_add(components, k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    CoordinateComponent_add(k, (sfVector2f) { 3.8f, -1.0f }, 0.0f);
+    LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(components, j, k);
 
     k = create_waypoint(components, (sfVector2f) { 5.0f, 2.5f });

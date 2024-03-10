@@ -36,8 +36,8 @@ void create_church(ComponentData* components, sfVector2f pos) {
     create_candle(components, sum(pos, sum(mult(12.5f, w), mult(-3.0f, h))));
     create_candle(components, sum(pos, sum(mult(12.5f, w), mult(3.0f, h))));
     int k = create_entity(components);
-    CoordinateComponent_add(components, k, sum(pos, mult(12.5f, w)), rand_angle());
-    ImageComponent_add(components, k, "blood_large", 2.0f, 2.0f, LAYER_ITEMS);
+    CoordinateComponent_add(k, sum(pos, mult(12.5f, w)), rand_angle());
+    ImageComponent_add(k, "blood_large", 2.0f, 2.0f, LAYER_ITEMS);
 
     for (int j = 0; j < 2; j++) {
         for (int i = 0; i < 7; i++) {

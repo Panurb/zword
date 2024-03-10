@@ -31,10 +31,10 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
         sfVector2f grad = rand_vector();
         sfVector2f pos = diff(position, mult(curviness, grad));
 
-        CoordinateComponent_add(components, current, pos, 0.0);
-        RoadComponent* road = RoadComponent_add(components, current, width, filename);
+        CoordinateComponent_add(current, pos, 0.0);
+        RoadComponent* road = RoadComponent_add(current, width, filename);
         road->next = next;
-        ImageComponent_add(components, current, "", 1.0, 1.0, LAYER_ROADS);
+        ImageComponent_add(current, "", 1.0, 1.0, LAYER_ROADS);
 
         if (next != -1) {
             RoadComponent* next_road = RoadComponent_get(next);
@@ -82,24 +82,24 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
         sfVector2f r = sum(pos, mult((0.5 * length + margin_1) / d, diff(next_pos, pos)));
 
         float angle = polar_angle(diff(next_pos, pos));
-        CoordinateComponent_add(components, i, r, angle);
+        CoordinateComponent_add(i, r, angle);
         Filename filename;
         snprintf(filename, 20, "%s%s", road->filename, "_tile");
-        ImageComponent_add(components, i, filename, length + 0.25, road->width, LAYER_ROADS);
+        ImageComponent_add(i, filename, length + 0.25, road->width, LAYER_ROADS);
         ColliderComponent_add_rectangle(components, i, d, road->width, group);
 
         snprintf(filename, 20, "%s%s", road->filename, "_end");
 
         if (road->prev == -1) {
             i = create_entity(components);
-            CoordinateComponent_add(components, i, pos, angle);
-            ImageComponent_add(components, i, filename, road->width, road->width, LAYER_ROADS);
+            CoordinateComponent_add(i, pos, angle);
+            ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
         }
 
         if (next_road->next == -1) {
             i = create_entity(components);
-            CoordinateComponent_add(components, i, next_pos, angle + M_PI);
-            ImageComponent_add(components, i, filename, road->width, road->width, LAYER_ROADS);
+            CoordinateComponent_add(i, next_pos, angle + M_PI);
+            ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
         }
 
         current = RoadComponent_get(current)->next;

@@ -17,9 +17,9 @@
 
 int create_camera(ComponentData* components, sfVideoMode mode) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, zeros(), 0.0);
-    CameraComponent_add(components, i, (sfVector2i) { mode.width, mode.height }, 40.0f);
-    // ParticleComponent* part = ParticleComponent_add(components, i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, sfWhite, sfWhite);
+    CoordinateComponent_add(i, zeros(), 0.0);
+    CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 40.0f);
+    // ParticleComponent* part = ParticleComponent_add(i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, sfWhite, sfWhite);
     // part->enabled = true;
     // part->loop = true;
     return i;
@@ -28,8 +28,8 @@ int create_camera(ComponentData* components, sfVideoMode mode) {
 
 int create_menu_camera(ComponentData* components, sfVideoMode mode) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, zeros(), 0.0);
-    CameraComponent_add(components, i, (sfVector2i) { mode.width, mode.height }, 25.0f);
+    CoordinateComponent_add(i, zeros(), 0.0);
+    CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 25.0f);
     return i;
 }
 

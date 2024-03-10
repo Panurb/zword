@@ -52,18 +52,18 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         }
 
         player->state = PLAYER_DEAD;
-        WaypointComponent_remove(components, entity);
+        WaypointComponent_remove(entity);
     } else {
         if (enemy) {
             coord->lifetime = 30.0f;
 
             enemy->state = ENEMY_DEAD;
             List_clear(enemy->path);
-            LightComponent_remove(components, entity);
+            LightComponent_remove(entity);
             destroy_entity(components, enemy->weapon);
             List_remove(coord->children, enemy->weapon);
             enemy->weapon = -1;
-            WaypointComponent_remove(components, entity);
+            WaypointComponent_remove(entity);
 
             float probs[5] = { 0.1f, 0.15f, 0.15f, 0.1f, 0.5f };
             int j = -1;
@@ -108,7 +108,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
 
         if (!enemy) {
             clear_grid(components, grid, entity);
-            ColliderComponent_remove(components, entity);
+            ColliderComponent_remove(entity);
         }
     }
 

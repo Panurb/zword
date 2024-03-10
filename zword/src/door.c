@@ -11,18 +11,18 @@
 
 int create_door(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity(components);
-    CoordinateComponent_add(components, i, pos, angle + M_PI);
-    ImageComponent_add(components, i, "door", 2.0f, 1.0f, LAYER_ITEMS);
+    CoordinateComponent_add(i, pos, angle + M_PI);
+    ImageComponent_add(i, "door", 2.0f, 1.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
     ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
-    SoundComponent_add(components, i, "wood_hit");
-    DoorComponent_add(components, i, 500);
-    PhysicsComponent_add(components, i, 1.0f);
+    SoundComponent_add(i, "wood_hit");
+    DoorComponent_add(i, 500);
+    PhysicsComponent_add(i, 1.0f);
 
     int j = create_entity(components);
-    CoordinateComponent_add(components, j, sum(pos, polar_to_cartesian(1.0f, angle + M_PI)), angle + M_PI);
-    ImageComponent_add(components, j, "hinge", 0.0f, 0.0f, LAYER_ITEMS);
-    JointComponent_add(components, i, j, 1.0f, 1.0f, 1.0f)->max_angle = 0.5f * M_PI;
+    CoordinateComponent_add(j, sum(pos, polar_to_cartesian(1.0f, angle + M_PI)), angle + M_PI);
+    ImageComponent_add(j, "hinge", 0.0f, 0.0f, LAYER_ITEMS);
+    JointComponent_add(i, j, 1.0f, 1.0f, 1.0f)->max_angle = 0.5f * M_PI;
 
     return i;
 }
