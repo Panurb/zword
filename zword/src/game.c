@@ -29,6 +29,8 @@
 
 
 GameState game_state = STATE_MENU;
+GameData* game_data;
+sfRenderWindow* game_window;
 
 ButtonText GAME_MODES[] = {
     "SURVIVAL",
@@ -36,7 +38,6 @@ ButtonText GAME_MODES[] = {
     "TUTORIAL"
 };
 
-GameData* game_data;
 
 static float game_over_timer = 0.0f;
 static bool level_won = false;

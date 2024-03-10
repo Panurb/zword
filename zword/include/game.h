@@ -22,9 +22,6 @@ typedef enum {
 } GameState;
 
 
-extern GameState game_state;
-
-
 typedef enum {
     MODE_SURVIVAL,
     MODE_CAMPAIGN,
@@ -54,7 +51,11 @@ typedef struct {
 } GameData;
 
 
+// Globals
+extern GameState game_state;
 extern GameData* game_data;
+extern sfRenderWindow* game_window;
+
 
 void change_state_win();
 
@@ -68,7 +69,7 @@ void end_game(GameData* data);
 
 void reset_game(GameData data);
 
-void update_game(GameData data, float time_step);
+void update_game(float time_step);
 
 void update_game_mode(GameData data, float time_step);
 
