@@ -47,7 +47,7 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, i
     if (image->shine > 0.0) {
         float vn = dot(velocity, info.normal);
         if (vn < -0.98) {
-            sfCircleShape_setPosition(light->shine, world_to_screen(components, camera, sum(info.position, mult(0.05, info.normal))));
+            sfCircleShape_setPosition(light->shine, world_to_screen(camera, sum(info.position, mult(0.05, info.normal))));
 
             sfColor color = sfWhite;
             color.a = (1 - 50 * (1 + vn)) * 128;
@@ -83,7 +83,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
         switch (collider->type) {
             case COLLIDER_CIRCLE: {
                 sfVertex* v = sfVertexArray_getVertex(collider->verts, 0);
-                v->position = world_to_texture(components, camera, start);
+                v->position = world_to_texture(camera, start);
                 sfColor color = sfBlack;
                 color.a = 128;
                 v->color = color;
@@ -98,7 +98,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                     sfVector2f end = sum(start, velocity);
 
                     v = sfVertexArray_getVertex(collider->verts, j);
-                    v->position = world_to_texture(components, camera, end);
+                    v->position = world_to_texture(camera, end);
                     v->color = color;
 
                     velocity = matrix_mult(rot, velocity);
@@ -131,7 +131,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                                   3, 2, 1, 0 };
                 for (int j = 0; j < collider->verts_size; j++) {
                     sfVertex* v = sfVertexArray_getVertex(collider->verts, j);
-                    v->position = world_to_texture(components, camera, corners[quads[j]]);
+                    v->position = world_to_texture(camera, corners[quads[j]]);
                     color.a = j % 4 < 2 || j > 15 ? 64 : 0;
                     v->color = color;
                 }
@@ -170,7 +170,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
         }
 
         sfVertex* v = sfVertexArray_getVertex(light->verts, 0);
-        v->position = world_to_texture(components, camera, start);
+        v->position = world_to_texture(camera, start);
         sfColor color = light->color;
         color.a = 255 * brightness;
         v->color = color;
@@ -188,7 +188,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
             end = sum(end, mult(0.25, velocity));
 
             v = sfVertexArray_getVertex(light->verts, j);
-            v->position = world_to_texture(components, camera, end);
+            v->position = world_to_texture(camera, end);
             color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
             v->color = color;
 

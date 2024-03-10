@@ -157,7 +157,7 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
 
     CameraComponent* cam = CameraComponent_get(camera);
 
-    sfConvexShape_setPosition(road->shape, world_to_screen(components, camera, pos));
+    sfConvexShape_setPosition(road->shape, world_to_screen(camera, pos));
     sfConvexShape_setScale(road->shape, (sfVector2f) { cam->zoom, cam->zoom });
 
     sfRenderWindow_drawConvexShape(window, road->shape, NULL);

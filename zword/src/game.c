@@ -76,8 +76,8 @@ void create_game(sfVideoMode mode) {
     ColliderGrid* grid = ColliderGrid_create();
     float ambient_light = 0.5f;
     int seed = time(NULL);
-    int camera = create_camera(game_data->components, mode);
-    int menu_camera = create_menu_camera(game_data->components, mode);
+    int camera = create_camera(mode);
+    int menu_camera = create_menu_camera(mode);
 
     sfTexture** textures = load_textures();
     sfSoundBuffer** sounds = load_sounds();
@@ -155,8 +155,8 @@ void start_game(GameData* data, Filename map_name) {
     CameraComponent* cam = CameraComponent_get(data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear();
-    data->camera = create_camera(data->components, mode);
-    data->menu_camera = create_menu_camera(data->components, mode);
+    data->camera = create_camera(mode);
+    data->menu_camera = create_menu_camera(mode);
     data->ambient_light = 0.5f;
     create_pause_menu(data);
     // create_level(data.components, data.grid, data.seed);
@@ -183,8 +183,8 @@ void end_game(GameData* data) {
     CameraComponent* cam = CameraComponent_get(data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
     ComponentData_clear();
-    data->camera = create_camera(data->components, mode);
-    data->menu_camera = create_menu_camera(data->components, mode);
+    data->camera = create_camera(mode);
+    data->menu_camera = create_menu_camera(mode);
     create_menu(*data);
 }
 

@@ -10,17 +10,17 @@ typedef enum {
     SHADER_OUTLINE
 } CameraShader;
 
-int create_camera(ComponentData* components, sfVideoMode mode);
+int create_camera(sfVideoMode mode);
 
-int create_menu_camera(ComponentData* components, sfVideoMode mode);
+int create_menu_camera(sfVideoMode mode);
 
-sfVector2f camera_size(ComponentData* components, int camera);
+sfVector2f camera_size(int camera);
 
-sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a);
+sfVector2f world_to_screen(int camera, sfVector2f a);
 
-sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a);
+sfVector2f screen_to_world(int camera, sfVector2i a);
 
-sfVector2f world_to_texture(ComponentData* components, int camera, sfVector2f a);
+sfVector2f world_to_texture(int camera, sfVector2f a);
 
 void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sfRectangleShape* line, sfVector2f start, sfVector2f end, float width, sfColor color);
 

@@ -508,7 +508,7 @@ void quit(ComponentData* components, int entity) {
 
 
 void create_editor_menu(GameData* data) {
-    sfVector2f size = camera_size(data->components, data->menu_camera);
+    sfVector2f size = camera_size(data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
     destroy_widgets(data->components);
     create_button(data->components, "TILES", pos, toggle_tiles);
@@ -742,7 +742,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
         sfVector2i mouse_new = { event.mouseMove.x, event.mouseMove.y };
         sfVector2f mouse_delta = { mouse_new.x - mouse_screen.x, mouse_screen.y - mouse_new.y };
         mouse_screen = mouse_new;
-        mouse_world = screen_to_world(components, data->camera, mouse_screen);
+        mouse_world = screen_to_world(data->camera, mouse_screen);
 
         if (sfMouse_isButtonPressed(sfMouseMiddle)) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
@@ -802,7 +802,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
     draw_game(data, window);
     draw_grid(data.components, window, data.camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
 
-    sfVector2f mouse_pos = screen_to_world(data.components, data.camera, sfMouse_getPosition((sfWindow*) window));
+    sfVector2f mouse_pos = screen_to_world(data.camera, sfMouse_getPosition((sfWindow*) window));
     sfVector2f mouse_grid = snap_to_grid(mouse_pos, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     sfVector2f mouse_grid_center = snap_to_grid_center(mouse_pos, grid_sizes[grid_size_index], 
         grid_sizes[grid_size_index]);

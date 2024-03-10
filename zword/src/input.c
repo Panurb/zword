@@ -200,7 +200,7 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         }
         player->controller.left_stick = normalized(left_stick);
 
-        sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
+        sfVector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) window));
         right_stick = diff(mouse, get_position(i));
         player->controller.right_stick = normalized(right_stick);
 

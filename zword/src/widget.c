@@ -378,7 +378,7 @@ void update_widgets(ComponentData* components, sfRenderWindow* window, int camer
         WidgetComponent* widget = WidgetComponent_get(i);
         if (!widget->enabled) continue;
 
-        sfVector2f mouse = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
+        sfVector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) window));
         widget->selected = false;
         if (point_inside_collider(components, i, mouse)) {
             last_selected = i;
@@ -490,7 +490,7 @@ bool input_widgets(ComponentData* components, int camera, sfEvent event) {
     
     if (event.type == sfEvtMouseMoved) {
         sfVector2i mouse_screen = { event.mouseMove.x, event.mouseMove.y };
-        mouse_position = screen_to_world(components, camera, mouse_screen);
+        mouse_position = screen_to_world(camera, mouse_screen);
     } else if (event.type == sfEvtMouseButtonPressed && event.mouseButton.button == sfMouseLeft) {
         mouse_down = true;
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {

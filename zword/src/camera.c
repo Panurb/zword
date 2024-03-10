@@ -15,7 +15,7 @@
 #include "image.h"
 
 
-int create_camera(ComponentData* components, sfVideoMode mode) {
+int create_camera(sfVideoMode mode) {
     int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
     CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 40.0f);
@@ -26,7 +26,7 @@ int create_camera(ComponentData* components, sfVideoMode mode) {
 }
 
 
-int create_menu_camera(ComponentData* components, sfVideoMode mode) {
+int create_menu_camera(sfVideoMode mode) {
     int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
     CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 25.0f);
@@ -34,7 +34,7 @@ int create_menu_camera(ComponentData* components, sfVideoMode mode) {
 }
 
 
-sfVector2f camera_size(ComponentData* components, int camera) {
+sfVector2f camera_size(int camera) {
     CameraComponent* cam = CameraComponent_get(camera);
     sfVector2i res = cam->resolution;
     float zoom = cam->zoom;
@@ -42,7 +42,7 @@ sfVector2f camera_size(ComponentData* components, int camera) {
 }
 
 
-sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) {
+sfVector2f world_to_screen(int camera, sfVector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     sfVector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
@@ -52,7 +52,7 @@ sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) 
 }
 
 
-sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) {
+sfVector2f screen_to_world(int camera, sfVector2i a) {
     CameraComponent* cam = CameraComponent_get(camera);
     sfVector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
@@ -62,7 +62,7 @@ sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) 
 }
 
 
-sfVector2f world_to_texture(ComponentData* components, int camera, sfVector2f a) {
+sfVector2f world_to_texture(int camera, sfVector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     sfVector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
@@ -83,7 +83,7 @@ void draw_line(sfRenderWindow* window, ComponentData* components, int camera, sf
 
     sfVector2f r = diff(end, start);
     sfVector2f pos = sum(start, mult(0.5f * width / norm(r), perp(r)));
-    sfRectangleShape_setPosition(line, world_to_screen(components, camera, pos));
+    sfRectangleShape_setPosition(line, world_to_screen(camera, pos));
     sfRectangleShape_setFillColor(line, color);
     sfRectangleShape_setSize(line, (sfVector2f) { dist(start, end) * cam->zoom, width * cam->zoom });
     sfRectangleShape_setRotation(line, to_degrees(-atan2(r.y, r.x)));
@@ -105,7 +105,7 @@ void draw_circle(sfRenderWindow* window, ComponentData* components, int camera, 
     }
 
     sfCircleShape_setOrigin(shape, (sfVector2f) { radius * cam->zoom, radius * cam->zoom });
-    sfCircleShape_setPosition(shape, world_to_screen(components, camera, position));
+    sfCircleShape_setPosition(shape, world_to_screen(camera, position));
     sfCircleShape_setRadius(shape, radius * cam->zoom);
     sfCircleShape_setFillColor(shape, color);
     sfRenderWindow_drawCircleShape(window, shape, NULL);
@@ -126,7 +126,7 @@ void draw_ellipse(sfRenderWindow* window, ComponentData* components, int camera,
     }
 
     sfCircleShape_setOrigin(shape, (sfVector2f) { major * cam->zoom, major * cam->zoom });
-    sfCircleShape_setPosition(shape, world_to_screen(components, camera, position));
+    sfCircleShape_setPosition(shape, world_to_screen(camera, position));
     sfCircleShape_setRadius(shape, major * cam->zoom);
     sfCircleShape_setScale(shape, (sfVector2f) { 1.0, minor / major });
     sfCircleShape_setFillColor(shape, color);
@@ -149,7 +149,7 @@ void draw_rectangle(sfRenderWindow* window, ComponentData* components, int camer
     }
 
     sfRectangleShape_setOrigin(shape, (sfVector2f) { 0.5 * width * cam->zoom, 0.5 * height * cam->zoom });
-    sfRectangleShape_setPosition(shape, world_to_screen(components, camera, position));
+    sfRectangleShape_setPosition(shape, world_to_screen(camera, position));
     sfVector2f size = { width * cam->zoom, height * cam->zoom };
     sfRectangleShape_setSize(shape, size);
     sfRectangleShape_setRotation(shape, -to_degrees(angle));
@@ -197,7 +197,7 @@ void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sf
         sfConvexShape_setPointCount(shape, n);
     }
     
-    sfVector2f start = world_to_screen(components, camera, position);
+    sfVector2f start = world_to_screen(camera, position);
     sfConvexShape_setPoint(shape, 0, start);
     sfConvexShape_setPoint(shape, n - 1, start);
 
@@ -205,7 +205,7 @@ void draw_cone(sfRenderWindow* window, ComponentData* components, int camera, sf
 
     for (int i = 1; i < n - 1; i++) {
         sfVector2f point = sum(position, polar_to_cartesian(range, angle));
-        sfConvexShape_setPoint(shape, i, world_to_screen(components, camera, point));
+        sfConvexShape_setPoint(shape, i, world_to_screen(camera, point));
         angle += spread / (n - 3);
     }
 
@@ -233,11 +233,11 @@ void draw_slice(sfRenderWindow* window, ComponentData* components, int camera, s
 
     for (int k = 0; k < verts_size / 2; k += 1) {
         sfVertex* v = sfVertexArray_getVertex(verts, 2 * k);
-        v->position = world_to_screen(components, camera, sum(position, start));
+        v->position = world_to_screen(camera, sum(position, start));
         v->color = color;
 
         v = sfVertexArray_getVertex(verts, 2 * k + 1);
-        v->position = world_to_screen(components, camera, sum(position, end));
+        v->position = world_to_screen(camera, sum(position, end));
         v->color = color;
 
         start = matrix_mult(rot, start);
@@ -288,7 +288,7 @@ void draw_slice_outline(sfRenderWindow* window, ComponentData* components, int c
 void draw_sprite(sfRenderWindow* window, ComponentData* components, int camera, sfSprite* sprite, sfVector2f position, float angle, sfVector2f scale, int shader_index) {
     CameraComponent* cam = CameraComponent_get(camera);
 
-    sfSprite_setPosition(sprite, world_to_screen(components, camera, position));
+    sfSprite_setPosition(sprite, world_to_screen(camera, position));
     sfSprite_setScale(sprite, mult(cam->zoom / PIXELS_PER_UNIT, scale));
     sfSprite_setRotation(sprite, -to_degrees(angle));
 
@@ -316,7 +316,7 @@ void draw_text(sfRenderWindow* window, ComponentData* components, int camera, sf
     sfText_setColor(text, color);
 
     sfText_setString(text, string);
-    sfText_setPosition(text, world_to_screen(components, camera, position));
+    sfText_setPosition(text, world_to_screen(camera, position));
 
     sfFloatRect bounds = sfText_getLocalBounds(text);
     sfText_setOrigin(text, (sfVector2f) { bounds.left + 0.5f * bounds.width, bounds.top + 0.5f * bounds.height });
