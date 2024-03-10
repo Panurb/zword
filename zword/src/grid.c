@@ -49,7 +49,7 @@ sfVector2i world_to_grid(ColliderGrid* grid, sfVector2f position) {
 
 
 Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
-    sfVector2f pos = get_position(components, i);
+    sfVector2f pos = get_position(i);
     
     float x = (pos.x + 0.5 * grid->width) / grid->tile_width;
     float y = (pos.y + 0.5 * grid->height) / grid->tile_height;
@@ -85,7 +85,7 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
                 ColliderComponent* col = ColliderComponent_get(n);
                 if (col->last_collision == id) continue;
 
-                if (dist(origin, get_position(components, n)) <= radius) {
+                if (dist(origin, get_position(n)) <= radius) {
                     List_add(list, n);
                 }
 
@@ -159,7 +159,7 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
     CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
-    sfVector2f pos = get_position(components, camera);
+    sfVector2f pos = get_position(camera);
     float major_lines = 16.0f;
     float left = pos.x - 0.5f * width;
     float right = pos.x + 0.5f * width;

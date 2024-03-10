@@ -42,7 +42,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         for (int j = 1; j < player->ammo_size; j++) {
             AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
             while (ammo && ammo->size > 0) {
-                sfVector2f pos = get_position(components, entity);
+                sfVector2f pos = get_position(entity);
                 int k = create_ammo(components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
                 int size = min(AmmoComponent_get(k)->size, ammo->size);
                 AmmoComponent* drop = AmmoComponent_get(k);
@@ -60,7 +60,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             enemy->state = ENEMY_DEAD;
             List_clear(enemy->path);
             LightComponent_remove(entity);
-            destroy_entity(components, enemy->weapon);
+            destroy_entity(enemy->weapon);
             List_remove(coord->children, enemy->weapon);
             enemy->weapon = -1;
             WaypointComponent_remove(entity);
@@ -84,7 +84,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
                     break;
             }
             if (j != -1) {
-                add_child(components, entity, j);
+                add_child(entity, j);
             }
         }
 
@@ -93,10 +93,10 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             CoordinateComponent* co = CoordinateComponent_get(i);
             ImageComponent_get(i)->alpha = 1.0f;
 
-            co->position = get_position(components, i);
-            co->angle = get_angle(components, i);
+            co->position = get_position(i);
+            co->angle = get_angle(i);
 
-            sfVector2f r = normalized(diff(co->position, get_position(components, entity)));
+            sfVector2f r = normalized(diff(co->position, get_position(entity)));
             if (!non_zero(r)) {
                 r = rand_vector();
             }
@@ -104,7 +104,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             PhysicsComponent_get(i)->angular_velocity = randf(-5.0f, 5.0f);
             ColliderComponent_get(i)->enabled = true;
         }
-        remove_children(components, entity);
+        remove_children(entity);
 
         if (!enemy) {
             clear_grid(components, grid, entity);
@@ -128,7 +128,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 
         if (health->decal[0] != '\0') {
             // TODO: use decal
-            sfVector2f pos = sum(get_position(components, entity), mult(0.5f, rand_vector()));
+            sfVector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
             if (dmg < 40) {
                 create_decal(components, pos, "blood", 60.0f);
             } else {
@@ -157,7 +157,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 
     ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
-        particle->origin = diff(pos, get_position(components, entity));
+        particle->origin = diff(pos, get_position(entity));
         add_particles(components, entity, particle->rate / 50.0f * dmg);
     }
 
@@ -185,7 +185,7 @@ void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfV
                 if (sound) {
                     add_sound(components, entity, sound->hit_sound, 1.0, 0.8);
                 }
-                damage(components, grid, entity, get_position(components, entity), vel, 100, -1);
+                damage(components, grid, entity, get_position(entity), vel, 100, -1);
             }
         }
     }

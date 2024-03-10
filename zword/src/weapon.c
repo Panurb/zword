@@ -59,7 +59,7 @@ void reload(ComponentData* components, int i) {
 
 
 void create_energy(ComponentData* components, sfVector2f position, sfVector2f velocity) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "energy", 1.0f, 1.0f, LAYER_PARTICLES);
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
@@ -84,7 +84,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
 
             for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
                 int j = node->value;
-                damage(components, grid, j, get_position(components, i), zeros(), 20, -1);
+                damage(components, grid, j, get_position(i), zeros(), 20, -1);
             }
             
             if (phys->collision.entities->size > 0) {
@@ -109,7 +109,7 @@ int create_rope(ComponentData* components, sfVector2f start, sfVector2f end) {
     int prev = -1;
     int n = len / seg_len;
     for (int i = 0; i < n; i++) {
-        int current = create_entity(components);
+        int current = create_entity();
         sfVector2f pos = sum(start, mult((i * seg_len) / len, r));
         CoordinateComponent_add(current, pos, 0.0f);
         PhysicsComponent_add(current, 0.2f);
@@ -160,7 +160,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
         AnimationComponent_get(player->arms)->framerate = 20.0f;
     }
 
-    sfVector2f pos = get_position(components, parent);
+    sfVector2f pos = get_position(parent);
 
     switch (weapon->ammo_type) {
         case AMMO_MELEE: {
@@ -174,7 +174,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             int rays = 7;
             for (int i = 0; i < rays; i++) {
                 float angle = i * weapon->spread / (rays - 1) - 0.5f * weapon->spread;
-                sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
+                sfVector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
                 HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
                 float d = dist(info.position, pos);
@@ -216,16 +216,16 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                 if (weapon->spread > 0.0f) {
                     angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                 }
-                sfVector2f vel = polar_to_cartesian(7.0f, get_angle(components, parent) + angle);
-                create_energy(components, sum(get_position(components, entity), mult(1.0f / 14.0f, vel)), vel);
+                sfVector2f vel = polar_to_cartesian(7.0f, get_angle(parent) + angle);
+                create_energy(components, sum(get_position(entity), mult(1.0f / 14.0f, vel)), vel);
             }
             break;
         } case AMMO_ROPE: {
             float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-            sfVector2f dir = polar_to_cartesian(1.0f, get_angle(components, parent) + angle);
+            sfVector2f dir = polar_to_cartesian(1.0f, get_angle(parent) + angle);
             HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
-            int i = create_rope(components, info.position, get_position(components, parent));
+            int i = create_rope(components, info.position, get_position(parent));
 
             int j = rope_root(components, i);
             JointComponent_get(j)->parent = info.entity;
@@ -244,7 +244,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                 if (weapon->spread > 0.0f) {
                     angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                 }
-                sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, parent) + angle);
+                sfVector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
                 HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
 
                 int dmg = weapon->damage;
@@ -312,7 +312,7 @@ void update_weapons(ComponentData* components, float time_step) {
 
 
 int create_pistol(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -329,7 +329,7 @@ int create_pistol(ComponentData* components, sfVector2f position) {
 
 
 int create_shotgun(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -346,7 +346,7 @@ int create_shotgun(ComponentData* components, sfVector2f position) {
 
 
 int create_sawed_off(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -363,7 +363,7 @@ int create_sawed_off(ComponentData* components, sfVector2f position) {
 
 
 int create_rifle(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -380,7 +380,7 @@ int create_rifle(ComponentData* components, sfVector2f position) {
 
 
 int create_assault_rifle(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -397,7 +397,7 @@ int create_assault_rifle(ComponentData* components, sfVector2f position) {
 
 
 int create_smg(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -414,7 +414,7 @@ int create_smg(ComponentData* components, sfVector2f position) {
 
 
 int create_axe(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -429,7 +429,7 @@ int create_axe(ComponentData* components, sfVector2f position) {
 
 
 int create_sword(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -444,7 +444,7 @@ int create_sword(ComponentData* components, sfVector2f position) {
  
 
 int create_rope_gun(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
     ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
@@ -459,7 +459,7 @@ int create_rope_gun(ComponentData* components, sfVector2f position) {
 
 
 int create_lasersight(ComponentData* components, sfVector2f pos) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle());
     PhysicsComponent_add(i, 0.5f);
     ImageComponent_add(i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
@@ -471,7 +471,7 @@ int create_lasersight(ComponentData* components, sfVector2f pos) {
 
 
 int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
     ColliderComponent_add_circle(components, i, 0.25f, GROUP_ITEMS);

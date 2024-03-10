@@ -18,7 +18,7 @@
 
 
 int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
@@ -33,10 +33,10 @@ int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
     SoundComponent_add(i, "squish");
 
     sfVector2f r = { 0.5f, 0.0f };
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, r, 0.0f);
     WeaponComponent_add(j, 0.5f, 25, 7, 0.35f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
-    add_child(components, i, j);
+    add_child(i, j);
     enemy->weapon = j;
 
     return i;
@@ -44,7 +44,7 @@ int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
 
 
 int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
@@ -67,7 +67,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     int j = create_rifle(components, r);
     ColliderComponent_remove(j);
     CoordinateComponent_get(j)->angle = 0.0f;
-    add_child(components, i, j);
+    add_child(i, j);
     enemy->weapon = j;
 
     return i;
@@ -75,7 +75,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
 
 
 int create_priest(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
@@ -96,11 +96,11 @@ int create_priest(ComponentData* components, sfVector2f pos, float angle) {
     LightComponent_add(i, 2.0f, 2.0f * M_PI, get_color(0.5f, 1.0f, 0.0f, 1.0f), 0.5f, 1.0f)->flicker = 0.25f;
 
     sfVector2f r = { 0.5f, 0.0f };
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, r, 0.0f);
     WeaponComponent_add(j, 0.25f, 20, 5, 0.25f * M_PI, -1, 0.0f, 15.0f, 0.0f, AMMO_ENERGY, "energy");
     SoundComponent_add(j, "");
-    add_child(components, i, j);
+    add_child(i, j);
     enemy->weapon = j;
 
     return i;
@@ -108,7 +108,7 @@ int create_priest(ComponentData* components, sfVector2f pos, float angle) {
 
 
 int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
@@ -129,10 +129,10 @@ int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     SoundComponent_add(i, "squish");
 
     sfVector2f r = { 0.5f, 0.0f };
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, r, 0.0f);
     WeaponComponent_add(j, 0.5f, 100, 7, 0.5f * M_PI, -1, 0.0f, 1.0f, 0.0f, AMMO_MELEE, "axe");
-    add_child(components, i, j);
+    add_child(i, j);
     enemy->weapon = j;
 
     return i;
@@ -140,7 +140,7 @@ int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
 
 
 int create_boss(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_circle(components, i, 1.0f, GROUP_ENEMIES);
@@ -162,15 +162,15 @@ int create_boss(ComponentData* components, sfVector2f pos, float angle) {
     LightComponent_add(i, 5.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 1.0f)->flicker = 0.1f;
 
     sfVector2f r = { 0.5f, 0.0f };
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, r, 0.0f);
     WeaponComponent_add(j, 5.0f, 50, 7, M_PI, -1, 0.0f, 3.0f, 0.0f, AMMO_MELEE, "axe");
-    add_child(components, i, j);
+    add_child(i, j);
     enemy->weapon = j;
 
     int parent = i;
     for (int k = 0; k < 5; k++) {
-        j = create_entity(components);
+        j = create_entity();
         pos = sum(pos, polar_to_cartesian(3.0f, angle));
         CoordinateComponent_add(j, pos, 0.0f);
         PhysicsComponent_add(j, 10.0f);
@@ -195,10 +195,10 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
         PlayerComponent* player = PlayerComponent_get(j);
         if (player->state == PLAYER_DEAD) continue;
 
-        sfVector2f pos = get_position(components, entity);
+        sfVector2f pos = get_position(entity);
 
-        sfVector2f r = diff(get_position(components, j), pos);
-        sfVector2f s = polar_to_cartesian(1.0f, get_angle(components, entity));
+        sfVector2f r = diff(get_position(j), pos);
+        sfVector2f s = polar_to_cartesian(1.0f, get_angle(entity));
         float angle = fabs(signed_angle(r, s));
 
         float d = norm(r);
@@ -223,7 +223,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
         CoordinateComponent* coord = CoordinateComponent_get(i);
         PhysicsComponent* phys = PhysicsComponent_get(i);
         WeaponComponent* weapon = WeaponComponent_get(enemy->weapon);
-        sfVector2f pos = get_position(components, i);
+        sfVector2f pos = get_position(i);
 
         if (enemy->state != ENEMY_ATTACK && enemy->state != ENEMY_DEAD) {
             update_vision(components, grid, i);
@@ -234,7 +234,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
         switch (enemy->state) {
             case ENEMY_IDLE: {
                 sfVector2f r = polar_to_cartesian(1.0f, enemy->desired_angle);
-                HitInfo info = raycast(components, grid, get_position(components, i), r, 2.0f, GROUP_ENEMIES);
+                HitInfo info = raycast(components, grid, get_position(i), r, 2.0f, GROUP_ENEMIES);
                 if (info.entity != -1) {
                     enemy->desired_angle = mod(enemy->desired_angle - 0.1f * sign(signed_angle(info.normal, r)), 2.0f * M_PI);
                     if (phys->speed < 0.5f) {
@@ -254,9 +254,9 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
                 sfVector2f r;
                 if (enemy->path->size > 1) {
-                    r = diff(get_position(components, enemy->path->head->next->value), get_position(components, i));
+                    r = diff(get_position(enemy->path->head->next->value), get_position(i));
                 } else {
-                    r = diff(get_position(components, enemy->target), get_position(components, i));
+                    r = diff(get_position(enemy->target), get_position(i));
                 }
 
                 if (phys->speed < enemy->walk_speed) {
@@ -267,7 +267,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             } case ENEMY_CHASE: {
-                sfVector2f r = diff(get_position(components, enemy->target), pos);
+                sfVector2f r = diff(get_position(enemy->target), pos);
                 float d = norm(r);
                 sfVector2f v = r;
 
@@ -275,13 +275,13 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 if (info.entity != enemy->target) {
                     a_star(components, i, enemy->target, enemy->path);
                     if (enemy->path->size > 1) {
-                        v = diff(get_position(components, enemy->path->head->next->value), pos);
+                        v = diff(get_position(enemy->path->head->next->value), pos);
                     }
                 }
 
                 enemy->desired_angle = polar_angle(v);
 
-                r = polar_to_cartesian(1.0f, get_angle(components, i));
+                r = polar_to_cartesian(1.0f, get_angle(i));
                 info = raycast(components, grid, pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
                 if (info.entity == enemy->target) {
                     enemy->attack_timer = enemy->attack_delay;
@@ -290,7 +290,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                     // TODO: dont hit other enemies
                     for (int j = 0; j < weapon->shots; j++) {
                         float angle = j * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
-                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(components, i) + angle);
+                        sfVector2f dir = polar_to_cartesian(1.0, get_angle(i) + angle);
                         HitInfo info = raycast(components, grid, pos, dir, 1.1f * ColliderComponent_get(i)->radius, GROUP_BULLETS);
 
                         if (HealthComponent_get(info.entity) && 
@@ -344,8 +344,8 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
 
         for (ListNode* current = enemy->path->head; current; current = current->next) {
             if (current->next) {
-                sfVector2f start = get_position(components, current->value);
-                sfVector2f end = get_position(components, current->next->value);
+                sfVector2f start = get_position(current->value);
+                sfVector2f end = get_position(current->next->value);
                 draw_line(window, components, camera, NULL, start, end, 0.05, sfRed);
             }
         }
@@ -354,7 +354,7 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
 
 
 void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range) {
-    List* list = get_entities(components, grid, get_position(components, player), range);
+    List* list = get_entities(components, grid, get_position(player), range);
     for (ListNode* node = list->head; node; node = node->next) {
         int j = node->value;
 
@@ -369,7 +369,7 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 
 
 void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
     EnemyComponent_add(i)->spawner = true;
@@ -382,8 +382,8 @@ void draw_spawners(sfRenderWindow* window, GameData data) {
         if (enemy && enemy->spawner) {
             ColliderComponent* col = ColliderComponent_get(i);
             sfColor color = get_color(1.0f, 0.0f, 1.0f, 0.25f);
-            sfVector2f pos = get_position(data.components, i);
-            float angle = get_angle(data.components, i);
+            sfVector2f pos = get_position(i);
+            float angle = get_angle(i);
             draw_rectangle(window, data.components, data.camera, NULL, pos, col->width, col->height, angle, color);
             draw_text(window, data.components, data.camera, NULL, pos, "spawner", 20, sfMagenta);
         }

@@ -26,11 +26,11 @@ bool point_inside_collider(ComponentData* components, int i, sfVector2f point) {
     // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
     ColliderComponent* col = ColliderComponent_get(i);
     if (col->type == COLLIDER_RECTANGLE) {
-        sfVector2f pos = get_position(components, i);
-        float angle = get_angle(components, i);
+        sfVector2f pos = get_position(i);
+        float angle = get_angle(i);
         return point_inside_rectangle(pos, angle, col->width, col->height, point);
     } else if (col->type == COLLIDER_CIRCLE) {
-        if (norm2(diff(get_position(components, i), point)) < col->radius * col->radius) {
+        if (norm2(diff(get_position(i), point)) < col->radius * col->radius) {
             return true;
         }
     }
@@ -39,7 +39,7 @@ bool point_inside_collider(ComponentData* components, int i, sfVector2f point) {
 
 
 void get_corners(ComponentData* components, int i, sfVector2f* corners) {
-    sfVector2f pos = get_position(components, i);
+    sfVector2f pos = get_position(i);
 
     sfVector2f hw = half_width(components, i);
     sfVector2f hh = half_height(components, i);
@@ -53,13 +53,13 @@ void get_corners(ComponentData* components, int i, sfVector2f* corners) {
 
 sfVector2f half_width(ComponentData* components, int i) {
     ColliderComponent* col = ColliderComponent_get(i);
-    return polar_to_cartesian(0.5 * col->width, get_angle(components, i));
+    return polar_to_cartesian(0.5 * col->width, get_angle(i));
 }
 
 
 sfVector2f half_height(ComponentData* components, int i) {
     ColliderComponent* col = ColliderComponent_get(i);
-    return polar_to_cartesian(0.5 * col->height, get_angle(components, i) + 0.5 * M_PI);
+    return polar_to_cartesian(0.5 * col->height, get_angle(i) + 0.5 * M_PI);
 }
 
 
@@ -93,8 +93,8 @@ float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f 
 
 
 sfVector2f overlap_circle_circle(ComponentData* components, int i, int j) {
-    sfVector2f a = get_position(components, i);
-    sfVector2f b = get_position(components, j);
+    sfVector2f a = get_position(i);
+    sfVector2f b = get_position(j);
 
     float d = dist(a, b);
     float r = ColliderComponent_get(i)->radius + ColliderComponent_get(j)->radius;
@@ -116,11 +116,11 @@ sfVector2f overlap_rectangle_circle(ComponentData* components, int i, int j) {
 
     float overlaps[2] = { 0.0, 0.0 };
     sfVector2f axes[2];
-    axes[0] = polar_to_cartesian(1.0, get_angle(components, i));
+    axes[0] = polar_to_cartesian(1.0, get_angle(i));
     axes[1] = perp(axes[0]);
 
-    sfVector2f a = get_position(components, i);
-    sfVector2f b = get_position(components, j);
+    sfVector2f a = get_position(i);
+    sfVector2f b = get_position(j);
     float radius = ColliderComponent_get(j)->radius;
 
     for (int k = 0; k < 2; k++) {
@@ -161,14 +161,14 @@ sfVector2f overlap_circle_rectangle(ComponentData* components, int i, int j) {
 }
 
 sfVector2f overlap_rectangle_rectangle(ComponentData* components, int i, int j) {
-    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(components, i));
-    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(components, j));
+    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
+    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
 
     float overlaps[4];
     sfVector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
 
-    sfVector2f a = get_position(components, i);
-    sfVector2f b = get_position(components, j);
+    sfVector2f a = get_position(i);
+    sfVector2f b = get_position(j);
 
     for (int k = 0; k < 4; k++) {
         overlaps[k] = axis_overlap(axis_half_width(components, i, axes[k]), a,
@@ -216,18 +216,18 @@ sfVector2f overlap_collider_collider(ComponentData* components, int i, int j) {
 sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j) {
     ImageComponent* image = ImageComponent_get(j);
 
-    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(components, i));
-    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(components, j));
+    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
+    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
 
     float overlaps[4];
     sfVector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
 
-    sfVector2f a = get_position(components, i);
-    sfVector2f b = get_position(components, j);
+    sfVector2f a = get_position(i);
+    sfVector2f b = get_position(j);
 
     for (int k = 0; k < 4; k++) {
-        sfVector2f hw = polar_to_cartesian(0.5 * image->width, get_angle(components, i));
-        sfVector2f hh = polar_to_cartesian(0.5 * image->height, get_angle(components, i) + 0.5 * M_PI);
+        sfVector2f hw = polar_to_cartesian(0.5 * image->width, get_angle(i));
+        sfVector2f hh = polar_to_cartesian(0.5 * image->height, get_angle(i) + 0.5 * M_PI);
         float image_axis_half_width = fabs(dot(hw, axes[k])) + fabs(dot(hh, axes[k]));
 
         overlaps[k] = axis_overlap(axis_half_width(components, i, axes[k]), a,
@@ -411,13 +411,13 @@ void draw_colliders(ComponentData* components, sfRenderWindow* window, int camer
         ColliderComponent* col = components->collider[i];
         if (!col) continue;
 
-        sfVector2f pos = get_position(components, i);
+        sfVector2f pos = get_position(i);
         if (col->type == COLLIDER_CIRCLE) {
             draw_circle(window, components, camera, NULL, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
             draw_line(window, components, camera, NULL, pos, sum(pos, half_width(components, i)), 0.05f, sfWhite);
         } else {
             sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
-            draw_rectangle(window, components, camera, NULL, get_position(components, i), col->width, col->height, get_angle(components, i), color);
+            draw_rectangle(window, components, camera, NULL, get_position(i), col->width, col->height, get_angle(i), color);
         }
     }
 }

@@ -750,11 +750,11 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
     if (preserve_id) {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
         if (CoordinateComponent_get(entity)) {
-            destroy_entity(components, entity);
+            destroy_entity(entity);
         }
         components->entities = max(entity, components->entities);
     } else {
-        entity = create_entity(components);
+        entity = create_entity();
     }
 
     CoordinateComponent_deserialize(entity_json, components, entity, offset, rotation);
@@ -884,7 +884,7 @@ void deserialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         if (!coord) continue;
         if (coord->parent != -1) {
-            add_child(components, coord->parent, i);
+            add_child(coord->parent, i);
         }
     }
 }

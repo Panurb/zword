@@ -154,7 +154,7 @@ void start_game(GameData* data, Filename map_name) {
     ColliderGrid_clear(data->grid);
     CameraComponent* cam = CameraComponent_get(data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
-    ComponentData_clear(data->components);
+    ComponentData_clear();
     data->camera = create_camera(data->components, mode);
     data->menu_camera = create_menu_camera(data->components, mode);
     data->ambient_light = 0.5f;
@@ -182,7 +182,7 @@ void end_game(GameData* data) {
     ColliderGrid_clear(data->grid);
     CameraComponent* cam = CameraComponent_get(data->camera);
     sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
-    ComponentData_clear(data->components);
+    ComponentData_clear();
     data->camera = create_camera(data->components, mode);
     data->menu_camera = create_menu_camera(data->components, mode);
     create_menu(*data);
@@ -251,7 +251,7 @@ int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, flo
         float x = randf(-1.0f, 1.0f);
         float y = randf(-1.0f, 1.0f);
 
-        sfVector2f pos = get_position(components, spawner);
+        sfVector2f pos = get_position(spawner);
         pos = sum(pos, lin_comb(x, half_width(components, spawner), y, half_height(components, spawner)));
 
         if (on_screen(components, camera, pos, 2.0f, 2.0f)) {
@@ -388,7 +388,7 @@ void update_lifetimes(ComponentData* components, float time_step) {
             }
 
             if (coord->lifetime == 0.0f) {
-                destroy_entity_recursive(components, i);
+                destroy_entity_recursive(i);
             }
         }
     }
@@ -435,8 +435,8 @@ void draw_parents(GameData data, sfRenderWindow* window) {
     for (int i = 0; i < data.components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         if (coord && coord->parent != -1) {
-            sfVector2f start = get_position(data.components, i);
-            sfVector2f end = get_position(data.components, coord->parent);
+            sfVector2f start = get_position(i);
+            sfVector2f end = get_position(coord->parent);
             draw_line(window, data.components, data.camera, NULL, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
         }
     }
@@ -504,7 +504,7 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
 
 
 int create_tutorial(ComponentData* components, sfVector2f position) {
-    int entity = create_entity(components);
+    int entity = create_entity();
     CoordinateComponent_add(entity, position, 0.0f);
     ColliderComponent_add_circle(components, entity, 1.0f, GROUP_CORPSES);
     TextComponent_add(entity, "", 30, sfWhite);
@@ -514,7 +514,7 @@ int create_tutorial(ComponentData* components, sfVector2f position) {
 
 
 int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height) {
-    int entity = create_entity(components);
+    int entity = create_entity();
     CoordinateComponent_add(entity, position, angle);
     ColliderComponent* collider = ColliderComponent_add_rectangle(components, entity, width, height, GROUP_WALLS);
     collider->trigger_type = TRIGGER_WIN;
@@ -527,14 +527,14 @@ void draw_tutorials(sfRenderWindow* window, GameData data) {
     for (int i = 0; i < data.components->entities; i++) {
         TextComponent* text = TextComponent_get(i);
         if (text) {
-            draw_text(window, data.components, data.camera, NULL, get_position(data.components, i), "?", 50, sfMagenta);
+            draw_text(window, data.components, data.camera, NULL, get_position(i), "?", 50, sfMagenta);
         }
 
         ColliderComponent* collider = ColliderComponent_get(i);
         if (collider && collider->trigger_type == TRIGGER_WIN) {
-            sfVector2f pos = get_position(data.components, i);
+            sfVector2f pos = get_position(i);
             sfColor color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
-            float angle = get_angle(data.components, i);
+            float angle = get_angle(i);
             draw_rectangle(window, data.components, data.camera, NULL, pos, collider->width, collider->height, angle, 
                 color);
             draw_text(window, data.components, data.camera, NULL, pos, "level_end", 20, sfGreen);

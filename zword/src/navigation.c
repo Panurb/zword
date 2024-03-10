@@ -16,7 +16,7 @@
 
 
 int create_waypoint(ComponentData* components, sfVector2f pos) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, pos, 0.0);
     WaypointComponent_add(i);
     ColliderComponent_add_circle(components, i, 0.25f, GROUP_ALL)->enabled = false;
@@ -34,7 +34,7 @@ void reconstruct_path(ComponentData* components, int current, List* path) {
 
 
 float heuristic(ComponentData* components, int start, int goal) {
-    return dist(get_position(components, start), get_position(components, goal));
+    return dist(get_position(start), get_position(goal));
 }
 
 
@@ -94,8 +94,8 @@ bool a_star(ComponentData* components, int start, int goal, List* path) {
 
 
 float connection_distance(ComponentData* component, ColliderGrid* grid, int i, int j) {
-    sfVector2f a = get_position(component, i);
-    sfVector2f b = get_position(component, j);
+    sfVector2f a = get_position(i);
+    sfVector2f b = get_position(j);
     sfVector2f v = diff(b, a);
     float d = norm(v);
 
@@ -128,7 +128,7 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera)
 
     List* waypoints = List_create();
 
-    List* list = get_entities(components, grid, get_position(components, camera), 50.0f);
+    List* list = get_entities(components, grid, get_position(camera), 50.0f);
     for (ListNode* node = list->head; node; node = node->next) {
         int i = node->value;
         WaypointComponent* waypoint = WaypointComponent_get(i);
@@ -165,7 +165,7 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
         if (!waypoint) continue;
         if (ImageComponent_get(i)) continue;
 
-        sfVector2f pos = get_position(components, i);
+        sfVector2f pos = get_position(i);
         float radius = ColliderComponent_get(i)->radius;
         draw_circle(window, components, camera, shape, pos, radius, sfWhite);
 
@@ -174,7 +174,7 @@ void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camer
                 int k = node->value;
                 sfColor color = sfWhite;
                 color.a = 64;
-                draw_line(window, components, camera, line, pos, get_position(components, k), 0.04f, color);
+                draw_line(window, components, camera, line, pos, get_position(k), 0.04f, color);
             }
         }
     }

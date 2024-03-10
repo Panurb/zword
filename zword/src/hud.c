@@ -9,7 +9,7 @@
 
 void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f pos = get_position(components, entity);
+    sfVector2f pos = get_position(entity);
 
     float gap = 0.2;
     float slice = (2 * M_PI / player->inventory_size);
@@ -48,7 +48,7 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
 
 void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, int atch, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f pos = get_position(components, entity);
+    sfVector2f pos = get_position(entity);
     ItemComponent* item = components->item[player->inventory[slot]];
 
     float gap = 0.2;
@@ -81,7 +81,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
 
 void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f pos = get_position(components, entity);
+    sfVector2f pos = get_position(entity);
 
     float gap = 0.2f;
     float slice = (2 * M_PI / (player->ammo_size - 1));
@@ -125,7 +125,7 @@ void draw_ammo_menu(ComponentData* components, sfRenderWindow* window, int camer
 
 
 void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
-    sfVector2f position = get_position(components, entity);
+    sfVector2f position = get_position(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
     int i = player->inventory[player->item];
     ItemComponent* item = ItemComponent_get(i);
@@ -138,7 +138,7 @@ void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera
 
 void draw_money(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f position = sum(get_position(components, entity), 
+    sfVector2f position = sum(get_position(entity), 
         vec(0.0f, (1.0f - player->money_timer) * sign(player->money_increment)));
 
     char buffer[256];
@@ -154,11 +154,11 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
     for (int i = 0; i < components->entities; i++) {
         if (!CoordinateComponent_get(i)) continue;
 
-        sfVector2f position = get_position(components, i);
+        sfVector2f position = get_position(i);
 
         TextComponent* text = TextComponent_get(i);
         if (text) {
-            float r = norm(diff(position, get_position(components, camera)));
+            float r = norm(diff(position, get_position(camera)));
             if (r < 8.0f) {
                 float alpha = 1.0f - 0.125f * r;
                 sfColor color = text->color;
@@ -183,7 +183,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
         if (player->controller.joystick == -1) {
             pos = screen_to_world(components, camera, sfMouse_getPosition((sfWindow*) window));
         } else {
-            pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(components, i));
+            pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(i));
             pos = sum(position, pos);
         }
 
@@ -229,7 +229,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_DRIVE:
                 // VehicleComponent* vehicle = VehicleComponent_get(player->vehicle);
                 // if (vehicle) {
-                //     draw_slice(window, components, camera, NULL, 50, get_position(components, player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
+                //     draw_slice(window, components, camera, NULL, 50, get_position(player->vehicle), 1.0, 1.2, 0.5 * M_PI, vehicle->fuel / vehicle->max_fuel * M_PI, sfWhite);
                 // }
 
                 break;

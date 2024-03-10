@@ -907,7 +907,7 @@ void TextComponent_remove(int entity) {
 }
 
 
-int create_entity(ComponentData* components) {
+int create_entity() {
     for (int i = 0; i < game_data->components->entities; i++) {
         if (!game_data->components->coordinate[i]) {
             if (game_data->components->added_entities) {
@@ -925,7 +925,7 @@ int create_entity(ComponentData* components) {
 }
 
 
-int get_root(ComponentData* components, int entity) {
+int get_root(int entity) {
     int root = entity;
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     while (coord->parent != -1) {
@@ -936,13 +936,13 @@ int get_root(ComponentData* components, int entity) {
 }
 
 
-void add_child(ComponentData* components, int parent, int child) {
+void add_child(int parent, int child) {
     CoordinateComponent_get(child)->parent = parent;
     List_append(CoordinateComponent_get(parent)->children, child);
 }
 
 
-void remove_children(ComponentData* components, int parent) {
+void remove_children(int parent) {
     CoordinateComponent* coord = CoordinateComponent_get(parent);
     for (ListNode* node = coord->children->head; node; node = node->next) {
         CoordinateComponent_get(node->value)->parent = -1;
@@ -951,7 +951,7 @@ void remove_children(ComponentData* components, int parent) {
 }
 
 
-void destroy_entity(ComponentData* components, int entity) {
+void destroy_entity(int entity) {
     if (entity == -1) return;
 
     CoordinateComponent_remove(entity);
@@ -983,50 +983,50 @@ void destroy_entity(ComponentData* components, int entity) {
 }
 
 
-void destroy_entity_recursive(ComponentData* components, int entity) {
+void destroy_entity_recursive(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
-        destroy_entity_recursive(components, node->value);
+        destroy_entity_recursive(node->value);
     }
     List_clear(coord->children);
-    destroy_entity(components, entity);
+    destroy_entity(entity);
 }
 
 
-void ComponentData_clear(ComponentData* components) {
+void ComponentData_clear() {
     for (int i = 0; i < game_data->components->entities; i++) {
-        destroy_entity(components, i);
+        destroy_entity(i);
     }
     game_data->components->entities = 0;
 }
 
 
-sfVector2f get_position(ComponentData* components, int entity) {
+sfVector2f get_position(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     sfVector2f position = coord->position;
 
     int parent = coord->parent;
     if (parent != -1) {
-        position = sum(get_position(components, parent), rotate(position, get_angle(components, parent)));
+        position = sum(get_position(parent), rotate(position, get_angle(parent)));
     }
     return position;
 }
 
 
-float get_angle(ComponentData* components, int entity) {
+float get_angle(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     float angle = coord->angle;
 
     int parent = coord->parent;
     if (parent != -1) {
-        angle += get_angle(components, parent);
+        angle += get_angle(parent);
     }
 
     return mod(angle, 2.0f * M_PI);
 }
 
 
-bool entity_exists(ComponentData* components, int entity) {
+bool entity_exists(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord) {
         return false;

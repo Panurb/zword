@@ -106,7 +106,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
         SoundComponent* scomp = SoundComponent_get(i);
         if (!scomp) continue;
 
-        float dist = norm(diff(get_position(components, i), get_position(components, camera)));
+        float dist = norm(diff(get_position(i), get_position(camera)));
 
         if (scomp->loop_sound[0] != '\0') {
             if (!scomp->events[0]) {

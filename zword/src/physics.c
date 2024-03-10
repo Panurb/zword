@@ -33,8 +33,8 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             if (col) {
                 clear_grid(components, grid, i);
             }
-            remove_children(components, i);
-            destroy_entity(components, i);
+            remove_children(i);
+            destroy_entity(i);
             continue;
         } else if (physics->lifetime <= 1.0f) {
             ImageComponent* image = ImageComponent_get(i);
@@ -61,7 +61,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
 
         JointComponent* joint = JointComponent_get(i);
         if (joint && joint->parent != -1) {
-            sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
+            sfVector2f r = diff(get_position(joint->parent), get_position(i));
             float d = norm(r);
 
             sfVector2f f = zeros();
@@ -74,10 +74,10 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             
             delta_angle = angle_diff(polar_angle(r), coord->angle);
 
-            float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(components, joint->parent)));
+            float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(joint->parent)));
             if (fabsf(angle) > joint->max_angle) {
-                r = polar_to_cartesian(d, get_angle(components, joint->parent) - sign(angle) * joint->max_angle);
-                delta_pos = sum(delta_pos, diff(diff(get_position(components, joint->parent), r), coord->position));
+                r = polar_to_cartesian(d, get_angle(joint->parent) - sign(angle) * joint->max_angle);
+                delta_pos = sum(delta_pos, diff(diff(get_position(joint->parent), r), coord->position));
             }
         }
 

@@ -10,12 +10,12 @@
 
 
 int create_car(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
     PhysicsComponent_add(i, 10.0f);
 
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, sum(pos, polar_to_cartesian(-3.0f, angle)), 0.0f);
     ColliderComponent_add_rectangle(components, j, 3.0f, 3.0f, GROUP_VEHICLES);
     PhysicsComponent_add(j, 10.0f);
@@ -23,32 +23,32 @@ int create_car(ComponentData* components, sfVector2f pos, float angle) {
     VehicleComponent_add(j, 100.0f);
     JointComponent_add(j, i, 3.0f, 3.0f, 1.0f);
 
-    int k = create_entity(components);
+    int k = create_entity();
     CoordinateComponent_add(k, (sfVector2f) {1.5f, 0.0f }, 0.0f);
     ImageComponent_add(k, "car", 6.0f, 3.0f, LAYER_VEHICLES);
-    add_child(components, j, k);
+    add_child(j, k);
 
-    k = create_entity(components);
+    k = create_entity();
     CoordinateComponent_add(k, (sfVector2f) { 3.8f, 1.0f }, 0.0f);
     LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
-    add_child(components, j, k);
+    add_child(j, k);
 
-    k = create_entity(components);
+    k = create_entity();
     CoordinateComponent_add(k, (sfVector2f) { 3.8f, -1.0f }, 0.0f);
     LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
-    add_child(components, j, k);
+    add_child(j, k);
 
     k = create_waypoint(components, (sfVector2f) { 5.0f, 2.5f });
-    add_child(components, j, k);
+    add_child(j, k);
 
     k = create_waypoint(components, (sfVector2f) { 5.0f, -2.5f });
-    add_child(components, j, k);
+    add_child(j, k);
 
     k = create_waypoint(components, (sfVector2f) { -2.0f, 2.5f });
-    add_child(components, j, k);
+    add_child(j, k);
 
     k = create_waypoint(components, (sfVector2f) { -2.0f, -2.5f });
-    add_child(components, j, k);
+    add_child(j, k);
 
     return i;
 }
@@ -64,8 +64,8 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
         float min_d = 3.0;
         int closest = 0;
         for (int k = 0; k < 4; k++) {
-            sfVector2f r = sum(get_position(components, j), rotate(vehicle->seats[k], get_angle(components, j)));
-            float d = dist(get_position(components, i), r);
+            sfVector2f r = sum(get_position(j), rotate(vehicle->seats[k], get_angle(j)));
+            float d = dist(get_position(i), r);
 
             if (d < min_d) {
                 min_d = d;
@@ -117,8 +117,8 @@ void exit_vehicle(ComponentData* components, int i) {
     CoordinateComponent* coord = components->coordinate[i];
     sfVector2f r = vehicle->seats[k];
     r.y *= 2.0;
-    r = rotate(r, get_angle(components, j));
-    coord->position = sum(get_position(components, j), r);
+    r = rotate(r, get_angle(j));
+    coord->position = sum(get_position(j), r);
     coord->parent = -1;
 
     player->vehicle = -1;
@@ -138,7 +138,7 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering) 
     int i = JointComponent_get(player->vehicle)->parent;
     PhysicsComponent* phys = PhysicsComponent_get(i);
 
-    float front_angle = get_angle(components, i);
+    float front_angle = get_angle(i);
 
     phys->acceleration = polar_to_cartesian(vehicle->acceleration * gas, front_angle);
 
@@ -155,7 +155,7 @@ void drive_vehicle(ComponentData* components, int p, float gas, float steering) 
 
     phys->velocity = polar_to_cartesian(vn, front_angle);
 
-    float angle = get_angle(components, player->vehicle);
+    float angle = get_angle(player->vehicle);
     float delta_angle = angle_diff(front_angle, angle);
 
     phys->angular_velocity = 4.0f * vehicle->turning * sign(-vehicle->turning * steering - delta_angle);

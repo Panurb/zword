@@ -54,7 +54,7 @@ void ParticleComponent_add_splinter(ComponentData* components, int entity) {
 
 void ParticleComponent_add_fire(ComponentData* components, int entity, float size) {
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
-    float angle = 0.5f * M_PI - get_angle(components, entity);
+    float angle = 0.5f * M_PI - get_angle(entity);
     ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, sfYellow);
     particle->loop = true;
     particle->enabled = true;
@@ -104,10 +104,10 @@ void add_particles(ComponentData* components, int entity, int n) {
     ParticleComponent* part = ParticleComponent_get(entity);
 
     for (int i = 0; i < n; i++) {
-        part->position[part->iterator] = sum(get_position(components, entity), part->origin);
+        part->position[part->iterator] = sum(get_position(entity), part->origin);
         float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
         float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
-        part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(components, entity) + angle);
+        part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(entity) + angle);
         part->time[part->iterator] = part->max_time;
         if (part->particles < part->max_particles) {
             part->particles++;
@@ -124,7 +124,7 @@ void update_particles(ComponentData* components, int camera, float delta_time) {
 
         float w = 3.0f * part->max_time * part->speed;
         bool visible = on_screen(components, camera, 
-            get_position(components, i), w, w);
+            get_position(i), w, w);
         if (part->loop && !visible) {
             
             continue;

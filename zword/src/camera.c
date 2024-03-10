@@ -16,7 +16,7 @@
 
 
 int create_camera(ComponentData* components, sfVideoMode mode) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
     CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 40.0f);
     // ParticleComponent* part = ParticleComponent_add(i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, sfWhite, sfWhite);
@@ -27,7 +27,7 @@ int create_camera(ComponentData* components, sfVideoMode mode) {
 
 
 int create_menu_camera(ComponentData* components, sfVideoMode mode) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
     CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 25.0f);
     return i;
@@ -44,7 +44,7 @@ sfVector2f camera_size(ComponentData* components, int camera) {
 
 sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
-    sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
+    sfVector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
     b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
@@ -54,7 +54,7 @@ sfVector2f world_to_screen(ComponentData* components, int camera, sfVector2f a) 
 
 sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) {
     CameraComponent* cam = CameraComponent_get(camera);
-    sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
+    sfVector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + pos.x;
     b.y = (0.5 * cam->resolution.y - a.y) / cam->zoom + pos.y;
@@ -64,7 +64,7 @@ sfVector2f screen_to_world(ComponentData* components, int camera, sfVector2i a) 
 
 sfVector2f world_to_texture(ComponentData* components, int camera, sfVector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
-    sfVector2f pos = sum(get_position(components, camera), cam->shake.position);
+    sfVector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
     b.y = (a.y - pos.y) * cam->zoom + 0.5 * cam->resolution.y;
@@ -342,7 +342,7 @@ void update_camera(ComponentData* components, int camera, float time_step, bool 
             PlayerComponent* player = PlayerComponent_get(i);
             if (player->state != PLAYER_DEAD) {
                 n += 1;
-                pos = sum(pos, get_position(components, i));
+                pos = sum(pos, get_position(i));
             }
         }
         if (n != 0) {
@@ -358,7 +358,7 @@ void update_camera(ComponentData* components, int camera, float time_step, bool 
 
 
 bool on_screen(ComponentData* components, int camera, sfVector2f position, float width, float height) {
-    sfVector2f pos = get_position(components, camera);
+    sfVector2f pos = get_position(camera);
     CameraComponent* cam = CameraComponent_get(camera);
 
     if (fabsf(position.x - pos.x) < 0.5f * (width + cam->resolution.x / cam->zoom)) {
@@ -384,7 +384,7 @@ void draw_overlay(sfRenderWindow* window, ComponentData* components, int camera,
     CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
-    sfVector2f pos = get_position(components, camera);
+    sfVector2f pos = get_position(camera);
     sfColor color = get_color(0.0f, 0.0f, 0.0f, alpha);
     draw_rectangle(window, components, camera, NULL, pos, width, height, 0.0f, color);
 }

@@ -73,7 +73,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
         ImageComponent* image = ImageComponent_get(i);
         if (!image || image->alpha == 0.0f || image->layer <= LAYER_DECALS) continue;
 
-        sfVector2f start = get_position(components, i);
+        sfVector2f start = get_position(i);
 
         float radius = 1.5f * collider->radius;
         if (!on_screen(components, camera, start, 2.0f * radius, 2.0f * radius)) {
@@ -109,7 +109,7 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
                 get_corners(components, i, corners);
 
                 float r = fminf(0.5f * radius, 1.0f);
-                float angle = get_angle(components, i);
+                float angle = get_angle(i);
                 for (int j = 0; j < 4; j++) {
                     sfVector2f corner = corners[j];
                     corners[j + 4] = sum(corner, polar_to_cartesian(r, angle + (0.25f - j * 0.5f) * M_PI));
@@ -154,7 +154,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
         LightComponent* light = LightComponent_get(i);
         if (!light) continue;
 
-        sfVector2f start = get_position(components, i);
+        sfVector2f start = get_position(i);
 
         if (!on_screen(components, camera, start, 2.0f * light->range, 2.0f * light->range)) {
             continue;
@@ -175,7 +175,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
         color.a = 255 * brightness;
         v->color = color;
 
-        float angle = get_angle(components, i) - 0.5 * light->angle;
+        float angle = get_angle(i) - 0.5 * light->angle;
         sfVector2f velocity = polar_to_cartesian(1.0, angle);
 
         float delta_angle = light->angle / (light->rays - 1);

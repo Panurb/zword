@@ -551,16 +551,16 @@ TextComponent* TextComponent_add(int entity, String string, int size, sfColor co
 TextComponent* TextComponent_get(int entity);
 void TextComponent_remove(int entity);
 
-int create_entity(ComponentData* components);
-void destroy_entity(ComponentData* components, int i);
-void destroy_entity_recursive(ComponentData* components, int entity);
-int get_root(ComponentData* components, int entity);
-void add_child(ComponentData* components, int parent, int child);
-void remove_children(ComponentData* components, int parent);
+int create_entity();
+void destroy_entity(int i);
+void destroy_entity_recursive(int entity);
+int get_root(int entity);
+void add_child(int parent, int child);
+void remove_children(int parent);
 
-void ComponentData_clear(ComponentData* components);
+void ComponentData_clear();
 
-sfVector2f get_position(ComponentData* components, int i);
-float get_angle(ComponentData* components, int i);
+sfVector2f get_position(int i);
+float get_angle(int i);
 
-bool entity_exists(ComponentData* components, int entity);
+bool entity_exists(int entity);

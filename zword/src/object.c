@@ -21,7 +21,7 @@
 
 
 int create_bench(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 0.8f, 2.8f, GROUP_WALLS);
@@ -30,26 +30,26 @@ int create_bench(ComponentData* components, sfVector2f position, float angle) {
     PhysicsComponent_add(i, 2.0f);
     SoundComponent_add(i, "wood_hit");
 
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) {0.0f, -1.0f}, 0.0f);
     ImageComponent_add(j, "bench_debris", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
     ColliderComponent_add_rectangle(components, j, 0.8f, 1.2f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(j, 1.0f);
-    add_child(components, i, j);
+    add_child(i, j);
 
-    j = create_entity(components);
+    j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) {0.0f, 0.5f}, 0.0f);
     ImageComponent_add(j, "bench_destroyed", 1.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
     ColliderComponent_add_rectangle(components, j, 0.8f, 1.4f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(j, 1.0f);
-    add_child(components, i, j);
+    add_child(i, j);
 
     return i;
 }
 
 
 int create_table(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "table", 3.0f, 3.0f, LAYER_ITEMS)->alpha = 1.0f;
     ColliderComponent_add_circle(components, i, 1.4f, GROUP_WALLS);
@@ -58,26 +58,26 @@ int create_table(ComponentData* components, sfVector2f position) {
     PhysicsComponent_add(i, 2.0f);
     SoundComponent_add(i, "wood_hit");
 
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) {-0.6f, 0.0f}, 0.0f);
     ImageComponent_add(j, "table_destroyed", 2.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
     ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(j, 1.0f);
-    add_child(components, i, j);
+    add_child(i, j);
 
-    j = create_entity(components);
+    j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) {0.6f, 0.0f}, M_PI);
     ImageComponent_add(j, "table_destroyed", 2.0f, 3.0f, LAYER_CORPSES)->alpha = 0.0f;
     ColliderComponent_add_rectangle(components, j, 1.2f, 1.8f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(j, 1.0f);
-    add_child(components, i, j);
+    add_child(i, j);
 
     return i;
 }
 
 
 int create_hay_bale(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "hay_bale", 3.0f, 2.0f, LAYER_ITEMS);
@@ -89,7 +89,7 @@ int create_hay_bale(ComponentData* components, sfVector2f position, float angle)
 
 
 int create_stove(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "stove", 2.0f, 2.0f, LAYER_ITEMS);
@@ -102,7 +102,7 @@ int create_stove(ComponentData* components, sfVector2f position, float angle) {
 
 
 int create_sink(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "sink", 2.0f, 3.0f, LAYER_ITEMS);
@@ -115,7 +115,7 @@ int create_sink(ComponentData* components, sfVector2f position, float angle) {
 
 
 int create_toilet(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "toilet", 2.0f, 2.0f, LAYER_ITEMS);
@@ -128,7 +128,7 @@ int create_toilet(ComponentData* components, sfVector2f position, float angle) {
 
 
 int create_bed(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "bed", 4.0f, 2.0f, LAYER_ITEMS);
@@ -141,7 +141,7 @@ int create_bed(ComponentData* components, sfVector2f position, float angle) {
 
 
 int create_candle(ComponentData* components, sfVector2f pos) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, pos, rand_angle());
     ColliderComponent_add_circle(components, i, 0.5f, LAYER_WALLS);
@@ -155,7 +155,7 @@ int create_candle(ComponentData* components, sfVector2f pos) {
 
 
 int create_lamp(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "lamp", 1.0f, 1.0f, LAYER_ITEMS);
@@ -169,7 +169,7 @@ int create_lamp(ComponentData* components, sfVector2f position) {
 
 
 int create_desk(ComponentData* components, sfVector2f position, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "desk", 2.0, 2.0f, LAYER_ITEMS);
@@ -179,26 +179,26 @@ int create_desk(ComponentData* components, sfVector2f position, float angle) {
     HealthComponent_add(i, 100, "", "", "wood_destroy");
     PhysicsComponent_add(i, 2.0f);
 
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) {0.0f, -0.75f}, 0.0f);
     ImageComponent_add(j, "desk_destroyed", 2.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
     ColliderComponent_add_rectangle(components, j, 1.3f, 1.0f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(j, 1.0f);
-    add_child(components, i, j);
+    add_child(i, j);
 
-    j = create_entity(components);
+    j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) {0.0f, 0.25f}, 0.0f);
     ImageComponent_add(j, "desk_debris", 2.0f, 2.0f, LAYER_CORPSES)->alpha = 0.0f;
     ColliderComponent_add_rectangle(components, j, 1.3f, 1.0f, GROUP_DEBRIS)->enabled = false;
     PhysicsComponent_add(j, 1.0f);
-    add_child(components, i, j);
+    add_child(i, j);
 
     return i;
 }
 
 
 int create_fire(ComponentData* components, sfVector2f pos) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
@@ -214,7 +214,7 @@ int create_fire(ComponentData* components, sfVector2f pos) {
 
 
 int create_tree(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());    
     float size = randf(1.0f, 1.5f);
     ColliderComponent_add_circle(components, i, 1.25f * size, GROUP_TREES);
@@ -225,7 +225,7 @@ int create_tree(ComponentData* components, sfVector2f position) {
 
 
 int create_rock(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     float size = randf(0.75f, 2.0f);
     ColliderComponent_add_circle(components, i, 1.4 * size, GROUP_WALLS);
@@ -236,7 +236,7 @@ int create_rock(ComponentData* components, sfVector2f position) {
 
 
 int create_uranium(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     float r = randf(0.8f, 1.2f);
     ColliderComponent_add_circle(components, i, 0.5f * r, GROUP_TREES);

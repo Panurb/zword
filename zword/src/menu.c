@@ -127,7 +127,7 @@ void apply(ComponentData* components, int entity) {
 void toggle_play(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_play != -1) {
-        destroy_entity_recursive(components, window_play);
+        destroy_entity_recursive(window_play);
         window_play = -1;
         return;
     }
@@ -136,7 +136,7 @@ void toggle_play(ComponentData* components, int entity) {
     window_play = create_window(components, pos, "PLAY", 1, toggle_play);
 
     int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
-    add_child(components, window_play, container);
+    add_child(window_play, container);
 
     add_button_to_container(components, container, "Tutorial", change_state_start);
     add_button_to_container(components, container, "Survival", change_state_start);
@@ -147,7 +147,7 @@ void toggle_play(ComponentData* components, int entity) {
 void toggle_new_map(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_new_map != -1) {
-        destroy_entity_recursive(components, window_new_map);
+        destroy_entity_recursive(window_new_map);
         window_new_map = -1;
         return;
     }
@@ -156,7 +156,7 @@ void toggle_new_map(ComponentData* components, int entity) {
     window_new_map = create_window(components, pos, "NEW MAP", 2, toggle_new_map);
 
     int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 2, 2);
-    add_child(components, window_new_map, container);
+    add_child(window_new_map, container);
 
     int label = create_label(components, "NAME", zeros());
     MAP_NAME_ID = create_textbox(components, zeros(), 1);
@@ -168,7 +168,7 @@ void toggle_new_map(ComponentData* components, int entity) {
 void toggle_editor(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_editor != -1) {
-        destroy_entity_recursive(components, window_editor);
+        destroy_entity_recursive(window_editor);
         window_editor = -1;
         return;
     }
@@ -177,7 +177,7 @@ void toggle_editor(ComponentData* components, int entity) {
     window_editor = create_window(components, pos, "EDITOR", 1, toggle_editor);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_editor, container);
+    add_child(window_editor, container);
 
     add_button_to_container(components, container, "NEW MAP", toggle_new_map);
     add_files_to_container(components, container, "maps", change_state_load);
@@ -200,7 +200,7 @@ int get_resolution_index() {
 void toggle_settings(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_settings != -1) {
-        destroy_entity_recursive(components, window_settings);
+        destroy_entity_recursive(window_settings);
         window_settings = -1;
         return;
     }
@@ -209,7 +209,7 @@ void toggle_settings(ComponentData* components, int entity) {
     window_settings = create_window(components, pos, "SETTINGS", 2, toggle_settings);
 
     int container = create_container(components, vec(0.0f, -2.5f * BUTTON_HEIGHT), 2, 4);
-    add_child(components, window_settings, container);
+    add_child(window_settings, container);
 
     int label = create_label(components, "Resolution", zeros());
     RESOLUTION_ID = create_dropdown(components, zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
@@ -231,7 +231,7 @@ void toggle_settings(ComponentData* components, int entity) {
 void toggle_keyboard_controls(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_keyboard_controls != -1) {
-        destroy_entity_recursive(components, window_keyboard_controls);
+        destroy_entity_recursive(window_keyboard_controls);
         window_keyboard_controls = -1;
         return;
     }
@@ -240,7 +240,7 @@ void toggle_keyboard_controls(ComponentData* components, int entity) {
     window_keyboard_controls = create_window(components, pos, "KEYBOARD CONTROLS", 2, toggle_keyboard_controls);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
-    add_child(components, window_keyboard_controls, container);
+    add_child(window_keyboard_controls, container);
 
     for (int i = 0; i < ACTIONS_SIZE; i++) {
         int label = create_label(components, ACTIONS[i], zeros());
@@ -254,7 +254,7 @@ void toggle_keyboard_controls(ComponentData* components, int entity) {
 void toggle_xbox_controls(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_xbox_controls != -1) {
-        destroy_entity_recursive(components, window_xbox_controls);
+        destroy_entity_recursive(window_xbox_controls);
         window_xbox_controls = -1;
         return;
     }
@@ -263,7 +263,7 @@ void toggle_xbox_controls(ComponentData* components, int entity) {
     window_xbox_controls = create_window(components, pos, "CONTROLS", 2, toggle_xbox_controls);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
-    add_child(components, window_xbox_controls, container);
+    add_child(window_xbox_controls, container);
 
     for (int i = 0; i < ACTIONS_SIZE; i++) {
         int label = create_label(components, ACTIONS[i], zeros());
@@ -277,7 +277,7 @@ void toggle_xbox_controls(ComponentData* components, int entity) {
 void toggle_controls(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_controls != -1) {
-        destroy_entity_recursive(components, window_controls);
+        destroy_entity_recursive(window_controls);
         window_controls = -1;
         return;
     }
@@ -286,7 +286,7 @@ void toggle_controls(ComponentData* components, int entity) {
     window_controls = create_window(components, pos, "CONTROLS", 1, toggle_controls);
 
     int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
-    add_child(components, window_controls, container);
+    add_child(window_controls, container);
 
     add_button_to_container(components, container, "KEYBOARD", toggle_keyboard_controls);
     add_button_to_container(components, container, "XBOX", toggle_xbox_controls);
@@ -296,7 +296,7 @@ void toggle_controls(ComponentData* components, int entity) {
 void toggle_credits(ComponentData* components, int entity) {
     UNUSED(entity);
     if (window_credits != -1) {
-        destroy_entity_recursive(components, window_credits);
+        destroy_entity_recursive(window_credits);
         window_credits = -1;
         return;
     }
@@ -305,7 +305,7 @@ void toggle_credits(ComponentData* components, int entity) {
     window_credits = create_window(components, pos, "CREDITS", 2, toggle_credits);
 
     int container = create_container(components, vec(0.0f, -3.5f * BUTTON_HEIGHT), 2, 6);
-    add_child(components, window_credits, container);
+    add_child(window_credits, container);
 
     add_row_to_container(components, container, create_label(components, "Programming, art, music", zeros()), create_label(components, "Panu Keskinen", zeros()));
     add_row_to_container(components, container, create_label(components, "Made with", zeros()), create_label(components, "C, CSFML, cJSON", zeros()));
@@ -334,7 +334,7 @@ void destroy_menu(GameData data) {
     for (int i = 0; i < data.components->entities; i++) {
         WidgetComponent* widget = WidgetComponent_get(i);
         if (widget) {
-            destroy_entity(data.components, i);
+            destroy_entity(i);
         }
     }
 }

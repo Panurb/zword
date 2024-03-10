@@ -175,7 +175,7 @@ sfVector2f get_selections_center(ComponentData* components) {
     FOREACH(node, selections) {
         int i = node->value;
         if (CoordinateComponent_get(i)->parent == -1) {
-            center = sum(center, get_position(components, i));
+            center = sum(center, get_position(i));
         }
     }
     if (selections->size != 0) {
@@ -207,7 +207,7 @@ void select_object(ComponentData* components, int entity) {
 
     ListNode* node;
     FOREACH(node, components->added_entities) {
-      destroy_entity(components, node->value);
+      destroy_entity(node->value);
     }
     List_delete(components->added_entities);
 }
@@ -216,7 +216,7 @@ void select_object(ComponentData* components, int entity) {
 int toggle_list_window(ComponentData* components, int window_id, ButtonText title, OnClick close, ButtonText* values, 
         int length, OnClick select) {
     if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
+        destroy_entity_recursive(window_id);
         return -1;
     }
 
@@ -224,7 +224,7 @@ int toggle_list_window(ComponentData* components, int window_id, ButtonText titl
     window_id = create_window(components, pos, title, 1, close);
 
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_id, container);
+    add_child(window_id, container);
 
     for (int i = 0; i < length; i++) {
         int j = add_button_to_container(components, container, values[i], select);
@@ -295,14 +295,14 @@ void toggle_editor_settings(ComponentData* components, int entity) {
     static int window_id = -1;
 
     if (window_id != -1) {
-        destroy_entity_recursive(components, window_id);
+        destroy_entity_recursive(window_id);
         window_id = -1;
         return;
     }
    
     window_id = create_window(components, vec(0.0f, 0.0f), "SETTINGS", 1, toggle_editor_settings);
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
-    add_child(components, window_id, container);
+    add_child(window_id, container);
 
     int i = create_label(components, "Game mode", zeros());
     add_widget_to_container(components, container, i);
@@ -322,7 +322,7 @@ void toggle_editor_settings(ComponentData* components, int entity) {
 
 void close_entity_settings(ComponentData* components, int entity) {
     UNUSED(entity);
-    destroy_entity_recursive(components, entity_settings_id);
+    destroy_entity_recursive(entity_settings_id);
     entity_settings_id = -1;
     entity_settings_entity = -1;
 }
@@ -348,7 +348,7 @@ void open_entity_settings(ComponentData* components, int entity) {
     snprintf(buffer, BUTTON_TEXT_SIZE, "ENTITY %d", entity);
     entity_settings_id = create_window(components, vec(0.0f, 0.0f), buffer, 2, close_entity_settings);
     int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
-    add_child(components, entity_settings_id, container);
+    add_child(entity_settings_id, container);
 
     TextComponent* text = TextComponent_get(entity);
     if (text) {
@@ -450,7 +450,7 @@ void destroy_selections(GameData* data) {
         if (ColliderComponent_get(i)) {
             clear_grid(data->components, data->grid, i);
         }
-        destroy_entity_recursive(data->components, i);
+        destroy_entity_recursive(i);
     }
     List_clear(selections);
 }
@@ -482,7 +482,7 @@ void update_selections(GameData data) {
         } else if (image) {
             overlap = overlap_rectangle_image(data.components, selection_box, i);
         } else {
-            if (point_inside_collider(data.components, selection_box, get_position(data.components, i))) {
+            if (point_inside_collider(data.components, selection_box, get_position(i))) {
                 overlap = ones();
             }
         }
@@ -602,7 +602,7 @@ void input_tool_select(GameData* data, sfEvent event) {
                 // TODO: grab top entity
             }
             if (!grabbed) {
-                selection_box = create_entity(components);
+                selection_box = create_entity();
                 CoordinateComponent_add(selection_box, tile_start, 0.0f);
                 ColliderComponent_add_rectangle(components, selection_box, 0.0f, 0.0f, GROUP_ALL);
             }
@@ -613,7 +613,7 @@ void input_tool_select(GameData* data, sfEvent event) {
         }
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
         if (selection_box != -1) {
-            destroy_entity(components, selection_box);
+            destroy_entity(selection_box);
             selection_box = -1;
         }
         grabbed = false;
@@ -810,7 +810,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
     switch(tool) {
         case TOOL_SELECT:
             if (selection_box != -1) {
-                sfVector2f pos = get_position(data.components, selection_box);
+                sfVector2f pos = get_position(selection_box);
                 ColliderComponent* collider = ColliderComponent_get(selection_box);
                 draw_rectangle_outline(window, data.components, data.camera, NULL, pos, collider->width, 
                     collider->height, 0.0f, 0.05f, sfWhite);
@@ -853,8 +853,8 @@ void draw_editor(GameData data, sfRenderWindow* window) {
         ListNode* node;
         FOREACH (node, selections) {
             int i = node->value;
-            sfVector2f pos = get_position(data.components, i);
-            float angle = get_angle(data.components, i);
+            sfVector2f pos = get_position(i);
+            float angle = get_angle(i);
 
             ImageComponent* image = ImageComponent_get(i);
             ColliderComponent* collider = ColliderComponent_get(i);

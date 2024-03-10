@@ -10,7 +10,7 @@
 
 
 int create_door(ComponentData* components, sfVector2f pos, float angle) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, pos, angle + M_PI);
     ImageComponent_add(i, "door", 2.0f, 1.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
@@ -19,7 +19,7 @@ int create_door(ComponentData* components, sfVector2f pos, float angle) {
     DoorComponent_add(i, 500);
     PhysicsComponent_add(i, 1.0f);
 
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, sum(pos, polar_to_cartesian(1.0f, angle + M_PI)), angle + M_PI);
     ImageComponent_add(j, "hinge", 0.0f, 0.0f, LAYER_ITEMS);
     JointComponent_add(i, j, 1.0f, 1.0f, 1.0f)->max_angle = 0.5f * M_PI;

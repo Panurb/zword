@@ -26,7 +26,7 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
     int current = -1;
 
     for (int i = 0; i < n; i++) {
-        current = create_entity(components);
+        current = create_entity();
 
         sfVector2f grad = rand_vector();
         sfVector2f pos = diff(position, mult(curviness, grad));
@@ -41,8 +41,8 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
             next_road->prev = current;
 
             if (next_road->next != -1) {
-                sfVector2f next_pos = get_position(components, road->next);
-                sfVector2f next_next_pos = get_position(components, next_road->next);
+                sfVector2f next_pos = get_position(road->next);
+                sfVector2f next_next_pos = get_position(next_road->next);
                 sfVector2f r1 = diff(next_pos, pos);
                 sfVector2f r2 = diff(next_next_pos, next_pos);
                 next_road->curve = signed_angle(r1, r2);
@@ -68,10 +68,10 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
         }
         RoadComponent* next_road = RoadComponent_get(road->next);
 
-        int i = create_entity(components);
+        int i = create_entity();
 
-        sfVector2f pos = get_position(components, current);
-        sfVector2f next_pos = get_position(components, road->next);
+        sfVector2f pos = get_position(current);
+        sfVector2f next_pos = get_position(road->next);
 
         float margin_1 = 0.5 * road->width * tanf(0.5 * fabs(road->curve));
         float margin_2 = 0.5 * road->width * tanf(0.5 * fabs(next_road->curve));
@@ -91,13 +91,13 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
         snprintf(filename, 20, "%s%s", road->filename, "_end");
 
         if (road->prev == -1) {
-            i = create_entity(components);
+            i = create_entity();
             CoordinateComponent_add(i, pos, angle);
             ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
         }
 
         if (next_road->next == -1) {
-            i = create_entity(components);
+            i = create_entity();
             CoordinateComponent_add(i, next_pos, angle + M_PI);
             ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
         }
@@ -124,7 +124,7 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
     RoadComponent* road = RoadComponent_get(entity);
     if (!road) return;
 
-    float angle = get_angle(components, entity);
+    float angle = get_angle(entity);
     float spread = fabs(road->curve);
 
     if (road->texture_changed) {
@@ -151,7 +151,7 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
         road->texture_changed = false;
     }
 
-    sfVector2f pos = get_position(components, entity);
+    sfVector2f pos = get_position(entity);
     float margin = 0.5 * road->width * tanf(0.5 * spread);
     pos = diff(pos, polar_to_cartesian(sqrtf(margin * margin + 0.25 * road->width * road->width), angle));
 

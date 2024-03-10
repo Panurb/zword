@@ -101,7 +101,7 @@ static const char* IMAGES[] = {
 
 
 int create_decal(ComponentData* components, sfVector2f pos, Filename filename, float lifetime) {
-    int i = create_entity(components);
+    int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle())->lifetime = 60.0f;
     ImageComponent_add(i, filename, 0.0f, 0.0f, LAYER_DECALS);
     PhysicsComponent_add(i, 0.0f)->lifetime = lifetime;
@@ -167,7 +167,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
             image->texture_changed = false;
         }
 
-        sfVector2f pos = get_position(components, i);
+        sfVector2f pos = get_position(i);
         float w = image->scale.x * image->width;
         float h = image->scale.y * image->height;
         float r = sqrtf(w * w + h * h);
@@ -181,7 +181,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
 
         if (image->alpha > 0.0f) {
             sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
-            draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, i), image->scale, 0);
+            draw_sprite(window, components, camera, image->sprite, pos, get_angle(i), image->scale, 0);
         }
     }
 }
@@ -198,7 +198,7 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
     image->scale.x = 1.0f - image->stretch;
     image->scale.y = 1.0f + image->stretch;
 
-    sfVector2f pos = get_position(components, entity);
+    sfVector2f pos = get_position(entity);
     float w = image->scale.x * image->width;
     float h = image->scale.y * image->height;
     float r = sqrtf(w * w + h * h);
@@ -208,7 +208,7 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
 
     sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
     if (image->alpha > 0.0f) {
-        draw_sprite(window, components, camera, image->sprite, pos, get_angle(components, entity), image->scale, 0);
+        draw_sprite(window, components, camera, image->sprite, pos, get_angle(entity), image->scale, 0);
     }
 }
 
@@ -312,8 +312,8 @@ void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfC
 
 
 bool point_inside_image(ComponentData* components, int entity, sfVector2f point) {
-    sfVector2f position = get_position(components, entity);
-    float angle = get_angle(components, entity);
+    sfVector2f position = get_position(entity);
+    float angle = get_angle(entity);
     ImageComponent* image = ImageComponent_get(entity);
     return point_inside_rectangle(position, angle, image->width, image->height, point);
 }

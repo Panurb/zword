@@ -10,7 +10,7 @@
 
 
 int create_flashlight(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     float angle = rand_angle();
     CoordinateComponent_add(i, position, angle);
@@ -25,7 +25,7 @@ int create_flashlight(ComponentData* components, sfVector2f position) {
 
 
 int create_gas(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     float angle = rand_angle();
     CoordinateComponent_add(i, position, angle);
@@ -39,7 +39,7 @@ int create_gas(ComponentData* components, sfVector2f position) {
 
 
 int create_bandage(ComponentData* components, sfVector2f position) {
-    int i = create_entity(components);
+    int i = create_entity();
 
     float angle = rand_angle();
     CoordinateComponent_add(i, position, angle);
@@ -120,7 +120,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             ColliderComponent_get(player->target)->enabled = false;
         } else {
             AmmoComponent_get(i)->size += ammo->size;
-            destroy_entity(components, player->target);
+            destroy_entity(player->target);
             player->target = -1;
         }
     } else {
@@ -163,8 +163,8 @@ void drop_item(ComponentData* components, int entity) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         coord->parent = -1;
 
-        sfVector2f r = polar_to_cartesian(1.0, get_angle(components, entity));
-        coord->position = sum(get_position(components, entity), r);
+        sfVector2f r = polar_to_cartesian(1.0, get_angle(entity));
+        coord->position = sum(get_position(entity), r);
 
         physics->velocity = mult(7.0, r);
         physics->angular_velocity = 3.0;
@@ -192,7 +192,7 @@ void heal(ComponentData* components, ColliderGrid* grid, int entity) {
 
     drop_item(components, parent);
     clear_grid(components, grid, entity);
-    destroy_entity(components, entity);
+    destroy_entity(entity);
 }
 
 
@@ -237,8 +237,8 @@ void draw_items(GameData* data, sfRenderWindow* window) {
         ImageComponent* image = ImageComponent_get(player->target);
 
         sfShader_setFloatUniform(CameraComponent_get(data->camera)->shaders[1], "offset", 0.05f);
-        sfVector2f pos = get_position(data->components, player->target);
-        float angle = get_angle(data->components, player->target);
+        sfVector2f pos = get_position(player->target);
+        float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
             draw_sprite(window, data->components, data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
         }

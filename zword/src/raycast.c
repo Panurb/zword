@@ -52,14 +52,14 @@ Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVecto
         // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 
         float radius = col->radius;
-        sfVector2f oc = diff(start, get_position(components, i));
+        sfVector2f oc = diff(start, get_position(i));
         float delta = powf(dot(velocity, oc), 2) - norm2(oc) + powf(radius, 2);
         float t = -dot(velocity, oc) - sqrtf(delta);
 
         if (delta >= 0.0 && t >= 0.0 && t < hit.time) {
             hit.time = t;
             sfVector2f p = sum(start, mult(t, velocity));
-            hit.normal = diff(p, get_position(components, i));
+            hit.normal = diff(p, get_position(i));
         }
     }
 

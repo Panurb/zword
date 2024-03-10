@@ -27,7 +27,7 @@
 
 int create_player(ComponentData* components, sfVector2f pos, float angle) {
     int joystick = -1;
-    int i = create_entity(components);
+    int i = create_entity();
 
     CoordinateComponent_add(i, pos, angle);
     ImageComponent_add(i, "player", 1.0, 1.0, LAYER_PLAYERS);
@@ -41,7 +41,7 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
     HealthComponent_add(i, 100, "player_dead", "blood", "");
     SoundComponent_add(i, "squish");
 
-    int j = create_entity(components);
+    int j = create_entity();
     CoordinateComponent_add(j, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
     ImageComponent_add(j, "", 0.0f, 0.0f, LAYER_WEAPONS);
     AnimationComponent* animation = AnimationComponent_add(j, 1);
@@ -107,7 +107,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             if (non_zero(right_stick)) {
                 coord->angle = polar_angle(right_stick);
                 if (coord->parent != -1) {
-                    coord->angle -= get_angle(components, coord->parent);
+                    coord->angle -= get_angle(coord->parent);
                 }
             }
 
@@ -135,7 +135,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
         
         switch (player->state) {
             case PLAYER_ON_FOOT:;
-                sfVector2f pos = get_position(components, i);
+                sfVector2f pos = get_position(i);
 
                 player->target = -1;
 
@@ -148,7 +148,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     if (!ItemComponent_get(k)) continue;
                     if (CoordinateComponent_get(k)->parent != -1) continue;
 
-                    float d = dist(pos, get_position(components, k));
+                    float d = dist(pos, get_position(k));
                     if (d < min_dist) {
                         player->target = k;
                         min_dist = d;
