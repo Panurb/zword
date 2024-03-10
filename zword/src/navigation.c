@@ -128,7 +128,7 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera)
 
     List* waypoints = List_create();
 
-    List* list = get_entities(components, grid, get_position(camera), 50.0f);
+    List* list = get_entities(get_position(camera), 50.0f);
     for (ListNode* node = list->head; node; node = node->next) {
         int i = node->value;
         WaypointComponent* waypoint = WaypointComponent_get(i);

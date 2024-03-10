@@ -143,7 +143,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     create_garage(components, sum(start, mult(25.0f, rand_vector())));
 
-    init_grid(components, grid);
+    init_grid();
 
     float f = 0.5f;
     for (int i = 1; i < LEVEL_WIDTH - 1; i++) {

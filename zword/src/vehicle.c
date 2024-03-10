@@ -82,7 +82,7 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
             }
 
             player->vehicle = j;
-            clear_grid(components, grid, i);
+            clear_grid(i);
             coord->position = vehicle->seats[closest];
             coord->angle = 0.0;
             coord->parent = j;

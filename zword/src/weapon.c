@@ -90,7 +90,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
             if (phys->collision.entities->size > 0) {
                 light->brightness = 0.5f;
                 add_particles(components, i, 10);
-                clear_grid(components, grid, i);
+                clear_grid(i);
                 ColliderComponent_get(i)->enabled = false;
                 ImageComponent_remove(i);
                 add_sound(components, i, "energy", 0.5f, randf(1.2f, 1.5f));

@@ -913,7 +913,7 @@ void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float 
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
         ids[n] = deserialize_entity(entity, data->components, false, offset, rotation);
-        update_grid(data->components, data->grid, ids[n]);
+        update_grid(ids[n]);
         n++;
     }
 

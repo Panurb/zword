@@ -141,7 +141,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 float min_dist = 9999.0;
 
-                List* list = get_entities(components, grid, pos, 1.0f);
+                List* list = get_entities(pos, 1.0f);
                 for (ListNode* current = list->head; current; current = current->next) {
                     int k = current->value;
                     if (k == -1) break;
@@ -319,7 +319,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 if (col) {
                     col->group = GROUP_ITEMS;
                     if (phys->speed == 0.0) {
-                        clear_grid(components, grid, i);
+                        clear_grid(i);
                         // ColliderComponent_remove(i);
                     }
                 }

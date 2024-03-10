@@ -31,7 +31,7 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
         physics->lifetime -= time_step;
         if (physics->lifetime <= 0.0f) {
             if (col) {
-                clear_grid(components, grid, i);
+                clear_grid(i);
             }
             remove_children(i);
             destroy_entity(i);
@@ -83,12 +83,12 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
 
         bool moved = col && col->enabled && (non_zero(delta_pos) || delta_angle != 0.0f);
         if (moved) {
-            clear_grid(components, grid, i);
+            clear_grid(i);
         }
         coord->position = sum(coord->position, delta_pos);
         coord->angle = mod(coord->angle + delta_angle, 2.0f * M_PI);
         if (moved) {
-            update_grid(components, grid, i);
+            update_grid(i);
         }
 
         sfVector2f v_hat = normalized(physics->velocity);

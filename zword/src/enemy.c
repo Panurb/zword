@@ -325,7 +325,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 if (col) {
                     col->group = GROUP_CORPSES;
                     if (phys->speed == 0.0f) {
-                        clear_grid(components, grid, i);
+                        clear_grid(i);
                         ColliderComponent_remove(i);
                     }
                 }
@@ -354,7 +354,7 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
 
 
 void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range) {
-    List* list = get_entities(components, grid, get_position(player), range);
+    List* list = get_entities(get_position(player), range);
     for (ListNode* node = list->head; node; node = node->next) {
         int j = node->value;
 

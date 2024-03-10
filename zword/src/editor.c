@@ -406,9 +406,9 @@ void move_selections(GameData* data, sfVector2f delta_pos) {
             int i = node->value;
             CoordinateComponent* coord = CoordinateComponent_get(node->value);
             if (ColliderComponent_get(i)) {
-                clear_grid(data->components, data->grid, i);
+                clear_grid(i);
                 coord->position = sum(coord->position, delta_pos);
-                update_grid(data->components, data->grid, i);
+                update_grid(i);
             } else {
                 coord->position = sum(coord->position, delta_pos);
             }
@@ -431,10 +431,10 @@ void rotate_selections(GameData* data) {
         sfVector2f r = diff(coord->position, center);
         r = perp(r);
         if (ColliderComponent_get(i)) {
-            clear_grid(data->components, data->grid, i);
+            clear_grid(i);
             coord->position = sum(center, r);
             coord->angle += 0.5f * M_PI;
-            update_grid(data->components, data->grid, i);
+            update_grid(i);
         } else {
             coord->position = sum(center, r);
             coord->angle += 0.5f * M_PI;
@@ -448,7 +448,7 @@ void destroy_selections(GameData* data) {
     FOREACH (node, selections) {
         int i = node->value;
         if (ColliderComponent_get(i)) {
-            clear_grid(data->components, data->grid, i);
+            clear_grid(i);
         }
         destroy_entity_recursive(i);
     }
@@ -670,7 +670,7 @@ void input_tool_tile(GameData* data, sfEvent event) {
             ListNode* node;
             FOREACH(node, data->components->added_entities) {
                 if (ColliderComponent_get(node->value)) {
-                   update_grid(data->components, data->grid, node->value);
+                   update_grid(node->value);
                 }
             }
             List_delete(data->components->added_entities);
@@ -690,7 +690,7 @@ void input_tool_object(GameData* data, sfEvent event) {
             ListNode* node;
             FOREACH(node, data->components->added_entities) {
                 if (ColliderComponent_get(node->value)) {
-                   update_grid(data->components, data->grid, node->value);
+                   update_grid(node->value);
                 }
             }
             List_delete(data->components->added_entities);
@@ -800,7 +800,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
 
 void draw_editor(GameData data, sfRenderWindow* window) {
     draw_game(data, window);
-    draw_grid(data.components, window, data.camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+    draw_grid(data.camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
 
     sfVector2f mouse_pos = screen_to_world(data.camera, sfMouse_getPosition((sfWindow*) window));
     sfVector2f mouse_grid = snap_to_grid(mouse_pos, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);

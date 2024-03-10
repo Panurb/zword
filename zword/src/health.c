@@ -107,7 +107,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         remove_children(entity);
 
         if (!enemy) {
-            clear_grid(components, grid, entity);
+            clear_grid(entity);
             ColliderComponent_remove(entity);
         }
     }

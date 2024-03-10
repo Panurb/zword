@@ -246,7 +246,7 @@ sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j) {
 
 bool collides_with(ComponentData* components, ColliderGrid* grid, int i, List* entities) {
     ColliderGroup group = ColliderComponent_get(i)->group;
-    Bounds bounds = get_bounds(components, grid, i);
+    Bounds bounds = get_bounds(i);
 
     for (int j = bounds.left; j <= bounds.right; j++) {
         for (int k = bounds.bottom; k <= bounds.top; k++) {
@@ -314,7 +314,7 @@ void collide(ComponentData* components, ColliderGrid* grid) {
         PhysicsComponent* physics = components->physics[i];
         if (!physics) continue;
 
-        Bounds bounds = get_bounds(components, grid, i);
+        Bounds bounds = get_bounds(i);
 
         for (int j = bounds.left; j <= bounds.right; j++) {
             for (int k = bounds.bottom; k <= bounds.top; k++) {

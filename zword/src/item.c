@@ -108,7 +108,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     ImageComponent* image = ImageComponent_get(player->target);
     AmmoComponent* ammo = AmmoComponent_get(player->target);
     if (ammo) {
-        clear_grid(components, grid, player->target);
+        clear_grid(player->target);
 
         int i = player->ammo[ammo->type];
         if (i == -1) {
@@ -126,7 +126,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
     } else {
         int i = find(-1, player->inventory, player->inventory_size);
         if (i != -1) {
-            clear_grid(components, grid, player->target);
+            clear_grid(player->target);
 
             player->inventory[i] = player->target;
             coord->parent = entity;
@@ -191,7 +191,7 @@ void heal(ComponentData* components, ColliderGrid* grid, int entity) {
     player_health->health = min(player_health->health + item->value, player_health->max_health);
 
     drop_item(components, parent);
-    clear_grid(components, grid, entity);
+    clear_grid(entity);
     destroy_entity(entity);
 }
 
