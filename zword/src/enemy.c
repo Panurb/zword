@@ -203,7 +203,7 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
 
         float d = norm(r);
         if (d < min_dist && angle < 0.5f * enemy->fov) {
-            HitInfo info = raycast(components, grid, pos, r, enemy->vision_range, GROUP_VISION);
+            HitInfo info = raycast(pos, r, enemy->vision_range, GROUP_VISION);
             if (info.entity == j) {
                 enemy->target = j;
                 enemy->state = ENEMY_CHASE;
@@ -234,7 +234,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
         switch (enemy->state) {
             case ENEMY_IDLE: {
                 sfVector2f r = polar_to_cartesian(1.0f, enemy->desired_angle);
-                HitInfo info = raycast(components, grid, get_position(i), r, 2.0f, GROUP_ENEMIES);
+                HitInfo info = raycast(get_position(i), r, 2.0f, GROUP_ENEMIES);
                 if (info.entity != -1) {
                     enemy->desired_angle = mod(enemy->desired_angle - 0.1f * sign(signed_angle(info.normal, r)), 2.0f * M_PI);
                     if (phys->speed < 0.5f) {
@@ -271,7 +271,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 float d = norm(r);
                 sfVector2f v = r;
 
-                HitInfo info = raycast(components, grid, pos, r, d, GROUP_BULLETS);
+                HitInfo info = raycast(pos, r, d, GROUP_BULLETS);
                 if (info.entity != enemy->target) {
                     a_star(i, enemy->target, enemy->path);
                     if (enemy->path->size > 1) {
@@ -282,7 +282,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 enemy->desired_angle = polar_angle(v);
 
                 r = polar_to_cartesian(1.0f, get_angle(i));
-                info = raycast(components, grid, pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
+                info = raycast(pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
                 if (info.entity == enemy->target) {
                     enemy->attack_timer = enemy->attack_delay;
                     enemy->state = ENEMY_ATTACK;
@@ -291,7 +291,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                     for (int j = 0; j < weapon->shots; j++) {
                         float angle = j * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
                         sfVector2f dir = polar_to_cartesian(1.0, get_angle(i) + angle);
-                        HitInfo info = raycast(components, grid, pos, dir, 1.1f * ColliderComponent_get(i)->radius, GROUP_BULLETS);
+                        HitInfo info = raycast(pos, dir, 1.1f * ColliderComponent_get(i)->radius, GROUP_BULLETS);
 
                         if (HealthComponent_get(info.entity) && 
                                 !EnemyComponent_get(info.entity)) {

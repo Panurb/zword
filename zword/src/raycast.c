@@ -8,6 +8,7 @@
 #include "util.h"
 #include "collider.h"
 #include "raycast.h"
+#include "game.h"
 
 
 typedef struct {
@@ -16,10 +17,10 @@ typedef struct {
 } Hit;
 
 
-Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVector2f velocity, float range) {
+Hit ray_intersection(int i, sfVector2f start, sfVector2f velocity, float range) {
     Hit hit = { range, perp(velocity) };
 
-    ColliderComponent* col = components->collider[i];
+    ColliderComponent* col = ColliderComponent_get(i);
 
     if (!col->enabled) return hit;
 
@@ -67,7 +68,7 @@ Hit ray_intersection(ComponentData* components, int i, sfVector2f start, sfVecto
 }
 
 
-HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, ColliderGroup group) {
+HitInfo raycast(sfVector2f start, sfVector2f velocity, float range, ColliderGroup group) {
     // http://www.cs.yorku.ca/~amana/research/grid.pdf
 
     static int id = MAX_ENTITIES;
@@ -83,6 +84,8 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
     if (v == 0.0f) {
         return info;
     }
+
+    ColliderGrid* grid = game_data->grid;
 
     int x = floorf((start.x + 0.5 * grid->width) / grid->tile_width);
     int y = floorf((start.y + 0.5 * grid->height) / grid->tile_height);
@@ -109,7 +112,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
 
             col->last_collision = id;
 
-            Hit hit = ray_intersection(components, j, start, velocity, range);
+            Hit hit = ray_intersection(j, start, velocity, range);
             if (hit.time < t_min) {
                 t_min = hit.time;
                 info.entity = j;

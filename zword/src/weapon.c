@@ -175,7 +175,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             for (int i = 0; i < rays; i++) {
                 float angle = i * weapon->spread / (rays - 1) - 0.5f * weapon->spread;
                 sfVector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
-                HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+                HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
                 float d = dist(info.position, pos);
 
@@ -223,7 +223,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
         } case AMMO_ROPE: {
             float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
             sfVector2f dir = polar_to_cartesian(1.0f, get_angle(parent) + angle);
-            HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+            HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
             int i = create_rope(components, info.position, get_position(parent));
 
@@ -245,7 +245,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                     angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                 }
                 sfVector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
-                HitInfo info = raycast(components, grid, pos, dir, weapon->range, GROUP_BULLETS);
+                HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
                 int dmg = weapon->damage;
                 if (dot(info.normal, dir) < -0.99f) {

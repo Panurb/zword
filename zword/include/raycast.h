@@ -10,4 +10,4 @@ typedef struct {
     sfVector2f normal;
 } HitInfo;
 
-HitInfo raycast(ComponentData* component, ColliderGrid* grid, sfVector2f start, sfVector2f velocity, float range, ColliderGroup group);
+HitInfo raycast(sfVector2f start, sfVector2f velocity, float range, ColliderGroup group);

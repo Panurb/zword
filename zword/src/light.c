@@ -182,7 +182,7 @@ void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture*
         Matrix2f rot = rotation_matrix(delta_angle);
 
         for (int j = 1; j < light->rays + 1; j++) {
-            HitInfo info = raycast(components, grid, start, velocity, range, GROUP_LIGHTS);
+            HitInfo info = raycast(start, velocity, range, GROUP_LIGHTS);
             sfVector2f end = info.position;
 
             end = sum(end, mult(0.25, velocity));
