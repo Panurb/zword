@@ -34,7 +34,7 @@ sfRenderWindow* create_game_window(sfVideoMode* mode) {
     sfContext_destroy(context);
     settings.antialiasingLevel = game_settings.antialiasing;
     sfUint32 style = game_settings.fullscreen ? sfFullscreen : sfClose;
-    sfRenderWindow* window = sfRenderWindow_create(*mode, "zword", style, &settings);
+    sfRenderWindow* window = sfRenderWindow_create(*mode, "NotK", style, &settings);
     sfRenderWindow_setKeyRepeatEnabled(window, false);
     sfRenderWindow_setMouseCursorVisible(window, false);
     sfWindow_setVerticalSyncEnabled((sfWindow*) window, game_settings.vsync);
@@ -255,9 +255,8 @@ int main() {
 
         if (debug_level) {
             draw_debug(*game_data, window, debug_level);
+            draw_fps(window, fps, delta_time);
         }
-
-        draw_fps(window, fps, delta_time);
 
         sfRenderWindow_display(window);
 

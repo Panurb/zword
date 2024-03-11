@@ -106,6 +106,7 @@ HitInfo raycast(ComponentData* components, ColliderGrid* grid, sfVector2f start,
             ColliderComponent* col = ColliderComponent_get(components, j);
             if (col->last_collision == id) continue;
             if (COLLISION_MATRIX[group][col->group] == 0) continue;
+            if (col->trigger_type != TRIGGER_NONE) continue;
 
             col->last_collision = id;
 

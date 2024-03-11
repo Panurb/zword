@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 set(CMAKE_C_FLAGS "-g -Wall -Wextra --pedantic -Wno-deprecated-declarations")
 
-project(zword C)
+project(notk C)
 
 include_directories(CSFML/include)
 
@@ -54,9 +54,9 @@ set(SOURCES
 )
 
 # Enable console by removing WIN32 flag
-add_executable(zword WIN32 ${SOURCES})
+add_executable(notk WIN32 ${SOURCES})
 
-install(TARGETS zword
+install(TARGETS notk
     DESTINATION ${CMAKE_SOURCE_DIR}/build)
 
 set(DLLS
@@ -67,7 +67,7 @@ set(DLLS
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-window-2.dll
 )
 
-target_link_libraries(zword ${DLLS})
+target_link_libraries(notk ${DLLS})
 
 install(FILES ${DLLS}
     DESTINATION ${CMAKE_SOURCE_DIR}/build
