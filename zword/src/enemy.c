@@ -64,7 +64,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     LightComponent_add(i, 15.0f, 0.25f * M_PI, sfWhite, 0.5f, 10.0f);
 
     sfVector2f r = { 0.75f, 0.0f };
-    int j = create_rifle(components, r);
+    int j = create_rifle(r);
     ColliderComponent_remove(j);
     CoordinateComponent_get(j)->angle = 0.0f;
     add_child(i, j);
@@ -313,7 +313,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
                 break;
             } case ENEMY_ATTACK: {
                 if (enemy->attack_timer <= 0.0f) {
-                    attack(components, grid, enemy->weapon);
+                    attack(enemy->weapon);
                     enemy->state = ENEMY_CHASE;
                 } else {
                     enemy->attack_timer -= time_step;

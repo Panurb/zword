@@ -288,16 +288,16 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("waypoint") return create_waypoint(position);
     MATCH("zombie") return create_zombie(components, position, angle);
 
-    MATCH("ammo pistol") return create_ammo(components, position, AMMO_PISTOL);
-    MATCH("ammorifle") return create_ammo(components, position, AMMO_RIFLE);
-    MATCH("ammo shotgun") return create_ammo(components, position, AMMO_SHOTGUN);
-    MATCH("assault rifle") return create_assault_rifle(components, position);
-    MATCH("axe") return create_axe(components, position);
-    MATCH("pistol") return create_pistol(components, position);
-    MATCH("sawed-off") return create_sawed_off(components, position);
-    MATCH("shotgun") return create_shotgun(components, position);
-    MATCH("smg") return create_smg(components, position);
-    MATCH("sword") return create_sword(components, position);
+    MATCH("ammo pistol") return create_ammo(position, AMMO_PISTOL);
+    MATCH("ammorifle") return create_ammo(position, AMMO_RIFLE);
+    MATCH("ammo shotgun") return create_ammo(position, AMMO_SHOTGUN);
+    MATCH("assault rifle") return create_assault_rifle(position);
+    MATCH("axe") return create_axe(position);
+    MATCH("pistol") return create_pistol(position);
+    MATCH("sawed-off") return create_sawed_off(position);
+    MATCH("shotgun") return create_shotgun(position);
+    MATCH("smg") return create_smg(position);
+    MATCH("sword") return create_sword(position);
 
     #undef MATCH
 

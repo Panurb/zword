@@ -16,11 +16,11 @@
 #include "image.h"
 
 
-int get_akimbo(ComponentData* components, int entity) {
+int get_akimbo(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     if (item && item->size > 0) {
-        if (item->attachments[0] != -1 && components->weapon[item->attachments[0]]) {
+        if (item->attachments[0] != -1 && WeaponComponent_get(item->attachments[0])) {
             return 1;
         }
     }
@@ -28,8 +28,8 @@ int get_akimbo(ComponentData* components, int entity) {
     return 0;
 }
 
-void reload(ComponentData* components, int i) {
-    WeaponComponent* weapon = components->weapon[i];
+void reload(int i) {
+    WeaponComponent* weapon = WeaponComponent_get(i);
     if (weapon->max_magazine == -1) {
         return;
     }
@@ -40,7 +40,7 @@ void reload(ComponentData* components, int i) {
         return;
     }
 
-    int akimbo = get_akimbo(components, i);
+    int akimbo = get_akimbo(i);
 
     if (weapon->reloading) {
         if (weapon->cooldown == 0.0f) {
@@ -58,7 +58,7 @@ void reload(ComponentData* components, int i) {
 }
 
 
-void create_energy(ComponentData* components, sfVector2f position, sfVector2f velocity) {
+void create_energy(sfVector2f position, sfVector2f velocity) {
     int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "energy", 1.0f, 1.0f, LAYER_PARTICLES);
@@ -74,8 +74,8 @@ void create_energy(ComponentData* components, sfVector2f position, sfVector2f ve
 }
 
 
-void update_energy(ComponentData* components, ColliderGrid* grid) {
-    for (int i = 0; i < components->entities; i++) {
+void update_energy() {
+    for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* col = ColliderComponent_get(i);
         if (!col) continue;
         if (col->group == GROUP_ENERGY) {
@@ -101,7 +101,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
 }
 
 
-int create_rope(ComponentData* components, sfVector2f start, sfVector2f end) {
+int create_rope(sfVector2f start, sfVector2f end) {
     sfVector2f r = diff(end, start);
     float seg_len = 0.5f;
     float len = norm(r);
@@ -124,7 +124,7 @@ int create_rope(ComponentData* components, sfVector2f start, sfVector2f end) {
 }
 
 
-int rope_root(ComponentData* components, int rope) {
+int rope_root(int rope) {
     int j = rope;
     while (true) {
         int p = JointComponent_get(j)->parent;
@@ -136,12 +136,12 @@ int rope_root(ComponentData* components, int rope) {
 }
 
 
-void attack(ComponentData* components, ColliderGrid* grid, int entity) {
+void attack(int entity) {
     WeaponComponent* weapon = WeaponComponent_get(entity);
     int parent = CoordinateComponent_get(entity)->parent;
 
     if (weapon->magazine == 0) {
-        reload(components, entity);
+        reload(entity);
         return;
     }
 
@@ -149,7 +149,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
         return;
     }
 
-    int akimbo = get_akimbo(components, entity);
+    int akimbo = get_akimbo(entity);
     weapon->cooldown = 1.0f / ((1 + akimbo) * weapon->fire_rate);
     if (weapon->max_magazine != -1) {
         weapon->magazine--;
@@ -217,7 +217,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                     angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                 }
                 sfVector2f vel = polar_to_cartesian(7.0f, get_angle(parent) + angle);
-                create_energy(components, sum(get_position(entity), mult(1.0f / 14.0f, vel)), vel);
+                create_energy(sum(get_position(entity), mult(1.0f / 14.0f, vel)), vel);
             }
             break;
         } case AMMO_ROPE: {
@@ -225,9 +225,9 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             sfVector2f dir = polar_to_cartesian(1.0f, get_angle(parent) + angle);
             HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
-            int i = create_rope(components, info.position, get_position(parent));
+            int i = create_rope(info.position, get_position(parent));
 
-            int j = rope_root(components, i);
+            int j = rope_root(i);
             JointComponent_get(j)->parent = info.entity;
             // CoordinateComponent* coord = CoordinateComponent_get(j);
             // coord->parent = j;
@@ -264,7 +264,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
 
             weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
             if (PlayerComponent_get(parent)) {
-                alert_enemies(components, grid, parent, weapon->sound_range);
+                alert_enemies(game_data->components, game_data->grid, parent, weapon->sound_range);
             }
 
             LightComponent* light = LightComponent_get(entity);
@@ -282,13 +282,13 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
     }
 
     if (weapon->magazine == 0) {
-        reload(components, entity);
+        reload(entity);
     }
 }
 
 
-void update_weapons(ComponentData* components, float time_step) {
-    for (int i = 0; i < components->entities; i++) {
+void update_weapons(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         WeaponComponent* weapon = WeaponComponent_get(i);
         if (!weapon) continue;
 
@@ -311,7 +311,7 @@ void update_weapons(ComponentData* components, float time_step) {
 }
 
 
-int create_pistol(ComponentData* components, sfVector2f position) {
+int create_pistol(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -328,7 +328,7 @@ int create_pistol(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_shotgun(ComponentData* components, sfVector2f position) {
+int create_shotgun(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -345,7 +345,7 @@ int create_shotgun(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_sawed_off(ComponentData* components, sfVector2f position) {
+int create_sawed_off(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -362,7 +362,7 @@ int create_sawed_off(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_rifle(ComponentData* components, sfVector2f position) {
+int create_rifle(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -379,7 +379,7 @@ int create_rifle(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_assault_rifle(ComponentData* components, sfVector2f position) {
+int create_assault_rifle(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -396,7 +396,7 @@ int create_assault_rifle(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_smg(ComponentData* components, sfVector2f position) {
+int create_smg(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -413,7 +413,7 @@ int create_smg(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_axe(ComponentData* components, sfVector2f position) {
+int create_axe(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
@@ -428,7 +428,7 @@ int create_axe(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_sword(ComponentData* components, sfVector2f position) {
+int create_sword(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -443,7 +443,7 @@ int create_sword(ComponentData* components, sfVector2f position) {
 }
  
 
-int create_rope_gun(ComponentData* components, sfVector2f position) {
+int create_rope_gun(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
@@ -458,7 +458,7 @@ int create_rope_gun(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_lasersight(ComponentData* components, sfVector2f pos) {
+int create_lasersight(sfVector2f pos) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle());
     PhysicsComponent_add(i, 0.5f);
@@ -470,7 +470,7 @@ int create_lasersight(ComponentData* components, sfVector2f pos) {
 }
 
 
-int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
+int create_ammo(sfVector2f position, AmmoType type) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());

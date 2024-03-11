@@ -177,7 +177,7 @@ void update_players(float time_step) {
                 break;
             case PLAYER_SHOOT:
                 if (weapon) {
-                    attack(game_data->components, game_data->grid, item);
+                    attack(item);
 
                     if (weapon->reloading) {
                         player->state = PLAYER_RELOAD;
@@ -192,7 +192,7 @@ void update_players(float time_step) {
             case PLAYER_RELOAD:
                 if (weapon) {
                     player->target = -1;
-                    reload(game_data->components, item);
+                    reload(item);
 
                     if (!weapon->reloading) {
                         player->state = PLAYER_ON_FOOT;

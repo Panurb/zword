@@ -219,7 +219,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 break;
             case PLAYER_RELOAD:
                 sfConvexShape_setFillColor(player->shape, sfWhite);
-                int akimbo = get_akimbo(components, item);
+                int akimbo = get_akimbo(item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
                 draw_slice(camera, NULL, 50, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
 

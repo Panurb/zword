@@ -65,28 +65,28 @@ void create_item(sfVector2f position, int tier) {
             break;
         case 1:
             if (randi(0, 1) == 0) {
-                create_axe(game_data->components, position);
+                create_axe(position);
             } else {
-                create_pistol(game_data->components, position);
+                create_pistol(position);
                 for (int i = 0; i < randi(1, 3); i++) {
-                    create_ammo(game_data->components, sum(position, rand_vector()), AMMO_PISTOL);
+                    create_ammo(sum(position, rand_vector()), AMMO_PISTOL);
                 }
             }
             break;
         case 2:
-            create_shotgun(game_data->components, position);
+            create_shotgun(position);
             for (int i = 0; i < randi(1, 3); i++) {
-                    create_ammo(game_data->components, sum(position, rand_vector()), AMMO_SHOTGUN);
+                    create_ammo(sum(position, rand_vector()), AMMO_SHOTGUN);
             }
             break;
         case 3:
-            create_assault_rifle(game_data->components, position);
+            create_assault_rifle(position);
             for (int i = 0; i < randi(1, 3); i++) {
-                create_ammo(game_data->components, sum(position, rand_vector()), AMMO_RIFLE);
+                create_ammo(sum(position, rand_vector()), AMMO_RIFLE);
             }
             break;
         default:
-            create_ammo(game_data->components, position, randi(1, 3));
+            create_ammo(position, randi(1, 3));
             break;
     }
 }

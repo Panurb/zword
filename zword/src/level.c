@@ -209,11 +209,11 @@ void test(ComponentData* components) {
     create_fire(components, vec(0.0f, 1.0f));
 
     create_player(start, -1);
-    create_assault_rifle(components, sum(start, rand_vector()));
-    create_ammo(components, sum(start, rand_vector()), AMMO_RIFLE);
-    create_ammo(components, sum(start, rand_vector()), AMMO_RIFLE);
-    create_ammo(components, sum(start, rand_vector()), AMMO_RIFLE);
-    create_axe(components, sum(start, rand_vector()));
+    create_assault_rifle(sum(start, rand_vector()));
+    create_ammo(sum(start, rand_vector()), AMMO_RIFLE);
+    create_ammo(sum(start, rand_vector()), AMMO_RIFLE);
+    create_ammo(sum(start, rand_vector()), AMMO_RIFLE);
+    create_axe(sum(start, rand_vector()));
     // create_big_boy(components, sum(start, vec(-3.0f, 1.0f)), 0.0f);
     // create_player(sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
     // create_player(sum(start, (sfVector2f) { 4.0, -5.0 }), 1);

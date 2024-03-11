@@ -43,7 +43,7 @@ void die(int entity) {
             AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
             while (ammo && ammo->size > 0) {
                 sfVector2f pos = get_position(entity);
-                int k = create_ammo(game_data->components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
+                int k = create_ammo(sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
                 int size = min(AmmoComponent_get(k)->size, ammo->size);
                 AmmoComponent* drop = AmmoComponent_get(k);
                 drop->size = size;
@@ -72,13 +72,13 @@ void die(int entity) {
                     j = create_bandage(zeros());
                     break;
                 case 1:
-                    j = create_ammo(game_data->components, zeros(), AMMO_PISTOL);
+                    j = create_ammo(zeros(), AMMO_PISTOL);
                     break;
                 case 2:
-                    j = create_ammo(game_data->components, zeros(), AMMO_SHOTGUN);
+                    j = create_ammo(zeros(), AMMO_SHOTGUN);
                     break;
                 case 3:
-                    j = create_ammo(game_data->components, zeros(), AMMO_RIFLE);
+                    j = create_ammo(zeros(), AMMO_RIFLE);
                     break;
                 default:
                     break;
