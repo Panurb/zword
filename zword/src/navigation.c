@@ -41,7 +41,7 @@ float heuristic(int start, int goal) {
 
 
 bool a_star(int start, int goal, List* path) {
-    Heap* open_set = Heap_create(game_data->components);
+    Heap* open_set = Heap_create();
 
     Heap_insert(open_set, start);
 

@@ -230,7 +230,7 @@ void draw(int camera) {
     }
 
     FOREACH(node, game_data->components->image.order) {
-        draw_particles(game_data->components, game_window, camera, node->value);
+        draw_particles(camera, node->value);
     }
 }
 

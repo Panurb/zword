@@ -36,7 +36,7 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
     phys->max_speed = 5.0;
     ColliderComponent_add_circle(i, 0.5, GROUP_PLAYERS);
     PlayerComponent* player = PlayerComponent_add(i, joystick);
-    ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 100, "player_dead", "blood", "");
     SoundComponent_add(i, "squish");

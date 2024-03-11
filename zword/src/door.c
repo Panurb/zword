@@ -7,14 +7,15 @@
 #include "sound.h"
 #include "particle.h"
 #include "navigation.h"
+#include "game.h"
 
 
-int create_door(ComponentData* components, sfVector2f pos, float angle) {
+int create_door(sfVector2f pos, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle + M_PI);
     ImageComponent_add(i, "door", 2.0f, 1.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 2.0f, 0.3f, GROUP_DOORS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(i, "wood_hit");
     DoorComponent_add(i, 500);
     PhysicsComponent_add(i, 1.0f);
@@ -28,8 +29,8 @@ int create_door(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-void update_doors(ComponentData* components) {
-    for (int i = 0; i < components->entities; i++) {
+void update_doors() {
+    for (int i = 0; i < game_data->components->entities; i++) {
         DoorComponent* door = DoorComponent_get(i);
         if (!door) continue;
 
@@ -44,9 +45,9 @@ void update_doors(ComponentData* components) {
             col->group = GROUP_DOORS;
 
             if (phys->speed > 0.25f) {
-                loop_sound(components, i, "door", 0.3f, 1.0f);
+                loop_sound(game_data->components, i, "door", 0.3f, 1.0f);
             } else {
-                stop_loop(components, i);
+                stop_loop(game_data->components, i);
             }
         }
     }

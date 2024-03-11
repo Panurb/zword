@@ -25,8 +25,8 @@ void create_church(ComponentData* components, sfVector2f pos) {
     create_floor(components, pos, 30.0f, 10.0f, angle, "tiles_tile");
     create_floor(components, sum(pos, mult(5.0f, w)), 10.0f, 20.0f, angle, "tiles_tile");
 
-    create_door(components, sum(pos, lin_comb(-14.5f, w, 1.0f, h)), angle - 0.5f * M_PI);
-    create_door(components, sum(pos, lin_comb(-14.5f, w, -1.0f, h)), angle + 0.5f * M_PI);
+    create_door(sum(pos, lin_comb(-14.5f, w, 1.0f, h)), angle - 0.5f * M_PI);
+    create_door(sum(pos, lin_comb(-14.5f, w, -1.0f, h)), angle + 0.5f * M_PI);
 
     // Back wall
     create_wall(components, sum(pos, mult(14.5f, w)), angle + 0.5f * M_PI, 8.0f, 1.0f, "stone_tile");
@@ -183,7 +183,7 @@ void create_house(ComponentData* components, sfVector2f pos) {
     create_waypoint(sum(pos, lin_comb(0.0f, w, 9.0f, h)));
     create_waypoint(sum(pos, lin_comb(0.0f, w, -9.0f, h)));
 
-    create_door(components, sum(pos, mult(7.5f, w)), angle + 0.5f * M_PI);
+    create_door(sum(pos, mult(7.5f, w)), angle + 0.5f * M_PI);
 
     // Toilet
     create_floor(components, sum(pos, lin_comb(-4.5f, w, 4.5f, h)), 6.0f, 6.0f, angle, "altar_tile");
@@ -260,7 +260,7 @@ void create_outhouse(ComponentData* components, sfVector2f pos) {
     create_waypoint(sum(pos, lin_comb(-2.5f, w, 2.5f, h)));
     create_waypoint(sum(pos, lin_comb(-2.5f, w, -2.5f, h)));
 
-    create_door(components, sum(pos, mult(1.25f, w)), angle + 0.5f * M_PI);
+    create_door(sum(pos, mult(1.25f, w)), angle + 0.5f * M_PI);
 
     create_item(components, pos, 0);
 }
@@ -314,8 +314,8 @@ void create_mansion(ComponentData* components, sfVector2f pos) {
     create_wall(components, sum(pos, lin_comb(23.5f, w, 5.0f, h)), angle + 0.5f * M_PI, 6.0f, 1.0f, "brick_tile");
     create_wall(components, sum(pos, lin_comb(19.0f, w, -7.5, h)), angle, 8.0f, 1.0f, "brick_tile");
     create_wall(components, sum(pos, lin_comb(19.0f, w, 7.5, h)), angle, 8.0f, 1.0f, "brick_tile");
-    create_door(components, sum(pos, lin_comb(23.5f, w, -1.0, h)), angle + 0.5f * M_PI);
-    create_door(components, sum(pos, lin_comb(23.5f, w, 1.0, h)), angle + 1.5f * M_PI);
+    create_door(sum(pos, lin_comb(23.5f, w, -1.0, h)), angle + 0.5f * M_PI);
+    create_door(sum(pos, lin_comb(23.5f, w, 1.0, h)), angle + 1.5f * M_PI);
     create_waypoint(sum(pos, lin_comb(25.0f, w, 9.0f, h)));
     create_waypoint(sum(pos, lin_comb(25.0f, w, -9.0f, h)));
 
@@ -347,12 +347,12 @@ void create_mansion(ComponentData* components, sfVector2f pos) {
 
     // Yard
     create_wall(components, sum(pos, lin_comb(-22.0f, w, -7.5, h)), angle, 4.0f, 1.0f, "brick_tile");
-    create_door(components, sum(pos, lin_comb(-19.0f, w, -7.5, h)), angle);
+    create_door(sum(pos, lin_comb(-19.0f, w, -7.5, h)), angle);
     create_wall(components, sum(pos, lin_comb(-6.5f, w, -7.5, h)), angle, 23.0f, 1.0f, "brick_tile");
     create_waypoint(sum(pos, lin_comb(-10.0f, w, 0.0f, h)));
 
     create_wall(components, sum(pos, lin_comb(-22.0f, w, 7.5, h)), angle, 4.0f, 1.0f, "brick_tile");
-    create_door(components, sum(pos, lin_comb(-19.0f, w, 7.5, h)), angle);
+    create_door(sum(pos, lin_comb(-19.0f, w, 7.5, h)), angle);
     create_wall(components, sum(pos, lin_comb(-6.5f, w, 7.5, h)), angle, 23.0f, 1.0f, "brick_tile");
 
     create_wall(components, sum(pos, lin_comb(4.5f, w, -4.5f, h)), angle + 0.5f * M_PI, 5.0f, 1.0f, "brick_tile");
@@ -407,7 +407,7 @@ void create_school(ComponentData* components, sfVector2f pos) {
         create_decal(sum(pos, lin_comb(r.x, w, r.y, h)), "blood_large", -1);
     }
     
-    create_door(components, sum(pos, mult(15.5f, w)), angle + 0.5f * M_PI);
+    create_door(sum(pos, mult(15.5f, w)), angle + 0.5f * M_PI);
 
     for (int i = -2; i < 3; i++) {
         for (int j = -2; j < 3; j++) {

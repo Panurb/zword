@@ -25,7 +25,7 @@ int create_bench(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 0.8f, 2.8f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     HealthComponent_add(i, 100, "", "", "wood_destroy");
     PhysicsComponent_add(i, 2.0f);
     SoundComponent_add(i, "wood_hit");
@@ -53,7 +53,7 @@ int create_table(ComponentData* components, sfVector2f position) {
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "table", 3.0f, 3.0f, LAYER_ITEMS)->alpha = 1.0f;
     ColliderComponent_add_circle(i, 1.4f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     HealthComponent_add(i, 100, "", "", "wood_destroy");
     PhysicsComponent_add(i, 2.0f);
     SoundComponent_add(i, "wood_hit");
@@ -82,7 +82,7 @@ int create_hay_bale(ComponentData* components, sfVector2f position, float angle)
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "hay_bale", 3.0f, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 2.8f, 1.5f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
 
     return i;
 }
@@ -94,7 +94,7 @@ int create_stove(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "stove", 2.0f, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 1.8f, 1.8f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPARKS, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPARKS, 0.0f);
     SoundComponent_add(i, "metal_hit");
 
     return i;
@@ -107,7 +107,7 @@ int create_sink(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "sink", 2.0f, 3.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 1.8f, 2.8f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPARKS, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPARKS, 0.0f);
     SoundComponent_add(i, "metal_hit");
 
     return i;
@@ -120,7 +120,7 @@ int create_toilet(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "toilet", 2.0f, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 1.8f, 1.3f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPARKS, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPARKS, 0.0f);
     SoundComponent_add(i, "metal_hit");
 
     return i;
@@ -133,7 +133,7 @@ int create_bed(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "bed", 4.0f, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 3.8f, 1.8f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(i, "wood_hit");
 
     return i;
@@ -147,7 +147,7 @@ int create_candle(ComponentData* components, sfVector2f pos) {
     ColliderComponent_add_circle(i, 0.5f, LAYER_WALLS);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(i, 7.5f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
-    ParticleComponent_add_type(components, i, PARTICLE_FIRE, 0.25f);
+    ParticleComponent_add_type(i, PARTICLE_FIRE, 0.25f);
     ImageComponent_add(i, "candle", 1.0f, 1.0f, LAYER_ITEMS);
 
     return i;
@@ -159,7 +159,7 @@ int create_lamp(ComponentData* components, sfVector2f position) {
 
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "lamp", 1.0f, 1.0f, LAYER_ITEMS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(i, "wood_hit");
     LightComponent_add(i, 10.0f, 2.0f * M_PI, sfWhite, 0.5f, 5.0f)->flicker = 0.1f;
     ColliderComponent_add_circle(i, 0.5f, GROUP_VEHICLES);
@@ -174,7 +174,7 @@ int create_desk(ComponentData* components, sfVector2f position, float angle) {
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "desk", 2.0, 2.0f, LAYER_ITEMS);
     ColliderComponent_add_rectangle(i, 1.3f, 1.8f, GROUP_WALLS);
-    ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(i, "wood_hit");
     HealthComponent_add(i, 100, "", "", "wood_destroy");
     PhysicsComponent_add(i, 2.0f);
@@ -203,7 +203,7 @@ int create_fire(ComponentData* components, sfVector2f pos) {
     CoordinateComponent_add(i, pos, 0.0);
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(i, 18.0f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
-    ParticleComponent_add_type(components, i, PARTICLE_FIRE, 0.6f);
+    ParticleComponent_add_type(i, PARTICLE_FIRE, 0.6f);
     ColliderComponent_add_circle(i, 0.35, GROUP_BARRIERS);
     ImageComponent_add(i, "fire", 1.0, 1.0, LAYER_ITEMS);
     SoundComponent* sound = SoundComponent_add(i, "");
@@ -267,7 +267,7 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("candle") return create_candle(components, position);
     MATCH("car") return create_car(components, position, angle);
     MATCH("desk") return create_desk(components, position, angle);
-    MATCH("door") return create_door(components, position, angle);
+    MATCH("door") return create_door(position, angle);
     MATCH("farmer") return create_farmer(components, position, angle);
     MATCH("fire") return create_fire(components, position);
     MATCH("flashlight") return create_flashlight(components, position);

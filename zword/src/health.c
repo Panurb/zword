@@ -158,7 +158,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
     ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
         particle->origin = diff(pos, get_position(entity));
-        add_particles(components, entity, particle->rate / 50.0f * dmg);
+        add_particles(entity, particle->rate / 50.0f * dmg);
     }
 
     SoundComponent* scomp = SoundComponent_get(entity);

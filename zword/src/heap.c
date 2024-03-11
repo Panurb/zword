@@ -28,7 +28,9 @@ void swap(Heap* heap, int i, int j) {
 
 
 bool compare(Heap* heap, int i, int j) {
-    return heap->component->waypoint[i]->f_score < heap->component->waypoint[j]->f_score;
+    WaypointComponent* wi = WaypointComponent_get(i);
+    WaypointComponent* wj = WaypointComponent_get(j);
+    return wi->f_score < wj->f_score;
 }
 
 
@@ -52,10 +54,9 @@ void heapify(Heap* heap, int i) {
 }
 
 
-Heap* Heap_create(ComponentData* component) {
+Heap* Heap_create() {
     Heap* heap = malloc(sizeof(Heap));
     heap->size = 0;
-    heap->component = component;
     return heap;
 }
 

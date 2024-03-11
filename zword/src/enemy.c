@@ -27,7 +27,7 @@ int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
     ImageComponent_add(i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(i, 1.0f);
     EnemyComponent* enemy = EnemyComponent_add(i);
-    ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 100, "zombie_dead", "blood", "");
     SoundComponent_add(i, "squish");
@@ -57,7 +57,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     enemy->run_speed = 3.0f;
     enemy->fov = 0.25f * M_PI;
     enemy->bounty = 200;
-    ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 100, "farmer_dead", "blood", "");
     SoundComponent_add(i, "squish");
@@ -89,7 +89,7 @@ int create_priest(ComponentData* components, sfVector2f pos, float angle) {
     enemy->run_speed = 2.0f;
     enemy->fov = 2.0f * M_PI;
     enemy->bounty = 500;
-    ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 200, "priest_dead", "blood", "");
     SoundComponent_add(i, "squish");
@@ -123,7 +123,7 @@ int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     enemy->walk_speed = 4.0f;
     enemy->run_speed = 8.0f;
     enemy->bounty = 1000;
-    ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 500, "big_boy_dead", "blood", "");
     SoundComponent_add(i, "squish");
@@ -155,7 +155,7 @@ int create_boss(ComponentData* components, sfVector2f pos, float angle) {
     enemy->turn_speed = 2.5f;
     enemy->attack_delay = 0.0f;
     enemy->attack_timer = 0.0f;
-    ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
+    ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 5000, "boss_dead", "blood", "stone_hit");
     SoundComponent_add(i, "squish");
@@ -178,7 +178,7 @@ int create_boss(ComponentData* components, sfVector2f pos, float angle) {
         ImageComponent_add(j, "boss_body", 6.0f, 4.0f, LAYER_ENEMIES);
         AnimationComponent_add(j, 4)->current_frame = 2 * (k % 2);
         JointComponent_add(j, parent, 3.0f, 3.0f, 1.0f);
-        ParticleComponent_add_type(components, parent, PARTICLE_SPARKS, 0.0f);
+        ParticleComponent_add_type(parent, PARTICLE_SPARKS, 0.0f);
         SoundComponent_add(j, "stone_hit");
         parent = j;
     }

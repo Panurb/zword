@@ -7,6 +7,7 @@
 #include "component.h"
 #include "util.h"
 #include "camera.h"
+#include "game.h"
 
 
 sfColor color_lerp(sfColor s, sfColor e, float t) {
@@ -14,45 +15,45 @@ sfColor color_lerp(sfColor s, sfColor e, float t) {
 }
 
 
-void ParticleComponent_add_bullet(ComponentData* components, int entity, float size) {
+void ParticleComponent_add_bullet(int entity, float size) {
     ParticleComponent_add(entity, 0.0f, 0.0f, size, size, 200.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite)->speed_spread = 0.0f;
 }
 
 
-void ParticleComponent_add_blood(ComponentData* components, int entity) {
+void ParticleComponent_add_blood(int entity) {
     sfColor color = get_color(0.78, 0.0, 0.0, 1.0);
     sfColor inner_color = color_lerp(color, sfWhite, 0.25f);
     ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.3f, 0.0, 3.0, 10.0, color, inner_color);
 }
 
 
-void ParticleComponent_add_sparks(ComponentData* components, int entity) {
+void ParticleComponent_add_sparks(int entity) {
     ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.15, 0.0, 5.0, 5.0, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite);
 }
 
 
-void ParticleComponent_add_dirt(ComponentData* components, int entity) {
+void ParticleComponent_add_dirt(int entity) {
     sfColor color = get_color(0.4, 0.25, 0.13, 0.5f);
     sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
     ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.25, 0.0, 2.5, 10.0, color, inner_color);
 }
 
 
-void ParticleComponent_add_rock(ComponentData* components, int entity) {
+void ParticleComponent_add_rock(int entity) {
     sfColor color = get_color(0.4f, 0.4f, 0.4f, 1.0f);
     sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
     ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.3f, 0.0f, 1.5f, 5.0f, color, inner_color);
 }
 
 
-void ParticleComponent_add_splinter(ComponentData* components, int entity) {
+void ParticleComponent_add_splinter(int entity) {
     sfColor color = get_color(0.5f, 0.4f, 0.3f, 1.0f);
     sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
     ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.15f, 0.0f, 5.0f, 10.0f, color, inner_color);
 }
 
 
-void ParticleComponent_add_fire(ComponentData* components, int entity, float size) {
+void ParticleComponent_add_fire(int entity, float size) {
     sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
     float angle = 0.5f * M_PI - get_angle(entity);
     ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, sfYellow);
@@ -61,46 +62,46 @@ void ParticleComponent_add_fire(ComponentData* components, int entity, float siz
 }
 
 
-void ParticleComponent_add_energy(ComponentData* components, int entity) {
+void ParticleComponent_add_energy(int entity) {
     sfColor green = get_color(0.5f, 1.0f, 0.0f, 1.0f);
     ParticleComponent_add(entity, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, green, green);
 }
 
 
-void ParticleComponent_add_type(ComponentData* components, int entity, ParticleType type, float size) {
+void ParticleComponent_add_type(int entity, ParticleType type, float size) {
     switch (type) {
         case PARTICLE_NONE:
             return;
         case PARTICLE_BULLET:
-            ParticleComponent_add_bullet(components, entity, size);
+            ParticleComponent_add_bullet(entity, size);
             break;
         case PARTICLE_BLOOD:
-            ParticleComponent_add_blood(components, entity);
+            ParticleComponent_add_blood(entity);
             break;
         case PARTICLE_SPARKS:
-            ParticleComponent_add_sparks(components, entity);
+            ParticleComponent_add_sparks(entity);
             break;
         case PARTICLE_DIRT:
-            ParticleComponent_add_dirt(components, entity);
+            ParticleComponent_add_dirt(entity);
             break;
         case PARTICLE_ROCK:
-            ParticleComponent_add_rock(components, entity);
+            ParticleComponent_add_rock(entity);
             break;
         case PARTICLE_SPLINTER:
-            ParticleComponent_add_splinter(components, entity);
+            ParticleComponent_add_splinter(entity);
             break;
         case PARTICLE_FIRE:
-            ParticleComponent_add_fire(components, entity, size);
+            ParticleComponent_add_fire(entity, size);
             break;
         case PARTICLE_ENERGY:
-            ParticleComponent_add_energy(components, entity);
+            ParticleComponent_add_energy(entity);
             break;
     }
     ParticleComponent_get(entity)->type = type;
 }
 
 
-void add_particles(ComponentData* components, int entity, int n) {
+void add_particles(int entity, int n) {
     ParticleComponent* part = ParticleComponent_get(entity);
 
     for (int i = 0; i < n; i++) {
@@ -117,8 +118,8 @@ void add_particles(ComponentData* components, int entity, int n) {
 }
 
 
-void update_particles(ComponentData* components, int camera, float delta_time) {
-    for (int i = 0; i < components->entities; i++) {
+void update_particles(int camera, float delta_time) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         ParticleComponent* part = ParticleComponent_get(i);
         if (!part) continue;
 
@@ -133,13 +134,13 @@ void update_particles(ComponentData* components, int camera, float delta_time) {
         if (part->enabled) {
             if (part->loop) {
                 while (part->timer <= 0.0) {
-                    add_particles(components, i, 1);
+                    add_particles(i, 1);
                     part->timer += 1.0 / part->rate;
                 }
 
                 part->timer -= delta_time;
             } else {
-                add_particles(components, i, part->rate);
+                add_particles(i, part->rate);
                 part->enabled = false;
             }
         }
@@ -152,8 +153,8 @@ void update_particles(ComponentData* components, int camera, float delta_time) {
 }
 
 
-void draw_particles(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
-    ParticleComponent* part = components->particle[entity];
+void draw_particles(int camera, int entity) {
+    ParticleComponent* part = game_data->components->particle[entity];
     if (!part) return;
 
     for (int i = part->particles - 1; i >= 0; i--) {

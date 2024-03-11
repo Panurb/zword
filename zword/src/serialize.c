@@ -355,7 +355,7 @@ void ParticleComponent_deserialize(cJSON* entity_json, ComponentData* components
         }
     } else {
         float size = cJSON_GetObjectItem(json, "start_size")->valuedouble;
-        ParticleComponent_add_type(components, entity, type, size);
+        ParticleComponent_add_type(entity, type, size);
     }
 }
 

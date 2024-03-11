@@ -534,7 +534,7 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
     // collide(data.components, data.grid);
     update_waypoints(data.camera);
 
-    update_particles(data.components, data.camera, time_step);
+    update_particles(data.camera, time_step);
     update_lights(data.components, time_step);
     update_camera(data.camera, time_step, false);
 

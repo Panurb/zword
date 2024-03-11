@@ -407,7 +407,7 @@ void update_game(GameData data, float time_step) {
     update_enemies(data.components, data.grid, time_step);
     update_energy(data.components, data.grid);
 
-    update_particles(data.components, data.camera, time_step);
+    update_particles(data.camera, time_step);
     update_lights(data.components, time_step);
     update_camera(data.camera, time_step, true);
 
