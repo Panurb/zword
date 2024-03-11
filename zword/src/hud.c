@@ -114,7 +114,7 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
 void draw_ammo_menu(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
 
-    int slot = get_slot(components, entity, player->ammo_size - 1);
+    int slot = get_slot(entity, player->ammo_size - 1);
 
     for (int i = 0; i < player->ammo_size - 1; i++) {
         float offset = (i == slot) ? 0.2f : 0.0f;
@@ -170,8 +170,8 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
         PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;
 
-        int slot = get_slot(components, i, player->inventory_size);
-        int atch = get_attachment(components, i);
+        int slot = get_slot(i, player->inventory_size);
+        int atch = get_attachment(i);
 
         int item = player->inventory[player->item];
         WeaponComponent* weapon = NULL;

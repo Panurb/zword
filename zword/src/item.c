@@ -9,7 +9,7 @@
 #include "player.h"
 
 
-int create_flashlight(ComponentData* components, sfVector2f position) {
+int create_flashlight(sfVector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
@@ -24,7 +24,7 @@ int create_flashlight(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_gas(ComponentData* components, sfVector2f position) {
+int create_gas(sfVector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
@@ -38,7 +38,7 @@ int create_gas(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_bandage(ComponentData* components, sfVector2f position) {
+int create_bandage(sfVector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
@@ -54,45 +54,45 @@ int create_bandage(ComponentData* components, sfVector2f position) {
 }
 
 
-void create_item(ComponentData* components, sfVector2f position, int tier) {
+void create_item(sfVector2f position, int tier) {
     switch (tier) {
         case 0:
             if (randi(0, 1) == 0) {
-                create_flashlight(components, position);
+                create_flashlight(position);
             } else {
-                create_gas(components, position);
+                create_gas(position);
             }
             break;
         case 1:
             if (randi(0, 1) == 0) {
-                create_axe(components, position);
+                create_axe(game_data->components, position);
             } else {
-                create_pistol(components, position);
+                create_pistol(game_data->components, position);
                 for (int i = 0; i < randi(1, 3); i++) {
-                    create_ammo(components, sum(position, rand_vector()), AMMO_PISTOL);
+                    create_ammo(game_data->components, sum(position, rand_vector()), AMMO_PISTOL);
                 }
             }
             break;
         case 2:
-            create_shotgun(components, position);
+            create_shotgun(game_data->components, position);
             for (int i = 0; i < randi(1, 3); i++) {
-                    create_ammo(components, sum(position, rand_vector()), AMMO_SHOTGUN);
+                    create_ammo(game_data->components, sum(position, rand_vector()), AMMO_SHOTGUN);
             }
             break;
         case 3:
-            create_assault_rifle(components, position);
+            create_assault_rifle(game_data->components, position);
             for (int i = 0; i < randi(1, 3); i++) {
-                create_ammo(components, sum(position, rand_vector()), AMMO_RIFLE);
+                create_ammo(game_data->components, sum(position, rand_vector()), AMMO_RIFLE);
             }
             break;
         default:
-            create_ammo(components, position, randi(1, 3));
+            create_ammo(game_data->components, position, randi(1, 3));
             break;
     }
 }
 
 
-void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
+void pick_up_item(int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
 
     if (player->target == -1) {
@@ -145,7 +145,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
                 }
             }
 
-            add_money(components, entity, -item->price);
+            add_money(entity, -item->price);
             item->price = 0;
         }
     }

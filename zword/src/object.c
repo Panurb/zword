@@ -258,7 +258,7 @@ int create_uranium(ComponentData* components, sfVector2f position) {
 int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
-    MATCH("bandage") return create_bandage(components, position);
+    MATCH("bandage") return create_bandage(position);
     MATCH("bed") return create_bed(components, position, angle);
     MATCH("bench") return create_bench(components, position, angle);
     MATCH("big boy") return create_big_boy(components, position, angle);
@@ -270,12 +270,12 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("door") return create_door(position, angle);
     MATCH("farmer") return create_farmer(components, position, angle);
     MATCH("fire") return create_fire(components, position);
-    MATCH("flashlight") return create_flashlight(components, position);
-    MATCH("gas") return create_gas(components, position);
+    MATCH("flashlight") return create_flashlight(position);
+    MATCH("gas") return create_gas(position);
     MATCH("hay bale") return create_hay_bale(components, position, angle);
     MATCH("hole") return create_decal(position, "hole", -1);
     MATCH("lamp") return create_lamp(components, position);
-    MATCH("player") return create_player(components, position, angle);
+    MATCH("player") return create_player(position, angle);
     MATCH("priest") return create_priest(components, position, angle);
     MATCH("rock") return create_rock(components, position);
     MATCH("stove") return create_stove(components, position, angle);

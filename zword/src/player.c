@@ -25,7 +25,7 @@
 #include "health.h"
 
 
-int create_player(ComponentData* components, sfVector2f pos, float angle) {
+int create_player(sfVector2f pos, float angle) {
     int joystick = -1;
     int i = create_entity();
 
@@ -53,7 +53,7 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-int get_slot(ComponentData* components, int i, int size) {
+int get_slot(int i, int size) {
     PlayerComponent* player = PlayerComponent_get(i);
 
     sfVector2f rs = player->controller.right_stick;
@@ -63,13 +63,13 @@ int get_slot(ComponentData* components, int i, int size) {
 }
 
 
-int get_attachment(ComponentData* components, int i) {
+int get_attachment(int i) {
     PlayerComponent* player = PlayerComponent_get(i);
-    int slot = get_slot(components, i, player->inventory_size);
+    int slot = get_slot(i, player->inventory_size);
     int item = player->inventory[slot];
 
     if (item != -1) {
-        int size = components->item[item]->size;
+        int size = ItemComponent_get(item)->size;
         if (size > 0) {
             float slot_angle = 2 * M_PI / player->inventory_size;
             sfVector2f rs = player->controller.right_stick;
@@ -84,17 +84,17 @@ int get_attachment(ComponentData* components, int i) {
 }
 
 
-void update_players(ComponentData* components, ColliderGrid* grid, float time_step) {
-    for (int i = 0; i < components->entities; i++) {
+void update_players(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;
 
-        PhysicsComponent* phys = components->physics[i];
+        PhysicsComponent* phys = PhysicsComponent_get(i);
         CoordinateComponent* coord = CoordinateComponent_get(i);
         sfVector2f left_stick = player->controller.left_stick;
         sfVector2f right_stick = player->controller.right_stick;
-        int slot = get_slot(components, i, player->inventory_size);
-        int atch = get_attachment(components, i);
+        int slot = get_slot(i, player->inventory_size);
+        int atch = get_attachment(i);
 
         int item = player->inventory[player->item];
         ItemComponent* itco = ItemComponent_get(item);
@@ -172,12 +172,12 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 player->use_timer = 0.0f;
                 break;
             case PLAYER_PICK_UP:
-                pick_up_item(components, grid, i);
+                pick_up_item(i);
                 player->state = PLAYER_ON_FOOT;
                 break;
             case PLAYER_SHOOT:
                 if (weapon) {
-                    attack(components, grid, item);
+                    attack(game_data->components, game_data->grid, item);
 
                     if (weapon->reloading) {
                         player->state = PLAYER_RELOAD;
@@ -185,14 +185,14 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                         player->state = PLAYER_ON_FOOT;
                     }
                 } else if (itco) {
-                    use_item(components, grid, item, time_step);
+                    use_item(game_data->components, game_data->grid, item, time_step);
                 }
 
                 break;
             case PLAYER_RELOAD:
                 if (weapon) {
                     player->target = -1;
-                    reload(components, item);
+                    reload(game_data->components, item);
 
                     if (!weapon->reloading) {
                         player->state = PLAYER_ON_FOOT;
@@ -201,19 +201,19 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             case PLAYER_ENTER:
-                if (!enter_vehicle(components, grid, i)) {
+                if (!enter_vehicle(game_data->components, game_data->grid, i)) {
                     player->state = PLAYER_ON_FOOT;
                 }
                 break;
             case PLAYER_DRIVE:
                 if (player->controller.joystick == -1) {
-                    drive_vehicle(components, i, sign(left_stick.y), sign(left_stick.x));
+                    drive_vehicle(game_data->components, i, sign(left_stick.y), sign(left_stick.x));
                 } else {
                     float gas = player->controller.right_trigger - player->controller.left_trigger;
-                    drive_vehicle(components, i, gas, left_stick.x);
+                    drive_vehicle(game_data->components, i, gas, left_stick.x);
                 }
 
-                alert_enemies(components, grid, i, 10.0f);
+                alert_enemies(game_data->components, game_data->grid, i, 10.0f);
 
                 break;
             case PLAYER_PASSENGER:
@@ -251,7 +251,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                     }
                 }
 
-                player->item = get_slot(components, i, player->inventory_size);
+                player->item = get_slot(i, player->inventory_size);
 
                 int new_item = player->inventory[player->item];
 
@@ -279,8 +279,8 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                 if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
                     if (atch == -1) {
                         player->grabbed_item = item;
-                    } else if (components->item[item]->attachments[atch] != -1) {
-                        player->grabbed_item = components->item[item]->attachments[atch];
+                    } else if (itco->attachments[atch] != -1) {
+                        player->grabbed_item = itco->attachments[atch];
                     }
                 }
 
@@ -291,21 +291,22 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
                         replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
                         for (int j = 0; j < player->inventory_size; j++) {
                             if (player->inventory[j] == -1) continue;
-                            ItemComponent* it = components->item[player->inventory[j]];
+                            ItemComponent* it = ItemComponent_get(player->inventory[j]);
                             replace(player->grabbed_item, -1, it->attachments, it->size);
                         }
                         player->inventory[slot] = player->grabbed_item;
-                        components->coordinate[player->grabbed_item]->parent = i;
+                        CoordinateComponent_get(player->grabbed_item)->parent = i;
                     } else if (atch != -1) {
-                        if (player->inventory[slot] != player->grabbed_item && components->item[player->inventory[slot]]->attachments[atch] == -1) {
+                        ItemComponent* item_slot = ItemComponent_get(player->inventory[slot]);
+                        if (player->inventory[slot] != player->grabbed_item && item_slot->attachments[atch] == -1) {
                             replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
                             for (int j = 0; j < player->inventory_size; j++) {
                                 if (player->inventory[j] == -1) continue;
-                                ItemComponent* it = components->item[player->inventory[j]];
+                                ItemComponent* it = ItemComponent_get(player->inventory[j]);
                                 replace(player->grabbed_item, -1, it->attachments, it->size);
                             }
-                            components->item[player->inventory[slot]]->attachments[atch] = player->grabbed_item;
-                            components->coordinate[player->grabbed_item]->parent = player->inventory[slot];
+                            item_slot->attachments[atch] = player->grabbed_item;
+                            CoordinateComponent_get(player->grabbed_item)->parent = player->inventory[slot];
                         }
                     }
                     player->grabbed_item = -1;
@@ -330,7 +331,7 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
 }
 
 
-void add_money(ComponentData* components, int entity, int amount) {
+void add_money(int entity, int amount) {
     if (amount == 0) return;
     
     PlayerComponent* player = PlayerComponent_get(entity);

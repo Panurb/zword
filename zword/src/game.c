@@ -400,9 +400,9 @@ void update_game(GameData data, float time_step) {
     update_physics(time_step);
     collide();
     update_waypoints(data.camera);
-    update_doors(data.components);
+    update_doors();
 
-    update_players(data.components, data.grid, time_step);
+    update_players(time_step);
     update_weapons(data.components, time_step);
     update_enemies(data.components, data.grid, time_step);
     update_energy(data.components, data.grid);

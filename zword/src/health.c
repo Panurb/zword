@@ -69,7 +69,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             int j = -1;
             switch (rand_choice(probs, 5)) {
                 case 0:
-                    j = create_bandage(components, zeros());
+                    j = create_bandage(zeros());
                     break;
                 case 1:
                     j = create_ammo(components, zeros(), AMMO_PISTOL);
@@ -141,7 +141,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 
             PlayerComponent* player = PlayerComponent_get(dealer);
             if (player && enemy) {
-                add_money(components, dealer, enemy->bounty);
+                add_money(dealer, enemy->bounty);
             }
         }
     }

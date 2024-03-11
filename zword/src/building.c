@@ -84,10 +84,10 @@ void create_church(ComponentData* components, sfVector2f pos) {
     for (int i = 0; i < items; i++) {
         switch (locations[i]) {
             case 0:
-                create_item(components, sum(pos, sum(mult(5.0f, w), mult(6.5f, h))), randi(2, 3));
+                create_item(sum(pos, sum(mult(5.0f, w), mult(6.5f, h))), randi(2, 3));
                 break;
             case 1:
-                create_item(components, sum(pos, sum(mult(5.0f, w), mult(-6.5f, h))), randi(2, 3));
+                create_item(sum(pos, sum(mult(5.0f, w), mult(-6.5f, h))), randi(2, 3));
                 break;
         }
     }
@@ -145,13 +145,13 @@ void create_barn(ComponentData* components, sfVector2f pos) {
     for (int i = 0; i < items; i++) {
         switch (locations[i]) {
             case 0:
-                create_item(components, sum(pos, lin_comb(4.0f, w, 4.0f, h)), i);
+                create_item(sum(pos, lin_comb(4.0f, w, 4.0f, h)), i);
                 break;
             case 1:
-                create_item(components, sum(pos, lin_comb(4.0f, w, -4.0f, h)), i);
+                create_item(sum(pos, lin_comb(4.0f, w, -4.0f, h)), i);
                 break;
             case 2:
-                create_item(components, sum(pos, mult(4.0f, w)), i);
+                create_item(sum(pos, mult(4.0f, w)), i);
                 break;
         }
     }
@@ -227,13 +227,13 @@ void create_house(ComponentData* components, sfVector2f pos) {
     for (int i = 0; i < items; i++) {
         switch (locations[i]) {
             case 0:
-                create_item(components, sum(pos, lin_comb(-4.5f, w, 4.0f, h)), i);
+                create_item(sum(pos, lin_comb(-4.5f, w, 4.0f, h)), i);
                 break;
             case 1:
-                create_item(components, sum(pos, lin_comb(3.0f, w, 5.0f, h)), i);
+                create_item(sum(pos, lin_comb(3.0f, w, 5.0f, h)), i);
                 break;
             case 2:
-                create_item(components, sum(pos, lin_comb(3.0f, w, -4.5f, h)), i);
+                create_item(sum(pos, lin_comb(3.0f, w, -4.5f, h)), i);
                 break;
         }
     }
@@ -262,7 +262,7 @@ void create_outhouse(ComponentData* components, sfVector2f pos) {
 
     create_door(sum(pos, mult(1.25f, w)), angle + 0.5f * M_PI);
 
-    create_item(components, pos, 0);
+    create_item(pos, 0);
 }
 
 
