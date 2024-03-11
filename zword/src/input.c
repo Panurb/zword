@@ -408,7 +408,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_RB]) {
-                    drop_item(components, i);
+                    drop_item(i);
                 }
 
                 break;

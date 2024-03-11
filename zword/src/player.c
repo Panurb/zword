@@ -185,7 +185,7 @@ void update_players(float time_step) {
                         player->state = PLAYER_ON_FOOT;
                     }
                 } else if (itco) {
-                    use_item(game_data->components, game_data->grid, item, time_step);
+                    use_item(item, time_step);
                 }
 
                 break;

@@ -152,7 +152,7 @@ void pick_up_item(int entity) {
 }
 
 
-void drop_item(ComponentData* components, int entity) {
+void drop_item(int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
 
     int i = player->inventory[player->item];
@@ -181,7 +181,7 @@ void drop_item(ComponentData* components, int entity) {
 }
 
 
-void heal(ComponentData* components, ColliderGrid* grid, int entity) {
+void heal(int entity) {
     int parent = CoordinateComponent_get(entity)->parent;
 
     ItemComponent* item = ItemComponent_get(entity);
@@ -190,13 +190,13 @@ void heal(ComponentData* components, ColliderGrid* grid, int entity) {
 
     player_health->health = min(player_health->health + item->value, player_health->max_health);
 
-    drop_item(components, parent);
+    drop_item(parent);
     clear_grid(entity);
     destroy_entity(entity);
 }
 
 
-void switch_light(ComponentData* components, int entity) {
+void switch_light(int entity) {
     LightComponent* light = LightComponent_get(entity);
     if (light) {
         light->enabled = true;
@@ -204,7 +204,7 @@ void switch_light(ComponentData* components, int entity) {
 }
 
 
-void use_item(ComponentData* components, ColliderGrid* grid, int entity, float time_step) {
+void use_item(int entity, float time_step) {
     int parent = CoordinateComponent_get(entity)->parent;
 
     PlayerComponent* player = PlayerComponent_get(parent);
@@ -213,10 +213,10 @@ void use_item(ComponentData* components, ColliderGrid* grid, int entity, float t
     if (player->use_timer >= item->use_time) {
         switch (item->type) {
             case ITEM_HEAL:
-                heal(components, grid, entity);
+                heal(entity);
                 break;
             case ITEM_LIGHT:
-                switch_light(components, entity);
+                switch_light(entity);
                 break;
             default:
                 break;
@@ -227,20 +227,20 @@ void use_item(ComponentData* components, ColliderGrid* grid, int entity, float t
 }
 
 
-void draw_items(GameData* data, sfRenderWindow* window) {
+void draw_items() {
     sfText* text = sfText_create();
     ListNode* node;
-    FOREACH(node, data->components->player.order) {
+    FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
         if (player->target == -1) continue;
         ItemComponent* item = ItemComponent_get(player->target);
         ImageComponent* image = ImageComponent_get(player->target);
 
-        sfShader_setFloatUniform(CameraComponent_get(data->camera)->shaders[1], "offset", 0.05f);
+        sfShader_setFloatUniform(CameraComponent_get(game_data->camera)->shaders[1], "offset", 0.05f);
         sfVector2f pos = get_position(player->target);
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
-            draw_sprite(data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
+            draw_sprite(game_data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);
         }
 
         if (item) {
@@ -248,11 +248,11 @@ void draw_items(GameData* data, sfRenderWindow* window) {
             char buffer[256];
             if (item->price > 0) {
                 snprintf(buffer, 256, "%d", item->price);
-                draw_text(data->camera, text, pos, buffer, 20, sfYellow);
+                draw_text(game_data->camera, text, pos, buffer, 20, sfYellow);
                 pos = sum(pos, vec(0.0f, 1.0f));
             }
 
-            draw_text(data->camera, text, pos, item->name, 20, sfYellow);
+            draw_text(game_data->camera, text, pos, item->name, 20, sfYellow);
         }
     }
     sfText_destroy(text);

@@ -15,8 +15,8 @@ void create_item(sfVector2f position, int tier);
 
 void pick_up_item(int entity);
 
-void drop_item(ComponentData* components, int entity);
+void drop_item(int entity);
 
-void draw_items(GameData* data, sfRenderWindow* window);
+void use_item(int entity, float time_step);
 
-void use_item(ComponentData* components, ColliderGrid* grid, int entity, float time_step);
+void draw_items();

@@ -34,7 +34,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         for (int j = 0; j < player->inventory_size; j++) {
             if (player->inventory[j] != -1) {
                 coord->angle = rand_angle();
-                drop_item(components, entity);
+                drop_item(entity);
             }
         }
         coord->angle = angle;
