@@ -84,7 +84,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
 
             for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
                 int j = node->value;
-                damage(components, grid, j, get_position(i), zeros(), 20, -1);
+                damage(j, get_position(i), zeros(), 20, -1);
             }
             
             if (phys->collision.entities->size > 0) {
@@ -93,7 +93,7 @@ void update_energy(ComponentData* components, ColliderGrid* grid) {
                 clear_grid(i);
                 ColliderComponent_get(i)->enabled = false;
                 ImageComponent_remove(i);
-                add_sound(components, i, "energy", 0.5f, randf(1.2f, 1.5f));
+                add_sound(i, "energy", 0.5f, randf(1.2f, 1.5f));
                 phys->lifetime = 1.0f;
             }
         }
@@ -206,7 +206,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                     dmg *= 2;
                 }
                 sfVector2f dir = normalized(diff(min_info[i].position, pos));
-                damage(components, grid, min_info[i].entity, min_info[i].position, dir, dmg, parent);
+                damage(min_info[i].entity, min_info[i].position, dir, dmg, parent);
                 shake_camera(0.0125f * weapon->damage);
             }
             break;
@@ -234,7 +234,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
             // coord->
             // PhysicsComponent_remove(j);
 
-            damage(components, grid, info.entity, info.position, dir, weapon->damage, parent);
+            damage(info.entity, info.position, dir, weapon->damage, parent);
 
             break;
         } default: {
@@ -251,7 +251,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
                 if (dot(info.normal, dir) < -0.99f) {
                     dmg *= 2;
                 }
-                damage(components, grid, info.entity, info.position, dir, dmg, parent);
+                damage(info.entity, info.position, dir, dmg, parent);
 
                 particle->angle = angle;
                 if (info.entity) {
@@ -278,7 +278,7 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
 
     SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
-        add_sound(components, entity, weapon->sound, 1.0f, 1.0f);
+        add_sound(entity, weapon->sound, 1.0f, 1.0f);
     }
 
     if (weapon->magazine == 0) {

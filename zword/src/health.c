@@ -15,11 +15,11 @@
 #include "weapon.h"
 
 
-void die(ComponentData* components, ColliderGrid* grid, int entity) {
-    HealthComponent* health = components->health[entity];
+void die(int entity) {
+    HealthComponent* health = HealthComponent_get(entity);
 
     if (AnimationComponent_get(entity)) {
-        stop_animation(components, entity);
+        stop_animation(game_data->components, entity);
     }
 
     change_texture(entity, health->dead_image, 0.0f, 0.0f);
@@ -43,7 +43,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
             while (ammo && ammo->size > 0) {
                 sfVector2f pos = get_position(entity);
-                int k = create_ammo(components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
+                int k = create_ammo(game_data->components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
                 int size = min(AmmoComponent_get(k)->size, ammo->size);
                 AmmoComponent* drop = AmmoComponent_get(k);
                 drop->size = size;
@@ -72,13 +72,13 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
                     j = create_bandage(zeros());
                     break;
                 case 1:
-                    j = create_ammo(components, zeros(), AMMO_PISTOL);
+                    j = create_ammo(game_data->components, zeros(), AMMO_PISTOL);
                     break;
                 case 2:
-                    j = create_ammo(components, zeros(), AMMO_SHOTGUN);
+                    j = create_ammo(game_data->components, zeros(), AMMO_SHOTGUN);
                     break;
                 case 3:
-                    j = create_ammo(components, zeros(), AMMO_RIFLE);
+                    j = create_ammo(game_data->components, zeros(), AMMO_RIFLE);
                     break;
                 default:
                     break;
@@ -113,15 +113,14 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
     }
 
     if (SoundComponent_get(entity) && health->die_sound[0] != '\0') {
-        add_sound(components, entity, health->die_sound, 1.0f, randf(0.9f, 1.1f));
+        add_sound(entity, health->die_sound, 1.0f, randf(0.9f, 1.1f));
     }
 }
 
 
-void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f pos, sfVector2f dir, int dmg, 
-        int dealer) {
-    HealthComponent* health = components->health[entity];
-    EnemyComponent* enemy = components->enemy[entity];
+void damage(int entity, sfVector2f pos, sfVector2f dir, int dmg, int dealer) {
+    HealthComponent* health = HealthComponent_get(entity);
+    EnemyComponent* enemy = EnemyComponent_get(entity);
     if (health) {
         int prev_health = health->health;
         health->health = max(0, health->health - dmg);
@@ -137,7 +136,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
         }
 
         if (prev_health > 0 && health->health == 0) {
-            die(components, grid, entity);
+            die(entity);
 
             PlayerComponent* player = PlayerComponent_get(dealer);
             if (player && enemy) {
@@ -163,7 +162,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 
     SoundComponent* scomp = SoundComponent_get(entity);
     if (scomp && scomp->hit_sound[0] != '\0') {
-        add_sound(components, entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
+        add_sound(entity, scomp->hit_sound, fminf(1.0f, dmg / 50.0f), randf(0.9f, 1.1f));
     }
 
     ImageComponent* image = ImageComponent_get(entity);
@@ -175,17 +174,17 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
 }
 
 
-void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2f vel) {
-    HealthComponent* health = components->health[entity];
+void blunt_damage(int entity, sfVector2f vel) {
+    HealthComponent* health = HealthComponent_get(entity);
     float v = norm(vel);
     if (health) {
         if (v > 10.0f) {
             if (health->health > 0) {
                 SoundComponent* sound = SoundComponent_get(entity);
                 if (sound) {
-                    add_sound(components, entity, sound->hit_sound, 1.0, 0.8);
+                    add_sound(entity, sound->hit_sound, 1.0, 0.8);
                 }
-                damage(components, grid, entity, get_position(entity), vel, 100, -1);
+                damage(entity, get_position(entity), vel, 100, -1);
             }
         }
     }
@@ -193,7 +192,7 @@ void blunt_damage(ComponentData* components, ColliderGrid* grid, int entity, sfV
     SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
         if (v > 5.0f) {
-            // add_sound(components, entity, sound->hit_sound, 0.5f, 1.0f);
+            // add_sound(entity, sound->hit_sound, 0.5f, 1.0f);
         }
     }
 }

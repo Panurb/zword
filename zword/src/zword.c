@@ -262,7 +262,7 @@ int main() {
 
         sfRenderWindow_display(game_window);
 
-        play_sounds(game_data->components, game_data->camera, game_data->sounds, channels);
+        play_sounds(game_data->camera, channels);
         sfMusic_setVolume(music, 0.5f * game_settings.music * music_fade);
         if (!music_playing) {
             sfMusic_play(music);

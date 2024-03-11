@@ -53,7 +53,7 @@ void update_physics(float time_step) {
             sfVector2f v_t = diff(physics->velocity, v_n);
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0f - physics->friction, v_t));
 
-            blunt_damage(game_data->components, game_data->grid, i, v_n);
+            blunt_damage(i, v_n);
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));

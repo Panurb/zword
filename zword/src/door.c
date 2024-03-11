@@ -45,9 +45,9 @@ void update_doors() {
             col->group = GROUP_DOORS;
 
             if (phys->speed > 0.25f) {
-                loop_sound(game_data->components, i, "door", 0.3f, 1.0f);
+                loop_sound(i, "door", 0.3f, 1.0f);
             } else {
-                stop_loop(game_data->components, i);
+                stop_loop(i);
             }
         }
     }

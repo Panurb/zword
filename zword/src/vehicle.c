@@ -92,11 +92,11 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
 
             if (closest == 0) {
                 player->state = PLAYER_DRIVE;
-                loop_sound(components, j, "car", 0.5, 0.8);
+                add_sound(j, "car", 0.5, 0.8);
             } else {
                 player->state = PLAYER_PASSENGER;
             }
-            add_sound(components, j, "car_door", 0.75, 1.0);
+            add_sound(j, "car_door", 0.75, 1.0);
 
             PhysicsComponent_get(i)->velocity = zeros();
             return true;
@@ -126,9 +126,9 @@ void exit_vehicle(ComponentData* components, int i) {
     components->collider[i]->enabled = true;
 
     if (k == 0) {
-        stop_loop(components, j);
+        stop_loop(j);
     }
-    add_sound(components, j, "car_door", 0.75, 1.0);
+    add_sound(j, "car_door", 0.75, 1.0);
 }
 
 
