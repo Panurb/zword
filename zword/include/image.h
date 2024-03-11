@@ -12,30 +12,28 @@
 
 typedef sfTexture* TextureArray[100];
 
-int create_decal(ComponentData* components, sfVector2f pos, Filename filename, float lifetime);
+int create_decal(sfVector2f pos, Filename filename, float lifetime);
 
 sfTexture** load_textures();
 
 int texture_index(Filename filename);
 
-void set_texture(ImageComponent* image, TextureArray textures);
+void set_texture(ImageComponent* image);
 
 sfTexture* load_texture(Filename filename);
 
-sfSprite* load_sprite(Filename filename, TextureArray textures);
+void draw_ground(int camera);
 
-void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures);
+void draw(int camera);
 
-void draw(ComponentData* component, sfRenderWindow* window,  int camera, TextureArray textures);
+void draw_roofs(int camera);
 
-void draw_roofs(ComponentData* component, sfRenderWindow* window, int camera, TextureArray textures);
+void change_texture(int entity, Filename filename, float width, float height);
 
-void change_texture(ComponentData* components, int entity, Filename filename, float width, float height);
-
-void change_layer(ComponentData* components, int entity, Layer layer);
+void change_layer(int entity, Layer layer);
 
 void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, float sharpness, Permutation p);
 
 void create_noise_tileable(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, Permutation p);
 
-bool point_inside_image(ComponentData* components, int entity, sfVector2f point);
+bool point_inside_image(int entity, sfVector2f point);

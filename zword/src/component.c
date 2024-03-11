@@ -103,7 +103,7 @@ ImageComponent* ImageComponent_add(int entity, Filename filename, float width, f
     
     game_data->components->image.array[entity] = image;
 
-    change_layer(game_data->components, entity, image->layer);
+    change_layer(entity, image->layer);
 
     return image;
 }

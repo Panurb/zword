@@ -13,6 +13,8 @@
 #include "particle.h"
 #include "road.h"
 #include "animation.h"
+#include "game.h"
+#include "list.h"
 
 
 static const char* IMAGES[] = {
@@ -100,7 +102,7 @@ static const char* IMAGES[] = {
 };
 
 
-int create_decal(ComponentData* components, sfVector2f pos, Filename filename, float lifetime) {
+int create_decal(sfVector2f pos, Filename filename, float lifetime) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle())->lifetime = 60.0f;
     ImageComponent_add(i, filename, 0.0f, 0.0f, LAYER_DECALS);
@@ -137,11 +139,11 @@ int texture_index(Filename filename) {
 }
 
 
-void set_texture(ImageComponent* image, TextureArray textures) {
+void set_texture(ImageComponent* image) {
     int i = texture_index(image->filename);
     
     if (i != -1) {
-        sfSprite_setTexture(image->sprite, textures[i], sfTrue);
+        sfSprite_setTexture(image->sprite, game_data->textures[i], sfTrue);
         if (image->width != 0.0f && image->height != 0.0f) {
             sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
             sfSprite_setTextureRect(image->sprite, rect);
@@ -154,8 +156,9 @@ void set_texture(ImageComponent* image, TextureArray textures) {
 }
 
 
-void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
-    for (ListNode* node = components->image.order->head; node; node = node->next) {
+void draw_ground(int camera) {
+    ListNode* node;
+    FOREACH(node, game_data->components->image.order) {
         int i = node->value;
 
         ImageComponent* image = ImageComponent_get(i);
@@ -163,7 +166,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
         if (image->layer > LAYER_DECALS) break;
 
         if (image->texture_changed) {
-            set_texture(image, textures);
+            set_texture(image);
             image->texture_changed = false;
         }
 
@@ -173,7 +176,7 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
         float r = sqrtf(w * w + h * h);
 
         // TODO: check if on screen
-        draw_road(components, window, camera, textures, i);
+        draw_road(game_data->components, game_window, camera, game_data->textures, i);
 
         if (!on_screen(camera, pos, r, r)) {
             continue;
@@ -187,11 +190,11 @@ void draw_ground(ComponentData* components, sfRenderWindow* window, int camera, 
 }
 
 
-void draw_image(ComponentData* components, int entity, sfRenderWindow* window, int camera, TextureArray textures) {
+void draw_image(int entity, int camera) {
     ImageComponent* image = ImageComponent_get(entity);
 
     if (image->texture_changed) {
-        set_texture(image, textures);
+        set_texture(image);
         image->texture_changed = false;
     }
 
@@ -213,8 +216,9 @@ void draw_image(ComponentData* components, int entity, sfRenderWindow* window, i
 }
 
 
-void draw(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
-    for (ListNode* node = components->image.order->head; node; node = node->next) {
+void draw(int camera) {
+    ListNode* node;
+    FOREACH(node, game_data->components->image.order) {
         int i = node->value;
 
         ImageComponent* image = ImageComponent_get(i);
@@ -222,29 +226,30 @@ void draw(ComponentData* components, sfRenderWindow* window, int camera, Texture
         if (image->layer <= LAYER_DECALS) continue;
         if (image->layer >= LAYER_ROOFS) break;
 
-        draw_image(components, i, window, camera, textures);
+        draw_image(i, camera);
     }
 
-    for (ListNode* node = components->image.order->head; node; node = node->next) {
-        draw_particles(components, window, camera, node->value);
+    FOREACH(node, game_data->components->image.order) {
+        draw_particles(game_data->components, game_window, camera, node->value);
     }
 }
 
 
-void draw_roofs(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures) {
-    for (ListNode* node = components->image.order->head; node; node = node->next) {
+void draw_roofs(int camera) {
+    ListNode* node;
+    FOREACH(node, game_data->components->image.order) {
         int i = node->value;
 
         ImageComponent* image = ImageComponent_get(i);
 
         if (image->layer < LAYER_ROOFS) continue;
 
-        draw_image(components, i, window, camera, textures);
+        draw_image(i, camera);
     }
 }
 
 
-void change_texture(ComponentData* components, int entity, Filename filename, float width, float height) {
+void change_texture(int entity, Filename filename, float width, float height) {
     ImageComponent* image = ImageComponent_get(entity);
     if (strcmp(image->filename, filename) == 0) {
         return;
@@ -266,15 +271,17 @@ void change_texture(ComponentData* components, int entity, Filename filename, fl
 }
 
 
-void change_layer(ComponentData* components, int entity, Layer layer) {
-    List_remove(components->image.order, entity);
+void change_layer(int entity, Layer layer) {
+    List* image_order = game_data->components->image.order;
+    List_remove(image_order, entity);
 
-    if (components->image.order->size == 0 || ImageComponent_get(components->image.order->head->value)->layer > layer) {
-        List_add(components->image.order, entity);
+    if (image_order->size == 0 || ImageComponent_get(image_order->head->value)->layer > layer) {
+        List_add(image_order, entity);
     } else {
-        for (ListNode* node = components->image.order->head; node; node = node->next) {
+        ListNode* node;
+        FOREACH(node, image_order) {
             if (!node->next || ImageComponent_get(node->next->value)->layer > layer) {
-                List_insert(components->image.order, node, entity);
+                List_insert(image_order, node, entity);
                 break;
             }
         }
@@ -311,7 +318,7 @@ void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfC
 }
 
 
-bool point_inside_image(ComponentData* components, int entity, sfVector2f point) {
+bool point_inside_image(int entity, sfVector2f point) {
     sfVector2f position = get_position(entity);
     float angle = get_angle(entity);
     ImageComponent* image = ImageComponent_get(entity);

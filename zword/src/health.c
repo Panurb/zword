@@ -22,8 +22,8 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
         stop_animation(components, entity);
     }
 
-    change_texture(components, entity, health->dead_image, 0.0f, 0.0f);
-    change_layer(components, entity, LAYER_CORPSES);
+    change_texture(entity, health->dead_image, 0.0f, 0.0f);
+    change_layer(entity, LAYER_CORPSES);
 
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
@@ -130,9 +130,9 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
             // TODO: use decal
             sfVector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
             if (dmg < 40) {
-                create_decal(components, pos, "blood", 60.0f);
+                create_decal(pos, "blood", 60.0f);
             } else {
-                create_decal(components, pos, "blood_large", 60.0f);
+                create_decal(pos, "blood_large", 60.0f);
             }
         }
 

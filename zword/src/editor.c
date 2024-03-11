@@ -592,7 +592,7 @@ void input_tool_select(GameData* data, sfEvent event) {
                             break;
                         }
                     } else if (ImageComponent_get(node->value)) {
-                        if (point_inside_image(components, node->value, mouse_world)) {
+                        if (point_inside_image(node->value, mouse_world)) {
                             grabbed = true;
                             break;
                         }

@@ -421,12 +421,12 @@ void update_game(GameData data, float time_step) {
 void draw_game(GameData data, sfRenderWindow* window) {
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
 
-    draw_ground(data.components, window, data.camera, data.textures);
+    draw_ground(data.camera);
     sfRenderWindow_drawSprite(window, data.shadow_sprite, &state);
-    draw(data.components, window, data.camera, data.textures);
+    draw(data.camera);
     sfRenderWindow_drawSprite(window, data.light_sprite, &state);
 
-    draw_roofs(data.components, window, data.camera, data.textures);
+    draw_roofs(data.camera);
     draw_items(&data, window);
 }
 

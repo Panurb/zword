@@ -119,17 +119,17 @@ void update_players(ComponentData* components, ColliderGrid* grid, float time_st
             snprintf(buffer, 256, "arms_%s", image->filename);
 
             if (strcmp(image->filename, "axe") == 0) {
-                change_texture(components, player->arms, buffer, 2.0f, 2.0f);
+                change_texture(player->arms, buffer, 2.0f, 2.0f);
             } else if (strcmp(image->filename, "sword") == 0) {
-                change_texture(components, player->arms, buffer, 2.0f, 3.0f);
+                change_texture(player->arms, buffer, 2.0f, 3.0f);
             } else {
-                change_texture(components, player->arms, buffer, 0.0f, 0.0f);
+                change_texture(player->arms, buffer, 0.0f, 0.0f);
             }
         } else {
             if (itco) {
-                change_texture(components, player->arms, "arms", 0.0f, 0.0f);
+                change_texture(player->arms, "arms", 0.0f, 0.0f);
             } else {
-                change_texture(components, player->arms, "", 0.0f, 0.0f);
+                change_texture(player->arms, "", 0.0f, 0.0f);
             }
         }
         

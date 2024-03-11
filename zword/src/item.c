@@ -133,7 +133,7 @@ void pick_up_item(ComponentData* components, ColliderGrid* grid, int entity) {
             coord->position = (sfVector2f) { 0.75f, 0.0f };
             coord->angle = 0.0f;
             ColliderComponent_get(player->target)->enabled = false;
-            change_layer(components, player->target, LAYER_WEAPONS);
+            change_layer(player->target, LAYER_WEAPONS);
             if (player->item != i) {
                 image->alpha = 0.0f;
             }
@@ -174,7 +174,7 @@ void drop_item(ComponentData* components, int entity) {
             light->enabled = false;
         }
 
-        change_layer(components, i, LAYER_ITEMS);
+        change_layer(i, LAYER_ITEMS);
         ImageComponent_get(i)->alpha = 1.0f;
         ColliderComponent_get(i)->enabled = true;
     }
