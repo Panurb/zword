@@ -416,5 +416,5 @@ void create_school(ComponentData* components, sfVector2f pos) {
         }
     }
 
-    create_boss(components, sum(pos, lin_comb(-10.0f, w, 5.0f, h)), angle + 1.5f * M_PI);
+    create_boss(sum(pos, lin_comb(-10.0f, w, 5.0f, h)), angle + 1.5f * M_PI);
 }

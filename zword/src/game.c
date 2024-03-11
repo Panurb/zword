@@ -195,16 +195,16 @@ int spawn_enemy(ComponentData* components, ColliderGrid* grid, sfVector2f positi
     float angle = rand_angle();
     switch (rand_choice(probs, 4)) {
         case 0:
-            j = create_zombie(components, position, angle);
+            j = create_zombie(position, angle);
             break;
         case 1:
-            j = create_farmer(components, position, angle);
+            j = create_farmer(position, angle);
             break;
         case 2:
-            j = create_big_boy(components, position, angle);
+            j = create_big_boy(position, angle);
             break;
         case 3:
-            j = create_priest(components, position, angle);
+            j = create_priest(position, angle);
             break;
     }
     int p = components->player.order->head->value;
@@ -404,7 +404,7 @@ void update_game(GameData data, float time_step) {
 
     update_players(time_step);
     update_weapons(time_step);
-    update_enemies(data.components, data.grid, time_step);
+    update_enemies(time_step);
     update_energy();
 
     update_particles(data.camera, time_step);
@@ -458,7 +458,7 @@ void draw_entities(GameData data, sfRenderWindow* window) {
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     draw_colliders(data.camera);
     draw_waypoints(data.camera, true);
-    draw_enemies(data.components, window, data.camera);
+    draw_enemies(data.camera);
     draw_parents(data, window);
     if (debug_level > 1) {
         draw_entities(data, window);

@@ -213,7 +213,7 @@ void update_players(float time_step) {
                     drive_vehicle(game_data->components, i, gas, left_stick.x);
                 }
 
-                alert_enemies(game_data->components, game_data->grid, i, 10.0f);
+                alert_enemies(i, 10.0f);
 
                 break;
             case PLAYER_PASSENGER:

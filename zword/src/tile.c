@@ -143,7 +143,7 @@ void create_tile(ComponentData* components, Tile tile, sfVector2f position, floa
             create_roof(components, position, width, height, angle);
             break;
         case TILE_SPAWNER:
-            create_spawner(components, position, angle, width, height);
+            create_spawner(position, angle, width, height);
             break;
         case TILE_STONE:
             create_wall(components, position, angle, width, height, "stone_tile");

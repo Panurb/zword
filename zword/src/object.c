@@ -261,14 +261,11 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("bandage") return create_bandage(position);
     MATCH("bed") return create_bed(components, position, angle);
     MATCH("bench") return create_bench(components, position, angle);
-    MATCH("big boy") return create_big_boy(components, position, angle);
     MATCH("blood") return create_decal(position, "blood", -1);
-    MATCH("boss") return create_boss(components, position, angle);
     MATCH("candle") return create_candle(components, position);
     MATCH("car") return create_car(components, position, angle);
     MATCH("desk") return create_desk(components, position, angle);
     MATCH("door") return create_door(position, angle);
-    MATCH("farmer") return create_farmer(components, position, angle);
     MATCH("fire") return create_fire(components, position);
     MATCH("flashlight") return create_flashlight(position);
     MATCH("gas") return create_gas(position);
@@ -276,7 +273,6 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("hole") return create_decal(position, "hole", -1);
     MATCH("lamp") return create_lamp(components, position);
     MATCH("player") return create_player(position, angle);
-    MATCH("priest") return create_priest(components, position, angle);
     MATCH("rock") return create_rock(components, position);
     MATCH("stove") return create_stove(components, position, angle);
     MATCH("sink") return create_sink(components, position, angle);
@@ -286,7 +282,12 @@ int create_object(ComponentData* components, ButtonText object_name, sfVector2f 
     MATCH("tree") return create_tree(components, position);
     MATCH("tutorial") create_tutorial(components, position);
     MATCH("waypoint") return create_waypoint(position);
-    MATCH("zombie") return create_zombie(components, position, angle);
+
+    MATCH("big boy") return create_big_boy(position, angle);
+    MATCH("boss") return create_boss(position, angle);
+    MATCH("farmer") return create_farmer(position, angle);
+    MATCH("priest") return create_priest(position, angle);
+    MATCH("zombie") return create_zombie(position, angle);
 
     MATCH("ammo pistol") return create_ammo(position, AMMO_PISTOL);
     MATCH("ammorifle") return create_ammo(position, AMMO_RIFLE);

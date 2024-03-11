@@ -264,7 +264,7 @@ void attack(int entity) {
 
             weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
             if (PlayerComponent_get(parent)) {
-                alert_enemies(game_data->components, game_data->grid, parent, weapon->sound_range);
+                alert_enemies(parent, weapon->sound_range);
             }
 
             LightComponent* light = LightComponent_get(entity);

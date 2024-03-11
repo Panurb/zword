@@ -155,13 +155,13 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
             for (int i = 0; i < 2; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
                 if (randf(0.0f, 1.0f) < 0.6f) {
-                    create_zombie(components, sum(pos, r), 0.0f);
+                    create_zombie(sum(pos, r), 0.0f);
                 } else if (randf(0.0f, 1.0f) < 0.5f) {
-                    create_farmer(components, sum(pos, r), 0.0f);
+                    create_farmer(sum(pos, r), 0.0f);
                 } else if (randf(0.0f, 1.0f) < 0.5f) {
-                    create_priest(components, sum(pos, r), 0.0f);
+                    create_priest(sum(pos, r), 0.0f);
                 } else {
-                    create_big_boy(components, sum(pos, r), 0.0f);
+                    create_big_boy(sum(pos, r), 0.0f);
                 }
                 // TODO: check collision
             }

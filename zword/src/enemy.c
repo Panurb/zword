@@ -15,9 +15,10 @@
 #include "health.h"
 #include "weapon.h"
 #include "game.h"
+#include "list.h"
 
 
-int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
+int create_zombie(sfVector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
@@ -43,7 +44,7 @@ int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
+int create_farmer(sfVector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
@@ -74,7 +75,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-int create_priest(ComponentData* components, sfVector2f pos, float angle) {
+int create_priest(sfVector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
@@ -107,7 +108,7 @@ int create_priest(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
+int create_big_boy(sfVector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
@@ -139,7 +140,7 @@ int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-int create_boss(ComponentData* components, sfVector2f pos, float angle) {
+int create_boss(sfVector2f pos, float angle) {
     int i = create_entity();
     
     CoordinateComponent_add(i, pos, angle);
@@ -187,10 +188,11 @@ int create_boss(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
+void update_vision(int entity) {
     EnemyComponent* enemy = EnemyComponent_get(entity);
     float min_dist = enemy->vision_range;
-    for (ListNode* node = components->player.order->head; node; node = node->next) {
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
         int j = node->value;
         PlayerComponent* player = PlayerComponent_get(j);
         if (player->state == PLAYER_DEAD) continue;
@@ -214,8 +216,8 @@ void update_vision(ComponentData* components, ColliderGrid* grid, int entity) {
 }
 
 
-void update_enemies(ComponentData* components, ColliderGrid* grid, float time_step) {
-    for (int i = 0; i < components->entities; i++) {
+void update_enemies(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(i);
         if (!enemy) continue;
         if (enemy->spawner) continue;
@@ -226,7 +228,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
         sfVector2f pos = get_position(i);
 
         if (enemy->state != ENEMY_ATTACK && enemy->state != ENEMY_DEAD) {
-            update_vision(components, grid, i);
+            update_vision(i);
             float delta_angle = angle_diff(enemy->desired_angle, coord->angle);
             phys->angular_velocity = enemy->turn_speed * delta_angle;
         }
@@ -337,8 +339,8 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 }
 
 
-void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera) {
-    for (int i = 0; i < components->entities; i++) {
+void draw_enemies(int camera) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(i);
         if (!enemy) continue;
 
@@ -353,7 +355,7 @@ void draw_enemies(ComponentData* components, sfRenderWindow* window, int camera)
 }
 
 
-void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range) {
+void alert_enemies(int player, float range) {
     List* list = get_entities(get_position(player), range);
     for (ListNode* node = list->head; node; node = node->next) {
         int j = node->value;
@@ -368,7 +370,7 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 }
 
 
-void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height) {
+void create_spawner(sfVector2f position, float angle, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ColliderComponent_add_rectangle(i, width, height, GROUP_FLOORS);
@@ -376,16 +378,16 @@ void create_spawner(ComponentData* components, sfVector2f position, float angle,
 }
 
 
-void draw_spawners(sfRenderWindow* window, GameData data) {
-    for (int i = 0; i <= data.components->entities; i++) {
+void draw_spawners() {
+    for (int i = 0; i <= game_data->components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(i);
         if (enemy && enemy->spawner) {
             ColliderComponent* col = ColliderComponent_get(i);
             sfColor color = get_color(1.0f, 0.0f, 1.0f, 0.25f);
             sfVector2f pos = get_position(i);
             float angle = get_angle(i);
-            draw_rectangle(data.camera, NULL, pos, col->width, col->height, angle, color);
-            draw_text(data.camera, NULL, pos, "spawner", 20, sfMagenta);
+            draw_rectangle(game_data->camera, NULL, pos, col->width, col->height, angle, color);
+            draw_text(game_data->camera, NULL, pos, "spawner", 20, sfMagenta);
         }
     }
 }
