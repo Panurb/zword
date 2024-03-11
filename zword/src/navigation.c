@@ -97,7 +97,7 @@ bool a_star(int start, int goal, List* path) {
 }
 
 
-float connection_distance(ComponentData* component, ColliderGrid* grid, int i, int j) {
+float connection_distance(int i, int j) {
     sfVector2f a = get_position(i);
     sfVector2f b = get_position(j);
     sfVector2f v = diff(b, a);
@@ -123,7 +123,7 @@ float connection_distance(ComponentData* component, ColliderGrid* grid, int i, i
 }
 
 
-void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera) {
+void update_waypoints(int camera) {
     static int id = 0;
     id = (id + 1) % 30;
     if (id != 0) {
@@ -149,7 +149,7 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera)
             int n = nod->value;
             if (n == i) continue;
 
-            float d = connection_distance(components, grid, i, n);
+            float d = connection_distance(i, n);
             if (d > 0.0f) {
                 List_add(WaypointComponent_get(i)->neighbors, n);
             }
@@ -160,11 +160,11 @@ void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera)
 }
 
 
-void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera, bool draw_neighbors) {
+void draw_waypoints(int camera, bool draw_neighbors) {
     sfCircleShape* shape = sfCircleShape_create();
     sfRectangleShape* line = sfRectangleShape_create();
 
-    for (int i = 0; i < components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         WaypointComponent* waypoint = WaypointComponent_get(i);
         if (!waypoint) continue;
         if (ImageComponent_get(i)) continue;

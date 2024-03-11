@@ -532,7 +532,7 @@ void create_editor_menu(GameData* data) {
 void update_editor(GameData data, sfRenderWindow* window, float time_step) {
     // update(data.components, time_step, data.grid);
     // collide(data.components, data.grid);
-    update_waypoints(data.components, data.grid, data.camera);
+    update_waypoints(data.camera);
 
     update_particles(data.components, data.camera, time_step);
     update_lights(data.components, time_step);
@@ -879,7 +879,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
         }
     }
 
-    draw_waypoints(data.components, window, data.camera, waypoint_selected);
+    draw_waypoints(data.camera, waypoint_selected);
 
     draw_spawners(window, data);
 

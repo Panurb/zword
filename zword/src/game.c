@@ -399,7 +399,7 @@ void update_game(GameData data, float time_step) {
     update_lifetimes(time_step);
     update_physics(time_step);
     collide();
-    update_waypoints(data.components, data.grid, data.camera);
+    update_waypoints(data.camera);
     update_doors(data.components);
 
     update_players(data.components, data.grid, time_step);
@@ -457,7 +457,7 @@ void draw_entities(GameData data, sfRenderWindow* window) {
 
 void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
     draw_colliders(data.camera);
-    draw_waypoints(data.components, window, data.camera, true);
+    draw_waypoints(data.camera, true);
     draw_enemies(data.components, window, data.camera);
     draw_parents(data, window);
     if (debug_level > 1) {

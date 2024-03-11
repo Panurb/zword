@@ -15,6 +15,6 @@ int create_waypoint(sfVector2f pos);
 
 bool a_star(int start, int goal, List* path);
 
-void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera);
+void update_waypoints(int camera);
 
-void draw_waypoints(ComponentData* components, sfRenderWindow* window, int camera, bool draw_neighbors);
+void draw_waypoints(int camera, bool draw_neighbors);
