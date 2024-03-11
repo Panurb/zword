@@ -170,7 +170,7 @@ void PhysicsComponent_remove(int entity) {
 }
 
 
-ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group) {
+ColliderComponent* ColliderComponent_add_circle(int entity, float radius, ColliderGroup group) {
     ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
     col->trigger_type = TRIGGER_NONE;
@@ -192,7 +192,7 @@ ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int e
 }
 
 
-ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, int entity, float width, float height, ColliderGroup group) {
+ColliderComponent* ColliderComponent_add_rectangle(int entity, float width, float height, ColliderGroup group) {
     ColliderComponent* col = malloc(sizeof(ColliderComponent));
     col->enabled = true;
     col->trigger_type = TRIGGER_NONE;

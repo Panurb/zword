@@ -31,7 +31,7 @@ void create_water(ComponentData* components, sfVector2f position, float width, f
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ImageComponent_add(i, "water_tile", width, height, LAYER_GROUND);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
+    ColliderComponent_add_rectangle(i, width, height, GROUP_WALLS);
 
     if (noise_texture) {
         i = create_entity();
@@ -62,7 +62,7 @@ void create_beach_corner(ComponentData* components, sfVector2f position, float a
 int create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_WALLS);
+    ColliderComponent_add_rectangle(i, width, height, GROUP_WALLS);
     ImageComponent_add(i, filename, width, height, LAYER_WALLS);
 
     if (strcmp(filename, "wood_tile") == 0) {
@@ -80,15 +80,15 @@ int create_wall(ComponentData* components, sfVector2f pos, float angle, float wi
 void create_fence(ComponentData* components, sfVector2f pos, float angle, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_BARRIERS);
+    ColliderComponent_add_rectangle(i, width, height, GROUP_BARRIERS);
     ImageComponent_add(i, "fence_tile", width, height, LAYER_WALLS);
 }
 
 
 void create_glass(ComponentData* components, sfVector2f pos, float angle) {
     create_fence(components, pos, angle, 1.0f, 4.0f);
-    create_waypoint(components, sum(pos, polar_to_cartesian(1.5f, angle)));
-    create_waypoint(components, diff(pos, polar_to_cartesian(1.5f, angle)));
+    create_waypoint(sum(pos, polar_to_cartesian(1.5f, angle)));
+    create_waypoint(diff(pos, polar_to_cartesian(1.5f, angle)));
 }
 
 
@@ -98,7 +98,7 @@ int create_floor(ComponentData* components, sfVector2f pos, float width, float h
 
     CoordinateComponent_add(i, pos, angle);
     ImageComponent_add(i, filename, width, height, LAYER_FLOOR);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
+    ColliderComponent_add_rectangle(i, width, height, GROUP_FLOORS);
 
     return i;
 }
@@ -108,7 +108,7 @@ void create_roof(ComponentData* components, sfVector2f pos, float width, float h
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
+    ColliderComponent_add_rectangle(i, width, height, GROUP_FLOORS);
     ImageComponent_add(i, "roof_tile", width, height, LAYER_ROOFS);
 }
 

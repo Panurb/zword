@@ -22,7 +22,7 @@ int create_zombie(ComponentData* components, sfVector2f pos, float angle) {
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+    ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
     ImageComponent_add(i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(i, 1.0f);
@@ -48,7 +48,7 @@ int create_farmer(ComponentData* components, sfVector2f pos, float angle) {
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+    ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
     ImageComponent_add(i, "farmer", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(i, 1.0f);
@@ -79,7 +79,7 @@ int create_priest(ComponentData* components, sfVector2f pos, float angle) {
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_circle(components, i, 0.5, GROUP_ENEMIES);
+    ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
     ImageComponent_add(i, "priest", 1.0, 1.0, LAYER_ENEMIES);
     PhysicsComponent_add(i, 1.0f);
@@ -112,7 +112,7 @@ int create_big_boy(ComponentData* components, sfVector2f pos, float angle) {
     
     angle = rand_angle();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_circle(components, i, 0.9f, GROUP_ENEMIES);
+    ColliderComponent_add_circle(i, 0.9f, GROUP_ENEMIES);
 
     ImageComponent_add(i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
     AnimationComponent_add(i, 2);
@@ -143,7 +143,7 @@ int create_boss(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity();
     
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_circle(components, i, 1.0f, GROUP_ENEMIES);
+    ColliderComponent_add_circle(i, 1.0f, GROUP_ENEMIES);
     ImageComponent_add(i, "boss_head", 6.0f, 4.0f, LAYER_ENEMIES);
     AnimationComponent_add(i, 1);
     PhysicsComponent_add(i, 100.0f);
@@ -174,7 +174,7 @@ int create_boss(ComponentData* components, sfVector2f pos, float angle) {
         pos = sum(pos, polar_to_cartesian(3.0f, angle));
         CoordinateComponent_add(j, pos, 0.0f);
         PhysicsComponent_add(j, 10.0f);
-        ColliderComponent_add_rectangle(components, j, 3.0f, 1.5f, GROUP_ENEMIES);
+        ColliderComponent_add_rectangle(j, 3.0f, 1.5f, GROUP_ENEMIES);
         ImageComponent_add(j, "boss_body", 6.0f, 4.0f, LAYER_ENEMIES);
         AnimationComponent_add(j, 4)->current_frame = 2 * (k % 2);
         JointComponent_add(j, parent, 3.0f, 3.0f, 1.0f);
@@ -250,7 +250,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
                 break;
             } case ENEMY_INVESTIGATE: {
-                a_star(components, i, enemy->target, enemy->path);
+                a_star(i, enemy->target, enemy->path);
 
                 sfVector2f r;
                 if (enemy->path->size > 1) {
@@ -273,7 +273,7 @@ void update_enemies(ComponentData* components, ColliderGrid* grid, float time_st
 
                 HitInfo info = raycast(components, grid, pos, r, d, GROUP_BULLETS);
                 if (info.entity != enemy->target) {
-                    a_star(components, i, enemy->target, enemy->path);
+                    a_star(i, enemy->target, enemy->path);
                     if (enemy->path->size > 1) {
                         v = diff(get_position(enemy->path->head->next->value), pos);
                     }
@@ -371,7 +371,7 @@ void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, fl
 void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
-    ColliderComponent_add_rectangle(components, i, width, height, GROUP_FLOORS);
+    ColliderComponent_add_rectangle(i, width, height, GROUP_FLOORS);
     EnemyComponent_add(i)->spawner = true;
 }
 

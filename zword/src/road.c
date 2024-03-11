@@ -86,7 +86,7 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
         Filename filename;
         snprintf(filename, 20, "%s%s", road->filename, "_tile");
         ImageComponent_add(i, filename, length + 0.25, road->width, LAYER_ROADS);
-        ColliderComponent_add_rectangle(components, i, d, road->width, group);
+        ColliderComponent_add_rectangle(i, d, road->width, group);
 
         snprintf(filename, 20, "%s%s", road->filename, "_end");
 

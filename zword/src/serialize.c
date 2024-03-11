@@ -255,9 +255,9 @@ void ColliderComponent_deserialize(cJSON* entity_json, ComponentData* components
     int group = cJSON_GetObjectItem(json, "group")->valueint;
     ColliderComponent* collider;
     if (type == COLLIDER_CIRCLE) {
-        collider = ColliderComponent_add_circle(components, entity, 0.5f * width, group);
+        collider = ColliderComponent_add_circle(entity, 0.5f * width, group);
     } else if (type == COLLIDER_RECTANGLE) {
-        collider = ColliderComponent_add_rectangle(components, entity, width, height, group);
+        collider = ColliderComponent_add_rectangle(entity, width, height, group);
     }
     collider->enabled = deserialize_int(json, "enabled", collider->enabled);
     collider->trigger_type = deserialize_int(json, "trigger_type", collider->trigger_type);

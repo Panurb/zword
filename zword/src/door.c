@@ -13,7 +13,7 @@ int create_door(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle + M_PI);
     ImageComponent_add(i, "door", 2.0f, 1.0f, LAYER_ITEMS);
-    ColliderComponent_add_rectangle(components, i, 2.0f, 0.3f, GROUP_DOORS);
+    ColliderComponent_add_rectangle(i, 2.0f, 0.3f, GROUP_DOORS);
     ParticleComponent_add_type(components, i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(i, "wood_hit");
     DoorComponent_add(i, 500);

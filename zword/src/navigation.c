@@ -10,76 +10,80 @@
 #include "raycast.h"
 #include "list.h"
 #include "collider.h"
+#include "game.h"
 
 
 #define INFINITY 10000.0
 
 
-int create_waypoint(ComponentData* components, sfVector2f pos) {
+int create_waypoint(sfVector2f pos) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, 0.0);
     WaypointComponent_add(i);
-    ColliderComponent_add_circle(components, i, 0.25f, GROUP_ALL)->enabled = false;
+    ColliderComponent_add_circle(i, 0.25f, GROUP_ALL)->enabled = false;
 
     return i;
 }
 
 
-void reconstruct_path(ComponentData* components, int current, List* path) {
+void reconstruct_path(int current, List* path) {
     while(current != -1) {
         List_add(path, current);
-        current = components->waypoint[current]->came_from;
+        WaypointComponent* waypoint = WaypointComponent_get(current);
+        current = waypoint->came_from;
     }
 }
 
 
-float heuristic(ComponentData* components, int start, int goal) {
+float heuristic(int start, int goal) {
     return dist(get_position(start), get_position(goal));
 }
 
 
-bool a_star(ComponentData* components, int start, int goal, List* path) {
-    Heap* open_set = Heap_create(components);
+bool a_star(int start, int goal, List* path) {
+    Heap* open_set = Heap_create(game_data->components);
 
     Heap_insert(open_set, start);
 
     List_clear(path);
 
-    for (int i = 0; i < components->entities; i++) {
-        if (components->waypoint[i]) {
-            components->waypoint[i]->came_from = -1;
-            components->waypoint[i]->g_score = INFINITY;
-            components->waypoint[i]->f_score = INFINITY;
+    for (int i = 0; i < game_data->components->entities; i++) {
+        WaypointComponent* waypoint = WaypointComponent_get(i);
+        if (waypoint) {
+            waypoint->came_from = -1;
+            waypoint->g_score = INFINITY;
+            waypoint->f_score = INFINITY;
         }
     }
 
-    components->waypoint[start]->g_score = 0.0;
-    components->waypoint[start]->f_score = heuristic(components, start, goal);
+    WaypointComponent* start_waypoint = WaypointComponent_get(start);
+    start_waypoint->g_score = 0.0;
+    start_waypoint->f_score = heuristic(start, goal);
 
     while (open_set->size > 0) {
         int current = Heap_extract(open_set);
 
         if (current == goal) {
-            reconstruct_path(components, current, path);
+            reconstruct_path(current, path);
             Heap_destroy(open_set);
             return true;
         }
 
-        WaypointComponent* waypoint = components->waypoint[current];
+        WaypointComponent* waypoint = WaypointComponent_get(current);
 
         for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
             int n = node->value;
             
-            WaypointComponent* neighbor = components->waypoint[n];
+            WaypointComponent* neighbor = WaypointComponent_get(n);
 
-            float d = heuristic(components, current, n);
+            float d = heuristic(current, n);
 
             float tentative_g_score = waypoint->g_score + d;
 
             if (tentative_g_score < neighbor->g_score) {
                 neighbor->came_from = current;
                 neighbor->g_score = tentative_g_score;
-                neighbor->f_score = neighbor->g_score + heuristic(components, n, goal);
+                neighbor->f_score = neighbor->g_score + heuristic(n, goal);
                 
                 if (Heap_find(open_set, n) == -1) {
                     Heap_insert(open_set, n);

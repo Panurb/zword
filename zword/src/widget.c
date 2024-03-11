@@ -32,7 +32,7 @@ void bring_to_top(ComponentData* components, int entity) {
 int create_window(ComponentData* components, sfVector2f position, ButtonText text, int width, OnClick on_close) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, width * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(i, width * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_WINDOW);
 
     int j = create_button_small(components, "X", vec(0.5 * (width * BUTTON_WIDTH - BUTTON_HEIGHT), 0.0f), on_close);
@@ -45,7 +45,7 @@ int create_window(ComponentData* components, sfVector2f position, ButtonText tex
 int create_label(ComponentData* components, ButtonText text, sfVector2f position) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_LABEL);
 
     return i;
@@ -55,7 +55,7 @@ int create_label(ComponentData* components, ButtonText text, sfVector2f position
 int create_button(ComponentData* components, ButtonText text, sfVector2f position, OnClick on_click) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_BUTTON)->on_click = on_click;
 
     return i;
@@ -66,7 +66,7 @@ int create_button_small(ComponentData* components, ButtonText text, sfVector2f p
     int i = create_entity();
     CoordinateComponent_add(i, sum(position, vec(0.0f, 0.25f * BORDER_WIDTH)), 0.0f);
     float height = BUTTON_HEIGHT - 0.5f * BORDER_WIDTH;
-    ColliderComponent_add_rectangle(components, i, BUTTON_HEIGHT, height, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(i, BUTTON_HEIGHT, height, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_BUTTON)->on_click = on_click;
 
     return i;
@@ -76,7 +76,7 @@ int create_button_small(ComponentData* components, ButtonText text, sfVector2f p
 int create_container(ComponentData* components, sfVector2f position, int width, int height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, width * BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(i, width * BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_CONTAINER);
     widget->type = WIDGET_CONTAINER;
 
@@ -319,7 +319,7 @@ int create_slider(ComponentData* components, sfVector2f position, int min_value,
         OnChange on_change) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_SLIDER);
     widget->min_value = min_value;
     widget->max_value = max_value;
@@ -347,7 +347,7 @@ void set_scrollbar(ComponentData* components, int entity, sfVector2f mouse_posit
 int create_scrollbar(ComponentData* components, sfVector2f position, int height, int max_value, OnChange on_change) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, SCROLLBAR_WIDTH, 
+    ColliderComponent* collider = ColliderComponent_add_rectangle(i, SCROLLBAR_WIDTH, 
         BUTTON_HEIGHT * height, GROUP_WALLS);
     collider->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_SCROLLBAR);
@@ -361,7 +361,7 @@ int create_scrollbar(ComponentData* components, sfVector2f position, int height,
 int create_textbox(ComponentData* components, sfVector2f position, int width) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent* collider = ColliderComponent_add_rectangle(components, i, BUTTON_WIDTH * width, 
+    ColliderComponent* collider = ColliderComponent_add_rectangle(i, BUTTON_WIDTH * width, 
         BUTTON_HEIGHT, GROUP_WALLS);
     collider->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_TEXTBOX);

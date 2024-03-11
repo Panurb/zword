@@ -374,8 +374,8 @@ void draw_game_mode(GameData data, sfRenderWindow* window) {
 }
 
 
-void update_lifetimes(ComponentData* components, float time_step) {
-    for (int i = 0; i < components->entities; i++) {
+void update_lifetimes(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         if (!coord) continue;
 
@@ -396,9 +396,9 @@ void update_lifetimes(ComponentData* components, float time_step) {
 
 
 void update_game(GameData data, float time_step) {
-    update_lifetimes(data.components, time_step);
+    update_lifetimes(time_step);
     update_physics(time_step);
-    collide(data.components, data.grid);
+    collide();
     update_waypoints(data.components, data.grid, data.camera);
     update_doors(data.components);
 
@@ -506,7 +506,7 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
 int create_tutorial(ComponentData* components, sfVector2f position) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, 0.0f);
-    ColliderComponent_add_circle(components, entity, 1.0f, GROUP_CORPSES);
+    ColliderComponent_add_circle(entity, 1.0f, GROUP_CORPSES);
     TextComponent_add(entity, "", 30, sfWhite);
 
     return entity;
@@ -516,7 +516,7 @@ int create_tutorial(ComponentData* components, sfVector2f position) {
 int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, angle);
-    ColliderComponent* collider = ColliderComponent_add_rectangle(components, entity, width, height, GROUP_WALLS);
+    ColliderComponent* collider = ColliderComponent_add_rectangle(entity, width, height, GROUP_WALLS);
     collider->trigger_type = TRIGGER_WIN;
 
     return entity;

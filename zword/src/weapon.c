@@ -67,7 +67,7 @@ void create_energy(ComponentData* components, sfVector2f position, sfVector2f ve
     phys->drag = 0.0f;
     phys->drag_sideways = 0.0f;
     phys->lifetime = 5.0f;
-    ColliderComponent_add_circle(components, i, 0.25f, GROUP_ENERGY);
+    ColliderComponent_add_circle(i, 0.25f, GROUP_ENERGY);
     LightComponent_add(i, 8.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 2.5f)->enabled = false;
     ParticleComponent_add_type(components, i, PARTICLE_ENERGY, 0.0f);
     SoundComponent_add(i, "");
@@ -114,7 +114,7 @@ int create_rope(ComponentData* components, sfVector2f start, sfVector2f end) {
         CoordinateComponent_add(current, pos, 0.0f);
         PhysicsComponent_add(current, 0.2f);
         JointComponent_add(current, prev, 0.0f, seg_len, 1.0f);
-        ColliderComponent_add_circle(components, current, 0.25f, GROUP_BULLETS);
+        ColliderComponent_add_circle(current, 0.25f, GROUP_BULLETS);
         ImageComponent_add(current, "rope", 0.0f, 0.0f, LAYER_ITEMS);
 
         prev = current;
@@ -315,7 +315,7 @@ int create_pistol(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "pistol", 1.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 10.0f, 20, 1, 0.0f, 12, 0.1f, 25.0f, 2.0f, AMMO_PISTOL, "pistol");
@@ -332,7 +332,7 @@ int create_shotgun(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "combat_shotgun", 3.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 0.8f, 10, 8, 0.05f * M_PI, 6, 0.25f, 25.0f, 3.0f, AMMO_SHOTGUN, "shotgun");
@@ -349,7 +349,7 @@ int create_sawed_off(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "shotgun", 2.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 10.0f, 10, 10, 0.1f * M_PI, 2, 0.25f, 20.0f, 1.5f, AMMO_SHOTGUN, "shotgun");
@@ -366,7 +366,7 @@ int create_rifle(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 0.5f, 10, 1, 0.0f, -1, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
@@ -383,7 +383,7 @@ int create_assault_rifle(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 10.0f, 40, 1, 0.0f, 30, 0.05f, 30.0f, 3.0f, AMMO_RIFLE, "assault_rifle")->automatic = true;
@@ -400,7 +400,7 @@ int create_smg(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "smg", 2.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 15.0f, 20, 1, 0.0f, 20, 0.15f, 30.0f, 2.0f, AMMO_PISTOL, "pistol")->automatic = true;
@@ -417,7 +417,7 @@ int create_axe(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "axe", 2.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 1.0f);
     WeaponComponent_add(i, 2.0f, 50, 1, 0.35f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
@@ -432,7 +432,7 @@ int create_sword(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "sword", 3.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 1.0f);
     WeaponComponent_add(i, 3.0f, 100, 5, 1.0f * M_PI, -1, 0.0f, 2.0f, 0.0f, AMMO_MELEE, "axe");
@@ -447,7 +447,7 @@ int create_rope_gun(ComponentData* components, sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "pistol", 1.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     WeaponComponent_add(i, 0.5f, 0, 1, 0.0f, -1, 0.0f, 25.0f, 2.0f, AMMO_ROPE, "pistol");
@@ -474,7 +474,7 @@ int create_ammo(ComponentData* components, sfVector2f position, AmmoType type) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
-    ColliderComponent_add_circle(components, i, 0.25f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.25f, GROUP_ITEMS);
     switch (type) {
         case AMMO_PISTOL:
             ImageComponent_add(i, "ammo_pistol", 1.0, 1.0, LAYER_ITEMS);

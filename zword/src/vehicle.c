@@ -12,12 +12,12 @@
 int create_car(ComponentData* components, sfVector2f pos, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
-    ColliderComponent_add_circle(components, i, 1.5f, GROUP_VEHICLES);
+    ColliderComponent_add_circle(i, 1.5f, GROUP_VEHICLES);
     PhysicsComponent_add(i, 10.0f);
 
     int j = create_entity();
     CoordinateComponent_add(j, sum(pos, polar_to_cartesian(-3.0f, angle)), 0.0f);
-    ColliderComponent_add_rectangle(components, j, 3.0f, 3.0f, GROUP_VEHICLES);
+    ColliderComponent_add_rectangle(j, 3.0f, 3.0f, GROUP_VEHICLES);
     PhysicsComponent_add(j, 10.0f);
     SoundComponent_add(j, "metal_hit");
     VehicleComponent_add(j, 100.0f);
@@ -38,16 +38,16 @@ int create_car(ComponentData* components, sfVector2f pos, float angle) {
     LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(j, k);
 
-    k = create_waypoint(components, (sfVector2f) { 5.0f, 2.5f });
+    k = create_waypoint((sfVector2f) { 5.0f, 2.5f });
     add_child(j, k);
 
-    k = create_waypoint(components, (sfVector2f) { 5.0f, -2.5f });
+    k = create_waypoint((sfVector2f) { 5.0f, -2.5f });
     add_child(j, k);
 
-    k = create_waypoint(components, (sfVector2f) { -2.0f, 2.5f });
+    k = create_waypoint((sfVector2f) { -2.0f, 2.5f });
     add_child(j, k);
 
-    k = create_waypoint(components, (sfVector2f) { -2.0f, -2.5f });
+    k = create_waypoint((sfVector2f) { -2.0f, -2.5f });
     add_child(j, k);
 
     return i;

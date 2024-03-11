@@ -34,7 +34,7 @@ int create_player(ComponentData* components, sfVector2f pos, float angle) {
     PhysicsComponent* phys = PhysicsComponent_add(i, 1.0f);
     phys->bounce = 0.0f;
     phys->max_speed = 5.0;
-    ColliderComponent_add_circle(components, i, 0.5, GROUP_PLAYERS);
+    ColliderComponent_add_circle(i, 0.5, GROUP_PLAYERS);
     PlayerComponent* player = PlayerComponent_add(i, joystick);
     ParticleComponent_add_type(components, i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);

@@ -604,7 +604,7 @@ void input_tool_select(GameData* data, sfEvent event) {
             if (!grabbed) {
                 selection_box = create_entity();
                 CoordinateComponent_add(selection_box, tile_start, 0.0f);
-                ColliderComponent_add_rectangle(components, selection_box, 0.0f, 0.0f, GROUP_ALL);
+                ColliderComponent_add_rectangle(selection_box, 0.0f, 0.0f, GROUP_ALL);
             }
         } else if (event.mouseButton.button == sfMouseRight) {
             if (selections) {

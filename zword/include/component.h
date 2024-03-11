@@ -474,8 +474,8 @@ PhysicsComponent* PhysicsComponent_add(int entity, float mass);
 PhysicsComponent* PhysicsComponent_get(int entity);
 void PhysicsComponent_remove(int entity);
 
-ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group);
-ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, int entity, float width, float height, ColliderGroup group);
+ColliderComponent* ColliderComponent_add_circle(int entity, float radius, ColliderGroup group);
+ColliderComponent* ColliderComponent_add_rectangle(int entity, float width, float height, ColliderGroup group);
 ColliderComponent* ColliderComponent_get(int entity);
 void ColliderComponent_remove(int entity);
 

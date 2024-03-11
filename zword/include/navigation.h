@@ -11,9 +11,9 @@
 #define MAX_PATH_LENGTH 50
 
 
-int create_waypoint(ComponentData* components, sfVector2f pos);
+int create_waypoint(sfVector2f pos);
 
-bool a_star(ComponentData* component, int start, int goal, List* path);
+bool a_star(int start, int goal, List* path);
 
 void update_waypoints(ComponentData* components, ColliderGrid* grid, int camera);
 

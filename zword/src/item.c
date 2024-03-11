@@ -14,7 +14,7 @@ int create_flashlight(ComponentData* components, sfVector2f position) {
 
     float angle = rand_angle();
     CoordinateComponent_add(i, position, angle);
-    ColliderComponent_add_rectangle(components, i, 1.0, 0.5, GROUP_ITEMS);
+    ColliderComponent_add_rectangle(i, 1.0, 0.5, GROUP_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     ImageComponent_add(i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent_add(i, 0, 100, "Flashlight");
@@ -29,7 +29,7 @@ int create_gas(ComponentData* components, sfVector2f position) {
 
     float angle = rand_angle();
     CoordinateComponent_add(i, position, angle);
-    ColliderComponent_add_rectangle(components, i, 0.75, 0.8, GROUP_ITEMS);
+    ColliderComponent_add_rectangle(i, 0.75, 0.8, GROUP_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     ImageComponent_add(i, "gas", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent_add(i, 0, 0, "");
@@ -43,7 +43,7 @@ int create_bandage(ComponentData* components, sfVector2f position) {
 
     float angle = rand_angle();
     CoordinateComponent_add(i, position, angle);
-    ColliderComponent_add_circle(components, i, 0.5f, GROUP_ITEMS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     ImageComponent_add(i, "bandage", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent* item = ItemComponent_add(i, 0, 0, "");
