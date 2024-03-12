@@ -12,16 +12,18 @@
 #include "grid.h"
 #include "raycast.h"
 #include "image.h"
+#include "game.h"
 
 
-void update_lights(ComponentData* components, float delta_time) {
-    for (int i = 0; i < components->entities; i++) {
-        LightComponent* light = components->light[i];
+void update_lights(float delta_time) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        LightComponent* light = LightComponent_get(i);
 
         if (!light) continue;
 
-        if (components->coordinate[i]->parent != -1) {
-            VehicleComponent* vehicle = components->vehicle[components->coordinate[i]->parent];
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (coord->parent != -1) {
+            VehicleComponent* vehicle = VehicleComponent_get(coord->parent);
             if (vehicle) {
                 light->enabled = (vehicle->riders[0] != -1);
             }
@@ -38,11 +40,11 @@ void update_lights(ComponentData* components, float delta_time) {
 }
 
 
-void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, int entity, HitInfo info, sfVector2f velocity) {
+void draw_shine(int camera, int entity, HitInfo info, sfVector2f velocity) {
     ImageComponent* image = ImageComponent_get(info.entity);
     if (!image) return;
 
-    LightComponent* light = components->light[entity];
+    LightComponent* light = LightComponent_get(entity);
 
     if (image->shine > 0.0) {
         float vn = dot(velocity, info.normal);
@@ -55,18 +57,18 @@ void draw_shine(ComponentData* components, sfRenderWindow* window, int camera, i
             float radius = 0.05 * (1 - 5 * (1 + vn)) * CameraComponent_get(camera)->zoom;
             sfCircleShape_setRadius(light->shine, radius);
             sfCircleShape_setOrigin(light->shine, (sfVector2f) { radius, radius });
-            sfRenderWindow_drawCircleShape(window, light->shine, NULL);
+            sfRenderWindow_drawCircleShape(game_window, light->shine, NULL);
         }
     }
 }
 
 
-void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camera) {
+void draw_shadows(sfRenderTexture* texture, int camera) {
     sfRenderTexture_clear(texture, sfWhite);
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
     sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
-    for (int i = 0; i < components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
 
@@ -145,12 +147,12 @@ void draw_shadows(ComponentData* components, sfRenderTexture* texture, int camer
 }
 
 
-void draw_lights(ComponentData* components, ColliderGrid* grid, sfRenderTexture* texture, int camera, float ambient_light) {
+void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
     sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0f));
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
     sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
-    for (int i = 0; i < components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         LightComponent* light = LightComponent_get(i);
         if (!light) continue;
 

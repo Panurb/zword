@@ -535,11 +535,11 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
     update_waypoints(data.camera);
 
     update_particles(data.camera, time_step);
-    update_lights(data.components, time_step);
+    update_lights(time_step);
     update_camera(data.camera, time_step, false);
 
-    draw_shadows(data.components, data.shadow_texture, data.camera);
-    draw_lights(data.components, data.grid, data.light_texture, data.camera, data.ambient_light);
+    draw_shadows(data.shadow_texture, data.camera);
+    draw_lights(data.light_texture, data.camera, data.ambient_light);
 
     animate(data.components, time_step);
 
