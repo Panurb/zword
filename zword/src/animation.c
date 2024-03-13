@@ -4,6 +4,7 @@
 #include "component.h"
 #include "animation.h"
 #include "image.h"
+#include "game.h"
 
 
 int animation_frames(Filename image) {
@@ -21,8 +22,8 @@ int animation_frames(Filename image) {
 }
 
 
-void animate(ComponentData* components, float time_step) {
-    for (int i = 0; i < components->entities; i++) {
+void animate(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         ImageComponent* image = ImageComponent_get(i);
         if (!image) continue;
 
@@ -65,7 +66,7 @@ void animate(ComponentData* components, float time_step) {
 }
 
 
-void stop_animation(ComponentData* components, int entity) {
+void stop_animation(int entity) {
     AnimationComponent* animation = AnimationComponent_get(entity);
     animation->current_frame = 0;
     animation->framerate = 0.0f;

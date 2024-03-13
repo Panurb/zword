@@ -541,7 +541,7 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
     draw_shadows(data.shadow_texture, data.camera);
     draw_lights(data.light_texture, data.camera, data.ambient_light);
 
-    animate(data.components, time_step);
+    animate(time_step);
 
     update_widgets(data.components, window, data.menu_camera);
 

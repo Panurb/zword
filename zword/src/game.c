@@ -395,11 +395,11 @@ void update_lifetimes(float time_step) {
 }
 
 
-void update_game(GameData data, float time_step) {
+void update_game(float time_step) {
     update_lifetimes(time_step);
     update_physics(time_step);
     collide();
-    update_waypoints(data.camera);
+    update_waypoints(game_data->camera);
     update_doors();
 
     update_players(time_step);
@@ -407,27 +407,27 @@ void update_game(GameData data, float time_step) {
     update_enemies(time_step);
     update_energy();
 
-    update_particles(data.camera, time_step);
+    update_particles(game_data->camera, time_step);
     update_lights(time_step);
-    update_camera(data.camera, time_step, true);
+    update_camera(game_data->camera, time_step, true);
 
-    draw_shadows(data.shadow_texture, data.camera);
-    draw_lights(data.light_texture, data.camera, data.ambient_light);
+    draw_shadows(game_data->shadow_texture, game_data->camera);
+    draw_lights(game_data->light_texture, game_data->camera, game_data->ambient_light);
 
-    animate(data.components, time_step);
+    animate(time_step);
 }
 
 
-void draw_game(GameData data, sfRenderWindow* window) {
+void draw_game() {
     sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
 
-    draw_ground(data.camera);
-    sfRenderWindow_drawSprite(window, data.shadow_sprite, &state);
-    draw(data.camera);
-    sfRenderWindow_drawSprite(window, data.light_sprite, &state);
+    draw_ground(game_data->camera);
+    sfRenderWindow_drawSprite(game_window, game_data->shadow_sprite, &state);
+    draw(game_data->camera);
+    sfRenderWindow_drawSprite(game_window, game_data->light_sprite, &state);
 
-    draw_roofs(data.camera);
-    draw_items(&data, window);
+    draw_roofs(game_data->camera);
+    draw_items();
 }
 
 
@@ -471,7 +471,7 @@ void draw_debug(GameData data, sfRenderWindow* window, int debug_level) {
 
 void update_game_over(GameData data, sfRenderWindow* window, float time_step) {
     if (game_over_timer > 0.0f) {
-        update_game(data, time_step);
+        update_game(time_step);
     } else {
         update_menu(data, window);
     }

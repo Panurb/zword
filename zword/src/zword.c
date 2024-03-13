@@ -154,7 +154,7 @@ int main() {
                         break;
                     case STATE_GAME:
                         input(game_data->components, game_window, game_data->camera);
-                        update_game(*game_data, time_step);
+                        update_game(time_step);
                         update_game_mode(*game_data, time_step);
                         break;
                     case STATE_PAUSE:
@@ -231,12 +231,12 @@ int main() {
                 draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_GAME:
-                draw_game(*game_data, game_window);
+                draw_game();
                 draw_hud(game_data->components, game_window, game_data->camera);
                 draw_game_mode(*game_data, game_window);
                 break;
             case STATE_PAUSE:
-                draw_game(*game_data, game_window);
+                draw_game();
                 draw_overlay(game_data->camera, 0.4f);
                 draw_menu(*game_data, game_window);
                 break;

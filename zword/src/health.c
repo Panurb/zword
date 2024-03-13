@@ -19,7 +19,7 @@ void die(int entity) {
     HealthComponent* health = HealthComponent_get(entity);
 
     if (AnimationComponent_get(entity)) {
-        stop_animation(game_data->components, entity);
+        stop_animation(entity);
     }
 
     change_texture(entity, health->dead_image, 0.0f, 0.0f);
