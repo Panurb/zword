@@ -311,7 +311,7 @@ void toggle_credits(int entity) {
 }
 
 
-void create_menu(GameData data) {
+void create_menu() {
     int height = game_settings.debug ? 6 : 5;
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     add_button_to_container(container, "PLAY", toggle_play);
@@ -325,8 +325,8 @@ void create_menu(GameData data) {
 }
 
 
-void destroy_menu(GameData data) {
-    for (int i = 0; i < data.components->entities; i++) {
+void destroy_menu() {
+    for (int i = 0; i < game_data->components->entities; i++) {
         WidgetComponent* widget = WidgetComponent_get(i);
         if (widget) {
             destroy_entity(i);
@@ -335,7 +335,7 @@ void destroy_menu(GameData data) {
 }
 
 
-void create_pause_menu(GameData* data) {
+void create_pause_menu() {
     int container = create_container(vec(-20.0f, 0.0f), 1, 3);
     add_button_to_container(container, "RESUME", change_state_game);
     add_button_to_container(container, "SETTINGS", toggle_settings);
@@ -343,30 +343,30 @@ void create_pause_menu(GameData* data) {
 }
 
 
-void update_menu(GameData data, sfRenderWindow* window) {
-    update_widgets(data.menu_camera);
+void update_menu() {
+    update_widgets(game_data->menu_camera);
 }
 
 
-void input_menu(ComponentData* components, int camera, sfEvent event) {
+void input_menu(int camera, sfEvent event) {
     input_widgets(camera, event);
 }
 
 
-void draw_menu(GameData data, sfRenderWindow* window) {
-    draw_widgets(data.menu_camera);
+void draw_menu() {
+    draw_widgets(game_data->menu_camera);
 
-    sfVector2f pos = screen_to_world(data.menu_camera, sfMouse_getPosition((sfWindow*) window));
-    draw_circle(data.menu_camera, NULL, pos, 0.1f, sfWhite);
+    sfVector2f pos = screen_to_world(game_data->menu_camera, sfMouse_getPosition((sfWindow*) game_window));
+    draw_circle(game_data->menu_camera, NULL, pos, 0.1f, sfWhite);
 }
 
 
-void create_game_over_menu(GameData data) {
+void create_game_over_menu() {
     create_button("Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
 }
 
 
-void create_win_menu(GameData data) {
+void create_win_menu() {
     create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
 }

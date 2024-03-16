@@ -72,7 +72,7 @@ int main() {
     sfClock* game_clock = sfClock_create();
 
     create_game(mode);
-    create_menu(*game_data);
+    create_menu();
 
     ButtonText buffer;
 
@@ -123,7 +123,7 @@ int main() {
                         input_editor(game_data, game_window, event);
                     }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
-                        input_menu(game_data->components, game_data->menu_camera, event);
+                        input_menu(game_data->menu_camera, event);
                     }
                     break;
             }
@@ -158,7 +158,7 @@ int main() {
                         update_game_mode(*game_data, time_step);
                         break;
                     case STATE_PAUSE:
-                        update_menu(*game_data, game_window);
+                        update_menu(game_window);
                         break;
                     case STATE_APPLY:
                         if (game_settings.width != (int)mode.width || game_settings.height != (int)mode.height) {
@@ -174,7 +174,7 @@ int main() {
                         if (buffer[0] == '\0') {
                             game_state = STATE_MENU;
                         } else {
-                            destroy_menu(*game_data);
+                            destroy_menu();
                             create_editor_menu(game_data);
                             game_state = STATE_EDITOR;
                         }
@@ -185,7 +185,7 @@ int main() {
                         if (buffer[0] == '\0') {
                             game_state = STATE_MENU;
                         } else {
-                            destroy_menu(*game_data);
+                            destroy_menu();
                             create_editor_menu(game_data);
                             load_game(game_data, buffer);
                             game_state = STATE_EDITOR;
@@ -218,7 +218,7 @@ int main() {
                     mult(3.5f, ones()), 0);
                 draw_sprite(game_data->menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
                     vec(title_scale, title_scale), 0);
-                draw_menu(*game_data, game_window);
+                draw_menu();
 
                 String buffer;
                 snprintf(buffer, STRING_SIZE, "v%s", version);
