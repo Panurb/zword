@@ -403,8 +403,8 @@ typedef enum {
 
 typedef struct ComponentData ComponentData;
 
-typedef void (*OnClick)(ComponentData*, int);
-typedef void (*OnChange)(ComponentData*, int, int);
+typedef void (*OnClick)(int);
+typedef void (*OnChange)(int, int);
 
 typedef struct {
     bool enabled;

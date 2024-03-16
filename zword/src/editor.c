@@ -221,17 +221,17 @@ int toggle_list_window(ComponentData* components, int window_id, ButtonText titl
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(components, pos, title, 1, close);
+    window_id = create_window(pos, title, 1, close);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
     add_child(window_id, container);
 
     for (int i = 0; i < length; i++) {
-        int j = add_button_to_container(components, container, values[i], select);
+        int j = add_button_to_container(container, values[i], select);
         WidgetComponent_get(j)->value = i;
     }
 
-    add_scrollbar_to_container(components, container);
+    add_scrollbar_to_container(container);
 
     return window_id;
 }
@@ -300,23 +300,23 @@ void toggle_editor_settings(ComponentData* components, int entity) {
         return;
     }
    
-    window_id = create_window(components, vec(0.0f, 0.0f), "SETTINGS", 1, toggle_editor_settings);
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    window_id = create_window(vec(0.0f, 0.0f), "SETTINGS", 1, toggle_editor_settings);
+    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
     add_child(window_id, container);
 
-    int i = create_label(components, "Game mode", zeros());
-    add_widget_to_container(components, container, i);
+    int i = create_label("Game mode", zeros());
+    add_widget_to_container(container, i);
 
-    i = create_dropdown(components, zeros(), GAME_MODES, 3);
-    add_widget_to_container(components, container, i);
+    i = create_dropdown(zeros(), GAME_MODES, 3);
+    add_widget_to_container(container, i);
     WidgetComponent* widget = WidgetComponent_get(i);
     widget->on_change = set_game_mode;
 
-    i = create_label(components, "Ambient light", zeros());
-    add_widget_to_container(components, container, i);
+    i = create_label("Ambient light", zeros());
+    add_widget_to_container(container, i);
 
-    i = create_slider(components, zeros(), 0, 100, 50, set_ambient_light);
-    add_widget_to_container(components, container, i);
+    i = create_slider(zeros(), 0, 100, 50, set_ambient_light);
+    add_widget_to_container(container, i);
 }
 
 
@@ -346,14 +346,14 @@ void open_entity_settings(ComponentData* components, int entity) {
 
     ButtonText buffer;
     snprintf(buffer, BUTTON_TEXT_SIZE, "ENTITY %d", entity);
-    entity_settings_id = create_window(components, vec(0.0f, 0.0f), buffer, 2, close_entity_settings);
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    entity_settings_id = create_window(vec(0.0f, 0.0f), buffer, 2, close_entity_settings);
+    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(entity_settings_id, container);
 
     TextComponent* text = TextComponent_get(entity);
     if (text) {
-        int i = create_textbox(components, zeros(), 2);
-        add_widget_to_container(components, container, i);
+        int i = create_textbox(zeros(), 2);
+        add_widget_to_container(container, i);
         WidgetComponent* widget = WidgetComponent_get(i);
         strcpy(widget->string, text->source_string);
         widget->max_value = 100;
@@ -511,21 +511,21 @@ void create_editor_menu(GameData* data) {
     sfVector2f size = camera_size(data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
     destroy_widgets(data->components);
-    create_button(data->components, "TILES", pos, toggle_tiles);
+    create_button("TILES", pos, toggle_tiles);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button(data->components, "OBJECTS", pos, toggle_objects);
+    create_button("OBJECTS", pos, toggle_objects);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button(data->components, "CREATURES", pos, toggle_creatures);
+    create_button("CREATURES", pos, toggle_creatures);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button(data->components, "WEAPONS", pos, toggle_weapons);
+    create_button("WEAPONS", pos, toggle_weapons);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     // pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
-    // create_button(data->components, "PREFABS", pos, toggle_prefabs);
-    create_button(data->components, "SETTINGS", pos, toggle_editor_settings);
+    // create_button("PREFABS", pos, toggle_prefabs);
+    create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button(data->components, "SAVE", pos, save_map);
+    create_button("SAVE", pos, save_map);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button(data->components, "QUIT", pos, quit);
+    create_button("QUIT", pos, quit);
 }
 
 
@@ -543,7 +543,7 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
 
     animate(time_step);
 
-    update_widgets(data.components, window, data.menu_camera);
+    update_widgets(data.menu_camera);
 
     if (selection_box != -1) {
         update_selections(data);
@@ -714,7 +714,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
     UNUSED(window);
     static sfVector2i mouse_screen = { 0, 0 };
 
-    if (input_widgets(data->components, data->menu_camera, event)) {
+    if (input_widgets(data->menu_camera, event)) {
         return;
     }
 
@@ -885,7 +885,7 @@ void draw_editor(GameData data, sfRenderWindow* window) {
 
     draw_tutorials(window, data);
 
-    draw_widgets(data.components, window, data.menu_camera);
+    draw_widgets(data.menu_camera);
 
     draw_circle(data.camera, NULL, mouse_pos, 0.1f, sfWhite);
 }

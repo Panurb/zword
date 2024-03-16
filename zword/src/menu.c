@@ -47,23 +47,21 @@ void get_map_name(GameData* data, ButtonText buffer) {
 }
 
 
-void change_state_end(ComponentData* components, int entity) {
-    UNUSED(components);
+void change_state_end(int entity) {
     UNUSED(entity);
     game_state = STATE_END;
     reset_ids();
 }
 
 
-void change_state_create(ComponentData* components, int entity) {
-    UNUSED(components);
+void change_state_create(int entity) {
     UNUSED(entity);
     game_state = STATE_CREATE;
     reset_ids();
 }
 
 
-void change_state_start(ComponentData* components, int entity) {
+void change_state_start(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(map_name, widget->string);
     game_state = STATE_START;
@@ -71,23 +69,21 @@ void change_state_start(ComponentData* components, int entity) {
 }
 
 
-void change_state_reset(ComponentData* components, int entity) {
-    UNUSED(components);
+void change_state_reset(int entity) {
     UNUSED(entity);
     game_state = STATE_RESET;
     reset_ids();
 }
 
 
-void change_state_game(ComponentData* components, int entity) {
-    UNUSED(components);
+void change_state_game(int entity) {
     UNUSED(entity);
     game_state = STATE_GAME;
     reset_ids();
 }
 
 
-void change_state_load(ComponentData* components, int entity) {
+void change_state_load(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(map_name, widget->string);
     game_state = STATE_LOAD;
@@ -95,14 +91,13 @@ void change_state_load(ComponentData* components, int entity) {
 }
 
 
-void change_state_quit(ComponentData* components, int entity) {
-    UNUSED(components);
+void change_state_quit(int entity) {
     UNUSED(entity);
     game_state = STATE_QUIT;
 }
 
 
-void apply(ComponentData* components, int entity) {
+void apply(int entity) {
     UNUSED(entity);
 
     WidgetComponent* widget = WidgetComponent_get(RESOLUTION_ID);
@@ -124,7 +119,7 @@ void apply(ComponentData* components, int entity) {
 }
 
 
-void toggle_play(ComponentData* components, int entity) {
+void toggle_play(int entity) {
     UNUSED(entity);
     if (window_play != -1) {
         destroy_entity_recursive(window_play);
@@ -133,18 +128,18 @@ void toggle_play(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_play = create_window(components, pos, "PLAY", 1, toggle_play);
+    window_play = create_window(pos, "PLAY", 1, toggle_play);
 
-    int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
+    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
     add_child(window_play, container);
 
-    add_button_to_container(components, container, "Tutorial", change_state_start);
-    add_button_to_container(components, container, "Survival", change_state_start);
-    // add_files_to_container(components, container, "maps", change_state_start);
+    add_button_to_container(container, "Tutorial", change_state_start);
+    add_button_to_container(container, "Survival", change_state_start);
+    // add_files_to_container(container, "maps", change_state_start);
 }
 
 
-void toggle_new_map(ComponentData* components, int entity) {
+void toggle_new_map(int entity) {
     UNUSED(entity);
     if (window_new_map != -1) {
         destroy_entity_recursive(window_new_map);
@@ -153,19 +148,19 @@ void toggle_new_map(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_new_map = create_window(components, pos, "NEW MAP", 2, toggle_new_map);
+    window_new_map = create_window(pos, "NEW MAP", 2, toggle_new_map);
 
-    int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 2, 2);
+    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 2, 2);
     add_child(window_new_map, container);
 
-    int label = create_label(components, "NAME", zeros());
-    MAP_NAME_ID = create_textbox(components, zeros(), 1);
-    add_row_to_container(components, container, label, MAP_NAME_ID);
-    add_button_to_container(components, container, "CREATE", change_state_create);
+    int label = create_label("NAME", zeros());
+    MAP_NAME_ID = create_textbox(zeros(), 1);
+    add_row_to_container(container, label, MAP_NAME_ID);
+    add_button_to_container(container, "CREATE", change_state_create);
 }
 
 
-void toggle_editor(ComponentData* components, int entity) {
+void toggle_editor(int entity) {
     UNUSED(entity);
     if (window_editor != -1) {
         destroy_entity_recursive(window_editor);
@@ -174,13 +169,13 @@ void toggle_editor(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_editor = create_window(components, pos, "EDITOR", 1, toggle_editor);
+    window_editor = create_window(pos, "EDITOR", 1, toggle_editor);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
     add_child(window_editor, container);
 
-    add_button_to_container(components, container, "NEW MAP", toggle_new_map);
-    add_files_to_container(components, container, "maps", change_state_load);
+    add_button_to_container(container, "NEW MAP", toggle_new_map);
+    add_files_to_container(container, "maps", change_state_load);
 }
 
 
@@ -197,7 +192,7 @@ int get_resolution_index() {
 }
 
 
-void toggle_settings(ComponentData* components, int entity) {
+void toggle_settings(int entity) {
     UNUSED(entity);
     if (window_settings != -1) {
         destroy_entity_recursive(window_settings);
@@ -206,29 +201,29 @@ void toggle_settings(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_settings = create_window(components, pos, "SETTINGS", 2, toggle_settings);
+    window_settings = create_window(pos, "SETTINGS", 2, toggle_settings);
 
-    int container = create_container(components, vec(0.0f, -2.5f * BUTTON_HEIGHT), 2, 4);
+    int container = create_container(vec(0.0f, -2.5f * BUTTON_HEIGHT), 2, 4);
     add_child(window_settings, container);
 
-    int label = create_label(components, "Resolution", zeros());
-    RESOLUTION_ID = create_dropdown(components, zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
+    int label = create_label("Resolution", zeros());
+    RESOLUTION_ID = create_dropdown(zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
     WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
-    add_row_to_container(components, container, label, RESOLUTION_ID);
+    add_row_to_container(container, label, RESOLUTION_ID);
 
-    label = create_label(components, "Sound", zeros());
-    SOUND_ID = create_slider(components, zeros(), 0, 100, game_settings.volume, NULL);
-    add_row_to_container(components, container, label, SOUND_ID);
+    label = create_label("Sound", zeros());
+    SOUND_ID = create_slider(zeros(), 0, 100, game_settings.volume, NULL);
+    add_row_to_container(container, label, SOUND_ID);
 
-    label = create_label(components, "Music", zeros());
-    MUSIC_ID = create_slider(components, zeros(), 0, 100, game_settings.music, NULL);
-    add_row_to_container(components, container, label, MUSIC_ID);
+    label = create_label("Music", zeros());
+    MUSIC_ID = create_slider(zeros(), 0, 100, game_settings.music, NULL);
+    add_row_to_container(container, label, MUSIC_ID);
 
-    add_button_to_container(components, container, "Apply", apply);
+    add_button_to_container(container, "Apply", apply);
 }
 
 
-void toggle_keyboard_controls(ComponentData* components, int entity) {
+void toggle_keyboard_controls(int entity) {
     UNUSED(entity);
     if (window_keyboard_controls != -1) {
         destroy_entity_recursive(window_keyboard_controls);
@@ -237,21 +232,21 @@ void toggle_keyboard_controls(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_keyboard_controls = create_window(components, pos, "KEYBOARD CONTROLS", 2, toggle_keyboard_controls);
+    window_keyboard_controls = create_window(pos, "KEYBOARD CONTROLS", 2, toggle_keyboard_controls);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(window_keyboard_controls, container);
 
     for (int i = 0; i < ACTIONS_SIZE; i++) {
-        int label = create_label(components, ACTIONS[i], zeros());
-        int button = create_button(components, keybind_to_string(game_settings.keybinds[i]), zeros(), NULL);
-        add_row_to_container(components, container, label, button);
+        int label = create_label(ACTIONS[i], zeros());
+        int button = create_button(keybind_to_string(game_settings.keybinds[i]), zeros(), NULL);
+        add_row_to_container(container, label, button);
     }
-    add_scrollbar_to_container(components, container);
+    add_scrollbar_to_container(container);
 }
 
 
-void toggle_xbox_controls(ComponentData* components, int entity) {
+void toggle_xbox_controls(int entity) {
     UNUSED(entity);
     if (window_xbox_controls != -1) {
         destroy_entity_recursive(window_xbox_controls);
@@ -260,21 +255,21 @@ void toggle_xbox_controls(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_xbox_controls = create_window(components, pos, "CONTROLS", 2, toggle_xbox_controls);
+    window_xbox_controls = create_window(pos, "CONTROLS", 2, toggle_xbox_controls);
 
-    int container = create_container(components, vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
+    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(window_xbox_controls, container);
 
     for (int i = 0; i < ACTIONS_SIZE; i++) {
-        int label = create_label(components, ACTIONS[i], zeros());
-        int button = create_button(components, ACTION_BUTTONS_XBOX[i], zeros(), NULL);
-        add_row_to_container(components, container, label, button);
+        int label = create_label(ACTIONS[i], zeros());
+        int button = create_button(ACTION_BUTTONS_XBOX[i], zeros(), NULL);
+        add_row_to_container(container, label, button);
     }
-    add_scrollbar_to_container(components, container);
+    add_scrollbar_to_container(container);
 }
 
 
-void toggle_controls(ComponentData* components, int entity) {
+void toggle_controls(int entity) {
     UNUSED(entity);
     if (window_controls != -1) {
         destroy_entity_recursive(window_controls);
@@ -283,17 +278,17 @@ void toggle_controls(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_controls = create_window(components, pos, "CONTROLS", 1, toggle_controls);
+    window_controls = create_window(pos, "CONTROLS", 1, toggle_controls);
 
-    int container = create_container(components, vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
+    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
     add_child(window_controls, container);
 
-    add_button_to_container(components, container, "KEYBOARD", toggle_keyboard_controls);
-    add_button_to_container(components, container, "XBOX", toggle_xbox_controls);
+    add_button_to_container(container, "KEYBOARD", toggle_keyboard_controls);
+    add_button_to_container(container, "XBOX", toggle_xbox_controls);
 }
 
 
-void toggle_credits(ComponentData* components, int entity) {
+void toggle_credits(int entity) {
     UNUSED(entity);
     if (window_credits != -1) {
         destroy_entity_recursive(window_credits);
@@ -302,31 +297,31 @@ void toggle_credits(ComponentData* components, int entity) {
     }
 
     sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_credits = create_window(components, pos, "CREDITS", 2, toggle_credits);
+    window_credits = create_window(pos, "CREDITS", 2, toggle_credits);
 
-    int container = create_container(components, vec(0.0f, -3.5f * BUTTON_HEIGHT), 2, 6);
+    int container = create_container(vec(0.0f, -3.5f * BUTTON_HEIGHT), 2, 6);
     add_child(window_credits, container);
 
-    add_row_to_container(components, container, create_label(components, "Programming, art, music", zeros()), create_label(components, "Panu Keskinen", zeros()));
-    add_row_to_container(components, container, create_label(components, "Made with", zeros()), create_label(components, "C, CSFML, cJSON", zeros()));
-    add_row_to_container(components, container, create_label(components, "Software used", zeros()), create_label(components, "Visual Studio Code", zeros()));
-    add_row_to_container(components, container, create_label(components, "", zeros()), create_label(components, "Gimp", zeros()));
-    add_row_to_container(components, container, create_label(components, "", zeros()), create_label(components, "Ableton Live Lite", zeros()));
-    add_row_to_container(components, container, create_label(components, "", zeros()), create_label(components, "Audacity", zeros()));
+    add_row_to_container(container, create_label("Programming, art, music", zeros()), create_label("Panu Keskinen", zeros()));
+    add_row_to_container(container, create_label("Made with", zeros()), create_label("C, CSFML, cJSON", zeros()));
+    add_row_to_container(container, create_label("Software used", zeros()), create_label("Visual Studio Code", zeros()));
+    add_row_to_container(container, create_label("", zeros()), create_label("Gimp", zeros()));
+    add_row_to_container(container, create_label("", zeros()), create_label("Ableton Live Lite", zeros()));
+    add_row_to_container(container, create_label("", zeros()), create_label("Audacity", zeros()));
 }
 
 
 void create_menu(GameData data) {
     int height = game_settings.debug ? 6 : 5;
-    int container = create_container(data.components, vec(-18.0f, -2.0f), 1, height);
-    add_button_to_container(data.components, container, "PLAY", toggle_play);
+    int container = create_container(vec(-18.0f, -2.0f), 1, height);
+    add_button_to_container(container, "PLAY", toggle_play);
     if (game_settings.debug) {
-        add_button_to_container(data.components, container, "EDITOR", toggle_editor);
+        add_button_to_container(container, "EDITOR", toggle_editor);
     }
-    add_button_to_container(data.components, container, "SETTINGS", toggle_settings);
-    add_button_to_container(data.components, container, "CONTROLS", toggle_controls);
-    add_button_to_container(data.components, container, "CREDITS", toggle_credits);
-    add_button_to_container(data.components, container, "QUIT", change_state_quit);
+    add_button_to_container(container, "SETTINGS", toggle_settings);
+    add_button_to_container(container, "CONTROLS", toggle_controls);
+    add_button_to_container(container, "CREDITS", toggle_credits);
+    add_button_to_container(container, "QUIT", change_state_quit);
 }
 
 
@@ -341,25 +336,25 @@ void destroy_menu(GameData data) {
 
 
 void create_pause_menu(GameData* data) {
-    int container = create_container(data->components, vec(-20.0f, 0.0f), 1, 3);
-    add_button_to_container(data->components, container, "RESUME", change_state_game);
-    add_button_to_container(data->components, container, "SETTINGS", toggle_settings);
-    add_button_to_container(data->components, container, "QUIT TO MENU", change_state_end);
+    int container = create_container(vec(-20.0f, 0.0f), 1, 3);
+    add_button_to_container(container, "RESUME", change_state_game);
+    add_button_to_container(container, "SETTINGS", toggle_settings);
+    add_button_to_container(container, "QUIT TO MENU", change_state_end);
 }
 
 
 void update_menu(GameData data, sfRenderWindow* window) {
-    update_widgets(data.components, window, data.menu_camera);
+    update_widgets(data.menu_camera);
 }
 
 
 void input_menu(ComponentData* components, int camera, sfEvent event) {
-    input_widgets(components, camera, event);
+    input_widgets(camera, event);
 }
 
 
 void draw_menu(GameData data, sfRenderWindow* window) {
-    draw_widgets(data.components, window, data.menu_camera);
+    draw_widgets(data.menu_camera);
 
     sfVector2f pos = screen_to_world(data.menu_camera, sfMouse_getPosition((sfWindow*) window));
     draw_circle(data.menu_camera, NULL, pos, 0.1f, sfWhite);
@@ -367,11 +362,11 @@ void draw_menu(GameData data, sfRenderWindow* window) {
 
 
 void create_game_over_menu(GameData data) {
-    create_button(data.components, "Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
-    create_button(data.components, "Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+    create_button("Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
+    create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
 }
 
 
 void create_win_menu(GameData data) {
-    create_button(data.components, "Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+    create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
 }
