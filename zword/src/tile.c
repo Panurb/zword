@@ -119,7 +119,7 @@ void create_tile(ComponentData* components, Tile tile, sfVector2f position, floa
             create_wall(components, position, angle, width, height, "altar_tile");
             break;
         case TILE_BEACH:
-            create_beach(components, position, max(width, height), angle);
+            create_beach(components, position, maxi(width, height), angle);
             break;
         case TILE_BEACH_CORNER:
             create_beach_corner(components, position, angle);

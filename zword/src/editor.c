@@ -786,10 +786,10 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
                 toggle_weapons(data->components, -1);
                 break;
             case sfKeyDash:
-                grid_size_index = max(grid_size_index - 1, 0);
+                grid_size_index = maxi(grid_size_index - 1, 0);
                 break;
             case sfKeyEqual:
-                grid_size_index = min(grid_size_index + 1, LENGTH(grid_sizes) - 1);
+                grid_size_index = mini(grid_size_index + 1, LENGTH(grid_sizes) - 1);
                 break;
             default:
                 break;

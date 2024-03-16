@@ -58,10 +58,10 @@ Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
     float h = axis_half_width(components, i, (sfVector2f) { 0.0, 1.0 }) / grid->tile_height;
 
     Bounds bounds;
-    bounds.left = max(0, floorf(x - w));
-    bounds.right = min(grid->columns - 1, floorf(x + w));
-    bounds.bottom = max(0, floorf(y - h));
-    bounds.top = min(grid->rows - 1, floorf(y + h));
+    bounds.left = maxi(0, floorf(x - w));
+    bounds.right = mini(grid->columns - 1, floorf(x + w));
+    bounds.bottom = maxi(0, floorf(y - h));
+    bounds.top = mini(grid->rows - 1, floorf(y + h));
 
     return bounds;
 }
@@ -77,8 +77,8 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
     float y = (origin.y + 0.5f * grid->height) / grid->tile_height;
     float r = radius / grid->tile_width;
       
-    for (int i = max(0, x - r); i <= min(grid->columns - 1, x + r); i++) {
-        for (int j = max(0, y - r); j <= min(grid->rows - 1, y + r); j++) {
+    for (int i = maxi(0, x - r); i <= mini(grid->columns - 1, x + r); i++) {
+        for (int j = maxi(0, y - r); j <= mini(grid->rows - 1, y + r); j++) {
             for (ListNode* node = grid->array[i][j]->head; node; node = node->next) {
                 int n = node->value;
 

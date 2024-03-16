@@ -176,11 +176,11 @@ int replace(int old, int new, int* array, int size) {
     return i;
 }
 
-int min(int a, int b) {
+int mini(int a, int b) {
     return (a < b) ? a : b;
 }
 
-int max(int a, int b) {
+int maxi(int a, int b) {
     return (a > b) ? a : b;
 }
 

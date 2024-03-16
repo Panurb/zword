@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_C_FLAGS "-g -Wall -Wextra --pedantic -Wno-deprecated-declarations")
+set(CMAKE_C_FLAGS "-O3 -Wall")
 
 project(notk C)
 
@@ -59,15 +59,21 @@ add_executable(notk WIN32 ${SOURCES})
 install(TARGETS notk
     DESTINATION ${CMAKE_SOURCE_DIR}/build)
 
+set(LIBS
+    ${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-audio.lib
+	${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-graphics.lib
+	${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-system.lib
+	${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-window.lib
+)
+
+target_link_libraries(notk ${LIBS})
+
 set(DLLS
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-audio-2.dll
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-graphics-2.dll
-	# ${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-network-2.dll
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-system-2.dll
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-window-2.dll
 )
-
-target_link_libraries(notk ${DLLS})
 
 install(FILES ${DLLS}
     DESTINATION ${CMAKE_SOURCE_DIR}/build

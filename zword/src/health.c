@@ -44,7 +44,7 @@ void die(ComponentData* components, ColliderGrid* grid, int entity) {
             while (ammo && ammo->size > 0) {
                 sfVector2f pos = get_position(components, entity);
                 int k = create_ammo(components, sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
-                int size = min(AmmoComponent_get(components, k)->size, ammo->size);
+                int size = mini(AmmoComponent_get(components, k)->size, ammo->size);
                 AmmoComponent* drop = AmmoComponent_get(components, k);
                 drop->size = size;
                 ammo->size -= size;
@@ -124,7 +124,7 @@ void damage(ComponentData* components, ColliderGrid* grid, int entity, sfVector2
     EnemyComponent* enemy = components->enemy[entity];
     if (health) {
         int prev_health = health->health;
-        health->health = max(0, health->health - dmg);
+        health->health = maxi(0, health->health - dmg);
 
         if (health->decal[0] != '\0') {
             // TODO: use decal

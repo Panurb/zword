@@ -164,8 +164,8 @@ void attack(ComponentData* components, ColliderGrid* grid, int entity) {
 
     switch (weapon->ammo_type) {
         case AMMO_MELEE: {
-            HitInfo min_info[weapon->shots];
-            float min_dist[weapon->shots];
+            HitInfo min_info[7];
+            float min_dist[7];
             for (int i = 0; i < weapon->shots; i++) {
                 min_info[i].entity = -1;
                 min_dist[i] = INFINITY;
