@@ -57,7 +57,7 @@ set(SOURCES
 add_executable(notk WIN32 ${SOURCES})
 
 install(TARGETS notk
-    DESTINATION ${CMAKE_SOURCE_DIR}/build)
+    DESTINATION ${CMAKE_BINARY_DIR}/build)
 
 set(LIBS
     ${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-audio.lib
@@ -76,11 +76,11 @@ set(DLLS
 )
 
 install(FILES ${DLLS}
-    DESTINATION ${CMAKE_SOURCE_DIR}/build
+    DESTINATION ${CMAKE_BINARY_DIR}/build
 )
 
 install(DIRECTORY zword/data
-    DESTINATION ${CMAKE_SOURCE_DIR}/build
+    DESTINATION ${CMAKE_BINARY_DIR}/build
     FILES_MATCHING 
         PATTERN "*.png"
         PATTERN "*.ttf"
@@ -94,13 +94,13 @@ set(SHADERS
 )
 
 install(FILES ${SHADERS}
-    DESTINATION ${CMAKE_SOURCE_DIR}/build
+    DESTINATION ${CMAKE_BINARY_DIR}/build
 )
 
 set(EXTERNAL_DLLS ${CMAKE_SOURCE_DIR}/OpenAL32.dll)
 
 install(FILES ${EXTERNAL_DLLS}
-    DESTINATION ${CMAKE_SOURCE_DIR}/build
+    DESTINATION ${CMAKE_BINARY_DIR}/build
 )
 
 set(CONFIG 
@@ -108,5 +108,5 @@ set(CONFIG
 )
 
 install(FILES ${CONFIG}
-    DESTINATION ${CMAKE_SOURCE_DIR}/build
+    DESTINATION ${CMAKE_BINARY_DIR}/build
 )
