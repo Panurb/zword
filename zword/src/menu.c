@@ -16,8 +16,6 @@ static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x108
 int RESOLUTION_ID = -1;
 int SOUND_ID = -1;
 int MUSIC_ID = -1;
-int MAP_NAME_ID = -1;
-static ButtonText map_name = "mansion";
 static int window_play = -1;
 static int window_new_map = -1;
 static int window_editor = -1;
@@ -29,21 +27,14 @@ static int window_xbox_controls = -1;
 
 
 void reset_ids() {
+    RESOLUTION_ID = -1;
+    SOUND_ID = -1;
+    MUSIC_ID = -1;
     window_play = -1;
     window_new_map = -1;
     window_editor = -1;
     window_settings = -1;
     window_controls = -1;
-}
-
-
-void get_map_name(GameData* data, ButtonText buffer) {
-    WidgetComponent* widget = WidgetComponent_get(MAP_NAME_ID);
-    if (widget) {
-        strcpy(buffer, widget->string);
-    } else {
-        strcpy(buffer, map_name);
-    }
 }
 
 
@@ -63,7 +54,7 @@ void change_state_create(int entity) {
 
 void change_state_start(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
-    strcpy(map_name, widget->string);
+    strcpy(game_data->map_name, widget->string);
     game_state = STATE_START;
     reset_ids();
 }
@@ -85,7 +76,7 @@ void change_state_game(int entity) {
 
 void change_state_load(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
-    strcpy(map_name, widget->string);
+    strcpy(game_data->map_name, widget->string);
     game_state = STATE_LOAD;
     reset_ids();
 }
@@ -154,8 +145,8 @@ void toggle_new_map(int entity) {
     add_child(window_new_map, container);
 
     int label = create_label("NAME", zeros());
-    MAP_NAME_ID = create_textbox(zeros(), 1);
-    add_row_to_container(container, label, MAP_NAME_ID);
+    int i = create_textbox(zeros(), 1);
+    add_row_to_container(container, label, i);
     add_button_to_container(container, "CREATE", change_state_create);
 }
 

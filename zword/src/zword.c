@@ -137,9 +137,7 @@ int main() {
                         update_menu(*game_data, game_window);
                         break;
                     case STATE_START:
-                        get_map_name(game_data, buffer);
-                        set_map_name(buffer);
-                        start_game(game_data, buffer);
+                        start_game(game_data, game_data->map_name);
                         game_state = STATE_GAME;
                         break;
                     case STATE_END:
@@ -169,27 +167,15 @@ int main() {
                         game_state = STATE_MENU;
                         break;
                     case STATE_CREATE:
-                        get_map_name(game_data, buffer);
-                        set_map_name(buffer);
-                        if (buffer[0] == '\0') {
-                            game_state = STATE_MENU;
-                        } else {
-                            destroy_menu();
-                            create_editor_menu(game_data);
-                            game_state = STATE_EDITOR;
-                        }
+                        destroy_menu();
+                        create_editor_menu(game_data);
+                        game_state = STATE_EDITOR;
                         break;
                     case STATE_LOAD:
-                        get_map_name(game_data, buffer);
-                        set_map_name(buffer);
-                        if (buffer[0] == '\0') {
-                            game_state = STATE_MENU;
-                        } else {
-                            destroy_menu();
-                            create_editor_menu(game_data);
-                            load_game(game_data, buffer);
-                            game_state = STATE_EDITOR;
-                        }
+                        destroy_menu();
+                        create_editor_menu(game_data);
+                        load_game(game_data, game_data->map_name);
+                        game_state = STATE_EDITOR;
                         break;
                     case STATE_EDITOR:
                         update_editor(*game_data, game_window, time_step);

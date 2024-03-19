@@ -51,7 +51,6 @@ static ButtonText prefabs[] = { "testi.json", "prefab.json" };
 static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
-static ButtonText map_name = "";
 static float double_click_time = 0.0f;
 static int entity_settings_id = -1;
 static int entity_settings_entity = -1;
@@ -161,11 +160,6 @@ bool category_selected(ComponentData* components, int entity) {
     }
 
     return true;
-}
-
-
-void set_map_name(ButtonText name) {
-    strcpy(map_name, name);
 }
 
 
@@ -496,7 +490,7 @@ void update_selections(GameData data) {
 
 void save_map(ComponentData* components, int entity) {
     UNUSED(entity);
-    save_game(game_data, map_name);
+    save_game(game_data, game_data->map_name);
 }
 
 

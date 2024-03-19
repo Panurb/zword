@@ -982,6 +982,7 @@ void save_game(GameData* data, ButtonText map_name) {
 void load_game(GameData* data, ButtonText map_name) {
     cJSON* json = load_json("maps", map_name);
     if (json) {
+        strcpy(data->map_name, map_name);
         deserialize_game(json, data, false);
         cJSON_Delete(json);
         strcpy(data->map_name, map_name);
