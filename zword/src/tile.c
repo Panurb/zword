@@ -10,7 +10,7 @@
 #include "enemy.h"
 
 
-void create_ground(ComponentData* components, sfVector2f position, float width, float height, sfTexture* noise_texture) {
+void create_ground(sfVector2f position, float width, float height, sfTexture* noise_texture) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0);
     ImageComponent_add(i, "grass_tile", width, height, LAYER_GROUND);
@@ -27,7 +27,7 @@ void create_ground(ComponentData* components, sfVector2f position, float width, 
 }
 
 
-void create_water(ComponentData* components, sfVector2f position, float width, float height, sfTexture* noise_texture) {
+void create_water(sfVector2f position, float width, float height, sfTexture* noise_texture) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ImageComponent_add(i, "water_tile", width, height, LAYER_GROUND);
@@ -45,21 +45,21 @@ void create_water(ComponentData* components, sfVector2f position, float width, f
 }
 
 
-void create_beach(ComponentData* components, sfVector2f position, float length, float angle) {
+void create_beach(sfVector2f position, float length, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "beach_tile", 16.0f, length, LAYER_ROADS);
 }
 
 
-void create_beach_corner(ComponentData* components, sfVector2f position, float angle) {
+void create_beach_corner(sfVector2f position, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "beach_corner", 0, 0, LAYER_ROADS);
 }
 
 
-int create_wall(ComponentData* components, sfVector2f pos, float angle, float width, float height, Filename filename) {
+int create_wall(sfVector2f pos, float angle, float width, float height, Filename filename) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_rectangle(i, width, height, GROUP_WALLS);
@@ -77,7 +77,7 @@ int create_wall(ComponentData* components, sfVector2f pos, float angle, float wi
 }
 
 
-void create_fence(ComponentData* components, sfVector2f pos, float angle, float width, float height) {
+void create_fence(sfVector2f pos, float angle, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_rectangle(i, width, height, GROUP_BARRIERS);
@@ -85,14 +85,14 @@ void create_fence(ComponentData* components, sfVector2f pos, float angle, float 
 }
 
 
-void create_glass(ComponentData* components, sfVector2f pos, float angle) {
-    create_fence(components, pos, angle, 1.0f, 4.0f);
+void create_glass(sfVector2f pos, float angle) {
+    create_fence(pos, angle, 1.0f, 4.0f);
     create_waypoint(sum(pos, polar_to_cartesian(1.5f, angle)));
     create_waypoint(diff(pos, polar_to_cartesian(1.5f, angle)));
 }
 
 
-int create_floor(ComponentData* components, sfVector2f pos, float width, float height, float angle, Filename filename) {
+int create_floor(sfVector2f pos, float width, float height, float angle, Filename filename) {
     printf("%f, %f, %f, %f\n", pos.x, pos.y, width, height);
     int i = create_entity();
 
@@ -104,7 +104,7 @@ int create_floor(ComponentData* components, sfVector2f pos, float width, float h
 }
 
 
-void create_roof(ComponentData* components, sfVector2f pos, float width, float height, float angle) {
+void create_roof(sfVector2f pos, float width, float height, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, angle);
@@ -113,49 +113,49 @@ void create_roof(ComponentData* components, sfVector2f pos, float width, float h
 }
 
 
-void create_tile(ComponentData* components, Tile tile, sfVector2f position, float angle, float width, float height) {
+void create_tile(Tile tile, sfVector2f position, float angle, float width, float height) {
     switch (tile) {
         case TILE_ALTAR:
-            create_wall(components, position, angle, width, height, "altar_tile");
+            create_wall(position, angle, width, height, "altar_tile");
             break;
         case TILE_BEACH:
-            create_beach(components, position, max(width, height), angle);
+            create_beach(position, max(width, height), angle);
             break;
         case TILE_BEACH_CORNER:
-            create_beach_corner(components, position, angle);
+            create_beach_corner(position, angle);
             break;
         case TILE_BOARD:
-            create_floor(components, position, width, height, angle, "board_tile");
+            create_floor(position, width, height, angle, "board_tile");
             break;
         case TILE_BRICK:
-            create_wall(components, position, angle, width, height, "brick_tile");
+            create_wall(position, angle, width, height, "brick_tile");
             break;
         case TILE_FENCE:
-            create_fence(components, position, angle, width, height);
+            create_fence(position, angle, width, height);
             break;
         case TILE_GRASS:
-            create_ground(components, position, width, height, NULL);
+            create_ground(position, width, height, NULL);
             break;
         case TILE_LEVEL_END:
-            create_level_end(components, position, angle, width, height);
+            create_level_end(position, angle, width, height);
             break;
         case TILE_ROOF:
-            create_roof(components, position, width, height, angle);
+            create_roof(position, width, height, angle);
             break;
         case TILE_SPAWNER:
             create_spawner(position, angle, width, height);
             break;
         case TILE_STONE:
-            create_wall(components, position, angle, width, height, "stone_tile");
+            create_wall(position, angle, width, height, "stone_tile");
             break;
         case TILE_TILES:
-            create_floor(components, position, width, height, angle, "tiles_tile");
+            create_floor(position, width, height, angle, "tiles_tile");
             break;
         case TILE_WATER:
-            create_water(components, position, width, height, NULL);
+            create_water(position, width, height, NULL);
             break;
         case TILE_WOOD:
-            create_wall(components, position, angle, width, height, "wood_tile");
+            create_wall(position, angle, width, height, "wood_tile");
             break;
     }
 }

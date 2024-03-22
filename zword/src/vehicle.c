@@ -7,9 +7,10 @@
 #include "image.h"
 #include "sound.h"
 #include "navigation.h"
+#include "game.h"
 
 
-int create_car(ComponentData* components, sfVector2f pos, float angle) {
+int create_car(sfVector2f pos, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_circle(i, 1.5f, GROUP_VEHICLES);
@@ -54,11 +55,11 @@ int create_car(ComponentData* components, sfVector2f pos, float angle) {
 }
 
 
-bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
+bool enter_vehicle(int i) {
     CoordinateComponent* coord = CoordinateComponent_get(i);
 
-    for (int j = 0; j < components->entities; j++) {
-        VehicleComponent* vehicle = components->vehicle[j];
+    for (int j = 0; j < game_data->components->entities; j++) {
+        VehicleComponent* vehicle = VehicleComponent_get(j);
         if (!vehicle)  continue;
 
         float min_d = 3.0;
@@ -107,14 +108,14 @@ bool enter_vehicle(ComponentData* components, ColliderGrid* grid, int i) {
 }
 
 
-void exit_vehicle(ComponentData* components, int i) {
+void exit_vehicle(int i) {
     PlayerComponent* player = PlayerComponent_get(i);
     int j = player->vehicle;
     VehicleComponent* vehicle = VehicleComponent_get(j);
 
     int k = find(i, vehicle->riders, vehicle->size);
 
-    CoordinateComponent* coord = components->coordinate[i];
+    CoordinateComponent* coord = CoordinateComponent_get(i);
     sfVector2f r = vehicle->seats[k];
     r.y *= 2.0;
     r = rotate(r, get_angle(j));
@@ -123,7 +124,7 @@ void exit_vehicle(ComponentData* components, int i) {
 
     player->vehicle = -1;
     vehicle->riders[k] = -1;
-    components->collider[i]->enabled = true;
+    ColliderComponent_get(i)->enabled = true;
 
     if (k == 0) {
         stop_loop(j);
@@ -132,7 +133,7 @@ void exit_vehicle(ComponentData* components, int i) {
 }
 
 
-void drive_vehicle(ComponentData* components, int p, float gas, float steering) {
+void drive_vehicle(int p, float gas, float steering) {
     PlayerComponent* player = PlayerComponent_get(p);
     VehicleComponent* vehicle = VehicleComponent_get(player->vehicle);
     int i = JointComponent_get(player->vehicle)->parent;

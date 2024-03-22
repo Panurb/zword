@@ -36,9 +36,9 @@ void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f pos
 
             if ((1.0f - forestation) < perlin(0.03f * r.x, 0.03f * r.y, 0.0, p, -1)) {
                 if (randf(0.0f, 1.0f) < 0.05f) {
-                    create_rock(components, r);
+                    create_rock(r);
                 } else {
-                    create_tree(components, r);
+                    create_tree(r);
                 }
                 ListNode* node;
                 FOREACH(node, components->added_entities) {
@@ -73,9 +73,9 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
         for (int j = 0; j < LEVEL_HEIGHT; j++) {
             sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
             if (i == 0 || j == 0 || i == LEVEL_WIDTH - 1 || j == LEVEL_WIDTH - 1) {
-                create_water(components, pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+                create_water(pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
             } else {
-                create_ground(components, pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+                create_ground(pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
             }
         }
     }
@@ -85,10 +85,10 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     float angle = 1.5f * M_PI;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 2 * LEVEL_WIDTH - 5; j++) {
-            create_beach(components, pos, 0.5f * CHUNK_WIDTH, angle);
+            create_beach(pos, 0.5f * CHUNK_WIDTH, angle);
             pos = sum(pos, r);
         }
-        create_beach_corner(components, pos, angle + 0.5f * M_PI);
+        create_beach_corner(pos, angle + 0.5f * M_PI);
         angle += 0.5f * M_PI;
         r = rotate(r, 0.5f * M_PI);
         pos = sum(pos, r);
@@ -168,7 +168,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
             for (int i = 0; i < 2; i++) {
                 sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
-                create_uranium(components, sum(pos, r));
+                create_uranium(sum(pos, r));
             }
         }
     }
@@ -196,9 +196,9 @@ void test(ComponentData* components) {
         for (int j = 0; j < 5; j++) {
             sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - 5) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - 5) * CHUNK_HEIGHT };
             if (i == 0 || j == 0 || i == 5 - 1 || j == 5 - 1) {
-                create_water(components, pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+                create_water(pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
             } else {
-                create_ground(components, pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
+                create_ground(pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
             }
         }
     }
@@ -206,7 +206,7 @@ void test(ComponentData* components) {
     sfVector2f start = zeros();
     create_mansion(components, start);
     // create_school(components, start);
-    create_fire(components, vec(0.0f, 1.0f));
+    create_fire(vec(0.0f, 1.0f));
 
     create_player(start, -1);
     create_assault_rifle(sum(start, rand_vector()));

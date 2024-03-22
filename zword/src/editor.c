@@ -129,7 +129,7 @@ static ButtonText weapon_names[] = {
 };
 
 
-bool category_selected(ComponentData* components, int entity) {
+bool category_selected(int entity) {
     if (WaypointComponent_get(entity)) {
         return selected_categories[CATEGORY_WAYPOINTS];
     }
@@ -163,7 +163,7 @@ bool category_selected(ComponentData* components, int entity) {
 }
 
 
-sfVector2f get_selections_center(ComponentData* components) {
+sfVector2f get_selections_center() {
     sfVector2f center = zeros();
     ListNode* node;
     FOREACH(node, selections) {
@@ -180,16 +180,16 @@ sfVector2f get_selections_center(ComponentData* components) {
 }
 
 
-void select_object(ComponentData* components, int entity) {
+void select_object(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(selected_object_name, widget->string);
     tool = TOOL_OBJECT;
 
-    components->added_entities = List_create();
+    game_data->components->added_entities = List_create();
 
     printf("selected object: %s\n", selected_object_name);
 
-    int i = create_object(components, selected_object_name, zeros(), 0.0f);
+    int i = create_object(selected_object_name, zeros(), 0.0f);
     ColliderComponent* collider = ColliderComponent_get(i);
     if (collider) {
         selected_object_width = collider->width;
@@ -200,14 +200,14 @@ void select_object(ComponentData* components, int entity) {
     }
 
     ListNode* node;
-    FOREACH(node, components->added_entities) {
+    FOREACH(node, game_data->components->added_entities) {
       destroy_entity(node->value);
     }
-    List_delete(components->added_entities);
+    List_delete(game_data->components->added_entities);
 }
 
 
-int toggle_list_window(ComponentData* components, int window_id, ButtonText title, OnClick close, ButtonText* values, 
+int toggle_list_window(int window_id, ButtonText title, OnClick close, ButtonText* values, 
         int length, OnClick select) {
     if (window_id != -1) {
         destroy_entity_recursive(window_id);
@@ -231,60 +231,60 @@ int toggle_list_window(ComponentData* components, int window_id, ButtonText titl
 }
 
 
-void select_tile(ComponentData* components, int entity) {
+void select_tile(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     selected_tile = widget->value;
     tool = TOOL_TILE;
 }
 
 
-void toggle_tiles(ComponentData* components, int entity) {
+void toggle_tiles(int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "TILES", toggle_tiles, tile_names, LENGTH(tile_names), 
+    window_id = toggle_list_window(window_id, "TILES", toggle_tiles, tile_names, LENGTH(tile_names), 
         select_tile);
 }
 
 
-void toggle_objects(ComponentData* components, int entity) {
+void toggle_objects(int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "OBJECTS", toggle_objects, object_names, LENGTH(object_names), 
+    window_id = toggle_list_window(window_id, "OBJECTS", toggle_objects, object_names, LENGTH(object_names), 
         select_object);
 }
 
 
-void toggle_creatures(ComponentData* components, int entity) {
+void toggle_creatures(int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "CREATURES", toggle_creatures, creature_names, LENGTH(creature_names), 
+    window_id = toggle_list_window(window_id, "CREATURES", toggle_creatures, creature_names, LENGTH(creature_names), 
         select_object);
 }
 
 
-void toggle_weapons(ComponentData* components, int entity) {
+void toggle_weapons(int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    window_id = toggle_list_window(components, window_id, "WEAPONS", toggle_weapons, weapon_names, LENGTH(weapon_names), 
+    window_id = toggle_list_window(window_id, "WEAPONS", toggle_weapons, weapon_names, LENGTH(weapon_names), 
         select_object);
 }
 
 
-void set_game_mode(ComponentData* components, int entity, int delta) {
+void set_game_mode(int entity, int delta) {
     UNUSED(delta);
     WidgetComponent* widget = WidgetComponent_get(entity);
     game_data->game_mode = widget->value;
 }
 
 
-void set_ambient_light(ComponentData* components, int entity, int delta) {
+void set_ambient_light(int entity, int delta) {
     UNUSED(delta);
     WidgetComponent* widget = WidgetComponent_get(entity);
     game_data->ambient_light = widget->value / 100.0f;
 }
 
 
-void toggle_editor_settings(ComponentData* components, int entity) {
+void toggle_editor_settings(int entity) {
     UNUSED(entity);
     static int window_id = -1;
 
@@ -314,7 +314,7 @@ void toggle_editor_settings(ComponentData* components, int entity) {
 }
 
 
-void close_entity_settings(ComponentData* components, int entity) {
+void close_entity_settings(int entity) {
     UNUSED(entity);
     destroy_entity_recursive(entity_settings_id);
     entity_settings_id = -1;
@@ -322,7 +322,7 @@ void close_entity_settings(ComponentData* components, int entity) {
 }
 
 
-void change_text(ComponentData* components, int textbox, int unicode) {
+void change_text(int textbox, int unicode) {
     UNUSED(unicode);
     TextComponent* text = TextComponent_get(entity_settings_entity);
     WidgetComponent* widget = WidgetComponent_get(textbox);
@@ -331,9 +331,9 @@ void change_text(ComponentData* components, int textbox, int unicode) {
 }
 
 
-void open_entity_settings(ComponentData* components, int entity) {
+void open_entity_settings(int entity) {
     if (entity_settings_id != -1) {
-        close_entity_settings(components, entity);
+        close_entity_settings(entity);
     }
 
     entity_settings_entity = entity;
@@ -356,28 +356,28 @@ void open_entity_settings(ComponentData* components, int entity) {
 }
 
 
-void select_prefab(ComponentData* components, int entity) {
+void select_prefab(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(prefab_name, widget->string);
     tool = TOOL_PREFAB;
 }
 
 
-void toggle_prefabs(ComponentData* components, int entity) {
+void toggle_prefabs(int entity) {
     UNUSED(entity);
     static int window_id = -1;
     // TODO: list files in directory
-    window_id = toggle_list_window(components, window_id, "PREFABS", toggle_prefabs, prefabs, LENGTH(prefabs), 
+    window_id = toggle_list_window(window_id, "PREFABS", toggle_prefabs, prefabs, LENGTH(prefabs), 
         select_prefab);
 }
 
 
-void save_prefab(ComponentData* components, Filename filename) {
-    sfVector2f center = get_selections_center(components);
+void save_prefab(Filename filename) {
+    sfVector2f center = get_selections_center();
     center = snap_to_grid_center(center, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     center = mult(-1.0f, center);
 
-    cJSON* json = serialize_entities(components, selections, center);
+    cJSON* json = serialize_entities(game_data->components, selections, center);
 
     save_json(json, "prefabs", filename);
     cJSON_Delete(json);
@@ -464,7 +464,7 @@ void update_selections(GameData data) {
         if (CameraComponent_get(i)) continue;
         if (coord->parent != -1) continue;
 
-        if (!category_selected(data.components, i)) {
+        if (!category_selected(i)) {
             continue;
         }
 
@@ -488,14 +488,13 @@ void update_selections(GameData data) {
 }
 
 
-void save_map(ComponentData* components, int entity) {
+void save_map(int entity) {
     UNUSED(entity);
     save_game(game_data, game_data->map_name);
 }
 
 
-void quit(ComponentData* components, int entity) {
-    UNUSED(components);
+void quit(int entity) {
     UNUSED(entity);
     game_state = STATE_END;
 }
@@ -524,8 +523,8 @@ void create_editor_menu(GameData* data) {
 
 
 void update_editor(GameData data, sfRenderWindow* window, float time_step) {
-    // update(data.components, time_step, data.grid);
-    // collide(data.components, data.grid);
+    // update(data.time_step, data.grid);
+    // collide(data.data.grid);
     update_waypoints(data.camera);
 
     update_particles(data.camera, time_step);
@@ -547,10 +546,10 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
 }
 
 
-void input_tool_select(GameData* data, sfEvent event) {
+void input_tool_select(sfEvent event) {
     static bool grabbed = false;
 
-    ComponentData* components = data->components;
+    ComponentData* components = game_data->components;
 
     if (event.type == sfEvtMouseMoved) {
         if (selection_box != -1) {
@@ -571,7 +570,7 @@ void input_tool_select(GameData* data, sfEvent event) {
             sfVector2f delta_pos = vec(dx, dy);
             tile_start = sum(tile_start, vec(dx, dy));
 
-            move_selections(data, delta_pos);
+            move_selections(game_data, delta_pos);
         }
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
@@ -602,7 +601,7 @@ void input_tool_select(GameData* data, sfEvent event) {
             }
         } else if (event.mouseButton.button == sfMouseRight) {
             if (selections) {
-                rotate_selections(data);
+                rotate_selections(game_data);
             }
         }
     } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
@@ -612,7 +611,7 @@ void input_tool_select(GameData* data, sfEvent event) {
         }
         grabbed = false;
         if (double_click_time > 0.0f && selections->size == 1) {
-            open_entity_settings(components, selections->head->value);
+            open_entity_settings(selections->head->value);
             double_click_time = 0.0f;
         } else {
             double_click_time = 0.2f;
@@ -621,22 +620,22 @@ void input_tool_select(GameData* data, sfEvent event) {
         if (selections) {
             switch (event.key.code) {
             case sfKeyDelete:
-                destroy_selections(data);
+                destroy_selections(game_data);
                 break;
             case sfKeyS:
-                save_prefab(data->components, "prefab.json");
+                save_prefab("prefab.json");
                 break;
             case sfKeyLeft:
-                move_selections(data, vec(-grid_sizes[grid_size_index], 0.0f));
+                move_selections(game_data, vec(-grid_sizes[grid_size_index], 0.0f));
                 break;
             case sfKeyRight:
-                move_selections(data, vec(grid_sizes[grid_size_index], 0.0f));
+                move_selections(game_data, vec(grid_sizes[grid_size_index], 0.0f));
                 break;
             case sfKeyDown:
-                move_selections(data, vec(0.0f, -grid_sizes[grid_size_index]));
+                move_selections(game_data, vec(0.0f, -grid_sizes[grid_size_index]));
                 break;
             case sfKeyUp:
-                move_selections(data, vec(0.0f, grid_sizes[grid_size_index]));
+                move_selections(game_data, vec(0.0f, grid_sizes[grid_size_index]));
                 break;
             default:
                 break;
@@ -646,7 +645,7 @@ void input_tool_select(GameData* data, sfEvent event) {
 }
 
 
-void input_tool_tile(GameData* data, sfEvent event) {
+void input_tool_tile(sfEvent event) {
     if (event.type == sfEvtMouseMoved) {
         tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     } else if (event.type == sfEvtMouseButtonPressed) {
@@ -659,76 +658,73 @@ void input_tool_tile(GameData* data, sfEvent event) {
         float height = fabsf(tile_end.y - tile_start.y);
         sfVector2f pos = mult(0.5f, sum(tile_end, tile_start));
         if (width > 0.0f && height > 0.0f) {
-            data->components->added_entities = List_create();
-            create_tile(data->components, selected_tile, pos, 0.0f, width, height);
+            game_data->components->added_entities = List_create();
+            create_tile(selected_tile, pos, 0.0f, width, height);
             ListNode* node;
-            FOREACH(node, data->components->added_entities) {
+            FOREACH(node, game_data->components->added_entities) {
                 if (ColliderComponent_get(node->value)) {
                    update_grid(node->value);
                 }
             }
-            List_delete(data->components->added_entities);
-            data->components->added_entities = NULL;
+            List_delete(game_data->components->added_entities);
+            game_data->components->added_entities = NULL;
         }
         tile_started = false;
     }
 }
 
 
-void input_tool_object(GameData* data, sfEvent event) {
+void input_tool_object(sfEvent event) {
     if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
-            data->components->added_entities = List_create();
+            game_data->components->added_entities = List_create();
             sfVector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            create_object(data->components, selected_object_name, pos, 0.0f);
+            create_object(selected_object_name, pos, 0.0f);
             ListNode* node;
-            FOREACH(node, data->components->added_entities) {
+            FOREACH(node, game_data->components->added_entities) {
                 if (ColliderComponent_get(node->value)) {
                    update_grid(node->value);
                 }
             }
-            List_delete(data->components->added_entities);
-            data->components->added_entities = NULL;
+            List_delete(game_data->components->added_entities);
+            game_data->components->added_entities = NULL;
         }
     }
 }
 
 
-void input_tool_prefab(GameData* data, sfEvent event) {
+void input_tool_prefab(sfEvent event) {
     if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
             sfVector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            load_prefab(data, prefab_name, pos, 0.0f);
+            load_prefab(game_data, prefab_name, pos, 0.0f);
         }
     }
 }
 
 
-void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
-    UNUSED(window);
+void input_editor(sfEvent event) {
     static sfVector2i mouse_screen = { 0, 0 };
 
-    if (input_widgets(data->menu_camera, event)) {
+    if (input_widgets(game_data->menu_camera, event)) {
         return;
     }
 
-    ComponentData* components = data->components;
-
-    CoordinateComponent* cam_coord = CoordinateComponent_get(data->camera);
-    CameraComponent* cam = CameraComponent_get(data->camera);
+    CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
+    CameraComponent* cam = CameraComponent_get(game_data->camera);
 
     switch (tool) {
         case TOOL_SELECT:
-            input_tool_select(data, event);
+            input_tool_select(event);
             break;
         case TOOL_TILE:
-            input_tool_tile(data, event);
+            input_tool_tile(event);
             break;
         case TOOL_OBJECT:
-            input_tool_object(data, event);
+            input_tool_object(event);
             break;
         case TOOL_PREFAB:
-            input_tool_prefab(data, event);
+            input_tool_prefab(event);
             break;
     }
 
@@ -736,7 +732,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
         sfVector2i mouse_new = { event.mouseMove.x, event.mouseMove.y };
         sfVector2f mouse_delta = { mouse_new.x - mouse_screen.x, mouse_screen.y - mouse_new.y };
         mouse_screen = mouse_new;
-        mouse_world = screen_to_world(data->camera, mouse_screen);
+        mouse_world = screen_to_world(game_data->camera, mouse_screen);
 
         if (sfMouse_isButtonPressed(sfMouseMiddle)) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
@@ -751,7 +747,7 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
         if (entity_settings_entity != -1) {
             switch (event.key.code) {
             case sfKeyEscape:
-                close_entity_settings(components, entity_settings_id);
+                close_entity_settings(entity_settings_id);
                 break;
             default:
                 return;
@@ -768,16 +764,16 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
                 selected_categories[event.key.code - 27] = !selected_categories[event.key.code - 27];
                 break;
             case sfKeyO:
-                toggle_objects(data->components, -1);
+                toggle_objects(-1);
                 break;
             case sfKeyP:
-                toggle_prefabs(data->components, -1);
+                toggle_prefabs(-1);
                 break;
             case sfKeyT:
-                toggle_tiles(data->components, -1);
+                toggle_tiles(-1);
                 break;
             case sfKeyW:
-                toggle_weapons(data->components, -1);
+                toggle_weapons(-1);
                 break;
             case sfKeyDash:
                 grid_size_index = max(grid_size_index - 1, 0);
@@ -792,11 +788,11 @@ void input_editor(GameData* data, sfRenderWindow* window, sfEvent event) {
 }
 
 
-void draw_editor(GameData data, sfRenderWindow* window) {
-    draw_game(data, window);
-    draw_grid(data.camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+void draw_editor() {
+    draw_game();
+    draw_grid(game_data->camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
 
-    sfVector2f mouse_pos = screen_to_world(data.camera, sfMouse_getPosition((sfWindow*) window));
+    sfVector2f mouse_pos = screen_to_world(game_data->camera, sfMouse_getPosition((sfWindow*) game_window));
     sfVector2f mouse_grid = snap_to_grid(mouse_pos, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     sfVector2f mouse_grid_center = snap_to_grid_center(mouse_pos, grid_sizes[grid_size_index], 
         grid_sizes[grid_size_index]);
@@ -806,14 +802,14 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             if (selection_box != -1) {
                 sfVector2f pos = get_position(selection_box);
                 ColliderComponent* collider = ColliderComponent_get(selection_box);
-                draw_rectangle_outline(data.camera, NULL, pos, collider->width, 
+                draw_rectangle_outline(game_data->camera, NULL, pos, collider->width, 
                     collider->height, 0.0f, 0.05f, sfWhite);
             }
             for (int i = 0; i < LENGTH(category_names); i++) {
                 sfColor color = selected_categories[i] ? sfWhite : get_color(0.6f, 0.6f, 0.6f, 1.0f);
                 char buffer[128];
                 snprintf(buffer, 128, "%d %s", i + 1, category_names[i]);
-                draw_text(data.menu_camera, NULL, vec(i * 5 - 15, 14), buffer, 20, color);
+                draw_text(game_data->menu_camera, NULL, vec(i * 5 - 15, 14), buffer, 20, color);
             }
             break;
         case TOOL_TILE:
@@ -822,22 +818,22 @@ void draw_editor(GameData data, sfRenderWindow* window) {
                 float width = fabsf(end.x - tile_start.x);
                 float height = fabsf(end.y - tile_start.y);
                 sfVector2f pos = mult(0.5f, sum(end, tile_start));
-                draw_rectangle_outline(data.camera, NULL, pos, width, height, 0.0f, 0.05f, 
+                draw_rectangle_outline(game_data->camera, NULL, pos, width, height, 0.0f, 0.05f, 
                     sfWhite);
             } else {
                 sfVector2f pos = mouse_grid;
-                draw_line(data.camera, NULL, vec(pos.x - 0.2f, pos.y), 
+                draw_line(game_data->camera, NULL, vec(pos.x - 0.2f, pos.y), 
                     vec(pos.x + 0.2f, pos.y), 0.05f, sfWhite);
-                draw_line(data.camera, NULL, vec(pos.x, pos.y - 0.2f), 
+                draw_line(game_data->camera, NULL, vec(pos.x, pos.y - 0.2f), 
                     vec(pos.x, pos.y + 0.2f), 0.05f, sfWhite);
             }
             break;
         case TOOL_OBJECT: {
-            draw_rectangle_outline(data.camera, NULL, mouse_grid,
+            draw_rectangle_outline(game_data->camera, NULL, mouse_grid,
                 selected_object_width, selected_object_height, 0.0f, 0.05f, sfWhite);
             break;
         } case TOOL_PREFAB:
-            draw_rectangle_outline(data.camera, NULL, mouse_grid_center,
+            draw_rectangle_outline(game_data->camera, NULL, mouse_grid_center,
                 1.0f, 1.0f, 0.0f, 0.05f, sfWhite);
             break;
     }
@@ -854,17 +850,17 @@ void draw_editor(GameData data, sfRenderWindow* window) {
             ColliderComponent* collider = ColliderComponent_get(i);
             if (image) {
                 if (image->layer > LAYER_WALLS) {
-                    draw_sprite(data.camera, image->sprite, pos, angle, image->scale, 
+                    draw_sprite(game_data->camera, image->sprite, pos, angle, image->scale, 
                         SHADER_OUTLINE);
                 } else {
-                    draw_rectangle_outline(data.camera, NULL, pos, image->width, 
+                    draw_rectangle_outline(game_data->camera, NULL, pos, image->width, 
                         image->height, angle, 0.05f, sfWhite);
                 }
             } else if (collider) {
-                draw_rectangle_outline(data.camera, NULL, pos, collider->width, 
+                draw_rectangle_outline(game_data->camera, NULL, pos, collider->width, 
                     collider->height, angle, 0.05f, sfWhite);
             } else {
-                draw_circle(data.camera, NULL, pos, 0.1f, sfWhite);
+                draw_circle(game_data->camera, NULL, pos, 0.1f, sfWhite);
             }
 
             if (WaypointComponent_get(i)) {
@@ -873,13 +869,13 @@ void draw_editor(GameData data, sfRenderWindow* window) {
         }
     }
 
-    draw_waypoints(data.camera, waypoint_selected);
+    draw_waypoints(game_data->camera, waypoint_selected);
 
-    draw_spawners(window, data);
+    draw_spawners(game_window, *game_data);
 
-    draw_tutorials(window, data);
+    draw_tutorials(game_window, *game_data);
 
-    draw_widgets(data.menu_camera);
+    draw_widgets(game_data->menu_camera);
 
-    draw_circle(data.camera, NULL, mouse_pos, 0.1f, sfWhite);
+    draw_circle(game_data->camera, NULL, mouse_pos, 0.1f, sfWhite);
 }

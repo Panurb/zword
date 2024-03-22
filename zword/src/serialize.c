@@ -801,7 +801,7 @@ void update_deserialized_ids(int ids[MAX_ENTITIES]) {
 }
 
 
-cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
+cJSON* serialize_entities(List* entities, sfVector2f offset) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         serialized_ids[i] = NULL;
     }
@@ -816,7 +816,7 @@ cJSON* serialize_entities(GameData* data, List* entities, sfVector2f offset) {
     ListNode* node;
     FOREACH(node, entities) {
         int i = node->value;
-        if (serialize_entity(entities_json, data->components, i, id, offset)) {
+        if (serialize_entity(entities_json, game_data->components, i, id, offset)) {
             ids[i] = id;
             id++;
         }

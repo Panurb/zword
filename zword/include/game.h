@@ -83,8 +83,8 @@ void draw_game_over(GameData data, sfRenderWindow* window);
 
 void draw_game_mode(GameData data, sfRenderWindow* window);
 
-int create_tutorial(ComponentData* components, sfVector2f position);
+int create_tutorial(sfVector2f position);
 
-int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height);
+int create_level_end(sfVector2f position, float angle, float width, float height);
 
 void draw_tutorials(sfRenderWindow* window, GameData data);

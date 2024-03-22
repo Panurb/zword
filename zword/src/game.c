@@ -503,7 +503,7 @@ void draw_game_over(GameData data, sfRenderWindow* window) {
 }
 
 
-int create_tutorial(ComponentData* components, sfVector2f position) {
+int create_tutorial(sfVector2f position) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, 0.0f);
     ColliderComponent_add_circle(entity, 1.0f, GROUP_CORPSES);
@@ -513,7 +513,7 @@ int create_tutorial(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height) {
+int create_level_end(sfVector2f position, float angle, float width, float height) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, angle);
     ColliderComponent* collider = ColliderComponent_add_rectangle(entity, width, height, GROUP_WALLS);

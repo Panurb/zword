@@ -20,7 +20,7 @@
 #include "input.h"
 
 
-int create_bench(ComponentData* components, sfVector2f position, float angle) {
+int create_bench(sfVector2f position, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "bench", 1.0f, 3.0f, LAYER_ITEMS);
@@ -48,7 +48,7 @@ int create_bench(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-int create_table(ComponentData* components, sfVector2f position) {
+int create_table(sfVector2f position) {
     int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "table", 3.0f, 3.0f, LAYER_ITEMS)->alpha = 1.0f;
@@ -76,7 +76,7 @@ int create_table(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_hay_bale(ComponentData* components, sfVector2f position, float angle) {
+int create_hay_bale(sfVector2f position, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
@@ -88,7 +88,7 @@ int create_hay_bale(ComponentData* components, sfVector2f position, float angle)
 }
 
 
-int create_stove(ComponentData* components, sfVector2f position, float angle) {
+int create_stove(sfVector2f position, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
@@ -101,7 +101,7 @@ int create_stove(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-int create_sink(ComponentData* components, sfVector2f position, float angle) {
+int create_sink(sfVector2f position, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
@@ -114,7 +114,7 @@ int create_sink(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-int create_toilet(ComponentData* components, sfVector2f position, float angle) {
+int create_toilet(sfVector2f position, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
@@ -127,7 +127,7 @@ int create_toilet(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-int create_bed(ComponentData* components, sfVector2f position, float angle) {
+int create_bed(sfVector2f position, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
@@ -140,7 +140,7 @@ int create_bed(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-int create_candle(ComponentData* components, sfVector2f pos) {
+int create_candle(sfVector2f pos) {
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, rand_angle());
@@ -154,7 +154,7 @@ int create_candle(ComponentData* components, sfVector2f pos) {
 }
 
 
-int create_lamp(ComponentData* components, sfVector2f position) {
+int create_lamp(sfVector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
@@ -168,7 +168,7 @@ int create_lamp(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_desk(ComponentData* components, sfVector2f position, float angle) {
+int create_desk(sfVector2f position, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, angle);
@@ -197,7 +197,7 @@ int create_desk(ComponentData* components, sfVector2f position, float angle) {
 }
 
 
-int create_fire(ComponentData* components, sfVector2f pos) {
+int create_fire(sfVector2f pos) {
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, 0.0);
@@ -213,7 +213,7 @@ int create_fire(ComponentData* components, sfVector2f pos) {
 }
 
 
-int create_tree(ComponentData* components, sfVector2f position) {
+int create_tree(sfVector2f position) {
     int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());    
     float size = randf(1.0f, 1.5f);
@@ -224,7 +224,7 @@ int create_tree(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_rock(ComponentData* components, sfVector2f position) {
+int create_rock(sfVector2f position) {
     int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     float size = randf(0.75f, 2.0f);
@@ -235,7 +235,7 @@ int create_rock(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_uranium(ComponentData* components, sfVector2f position) {
+int create_uranium(sfVector2f position) {
     int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     float r = randf(0.8f, 1.2f);
@@ -255,32 +255,32 @@ int create_uranium(ComponentData* components, sfVector2f position) {
 }
 
 
-int create_object(ComponentData* components, ButtonText object_name, sfVector2f position, float angle) {
+int create_object(ButtonText object_name, sfVector2f position, float angle) {
     #define MATCH(x) if (strcmp(x, object_name) == 0)
 
     MATCH("bandage") return create_bandage(position);
-    MATCH("bed") return create_bed(components, position, angle);
-    MATCH("bench") return create_bench(components, position, angle);
+    MATCH("bed") return create_bed(position, angle);
+    MATCH("bench") return create_bench(position, angle);
     MATCH("blood") return create_decal(position, "blood", -1);
-    MATCH("candle") return create_candle(components, position);
-    MATCH("car") return create_car(components, position, angle);
-    MATCH("desk") return create_desk(components, position, angle);
+    MATCH("candle") return create_candle(position);
+    MATCH("car") return create_car(position, angle);
+    MATCH("desk") return create_desk(position, angle);
     MATCH("door") return create_door(position, angle);
-    MATCH("fire") return create_fire(components, position);
+    MATCH("fire") return create_fire(position);
     MATCH("flashlight") return create_flashlight(position);
     MATCH("gas") return create_gas(position);
-    MATCH("hay bale") return create_hay_bale(components, position, angle);
+    MATCH("hay bale") return create_hay_bale(position, angle);
     MATCH("hole") return create_decal(position, "hole", -1);
-    MATCH("lamp") return create_lamp(components, position);
+    MATCH("lamp") return create_lamp(position);
     MATCH("player") return create_player(position, angle);
-    MATCH("rock") return create_rock(components, position);
-    MATCH("stove") return create_stove(components, position, angle);
-    MATCH("sink") return create_sink(components, position, angle);
-    MATCH("table") return create_table(components, position);
-    MATCH("toilet") return create_toilet(components, position, angle);
-    MATCH("uranium") return create_uranium(components, position);
-    MATCH("tree") return create_tree(components, position);
-    MATCH("tutorial") create_tutorial(components, position);
+    MATCH("rock") return create_rock(position);
+    MATCH("stove") return create_stove(position, angle);
+    MATCH("sink") return create_sink(position, angle);
+    MATCH("table") return create_table(position);
+    MATCH("toilet") return create_toilet(position, angle);
+    MATCH("uranium") return create_uranium(position);
+    MATCH("tree") return create_tree(position);
+    MATCH("tutorial") create_tutorial(position);
     MATCH("waypoint") return create_waypoint(position);
 
     MATCH("big boy") return create_big_boy(position, angle);

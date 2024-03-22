@@ -74,8 +74,6 @@ int main() {
     create_game(mode);
     create_menu();
 
-    ButtonText buffer;
-
     sfMusic* music = sfMusic_createFromFile("data/music/zsong.ogg");
     bool music_playing = false;
     sfMusic_setLoop(music, true);
@@ -120,7 +118,7 @@ int main() {
                     }
                 default:
                     if (game_state == STATE_EDITOR) {
-                        input_editor(game_data, game_window, event);
+                        input_editor(event);
                     }
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
                         input_menu(game_data->menu_camera, event);
@@ -230,7 +228,7 @@ int main() {
                 draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_EDITOR:
-                draw_editor(*game_data, game_window);
+                draw_editor();
                 draw_hud(game_data->components, game_window, game_data->camera);
                 break;
             case STATE_GAME_OVER:

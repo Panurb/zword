@@ -378,7 +378,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 break;
             case PLAYER_DRIVE:
                 if (controller.buttons_pressed[BUTTON_A]) {
-                    exit_vehicle(components, i);
+                    exit_vehicle(i);
                     player->state = PLAYER_ON_FOOT;
                 }
 
@@ -393,7 +393,7 @@ void input(ComponentData* components, sfRenderWindow* window, int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_A]) {
-                    exit_vehicle(components, i);
+                    exit_vehicle(i);
                     player->state = PLAYER_ON_FOOT;
                 }
 

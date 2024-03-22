@@ -201,16 +201,16 @@ void update_players(float time_step) {
 
                 break;
             case PLAYER_ENTER:
-                if (!enter_vehicle(game_data->components, game_data->grid, i)) {
+                if (!enter_vehicle(i)) {
                     player->state = PLAYER_ON_FOOT;
                 }
                 break;
             case PLAYER_DRIVE:
                 if (player->controller.joystick == -1) {
-                    drive_vehicle(game_data->components, i, sign(left_stick.y), sign(left_stick.x));
+                    drive_vehicle(i, sign(left_stick.y), sign(left_stick.x));
                 } else {
                     float gas = player->controller.right_trigger - player->controller.left_trigger;
-                    drive_vehicle(game_data->components, i, gas, left_stick.x);
+                    drive_vehicle(i, gas, left_stick.x);
                 }
 
                 alert_enemies(i, 10.0f);
