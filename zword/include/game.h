@@ -22,9 +22,6 @@ typedef enum {
 } GameState;
 
 
-extern GameState game_state;
-
-
 typedef enum {
     MODE_SURVIVAL,
     MODE_CAMPAIGN,
@@ -54,36 +51,40 @@ typedef struct {
 } GameData;
 
 
+// Globals
+extern GameState game_state;
 extern GameData* game_data;
+extern sfRenderWindow* game_window;
+
 
 void change_state_win();
 
 void create_game(sfVideoMode mode);
 
-void resize_game(GameData* data, sfVideoMode mode);
+void resize_game(sfVideoMode mode);
 
-void start_game(GameData* data, Filename map_name);
+void start_game(Filename map_name);
 
-void end_game(GameData* data);
+void end_game();
 
-void reset_game(GameData data);
+void reset_game();
 
-void update_game(GameData data, float time_step);
+void update_game(float time_step);
 
-void update_game_mode(GameData data, float time_step);
+void update_game_mode(float time_step);
 
-void draw_game(GameData data, sfRenderWindow* window);
+void draw_game();
 
-void draw_debug(GameData data, sfRenderWindow* window, int debug_level);
+void draw_debug(int debug_level);
 
-void update_game_over(GameData data, sfRenderWindow* window, float time_step);
+void update_game_over(float time_step);
 
-void draw_game_over(GameData data, sfRenderWindow* window);
+void draw_game_over();
 
-void draw_game_mode(GameData data, sfRenderWindow* window);
+void draw_game_mode();
 
-int create_tutorial(ComponentData* components, sfVector2f position);
+int create_tutorial(sfVector2f position);
 
-int create_level_end(ComponentData* components, sfVector2f position, float angle, float width, float height);
+int create_level_end(sfVector2f position, float angle, float width, float height);
 
-void draw_tutorials(sfRenderWindow* window, GameData data);
+void draw_tutorials();

@@ -27,12 +27,12 @@ typedef sfSoundBuffer* SoundArray[100];
 
 sfSoundBuffer** load_sounds();
 
-void add_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch);
+void add_sound(int entity, Filename filename, float volume, float pitch);
 
-void loop_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch);
+void loop_sound(int entity, Filename filename, float volume, float pitch);
 
-void stop_loop(ComponentData* components, int entity);
+void stop_loop(int entity);
 
-void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSound* channels[MAX_SOUNDS]);
+void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]);
 
 void clear_sounds(sfSound* channels[MAX_SOUNDS]);

@@ -5,24 +5,18 @@
 #include "game.h"
 
 
-void get_map_name(GameData* data, ButtonText buffer);
+void create_menu();
 
-void create_menu(GameData data);
+void destroy_menu();
 
-void destroy_menu(GameData data);
+void create_pause_menu();
 
-void create_pause_menu(GameData* data);
+void update_menu();
 
-void update_menu(GameData data, sfRenderWindow* window);
+void input_menu(int camera, sfEvent event);
 
-void input_menu(ComponentData* components, int camera, sfEvent event);
+void draw_menu();
 
-void draw_menu(GameData data, sfRenderWindow* window);
+void create_game_over_menu();
 
-void update_widgets(ComponentData* components, sfRenderWindow* window, int camera);
-
-void draw_widgets(ComponentData* components, sfRenderWindow* window, int camera);
-
-void create_game_over_menu(GameData data);
-
-void create_win_menu(GameData data);
+void create_win_menu();

@@ -5,16 +5,12 @@
 #include "component.h"
 
 
-void input(ComponentData* component, sfRenderWindow* window, int camera);
+int create_player(sfVector2f pos, float angle);
 
-int create_player(ComponentData* components, sfVector2f pos, float angle);
+int get_slot(int i, int size);
 
-int get_slot(ComponentData* components, int i, int size);
+int get_attachment(int i);
 
-int get_attachment(ComponentData* components, int i);
+void update_players(float time_step);
 
-void update_players(ComponentData* components, ColliderGrid* grid, float time_step);
-
-void draw_players(ComponentData* components, sfRenderWindow* window, int camera);
-
-void add_money(ComponentData* components, int entity, int amount);
+void add_money(int entity, int amount);

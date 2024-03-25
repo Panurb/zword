@@ -13,37 +13,37 @@
 #include "health.h"
 
 
-void apply_force(ComponentData* components, int entity, sfVector2f force) {
-    PhysicsComponent* physics = PhysicsComponent_get(components, entity);
+void apply_force(int entity, sfVector2f force) {
+    PhysicsComponent* physics = PhysicsComponent_get(entity);
 
     sfVector2f a = mult(1.0f / physics->mass, force);
     physics->acceleration = sum(physics->acceleration, a);
 }
 
 
-void update(ComponentData* components, float time_step, ColliderGrid* grid) {
-    for (int i = 0; i < components->entities; i++) {
-        PhysicsComponent* physics = PhysicsComponent_get(components, i);
+void update_physics(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        PhysicsComponent* physics = PhysicsComponent_get(i);
         if (!physics) continue;
 
-        ColliderComponent* col = ColliderComponent_get(components, i);
+        ColliderComponent* col = ColliderComponent_get(i);
 
         physics->lifetime -= time_step;
         if (physics->lifetime <= 0.0f) {
             if (col) {
-                clear_grid(components, grid, i);
+                clear_grid(i);
             }
-            remove_children(components, i);
-            destroy_entity(components, i);
+            remove_children(i);
+            destroy_entity(i);
             continue;
         } else if (physics->lifetime <= 1.0f) {
-            ImageComponent* image = ImageComponent_get(components, i);
+            ImageComponent* image = ImageComponent_get(i);
             if (image) {
                 image->alpha = physics->lifetime;
             }
         }
 
-        CoordinateComponent* coord = CoordinateComponent_get(components, i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         if (coord->parent != -1) continue;
 
         if (physics->collision.entities->size > 0) {
@@ -53,15 +53,15 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             sfVector2f v_t = diff(physics->velocity, v_n);
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0f - physics->friction, v_t));
 
-            blunt_damage(components, grid, i, v_n);
+            blunt_damage(i, v_n);
         }
 
         sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
         float delta_angle = time_step * physics->angular_velocity;
 
-        JointComponent* joint = JointComponent_get(components, i);
+        JointComponent* joint = JointComponent_get(i);
         if (joint && joint->parent != -1) {
-            sfVector2f r = diff(get_position(components, joint->parent), get_position(components, i));
+            sfVector2f r = diff(get_position(joint->parent), get_position(i));
             float d = norm(r);
 
             sfVector2f f = zeros();
@@ -74,21 +74,21 @@ void update(ComponentData* components, float time_step, ColliderGrid* grid) {
             
             delta_angle = angle_diff(polar_angle(r), coord->angle);
 
-            float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(components, joint->parent)));
+            float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(joint->parent)));
             if (fabsf(angle) > joint->max_angle) {
-                r = polar_to_cartesian(d, get_angle(components, joint->parent) - sign(angle) * joint->max_angle);
-                delta_pos = sum(delta_pos, diff(diff(get_position(components, joint->parent), r), coord->position));
+                r = polar_to_cartesian(d, get_angle(joint->parent) - sign(angle) * joint->max_angle);
+                delta_pos = sum(delta_pos, diff(diff(get_position(joint->parent), r), coord->position));
             }
         }
 
         bool moved = col && col->enabled && (non_zero(delta_pos) || delta_angle != 0.0f);
         if (moved) {
-            clear_grid(components, grid, i);
+            clear_grid(i);
         }
         coord->position = sum(coord->position, delta_pos);
         coord->angle = mod(coord->angle + delta_angle, 2.0f * M_PI);
         if (moved) {
-            update_grid(components, grid, i);
+            update_grid(i);
         }
 
         sfVector2f v_hat = normalized(physics->velocity);

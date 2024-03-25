@@ -35,21 +35,21 @@ ColliderGrid* ColliderGrid_create();
 
 void ColliderGrid_clear(ColliderGrid* grid);
 
-sfVector2i world_to_grid(ColliderGrid* grid, sfVector2f position);
+sfVector2i world_to_grid(sfVector2f position);
 
-List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius);
+List* get_entities(sfVector2f origin, float radius);
 
-void update_grid(ComponentData* components, ColliderGrid* grid, int i);
+void update_grid(int i);
 
-void init_grid(ComponentData* components, ColliderGrid* grid);
+void init_grid();
 
-void clear_grid(ComponentData* components, ColliderGrid* grid, int i);
+void clear_grid(int i);
 
-Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i);
+Bounds get_bounds(int i);
 
-void get_neighbors(ComponentData* components, ColliderGrid* grid, int i, int entities[100]);
+void get_neighbors(int i, int entities[100]);
 
-void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, float tile_width, float tile_height);
+void draw_grid(int camera, float tile_width, float tile_height);
 
 sfVector2f snap_to_grid(sfVector2f vector, float tile_width, float tile_height);
 

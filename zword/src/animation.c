@@ -4,6 +4,7 @@
 #include "component.h"
 #include "animation.h"
 #include "image.h"
+#include "game.h"
 
 
 int animation_frames(Filename image) {
@@ -21,25 +22,25 @@ int animation_frames(Filename image) {
 }
 
 
-void animate(ComponentData* components, float time_step) {
-    for (int i = 0; i < components->entities; i++) {
-        ImageComponent* image = ImageComponent_get(components, i);
+void animate(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ImageComponent* image = ImageComponent_get(i);
         if (!image) continue;
 
         image->stretch_speed -= 5.0f * image->stretch + 0.1f * image->stretch_speed;
         image->stretch += image->stretch_speed * time_step;
 
-        AnimationComponent* animation = AnimationComponent_get(components, i);
+        AnimationComponent* animation = AnimationComponent_get(i);
         if (!animation) continue;
 
-        PhysicsComponent* physics = PhysicsComponent_get(components, i);
+        PhysicsComponent* physics = PhysicsComponent_get(i);
         if (physics) {
             animation->framerate = physics->speed;
         }
 
-        JointComponent* joint = JointComponent_get(components, i);
+        JointComponent* joint = JointComponent_get(i);
         if (joint) {
-            animation->framerate = AnimationComponent_get(components, joint->parent)->framerate;
+            animation->framerate = AnimationComponent_get(joint->parent)->framerate;
         }
 
         if (animation->framerate == 0.0f) continue;
@@ -65,8 +66,8 @@ void animate(ComponentData* components, float time_step) {
 }
 
 
-void stop_animation(ComponentData* components, int entity) {
-    AnimationComponent* animation = AnimationComponent_get(components, entity);
+void stop_animation(int entity) {
+    AnimationComponent* animation = AnimationComponent_get(entity);
     animation->current_frame = 0;
     animation->framerate = 0.0f;
     animation->timer = 0.0f;

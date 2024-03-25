@@ -9,24 +9,22 @@
 #include "game.h"
 
 
-void update_enemies(ComponentData* component, ColliderGrid* grid, float time_step);
+void update_enemies(float time_step);
 
-int create_zombie(ComponentData* component, sfVector2f pos, float angle);
+int create_zombie(sfVector2f pos, float angle);
 
-int create_farmer(ComponentData* component, sfVector2f pos, float angle);
+int create_farmer(sfVector2f pos, float angle);
 
-int create_priest(ComponentData* components, sfVector2f pos, float angle);
+int create_priest(sfVector2f pos, float angle);
 
-int create_big_boy(ComponentData* components, sfVector2f pos, float angle);
+int create_big_boy(sfVector2f pos, float angle);
 
-int create_boss(ComponentData* components, sfVector2f pos, float angle);
+int create_boss(sfVector2f pos, float angle);
 
-void draw_enemies(ComponentData* component, sfRenderWindow* window, int camera);
+void draw_enemies(int camera);
 
-void alert_enemies(ComponentData* components, ColliderGrid* grid, int player, float range);
+void alert_enemies(int player, float range);
 
-void create_spawner(ComponentData* components, sfVector2f position, float angle, float width, float height);
-
-int spawn_enemies(ComponentData* components, ColliderGrid* grid, int camera, float time_step, int max_enemies);
+void create_spawner(sfVector2f position, float angle, float width, float height);
 
 void draw_spawners(sfRenderWindow* window, GameData data);

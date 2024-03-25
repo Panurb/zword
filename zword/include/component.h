@@ -403,8 +403,8 @@ typedef enum {
 
 typedef struct ComponentData ComponentData;
 
-typedef void (*OnClick)(ComponentData*, int);
-typedef void (*OnChange)(ComponentData*, int, int);
+typedef void (*OnClick)(int);
+typedef void (*OnChange)(int, int);
 
 typedef struct {
     bool enabled;
@@ -462,105 +462,105 @@ struct ComponentData {
 
 ComponentData* ComponentData_create();
 
-CoordinateComponent* CoordinateComponent_add(ComponentData* components, int entity, sfVector2f pos, float angle);
-CoordinateComponent* CoordinateComponent_get(ComponentData* components, int entity);
-void CoordinateComponent_remove(ComponentData* components, int entity);
+CoordinateComponent* CoordinateComponent_add(int entity, sfVector2f pos, float angle);
+CoordinateComponent* CoordinateComponent_get(int entity);
+void CoordinateComponent_remove(int entity);
 
-ImageComponent* ImageComponent_add(ComponentData* components, int entity, Filename filename, float width, float height, Layer layer);
-ImageComponent* ImageComponent_get(ComponentData* components, int entity);
-void ImageComponent_remove(ComponentData* components, int entity);
+ImageComponent* ImageComponent_add(int entity, Filename filename, float width, float height, Layer layer);
+ImageComponent* ImageComponent_get(int entity);
+void ImageComponent_remove(int entity);
 
-PhysicsComponent* PhysicsComponent_add(ComponentData* components, int entity, float mass);
-PhysicsComponent* PhysicsComponent_get(ComponentData* components, int entity);
-void PhysicsComponent_remove(ComponentData* components, int entity);
+PhysicsComponent* PhysicsComponent_add(int entity, float mass);
+PhysicsComponent* PhysicsComponent_get(int entity);
+void PhysicsComponent_remove(int entity);
 
-ColliderComponent* ColliderComponent_add_circle(ComponentData* components, int entity, float radius, ColliderGroup group);
-ColliderComponent* ColliderComponent_add_rectangle(ComponentData* components, int entity, float width, float height, ColliderGroup group);
-ColliderComponent* ColliderComponent_get(ComponentData* components, int entity);
-void ColliderComponent_remove(ComponentData* components, int entity);
+ColliderComponent* ColliderComponent_add_circle(int entity, float radius, ColliderGroup group);
+ColliderComponent* ColliderComponent_add_rectangle(int entity, float width, float height, ColliderGroup group);
+ColliderComponent* ColliderComponent_get(int entity);
+void ColliderComponent_remove(int entity);
 
-PlayerComponent* PlayerComponent_add(ComponentData* components, int entity, int joystick);
-PlayerComponent* PlayerComponent_get(ComponentData* components, int entity);
-void PlayerComponent_remove(ComponentData* components, int entity);
+PlayerComponent* PlayerComponent_add(int entity, int joystick);
+PlayerComponent* PlayerComponent_get(int entity);
+void PlayerComponent_remove(int entity);
 
-LightComponent* LightComponent_add(ComponentData* components, int entity, float range, float angle, sfColor color, float brightness, float speed);
-LightComponent* LightComponent_get(ComponentData* components, int entity);
-void LightComponent_remove(ComponentData* components, int entity);
+LightComponent* LightComponent_add(int entity, float range, float angle, sfColor color, float brightness, float speed);
+LightComponent* LightComponent_get(int entity);
+void LightComponent_remove(int entity);
 
-EnemyComponent* EnemyComponent_add(ComponentData* components, int entity);
-EnemyComponent* EnemyComponent_get(ComponentData* components, int entity);
-void EnemyComponent_remove(ComponentData* components, int entity);
+EnemyComponent* EnemyComponent_add(int entity);
+EnemyComponent* EnemyComponent_get(int entity);
+void EnemyComponent_remove(int entity);
 
-ParticleComponent* ParticleComponent_add(ComponentData* components, int entity, float angle, float spread, float start_size, float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color);
-ParticleComponent* ParticleComponent_get(ComponentData* components, int entity);
-void ParticleComponent_remove(ComponentData* components, int entity);
+ParticleComponent* ParticleComponent_add(int entity, float angle, float spread, float start_size, float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color);
+ParticleComponent* ParticleComponent_get(int entity);
+void ParticleComponent_remove(int entity);
 
-VehicleComponent* VehicleComponent_add(ComponentData* components, int entity, float max_fuel);
-VehicleComponent* VehicleComponent_get(ComponentData* components, int entity);
-void VehicleComponent_remove(ComponentData* components, int entity);
+VehicleComponent* VehicleComponent_add(int entity, float max_fuel);
+VehicleComponent* VehicleComponent_get(int entity);
+void VehicleComponent_remove(int entity);
 
-WeaponComponent* WeaponComponent_add(ComponentData* components, int entity, float fire_rate, int damage, int shots, float spread, int magazine, float recoil, float range, float reload_time, AmmoType ammo_type, Filename sound);
-WeaponComponent* WeaponComponent_get(ComponentData* components, int entity);
-void WeaponComponent_remove(ComponentData* components, int entity);
+WeaponComponent* WeaponComponent_add(int entity, float fire_rate, int damage, int shots, float spread, int magazine, float recoil, float range, float reload_time, AmmoType ammo_type, Filename sound);
+WeaponComponent* WeaponComponent_get(int entity);
+void WeaponComponent_remove(int entity);
 
-ItemComponent* ItemComponent_add(ComponentData* components, int entity, int size, int price, ButtonText name);
-ItemComponent* ItemComponent_get(ComponentData* components, int entity);
-void ItemComponent_remove(ComponentData* components, int entity);
+ItemComponent* ItemComponent_add(int entity, int size, int price, ButtonText name);
+ItemComponent* ItemComponent_get(int entity);
+void ItemComponent_remove(int entity);
 
-WaypointComponent* WaypointComponent_add(ComponentData* components, int entity);
-WaypointComponent* WaypointComponent_get(ComponentData* components, int entity);
-void WaypointComponent_remove(ComponentData* components, int entity);
+WaypointComponent* WaypointComponent_add(int entity);
+WaypointComponent* WaypointComponent_get(int entity);
+void WaypointComponent_remove(int entity);
 
-HealthComponent* HealthComponent_add(ComponentData* components, int entity, int health, Filename dead_image, Filename decal, Filename die_sound);
-HealthComponent* HealthComponent_get(ComponentData* components, int entity);
-void HealthComponent_remove(ComponentData* components, int entity);
+HealthComponent* HealthComponent_add(int entity, int health, Filename dead_image, Filename decal, Filename die_sound);
+HealthComponent* HealthComponent_get(int entity);
+void HealthComponent_remove(int entity);
 
-CameraComponent* CameraComponent_add(ComponentData* components, int entity, sfVector2i resolution, float zoom);
-CameraComponent* CameraComponent_get(ComponentData* components, int entity);
-void CameraComponent_remove(ComponentData* components, int entity);
+CameraComponent* CameraComponent_add(int entity, sfVector2i resolution, float zoom);
+CameraComponent* CameraComponent_get(int entity);
+void CameraComponent_remove(int entity);
 
-RoadComponent* RoadComponent_add(ComponentData* components, int entity, float width, Filename filename);
-RoadComponent* RoadComponent_get(ComponentData* components, int entity);
-void RoadComponent_remove(ComponentData* components, int entity);
+RoadComponent* RoadComponent_add(int entity, float width, Filename filename);
+RoadComponent* RoadComponent_get(int entity);
+void RoadComponent_remove(int entity);
 
-SoundComponent* SoundComponent_add(ComponentData* components, int entity, Filename hit_sound);
-SoundComponent* SoundComponent_get(ComponentData* components, int entity);
-void SoundComponent_remove(ComponentData* components, int entity);
+SoundComponent* SoundComponent_add(int entity, Filename hit_sound);
+SoundComponent* SoundComponent_get(int entity);
+void SoundComponent_remove(int entity);
 
-AmmoComponent* AmmoComponent_add(ComponentData* components, int entity, AmmoType type);
-AmmoComponent* AmmoComponent_get(ComponentData* components, int entity);
-void AmmoComponent_remove(ComponentData* components, int entity);
+AmmoComponent* AmmoComponent_add(int entity, AmmoType type);
+AmmoComponent* AmmoComponent_get(int entity);
+void AmmoComponent_remove(int entity);
 
-AnimationComponent* AnimationComponent_add(ComponentData* components, int entity, int frames);
-AnimationComponent* AnimationComponent_get(ComponentData* components, int entity);
-void AnimationComponent_remove(ComponentData* components, int entity);
+AnimationComponent* AnimationComponent_add(int entity, int frames);
+AnimationComponent* AnimationComponent_get(int entity);
+void AnimationComponent_remove(int entity);
 
-DoorComponent* DoorComponent_add(ComponentData* components, int entity, int price);
-DoorComponent* DoorComponent_get(ComponentData* components, int entity);
-void DoorComponent_remove(ComponentData* components, int entity);
+DoorComponent* DoorComponent_add(int entity, int price);
+DoorComponent* DoorComponent_get(int entity);
+void DoorComponent_remove(int entity);
 
-JointComponent* JointComponent_add(ComponentData* components, int entity, int parent, float min_length, float max_length, float strength);
-JointComponent* JointComponent_get(ComponentData* components, int entity);
-void JointComponent_remove(ComponentData* components, int entity);
+JointComponent* JointComponent_add(int entity, int parent, float min_length, float max_length, float strength);
+JointComponent* JointComponent_get(int entity);
+void JointComponent_remove(int entity);
 
-WidgetComponent* WidgetComponent_add(ComponentData* components, int entity, ButtonText text, WidgetType type);
-WidgetComponent* WidgetComponent_get(ComponentData* components, int entity);
-void WidgetComponent_remove(ComponentData* components, int entity);
+WidgetComponent* WidgetComponent_add(int entity, ButtonText text, WidgetType type);
+WidgetComponent* WidgetComponent_get(int entity);
+void WidgetComponent_remove(int entity);
 
-TextComponent* TextComponent_add(ComponentData* components, int entity, String string, int size, sfColor color);
-TextComponent* TextComponent_get(ComponentData* components, int entity);
-void TextComponent_remove(ComponentData* components, int entity);
+TextComponent* TextComponent_add(int entity, String string, int size, sfColor color);
+TextComponent* TextComponent_get(int entity);
+void TextComponent_remove(int entity);
 
-int create_entity(ComponentData* components);
-void destroy_entity(ComponentData* components, int i);
-void destroy_entity_recursive(ComponentData* components, int entity);
-int get_root(ComponentData* components, int entity);
-void add_child(ComponentData* components, int parent, int child);
-void remove_children(ComponentData* components, int parent);
+int create_entity();
+void destroy_entity(int i);
+void destroy_entity_recursive(int entity);
+int get_root(int entity);
+void add_child(int parent, int child);
+void remove_children(int parent);
 
-void ComponentData_clear(ComponentData* components);
+void ComponentData_clear();
 
-sfVector2f get_position(ComponentData* components, int i);
-float get_angle(ComponentData* components, int i);
+sfVector2f get_position(int i);
+float get_angle(int i);
 
-bool entity_exists(ComponentData* components, int entity);
+bool entity_exists(int entity);

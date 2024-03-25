@@ -11,6 +11,7 @@
 #include "util.h"
 #include "component.h"
 #include "settings.h"
+#include "game.h"
 
 
 static const char* SOUNDS[] = {
@@ -54,8 +55,8 @@ int sound_index(Filename filename) {
 }
 
 
-void add_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch) {
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+void add_sound(int entity, Filename filename, float volume, float pitch) {
+    SoundComponent* scomp = SoundComponent_get(entity);
     for (int i = 0; i < scomp->size; i++) {
         if (!scomp->events[i]) {
             SoundEvent* event = malloc(sizeof(SoundEvent));
@@ -71,8 +72,8 @@ void add_sound(ComponentData* components, int entity, Filename filename, float v
 }
 
 
-void loop_sound(ComponentData* components, int entity, Filename filename, float volume, float pitch) {
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+void loop_sound(int entity, Filename filename, float volume, float pitch) {
+    SoundComponent* scomp = SoundComponent_get(entity);
     for (int i = 0; i < scomp->size; i++) {
         if (!scomp->events[i]) {
             SoundEvent* event = malloc(sizeof(SoundEvent));
@@ -88,8 +89,8 @@ void loop_sound(ComponentData* components, int entity, Filename filename, float 
 }
 
 
-void stop_loop(ComponentData* components, int entity) {
-    SoundComponent* scomp = SoundComponent_get(components, entity);
+void stop_loop(int entity) {
+    SoundComponent* scomp = SoundComponent_get(entity);
     for (int i = 0; i < scomp->size; i++) {
         SoundEvent* event = scomp->events[i];
         if (event) {
@@ -101,16 +102,16 @@ void stop_loop(ComponentData* components, int entity) {
 }
 
 
-void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSound* channels[MAX_SOUNDS]) {
-    for (int i = 0; i < components->entities; i++) {
-        SoundComponent* scomp = SoundComponent_get(components, i);
+void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        SoundComponent* scomp = SoundComponent_get(i);
         if (!scomp) continue;
 
-        float dist = norm(diff(get_position(components, i), get_position(components, camera)));
+        float dist = norm(diff(get_position(i), get_position(camera)));
 
         if (scomp->loop_sound[0] != '\0') {
             if (!scomp->events[0]) {
-                loop_sound(components, i, scomp->loop_sound, 0.5f, 1.0f);
+                loop_sound(i, scomp->loop_sound, 0.5f, 1.0f);
             }
         }
 
@@ -132,7 +133,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
             sfSound* channel = channels[chan];
 
             float vol = event->volume;
-            CameraComponent* cam = CameraComponent_get(components, camera);
+            CameraComponent* cam = CameraComponent_get(camera);
             float radius = 0.5f * cam->resolution.x / cam->zoom;
             if (dist > radius) {
                 vol = expf(-(dist - radius)) * event->volume;
@@ -155,7 +156,7 @@ void play_sounds(ComponentData* components, int camera, SoundArray sounds, sfSou
                     }
                 }
             } else {
-                sfSound_setBuffer(channel, sounds[sound_index(event->filename)]);
+                sfSound_setBuffer(channel, game_data->sounds[sound_index(event->filename)]);
                 sfSound_setLoop(channel, event->loop);
                 sfSound_play(channel);
 

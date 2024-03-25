@@ -36,26 +36,26 @@ static const int COLLISION_MATRIX[18][18] = { { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                               { 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } };   // ENERGY
 
 
-bool point_inside_collider(ComponentData* components, int i, sfVector2f point);
+bool point_inside_collider(int i, sfVector2f point);
 
-void get_corners(ComponentData* components, int i, sfVector2f* corners) ;
+void get_corners(int i, sfVector2f* corners) ;
 
-sfVector2f half_width(ComponentData* components, int i);
+sfVector2f half_width(int i);
 
-sfVector2f half_height(ComponentData* components, int i);
+sfVector2f half_height(int i);
 
-float axis_half_width(ComponentData* component, int i, sfVector2f axis);
+float axis_half_width(int i, sfVector2f axis);
 
-sfVector2f overlap_rectangle_rectangle(ComponentData* components, int i, int j);
+sfVector2f overlap_rectangle_rectangle(int i, int j);
 
-sfVector2f overlap_collider_collider(ComponentData* components, int i, int j);
+sfVector2f overlap_collider_collider(int i, int j);
 
-sfVector2f overlap_rectangle_image(ComponentData* components, int i, int j);
+sfVector2f overlap_rectangle_image(int i, int j);
 
-bool collides_with(ComponentData* components, ColliderGrid* grid, int entity, List* entities);
+bool collides_with(int entity, List* entities);
 
-void collide(ComponentData* component, ColliderGrid* collision_grid);
+void collide();
 
-void draw_occupied_tiles(ComponentData* components, ColliderGrid* grid, sfRenderWindow* window, int camera);
+void draw_occupied_tiles(int camera);
 
-void draw_colliders(ComponentData* component, sfRenderWindow* window, int camera);
+void draw_colliders(int camera);

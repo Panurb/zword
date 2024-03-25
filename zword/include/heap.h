@@ -10,11 +10,9 @@
 typedef struct {
     int array[MAX_HEAP_SIZE];
     int size;
-    ComponentData* component;
-    int start;
 } Heap;
 
-Heap* Heap_create(ComponentData* component);
+Heap* Heap_create();
 
 void Heap_destroy(Heap* heap);
 

@@ -54,4 +54,4 @@ char* action_to_keybind(char* action);
 
 void replace_actions(String output, String input);
 
-void input(ComponentData* components, sfRenderWindow* window, int camera);
+void input(int camera);

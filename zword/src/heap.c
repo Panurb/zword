@@ -27,8 +27,10 @@ void swap(Heap* heap, int i, int j) {
 }
 
 
-bool compare(Heap* heap, int i, int j) {
-    return heap->component->waypoint[i]->f_score < heap->component->waypoint[j]->f_score;
+bool compare(int i, int j) {
+    WaypointComponent* wi = WaypointComponent_get(i);
+    WaypointComponent* wj = WaypointComponent_get(j);
+    return wi->f_score < wj->f_score;
 }
 
 
@@ -37,11 +39,11 @@ void heapify(Heap* heap, int i) {
     int r = right(i);
     int smallest = i;
 
-    if (l <= heap->size && compare(heap, heap->array[l], heap->array[i])) {
+    if (l <= heap->size && compare(heap->array[l], heap->array[i])) {
         smallest = l;
     }
 
-    if (r <= heap->size && compare(heap, heap->array[r], heap->array[smallest])) {
+    if (r <= heap->size && compare(heap->array[r], heap->array[smallest])) {
         smallest = r;
     }
 
@@ -52,10 +54,9 @@ void heapify(Heap* heap, int i) {
 }
 
 
-Heap* Heap_create(ComponentData* component) {
+Heap* Heap_create() {
     Heap* heap = malloc(sizeof(Heap));
     heap->size = 0;
-    heap->component = component;
     return heap;
 }
 
@@ -69,7 +70,7 @@ void Heap_insert(Heap* heap, int key) {
     heap->size++;
 
     int i = heap->size;
-    while(i > 1 && compare(heap, key, heap->array[parent(i)])) {
+    while(i > 1 && compare(key, heap->array[parent(i)])) {
         heap->array[i] = heap->array[parent(i)];
         i = parent(i);
     }

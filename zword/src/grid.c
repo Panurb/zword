@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "level.h"
 #include "list.h"
+#include "game.h"
 
 
 ColliderGrid* ColliderGrid_create() {
@@ -40,22 +41,22 @@ void ColliderGrid_clear(ColliderGrid* grid) {
 }
 
 
-sfVector2i world_to_grid(ColliderGrid* grid, sfVector2f position) {
-    int x = floorf((position.x + 0.5 * grid->width) / grid->tile_width);
-    int y = floorf((position.y + 0.5 * grid->height) / grid->tile_height);
+sfVector2i world_to_grid(sfVector2f position) {
+    int x = floorf((position.x + 0.5 * game_data->grid->width) / game_data->grid->tile_width);
+    int y = floorf((position.y + 0.5 * game_data->grid->height) / game_data->grid->tile_height);
     
     return (sfVector2i) { x, y };
 }
 
 
-Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
-    sfVector2f pos = get_position(components, i);
+Bounds get_bounds(int i) {
+    sfVector2f pos = get_position(i);
     
-    float x = (pos.x + 0.5 * grid->width) / grid->tile_width;
-    float y = (pos.y + 0.5 * grid->height) / grid->tile_height;
+    float x = (pos.x + 0.5 * game_data->grid->width) / game_data->grid->tile_width;
+    float y = (pos.y + 0.5 * game_data->grid->height) / game_data->grid->tile_height;
 
-    float w = axis_half_width(components, i, (sfVector2f) { 1.0, 0.0 }) / grid->tile_width;
-    float h = axis_half_width(components, i, (sfVector2f) { 0.0, 1.0 }) / grid->tile_height;
+    float w = axis_half_width(i, (sfVector2f) { 1.0, 0.0 }) / game_data->grid->tile_width;
+    float h = axis_half_width(i, (sfVector2f) { 0.0, 1.0 }) / game_data->grid->tile_height;
 
     Bounds bounds;
     bounds.left = maxi(0, floorf(x - w));
@@ -67,25 +68,25 @@ Bounds get_bounds(ComponentData* components, ColliderGrid* grid, int i) {
 }
 
 
-List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f origin, float radius) {
+List* get_entities(sfVector2f origin, float radius) {
     List* list = List_create();
 
     static int id = 2 * MAX_ENTITIES;
     id = (id < 3 * MAX_ENTITIES) ? id + 1 : 2 * MAX_ENTITIES;
 
-    float x = (origin.x + 0.5f * grid->width) / grid->tile_width;
-    float y = (origin.y + 0.5f * grid->height) / grid->tile_height;
-    float r = radius / grid->tile_width;
+    float x = (origin.x + 0.5f * game_data->grid->width) / game_data->grid->tile_width;
+    float y = (origin.y + 0.5f * game_data->grid->height) / game_data->grid->tile_height;
+    float r = radius / game_data->grid->tile_width;
       
-    for (int i = maxi(0, x - r); i <= mini(grid->columns - 1, x + r); i++) {
-        for (int j = maxi(0, y - r); j <= mini(grid->rows - 1, y + r); j++) {
-            for (ListNode* node = grid->array[i][j]->head; node; node = node->next) {
+    for (int i = maxi(0, x - r); i <= mini(game_data->grid->columns - 1, x + r); i++) {
+        for (int j = maxi(0, y - r); j <= mini(game_data->grid->rows - 1, y + r); j++) {
+            for (ListNode* node = game_data->grid->array[i][j]->head; node; node = node->next) {
                 int n = node->value;
 
-                ColliderComponent* col = ColliderComponent_get(components, n);
+                ColliderComponent* col = ColliderComponent_get(n);
                 if (col->last_collision == id) continue;
 
-                if (dist(origin, get_position(components, n)) <= radius) {
+                if (dist(origin, get_position(n)) <= radius) {
                     List_add(list, n);
                 }
 
@@ -98,51 +99,51 @@ List* get_entities(ComponentData* components, ColliderGrid* grid, sfVector2f ori
 }
 
 
-void update_grid(ComponentData* components, ColliderGrid* grid, int entity) {
-    Bounds bounds = get_bounds(components, grid, entity);
+void update_grid(int entity) {
+    Bounds bounds = get_bounds(entity);
 
     for (int i = bounds.left; i <= bounds.right; i++) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
-            List_add(grid->array[i][j], entity);
+            List_add(game_data->grid->array[i][j], entity);
         }
     }
 }
 
 
-void init_grid(ComponentData* components, ColliderGrid* grid) {
-    for (int i = 0; i < components->entities; i++) {
-        ColliderComponent* collider = ColliderComponent_get(components, i);
+void init_grid() {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ColliderComponent* collider = ColliderComponent_get(i);
         if (collider && collider->enabled) {
-            update_grid(components, grid, i);
+            update_grid(i);
         }
     }
 }
 
 
-void clear_grid(ComponentData* components, ColliderGrid* grid, int entity) {
-    Bounds bounds = get_bounds(components, grid, entity);
+void clear_grid(int entity) {
+    Bounds bounds = get_bounds(entity);
     
     for (int i = bounds.left; i <= bounds.right; i++) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
-            List_remove(grid->array[i][j], entity);
+            List_remove(game_data->grid->array[i][j], entity);
         }
     }
 }
 
 
-void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, int entities[100]) {
+void get_neighbors(int entity, int entities[100]) {
     int id = 2 * MAX_ENTITIES + 2;
 
-    Bounds bounds = get_bounds(components, grid, entity);
+    Bounds bounds = get_bounds(entity);
 
     int l = 0;
     for (int i = bounds.left; i <= bounds.right; i++) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
-            for (ListNode* current = grid->array[i][j]->head; current != NULL; current = current->next) {
+            for (ListNode* current = game_data->grid->array[i][j]->head; current != NULL; current = current->next) {
                 int n = current->value;
                 if (n == -1 || n == entity) continue;
 
-                ColliderComponent* col = ColliderComponent_get(components, n);
+                ColliderComponent* col = ColliderComponent_get(n);
                 if (col->last_collision == id) continue;
 
                 entities[l] = n;
@@ -155,11 +156,11 @@ void get_neighbors(ComponentData* components, ColliderGrid* grid, int entity, in
 }
 
 
-void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, float tile_width, float tile_height) {
-    CameraComponent* cam = CameraComponent_get(components, camera);
+void draw_grid(int camera, float tile_width, float tile_height) {
+    CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
-    sfVector2f pos = get_position(components, camera);
+    sfVector2f pos = get_position(camera);
     float major_lines = 16.0f;
     float left = pos.x - 0.5f * width;
     float right = pos.x + 0.5f * width;
@@ -171,12 +172,12 @@ void draw_grid(ComponentData* components, sfRenderWindow* window, int camera, fl
     
     for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
         float linewidth = mod(x, major_lines) == 0.0f ? 0.05f : 0.01f;
-        draw_line(window, components, camera, shape, vec(x, bottom), vec(x, top), linewidth, color);
+        draw_line(camera, shape, vec(x, bottom), vec(x, top), linewidth, color);
     }
 
     for (float y = bottom - mod(bottom, tile_height); y < top; y += tile_height) {
         float linewidth = mod(y, major_lines) == 0.0f ? 0.05f : 0.01f;
-        draw_line(window, components, camera, shape, vec(left, y), vec(right, y), linewidth, color);
+        draw_line(camera, shape, vec(left, y), vec(right, y), linewidth, color);
     }
     
     sfRectangleShape_destroy(shape);

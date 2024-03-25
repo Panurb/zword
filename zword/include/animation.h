@@ -4,6 +4,6 @@
 
 int animation_frames(Filename image);
 
-void animate(ComponentData* components, float time_step);
+void animate(float time_step);
 
-void stop_animation(ComponentData* components, int entity);
+void stop_animation(int entity);
