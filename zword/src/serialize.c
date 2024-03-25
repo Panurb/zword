@@ -138,7 +138,7 @@ int updated_id(int id, int ids[MAX_ENTITIES]) {
 }
 
 
-void CoordinateComponent_serialize(cJSON* entity_json, ComponentData* components, int entity,
+void CoordinateComponent_serialize(cJSON* entity_json, int entity,
         sfVector2f offset) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (!coord) return;
@@ -152,7 +152,7 @@ void CoordinateComponent_serialize(cJSON* entity_json, ComponentData* components
 }
 
 
-void CoordinateComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity,
+void CoordinateComponent_deserialize(cJSON* entity_json, int entity,
         sfVector2f offset, float rotation) {
     cJSON* coord_json = cJSON_GetObjectItem(entity_json, "Coordinate");
     sfVector2f pos;
@@ -164,7 +164,7 @@ void CoordinateComponent_deserialize(cJSON* entity_json, ComponentData* componen
 }
 
 
-void ImageComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ImageComponent_serialize(cJSON* entity_json, int entity) {
     ImageComponent* image = ImageComponent_get(entity);
     if (!image) return;
 
@@ -180,7 +180,7 @@ void ImageComponent_serialize(cJSON* entity_json, ComponentData* components, int
 }
 
 
-void ImageComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ImageComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Image");
     if (!json) return;
 
@@ -195,7 +195,7 @@ void ImageComponent_deserialize(cJSON* entity_json, ComponentData* components, i
 }
 
 
-void PhysicsComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void PhysicsComponent_serialize(cJSON* entity_json, int entity) {
     PhysicsComponent* physics = PhysicsComponent_get(entity);
     if (!physics) return;
 
@@ -213,7 +213,7 @@ void PhysicsComponent_serialize(cJSON* entity_json, ComponentData* components, i
 }
 
 
-void PhysicsComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void PhysicsComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Physics");
     if (!json) return;
 
@@ -230,7 +230,7 @@ void PhysicsComponent_deserialize(cJSON* entity_json, ComponentData* components,
 }
 
 
-void ColliderComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ColliderComponent_serialize(cJSON* entity_json, int entity) {
     ColliderComponent* collider = ColliderComponent_get(entity);
     if (!collider) return;
 
@@ -245,7 +245,7 @@ void ColliderComponent_serialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
-void ColliderComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ColliderComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Collider");
     if (!json) return;
 
@@ -264,7 +264,7 @@ void ColliderComponent_deserialize(cJSON* entity_json, ComponentData* components
 }
 
 
-void LightComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void LightComponent_serialize(cJSON* entity_json, int entity) {
     LightComponent* light = LightComponent_get(entity);
     if (!light) return;
 
@@ -282,7 +282,7 @@ void LightComponent_serialize(cJSON* entity_json, ComponentData* components, int
 }
 
 
-void LightComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void LightComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Light");
     if (!json) return;
 
@@ -300,7 +300,7 @@ void LightComponent_deserialize(cJSON* entity_json, ComponentData* components, i
 }
 
 
-void ParticleComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ParticleComponent_serialize(cJSON* entity_json, int entity) {
     ParticleComponent* particle = ParticleComponent_get(entity);
     if (!particle) return;
 
@@ -327,7 +327,7 @@ void ParticleComponent_serialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
-void ParticleComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ParticleComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Particle");
     if (!json) return;
 
@@ -360,7 +360,7 @@ void ParticleComponent_deserialize(cJSON* entity_json, ComponentData* components
 }
 
 
-void JointComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void JointComponent_serialize(cJSON* entity_json, int entity) {
     JointComponent* joint = JointComponent_get(entity);
     if (!joint) return;
 
@@ -374,7 +374,7 @@ void JointComponent_serialize(cJSON* entity_json, ComponentData* components, int
 }
 
 
-void JointComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void JointComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Joint");
     if (!json) return;
 
@@ -388,7 +388,7 @@ void JointComponent_deserialize(cJSON* entity_json, ComponentData* components, i
 }
 
 
-void WaypointComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void WaypointComponent_serialize(cJSON* entity_json, int entity) {
     WaypointComponent* waypoint = WaypointComponent_get(entity);
     if (!waypoint) return;
 
@@ -397,14 +397,14 @@ void WaypointComponent_serialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
-void WaypointComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void WaypointComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Waypoint");
     if (!json) return;
 
     WaypointComponent_add(entity);
 }
 
-void PlayerComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void PlayerComponent_serialize(cJSON* entity_json, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
     if (!player) return;
 
@@ -419,7 +419,7 @@ void PlayerComponent_serialize(cJSON* entity_json, ComponentData* components, in
     serialize_int(json, "money", player->money, 0);
 }
 
-void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void PlayerComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Player");
     if (!json) return;
 
@@ -434,7 +434,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
-void EnemyComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void EnemyComponent_serialize(cJSON* entity_json, int entity) {
     EnemyComponent* enemy = EnemyComponent_get(entity);
     if (!enemy) return;
 
@@ -453,7 +453,7 @@ void EnemyComponent_serialize(cJSON* entity_json, ComponentData* components, int
 }
 
 
-void EnemyComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void EnemyComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Enemy");
     if (!json) return;
 
@@ -471,7 +471,7 @@ void EnemyComponent_deserialize(cJSON* entity_json, ComponentData* components, i
 }
 
 
-void HealthComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void HealthComponent_serialize(cJSON* entity_json, int entity) {
     HealthComponent* health = HealthComponent_get(entity);
     if (!health) return;
 
@@ -484,7 +484,7 @@ void HealthComponent_serialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
-void HealthComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void HealthComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Health");
     if (!json) return;
 
@@ -496,7 +496,7 @@ void HealthComponent_deserialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
-void SoundComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void SoundComponent_serialize(cJSON* entity_json, int entity) {
     SoundComponent* sound = SoundComponent_get(entity);
     if (!sound) return;
 
@@ -511,7 +511,7 @@ void SoundComponent_serialize(cJSON* entity_json, ComponentData* components, int
 }
 
 
-void SoundComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void SoundComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Sound");
     if (!json) return;
 
@@ -530,7 +530,7 @@ void SoundComponent_deserialize(cJSON* entity_json, ComponentData* components, i
 }
 
 
-void WeaponComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void WeaponComponent_serialize(cJSON* entity_json, int entity) {
     WeaponComponent* weapon = WeaponComponent_get(entity);
     if (!weapon) return;
 
@@ -553,7 +553,7 @@ void WeaponComponent_serialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
-void WeaponComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void WeaponComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Weapon");
     if (!json) return;
 
@@ -576,7 +576,7 @@ void WeaponComponent_deserialize(cJSON* entity_json, ComponentData* components, 
 }
 
 
-void ItemComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ItemComponent_serialize(cJSON* entity_json, int entity) {
     ItemComponent* item = ItemComponent_get(entity);
     if (!item) return;
 
@@ -594,7 +594,7 @@ void ItemComponent_serialize(cJSON* entity_json, ComponentData* components, int 
 }
 
 
-void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void ItemComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Item");
     if (!json) return;
 
@@ -613,7 +613,7 @@ void ItemComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
-void AnimationComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void AnimationComponent_serialize(cJSON* entity_json, int entity) {
     AnimationComponent* animation = AnimationComponent_get(entity);
     if (!animation) return;
 
@@ -627,7 +627,7 @@ void AnimationComponent_serialize(cJSON* entity_json, ComponentData* components,
 }
 
 
-void AnimationComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void AnimationComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Animation");
     if (!json) return;
 
@@ -640,7 +640,7 @@ void AnimationComponent_deserialize(cJSON* entity_json, ComponentData* component
 }
 
 
-void AmmoComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void AmmoComponent_serialize(cJSON* entity_json, int entity) {
     AmmoComponent* ammo = AmmoComponent_get(entity);
     if (!ammo) return;
 
@@ -651,7 +651,7 @@ void AmmoComponent_serialize(cJSON* entity_json, ComponentData* components, int 
 }
 
 
-void AmmoComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void AmmoComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Ammo");
     if (!json) return;
 
@@ -661,7 +661,7 @@ void AmmoComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
-void DoorComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void DoorComponent_serialize(cJSON* entity_json, int entity) {
     DoorComponent* door = DoorComponent_get(entity);
     if (!door) return;
 
@@ -672,7 +672,7 @@ void DoorComponent_serialize(cJSON* entity_json, ComponentData* components, int 
 }
 
 
-void DoorComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void DoorComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Ammo");
     if (!json) return;
 
@@ -682,7 +682,7 @@ void DoorComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
-void TextComponent_serialize(cJSON* entity_json, ComponentData* components, int entity) {
+void TextComponent_serialize(cJSON* entity_json, int entity) {
     TextComponent* text = TextComponent_get(entity);
     if (!text) return;
 
@@ -696,7 +696,7 @@ void TextComponent_serialize(cJSON* entity_json, ComponentData* components, int 
 }
 
 
-void TextComponent_deserialize(cJSON* entity_json, ComponentData* components, int entity) {
+void TextComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Text");
     if (!json) return;
 
@@ -710,7 +710,7 @@ void TextComponent_deserialize(cJSON* entity_json, ComponentData* components, in
 }
 
 
-bool serialize_entity(cJSON* entities_json, ComponentData* components, int entity, int id,
+bool serialize_entity(cJSON* entities_json, int entity, int id,
         sfVector2f offset) {
     if (!CoordinateComponent_get(entity)) return false;
     if (WidgetComponent_get(entity)) return false;
@@ -720,31 +720,31 @@ bool serialize_entity(cJSON* entities_json, ComponentData* components, int entit
     cJSON_AddItemToArray(entities_json, json);
     cJSON_AddNumberToObject(json, "id", id);
 
-    CoordinateComponent_serialize(json, components, entity, offset);
-    ImageComponent_serialize(json, components, entity);
-    PhysicsComponent_serialize(json, components, entity);
-    ColliderComponent_serialize(json, components, entity);
-    PlayerComponent_serialize(json, components, entity);
-    LightComponent_serialize(json, components, entity);
-    EnemyComponent_serialize(json, components, entity);
-    ParticleComponent_serialize(json, components, entity);
+    CoordinateComponent_serialize(json, entity, offset);
+    ImageComponent_serialize(json, entity);
+    PhysicsComponent_serialize(json, entity);
+    ColliderComponent_serialize(json, entity);
+    PlayerComponent_serialize(json, entity);
+    LightComponent_serialize(json, entity);
+    EnemyComponent_serialize(json, entity);
+    ParticleComponent_serialize(json, entity);
     // TODO: vehicle
-    WeaponComponent_serialize(json, components, entity);
-    ItemComponent_serialize(json, components, entity);
-    WaypointComponent_serialize(json, components, entity);
-    HealthComponent_serialize(json, components, entity);
+    WeaponComponent_serialize(json, entity);
+    ItemComponent_serialize(json, entity);
+    WaypointComponent_serialize(json, entity);
+    HealthComponent_serialize(json, entity);
     // TODO: road
-    SoundComponent_serialize(json, components, entity);
-    AmmoComponent_serialize(json, components, entity);
-    AnimationComponent_serialize(json, components, entity);
-    JointComponent_serialize(json, components, entity);
-    TextComponent_serialize(json, components, entity);
+    SoundComponent_serialize(json, entity);
+    AmmoComponent_serialize(json, entity);
+    AnimationComponent_serialize(json, entity);
+    JointComponent_serialize(json, entity);
+    TextComponent_serialize(json, entity);
 
     return true;
 }
 
 
-int deserialize_entity(cJSON* entity_json, ComponentData* components, bool preserve_id,
+int deserialize_entity(cJSON* entity_json, bool preserve_id,
         sfVector2f offset, float rotation) {
     int entity;
     if (preserve_id) {
@@ -752,28 +752,28 @@ int deserialize_entity(cJSON* entity_json, ComponentData* components, bool prese
         if (CoordinateComponent_get(entity)) {
             destroy_entity(entity);
         }
-        components->entities = max(entity, components->entities);
+        game_data->components->entities = max(entity, game_data->components->entities);
     } else {
         entity = create_entity();
     }
 
-    CoordinateComponent_deserialize(entity_json, components, entity, offset, rotation);
-    ImageComponent_deserialize(entity_json, components, entity);
-    PhysicsComponent_deserialize(entity_json, components, entity);
-    ColliderComponent_deserialize(entity_json, components, entity);
-    PlayerComponent_deserialize(entity_json, components, entity);
-    LightComponent_deserialize(entity_json, components, entity);
-    EnemyComponent_deserialize(entity_json, components, entity);
-    ParticleComponent_deserialize(entity_json, components, entity);
-    WeaponComponent_deserialize(entity_json, components, entity);
-    ItemComponent_deserialize(entity_json, components, entity);
-    WaypointComponent_deserialize(entity_json, components, entity);
-    HealthComponent_deserialize(entity_json, components, entity);
-    SoundComponent_deserialize(entity_json, components, entity);
-    AmmoComponent_deserialize(entity_json, components, entity);
-    AnimationComponent_deserialize(entity_json, components, entity);
-    JointComponent_deserialize(entity_json, components, entity);
-    TextComponent_deserialize(entity_json, components, entity);
+    CoordinateComponent_deserialize(entity_json, entity, offset, rotation);
+    ImageComponent_deserialize(entity_json, entity);
+    PhysicsComponent_deserialize(entity_json, entity);
+    ColliderComponent_deserialize(entity_json, entity);
+    PlayerComponent_deserialize(entity_json, entity);
+    LightComponent_deserialize(entity_json, entity);
+    EnemyComponent_deserialize(entity_json, entity);
+    ParticleComponent_deserialize(entity_json, entity);
+    WeaponComponent_deserialize(entity_json, entity);
+    ItemComponent_deserialize(entity_json, entity);
+    WaypointComponent_deserialize(entity_json, entity);
+    HealthComponent_deserialize(entity_json, entity);
+    SoundComponent_deserialize(entity_json, entity);
+    AmmoComponent_deserialize(entity_json, entity);
+    AnimationComponent_deserialize(entity_json, entity);
+    JointComponent_deserialize(entity_json, entity);
+    TextComponent_deserialize(entity_json, entity);
 
     return entity;
 }
@@ -816,7 +816,7 @@ cJSON* serialize_entities(List* entities, sfVector2f offset) {
     ListNode* node;
     FOREACH(node, entities) {
         int i = node->value;
-        if (serialize_entity(entities_json, game_data->components, i, id, offset)) {
+        if (serialize_entity(entities_json, i, id, offset)) {
             ids[i] = id;
             id++;
         }
@@ -828,7 +828,7 @@ cJSON* serialize_entities(List* entities, sfVector2f offset) {
 }
 
 
-void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
+void serialize_map(cJSON* json, bool preserve_id) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         serialized_ids[i] = NULL;
     }
@@ -839,11 +839,11 @@ void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
     int ids[MAX_ENTITIES];
     int id = 0;
     sfVector2f offset = zeros();
-    for (int i = 0; i < components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         if (preserve_id) {
-            serialize_entity(entities_json, components, i, i, offset);
+            serialize_entity(entities_json, i, i, offset);
         } else {
-            if (serialize_entity(entities_json, components, i, id, offset)) {
+            if (serialize_entity(entities_json, i, id, offset)) {
                 ids[i] = id;
                 id++;
             }
@@ -856,7 +856,7 @@ void serialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
 }
 
 
-void deserialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
+void deserialize_map(cJSON* json, bool preserve_id) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         deserialized_ids[i] = NULL;
     }
@@ -873,7 +873,7 @@ void deserialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
         if (!preserve_id) {
             i = cJSON_GetObjectItem(entity, "id")->valueint;
         }
-        ids[i] = deserialize_entity(entity, components, preserve_id, offset, 0.0f);
+        ids[i] = deserialize_entity(entity, preserve_id, offset, 0.0f);
     }
 
     if (!preserve_id) {
@@ -890,19 +890,19 @@ void deserialize_map(cJSON* json, ComponentData* components, bool preserve_id) {
 }
 
 
-cJSON* serialize_game(GameData* data, bool preserve_id) {
+cJSON* serialize_game(bool preserve_id) {
     cJSON* json = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(json, "game_mode", data->game_mode);
-    cJSON_AddNumberToObject(json, "ambient_light", data->ambient_light);
+    cJSON_AddNumberToObject(json, "game_mode", game_data->game_mode);
+    cJSON_AddNumberToObject(json, "ambient_light", game_data->ambient_light);
 
-    serialize_map(json, data->components, preserve_id);
+    serialize_map(json, preserve_id);
 
     return json;
 }
 
 
-void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float rotation) {
+void deserialize_entities(cJSON* json, sfVector2f offset, float rotation) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         deserialized_ids[i] = NULL;
     }
@@ -912,7 +912,7 @@ void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float 
     int ids[MAX_ENTITIES];
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
-        ids[n] = deserialize_entity(entity, data->components, false, offset, rotation);
+        ids[n] = deserialize_entity(entity, false, offset, rotation);
         update_grid(ids[n]);
         n++;
     }
@@ -921,12 +921,12 @@ void deserialize_entities(cJSON* json, GameData* data, sfVector2f offset, float 
 }
 
 
-void deserialize_game(cJSON* json, GameData* data, bool preserve_id) {
+void deserialize_game(cJSON* json, bool preserve_id) {
     game_data->game_mode = deserialize_int(json, "game_mode", game_data->game_mode);
     printf("Game mode: %d\n", game_data->game_mode);
     game_data->ambient_light = deserialize_float(json, "ambient_light", game_data->ambient_light);
     printf("Ambient light: %f\n", game_data->ambient_light);
-    deserialize_map(json, data->components, preserve_id);
+    deserialize_map(json, preserve_id);
 }
 
 
@@ -972,19 +972,19 @@ cJSON* load_json(Filename directory, Filename filename) {
 }
 
 
-void save_game(GameData* data, ButtonText map_name) {
-    cJSON* json = serialize_game(data, false);
+void save_game(ButtonText map_name) {
+    cJSON* json = serialize_game(false);
     save_json(json, "maps", map_name);
     cJSON_Delete(json);
 }
 
 
-void load_game(GameData* data, ButtonText map_name) {
+void load_game(ButtonText map_name) {
     cJSON* json = load_json("maps", map_name);
     if (json) {
-        strcpy(data->map_name, map_name);
-        deserialize_game(json, data, false);
+        strcpy(game_data->map_name, map_name);
+        deserialize_game(json, false);
         cJSON_Delete(json);
-        strcpy(data->map_name, map_name);
+        strcpy(game_data->map_name, map_name);
     }
 }

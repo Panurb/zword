@@ -179,7 +179,7 @@ void replace_actions(String output, String input) {
 }
 
 
-void update_controller(ComponentData* components, sfRenderWindow* window, int camera, int i) {
+void update_controller(int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(i);
     int joystick = player->controller.joystick;
 
@@ -200,7 +200,7 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
         }
         player->controller.left_stick = normalized(left_stick);
 
-        sfVector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) window));
+        sfVector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
         right_stick = diff(mouse, get_position(i));
         player->controller.right_stick = normalized(right_stick);
 
@@ -308,14 +308,14 @@ void update_controller(ComponentData* components, sfRenderWindow* window, int ca
 }
 
 
-void input(ComponentData* components, sfRenderWindow* window, int camera) {
+void input(int camera) {
     sfJoystick_update();
 
-    for (int i = 0; i < components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;
 
-        update_controller(components, window, camera, i);
+        update_controller(camera, i);
         Controller controller = player->controller;
 
         WeaponComponent* weapon = WeaponComponent_get(player->inventory[player->item]);

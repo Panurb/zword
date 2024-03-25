@@ -149,7 +149,7 @@ int main() {
                         game_state = STATE_START;
                         break;
                     case STATE_GAME:
-                        input(game_data->components, game_window, game_data->camera);
+                        input(game_data->camera);
                         update_game(time_step);
                         update_game_mode(*game_data, time_step);
                         break;
@@ -172,7 +172,7 @@ int main() {
                     case STATE_LOAD:
                         destroy_menu();
                         create_editor_menu();
-                        load_game(game_data, game_data->map_name);
+                        load_game(game_data->map_name);
                         game_state = STATE_EDITOR;
                         break;
                     case STATE_EDITOR:

@@ -377,7 +377,7 @@ void save_prefab(Filename filename) {
     center = snap_to_grid_center(center, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     center = mult(-1.0f, center);
 
-    cJSON* json = serialize_entities(game_data->components, selections, center);
+    cJSON* json = serialize_entities(selections, center);
 
     save_json(json, "prefabs", filename);
     cJSON_Delete(json);
@@ -387,7 +387,7 @@ void save_prefab(Filename filename) {
 void load_prefab(GameData* data, Filename filename, sfVector2f position, float angle) {
     cJSON* json = load_json("prefabs", filename);
 
-    deserialize_entities(json, data, position, angle);
+    deserialize_entities(json, position, angle);
 
     cJSON_Delete(json);
 }
@@ -490,7 +490,7 @@ void update_selections() {
 
 void save_map(int entity) {
     UNUSED(entity);
-    save_game(game_data, game_data->map_name);
+    save_game(game_data->map_name);
 }
 
 

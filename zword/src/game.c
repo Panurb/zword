@@ -161,7 +161,7 @@ void start_game(GameData* data, Filename map_name) {
     create_pause_menu(data);
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);
-    load_game(data, map_name);
+    load_game(map_name);
 
     init_grid(data->components, data->grid);
 
