@@ -5,9 +5,10 @@
 
 #include "player.h"
 #include "weapon.h"
+#include "game.h"
 
 
-void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
+void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
     sfVector2f pos = get_position(entity);
 
@@ -46,10 +47,10 @@ void draw_menu_slot(ComponentData* components, sfRenderWindow* window, int camer
 }
 
 
-void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, int atch, float offset, float alpha) {
+void draw_menu_attachment(int camera, int entity, int slot, int atch, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
     sfVector2f pos = get_position(entity);
-    ItemComponent* item = components->item[player->inventory[slot]];
+    ItemComponent* item = ItemComponent_get(player->inventory[slot]);
 
     float gap = 0.2;
     float slice = (2 * M_PI / player->inventory_size);
@@ -79,7 +80,7 @@ void draw_menu_attachment(ComponentData* components, sfRenderWindow* window, int
 }
 
 
-void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camera, int entity, int slot, float offset, float alpha) {
+void draw_ammo_slot(int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
     sfVector2f pos = get_position(entity);
 
@@ -111,7 +112,7 @@ void draw_ammo_slot(ComponentData* components, sfRenderWindow* window, int camer
 }
 
 
-void draw_ammo_menu(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+void draw_ammo_menu(int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
 
     int slot = get_slot(entity, player->ammo_size - 1);
@@ -119,12 +120,12 @@ void draw_ammo_menu(ComponentData* components, sfRenderWindow* window, int camer
     for (int i = 0; i < player->ammo_size - 1; i++) {
         float offset = (i == slot) ? 0.2f : 0.0f;
         float alpha = (player->ammo[i] == 0) ? 0.25f : 0.5f;
-        draw_ammo_slot(components, window, camera, entity, i, offset, alpha);
+        draw_ammo_slot(camera, entity, i, offset, alpha);
     }
 }
 
 
-void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+void draw_item_use(int camera, int entity) {
     sfVector2f position = get_position(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
     int i = player->inventory[player->item];
@@ -136,7 +137,7 @@ void draw_item_use(ComponentData* components, sfRenderWindow* window, int camera
 }
 
 
-void draw_money(ComponentData* components, sfRenderWindow* window, int camera, int entity) {
+void draw_money(int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
     sfVector2f position = sum(get_position(entity), 
         vec(0.0f, (1.0f - player->money_timer) * sign(player->money_increment)));
@@ -150,8 +151,8 @@ void draw_money(ComponentData* components, sfRenderWindow* window, int camera, i
 }
 
 
-void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
-    for (int i = 0; i < components->entities; i++) {
+void draw_hud(int camera) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         if (!CoordinateComponent_get(i)) continue;
 
         sfVector2f position = get_position(i);
@@ -176,12 +177,12 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
         int item = player->inventory[player->item];
         WeaponComponent* weapon = NULL;
         if (item != -1) {
-            weapon = components->weapon[item];
+            weapon = WeaponComponent_get(item);
         }
 
         sfVector2f pos;
         if (player->controller.joystick == -1) {
-            pos = screen_to_world(camera, sfMouse_getPosition((sfWindow*) window));
+            pos = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
         } else {
             pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(i));
             pos = sum(position, pos);
@@ -205,7 +206,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 draw_slice(camera, NULL, 50, position, 0.5f, 0.6f, M_PI_2 - 0.5f * x, x, sfRed);
             }
 
-            draw_money(components, window, camera, i);
+            draw_money(camera, i);
         }
 
         char buffer[128];
@@ -215,7 +216,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
             case PLAYER_PICK_UP:
                 break;
             case PLAYER_SHOOT:
-                draw_item_use(components, window, camera, i);
+                draw_item_use(camera, i);
                 break;
             case PLAYER_RELOAD:
                 sfConvexShape_setFillColor(player->shape, sfWhite);
@@ -257,10 +258,10 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                         alpha = 0.0;
                     }
                         
-                    draw_menu_slot(components, window, camera, i, j, offset, alpha);
+                    draw_menu_slot(camera, i, j, offset, alpha);
 
                     if (player->inventory[j] != -1) {
-                        ItemComponent* item = components->item[player->inventory[j]];
+                        ItemComponent* item = game_data->components->item[player->inventory[j]];
                         for (int k = 0; k < item->size; k++) {
                             if (j == slot) {
                                 offset = 0.2;
@@ -269,7 +270,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                                 }
                             }
 
-                            draw_menu_attachment(components, window, camera, i, j, k, offset, alpha);
+                            draw_menu_attachment(camera, i, j, k, offset, alpha);
                         }
                     }
                 }
@@ -279,7 +280,7 @@ void draw_hud(ComponentData* components, sfRenderWindow* window, int camera) {
                 snprintf(buffer, 128, "%d", player->money);
                 draw_text(camera, NULL, position, buffer, 20, sfYellow);
                 
-                draw_ammo_menu(components, window, camera, i);
+                draw_ammo_menu(camera, i);
                 break;
             case PLAYER_DEAD:
                 break;

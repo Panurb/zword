@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_C_FLAGS "-g -Wall -Wextra --pedantic -Wno-deprecated-declarations -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "-g -Wall -Wextra --pedantic -Wno-deprecated-declarations")
 
 project(zword C)
 

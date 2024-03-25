@@ -384,7 +384,7 @@ void save_prefab(Filename filename) {
 }
 
 
-void load_prefab(GameData* data, Filename filename, sfVector2f position, float angle) {
+void load_prefab(Filename filename, sfVector2f position, float angle) {
     cJSON* json = load_json("prefabs", filename);
 
     deserialize_entities(json, position, angle);
@@ -393,7 +393,7 @@ void load_prefab(GameData* data, Filename filename, sfVector2f position, float a
 }
 
 
-void move_selections(GameData* data, sfVector2f delta_pos) {
+void move_selections(sfVector2f delta_pos) {
     if (non_zero(delta_pos)) {
         ListNode* node;
         FOREACH (node, selections) {
@@ -412,9 +412,9 @@ void move_selections(GameData* data, sfVector2f delta_pos) {
 }
 
 
-void rotate_selections(GameData* data) {
+void rotate_selections() {
     // TODO: snap to grid after rotation
-    sfVector2f center = get_selections_center(data->components);
+    sfVector2f center = get_selections_center();
 
     ListNode* node;
     FOREACH (node, selections) {
@@ -437,7 +437,7 @@ void rotate_selections(GameData* data) {
 }
 
 
-void destroy_selections(GameData* data) {
+void destroy_selections() {
     ListNode* node;
     FOREACH (node, selections) {
         int i = node->value;
@@ -568,7 +568,7 @@ void input_tool_select(sfEvent event) {
             sfVector2f delta_pos = vec(dx, dy);
             tile_start = sum(tile_start, vec(dx, dy));
 
-            move_selections(game_data, delta_pos);
+            move_selections(delta_pos);
         }
     } else if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
@@ -624,16 +624,16 @@ void input_tool_select(sfEvent event) {
                 save_prefab("prefab.json");
                 break;
             case sfKeyLeft:
-                move_selections(game_data, vec(-grid_sizes[grid_size_index], 0.0f));
+                move_selections(vec(-grid_sizes[grid_size_index], 0.0f));
                 break;
             case sfKeyRight:
-                move_selections(game_data, vec(grid_sizes[grid_size_index], 0.0f));
+                move_selections(vec(grid_sizes[grid_size_index], 0.0f));
                 break;
             case sfKeyDown:
-                move_selections(game_data, vec(0.0f, -grid_sizes[grid_size_index]));
+                move_selections(vec(0.0f, -grid_sizes[grid_size_index]));
                 break;
             case sfKeyUp:
-                move_selections(game_data, vec(0.0f, grid_sizes[grid_size_index]));
+                move_selections(vec(0.0f, grid_sizes[grid_size_index]));
                 break;
             default:
                 break;
@@ -695,7 +695,7 @@ void input_tool_prefab(sfEvent event) {
     if (event.type == sfEvtMouseButtonPressed) {
         if (event.mouseButton.button == sfMouseLeft) {
             sfVector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            load_prefab(game_data, prefab_name, pos, 0.0f);
+            load_prefab(prefab_name, pos, 0.0f);
         }
     }
 }

@@ -132,26 +132,26 @@ int main() {
                 elapsed_time -= time_step;
                 switch (game_state) {
                     case STATE_MENU:
-                        update_menu(*game_data, game_window);
+                        update_menu();
                         break;
                     case STATE_START:
-                        start_game(game_data, game_data->map_name);
+                        start_game(game_data->map_name);
                         game_state = STATE_GAME;
                         break;
                     case STATE_END:
-                        end_game(game_data);
+                        end_game();
                         clear_sounds(channels);
                         game_state = STATE_MENU;
                         break;
                     case STATE_RESET:
-                        end_game(game_data);
+                        end_game();
                         clear_sounds(channels);
                         game_state = STATE_START;
                         break;
                     case STATE_GAME:
                         input(game_data->camera);
                         update_game(time_step);
-                        update_game_mode(*game_data, time_step);
+                        update_game_mode(time_step);
                         break;
                     case STATE_PAUSE:
                         update_menu(game_window);
@@ -160,7 +160,7 @@ int main() {
                         if (game_settings.width != (int)mode.width || game_settings.height != (int)mode.height) {
                             sfRenderWindow_destroy(game_window);
                             create_game_window(&mode);
-                            resize_game(game_data, mode);
+                            resize_game(mode);
                         }
                         game_state = STATE_MENU;
                         break;
@@ -179,7 +179,7 @@ int main() {
                         update_editor(time_step);
                         break;
                     case STATE_GAME_OVER:
-                        update_game_over(*game_data, game_window, time_step);
+                        update_game_over(time_step);
                         break;
                     case STATE_QUIT:
                         sfRenderWindow_close(game_window);
@@ -216,30 +216,30 @@ int main() {
                 break;
             case STATE_GAME:
                 draw_game();
-                draw_hud(game_data->components, game_window, game_data->camera);
-                draw_game_mode(*game_data, game_window);
+                draw_hud(game_data->camera);
+                draw_game_mode();
                 break;
             case STATE_PAUSE:
                 draw_game();
                 draw_overlay(game_data->camera, 0.4f);
-                draw_menu(*game_data, game_window);
+                draw_menu();
                 break;
             case STATE_LOAD:
                 draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_EDITOR:
                 draw_editor();
-                draw_hud(game_data->components, game_window, game_data->camera);
+                draw_hud(game_data->camera);
                 break;
             case STATE_GAME_OVER:
-                draw_game_over(*game_data, game_window);
+                draw_game_over();
                 break;
             default:
                 break;
         }
 
         if (debug_level) {
-            draw_debug(*game_data, game_window, debug_level);
+            draw_debug(debug_level);
         }
 
         draw_fps(game_window, fps, delta_time);
