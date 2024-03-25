@@ -166,17 +166,17 @@ int main() {
                         break;
                     case STATE_CREATE:
                         destroy_menu();
-                        create_editor_menu(game_data);
+                        create_editor_menu();
                         game_state = STATE_EDITOR;
                         break;
                     case STATE_LOAD:
                         destroy_menu();
-                        create_editor_menu(game_data);
+                        create_editor_menu();
                         load_game(game_data, game_data->map_name);
                         game_state = STATE_EDITOR;
                         break;
                     case STATE_EDITOR:
-                        update_editor(*game_data, game_window, time_step);
+                        update_editor(time_step);
                         break;
                     case STATE_GAME_OVER:
                         update_game_over(*game_data, game_window, time_step);

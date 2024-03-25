@@ -450,13 +450,13 @@ void destroy_selections(GameData* data) {
 }
 
 
-void update_selections(GameData data) {
+void update_selections() {
     if (!selections) {
         selections = List_create();
     }
     List_clear(selections);
 
-    for (int i = 0; i < data.components->entities; i++) {
+    for (int i = 0; i < game_data->components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         if (!coord) continue;
         if (i == selection_box) continue;
@@ -500,10 +500,10 @@ void quit(int entity) {
 }
 
 
-void create_editor_menu(GameData* data) {
-    sfVector2f size = camera_size(data->menu_camera);
+void create_editor_menu() {
+    sfVector2f size = camera_size(game_data->menu_camera);
     sfVector2f pos = vec(0.5f * (-size.x + BUTTON_WIDTH), 0.5f * (size.y - BUTTON_HEIGHT));
-    destroy_widgets(data->components);
+    destroy_widgets();
     create_button("TILES", pos, toggle_tiles);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("OBJECTS", pos, toggle_objects);
@@ -522,24 +522,24 @@ void create_editor_menu(GameData* data) {
 }
 
 
-void update_editor(GameData data, sfRenderWindow* window, float time_step) {
+void update_editor(float time_step) {
     // update(data.time_step, data.grid);
     // collide(data.data.grid);
-    update_waypoints(data.camera);
+    update_waypoints(game_data->camera);
 
-    update_particles(data.camera, time_step);
+    update_particles(game_data->camera, time_step);
     update_lights(time_step);
-    update_camera(data.camera, time_step, false);
+    update_camera(game_data->camera, time_step, false);
 
-    draw_shadows(data.shadow_texture, data.camera);
-    draw_lights(data.light_texture, data.camera, data.ambient_light);
+    draw_shadows(game_data->shadow_texture, game_data->camera);
+    draw_lights(game_data->light_texture, game_data->camera, game_data->ambient_light);
 
     animate(time_step);
 
-    update_widgets(data.menu_camera);
+    update_widgets(game_data->menu_camera);
 
     if (selection_box != -1) {
-        update_selections(data);
+        update_selections();
     }
 
     double_click_time = fmaxf(double_click_time - time_step, 0.0f);
@@ -548,8 +548,6 @@ void update_editor(GameData data, sfRenderWindow* window, float time_step) {
 
 void input_tool_select(sfEvent event) {
     static bool grabbed = false;
-
-    ComponentData* components = game_data->components;
 
     if (event.type == sfEvtMouseMoved) {
         if (selection_box != -1) {
