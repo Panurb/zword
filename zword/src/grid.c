@@ -60,9 +60,9 @@ Bounds get_bounds(int i) {
 
     Bounds bounds;
     bounds.left = maxi(0, floorf(x - w));
-    bounds.right = mini(grid->columns - 1, floorf(x + w));
+    bounds.right = mini(game_data->grid->columns - 1, floorf(x + w));
     bounds.bottom = maxi(0, floorf(y - h));
-    bounds.top = mini(grid->rows - 1, floorf(y + h));
+    bounds.top = mini(game_data->grid->rows - 1, floorf(y + h));
 
     return bounds;
 }

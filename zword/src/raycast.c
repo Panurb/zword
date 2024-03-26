@@ -130,7 +130,7 @@ HitInfo raycast(sfVector2f start, sfVector2f velocity, float range, ColliderGrou
             y += step_y;
         }
 
-        if (min(t_max_x, t_max_y) > range) break;
+        if (mini(t_max_x, t_max_y) > range) break;
     }
 
     info.position = sum(start, mult(t_min, velocity));

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_C_FLAGS "-O3 -Wall")
+set(CMAKE_C_FLAGS "-O3 -Wall -Wno-deprecated-declarations")
 
 project(notk C)
 

@@ -273,7 +273,7 @@ void toggle_dropdown(int entity) {
     if (coord->children->size > 0) {
         close_dropdown(entity);
     } else {
-        int height = min(3, widget->max_value + 1);
+        int height = mini(3, widget->max_value + 1);
 
         int container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 1, height);
         add_child(entity, container);

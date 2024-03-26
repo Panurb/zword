@@ -256,7 +256,7 @@ void ColliderComponent_deserialize(cJSON* entity_json, int entity) {
     ColliderComponent* collider;
     if (type == COLLIDER_CIRCLE) {
         collider = ColliderComponent_add_circle(entity, 0.5f * width, group);
-    } else if (type == COLLIDER_RECTANGLE) {
+    } else {
         collider = ColliderComponent_add_rectangle(entity, width, height, group);
     }
     collider->enabled = deserialize_int(json, "enabled", collider->enabled);
@@ -752,7 +752,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id,
         if (CoordinateComponent_get(entity)) {
             destroy_entity(entity);
         }
-        game_data->components->entities = max(entity, game_data->components->entities);
+        game_data->components->entities = maxi(entity, game_data->components->entities);
     } else {
         entity = create_entity();
     }
