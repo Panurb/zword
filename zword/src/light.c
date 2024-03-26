@@ -40,7 +40,7 @@ void update_lights(float delta_time) {
 }
 
 
-void draw_shine(int camera, int entity, HitInfo info, sfVector2f velocity) {
+void draw_shine(int camera, int entity, HitInfo info, Vector2f velocity) {
     ImageComponent* image = ImageComponent_get(info.entity);
     if (!image) return;
 
@@ -75,7 +75,7 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
         ImageComponent* image = ImageComponent_get(i);
         if (!image || image->alpha == 0.0f || image->layer <= LAYER_DECALS) continue;
 
-        sfVector2f start = get_position(i);
+        Vector2f start = get_position(i);
 
         float radius = 1.5f * collider->radius;
         if (!on_screen(camera, start, 2.0f * radius, 2.0f * radius)) {
@@ -90,14 +90,14 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
                 color.a = 128;
                 v->color = color;
 
-                sfVector2f velocity = polar_to_cartesian(radius, 0.0f);
+                Vector2f velocity = polar_to_cartesian(radius, 0.0f);
 
                 float delta_angle = 2.0f * M_PI / (collider->verts_size - 2);
                 Matrix2f rot = rotation_matrix(delta_angle);
 
                 color.a = 0;
                 for (int j = 1; j < collider->verts_size; j++) {
-                    sfVector2f end = sum(start, velocity);
+                    Vector2f end = sum(start, velocity);
 
                     v = sfVertexArray_getVertex(collider->verts, j);
                     v->position = world_to_texture(camera, end);
@@ -107,13 +107,13 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
                 }
                 break;
             } case COLLIDER_RECTANGLE: {
-                sfVector2f corners[8];
+                Vector2f corners[8];
                 get_corners(i, corners);
 
                 float r = fminf(0.5f * radius, 1.0f);
                 float angle = get_angle(i);
                 for (int j = 0; j < 4; j++) {
-                    sfVector2f corner = corners[j];
+                    Vector2f corner = corners[j];
                     corners[j + 4] = sum(corner, polar_to_cartesian(r, angle + (0.25f - j * 0.5f) * M_PI));
                 }
 
@@ -156,7 +156,7 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
         LightComponent* light = LightComponent_get(i);
         if (!light) continue;
 
-        sfVector2f start = get_position(i);
+        Vector2f start = get_position(i);
 
         if (!on_screen(camera, start, 2.0f * light->range, 2.0f * light->range)) {
             continue;
@@ -178,14 +178,14 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
         v->color = color;
 
         float angle = get_angle(i) - 0.5 * light->angle;
-        sfVector2f velocity = polar_to_cartesian(1.0, angle);
+        Vector2f velocity = polar_to_cartesian(1.0, angle);
 
         float delta_angle = light->angle / (light->rays - 1);
         Matrix2f rot = rotation_matrix(delta_angle);
 
         for (int j = 1; j < light->rays + 1; j++) {
             HitInfo info = raycast(start, velocity, range, GROUP_LIGHTS);
-            sfVector2f end = info.position;
+            Vector2f end = info.position;
 
             end = sum(end, mult(0.25, velocity));
 

@@ -16,7 +16,7 @@
 #define INFINITY 10000.0
 
 
-int create_waypoint(sfVector2f pos) {
+int create_waypoint(Vector2f pos) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, 0.0);
     WaypointComponent_add(i);
@@ -98,9 +98,9 @@ bool a_star(int start, int goal, List* path) {
 
 
 float connection_distance(int i, int j) {
-    sfVector2f a = get_position(i);
-    sfVector2f b = get_position(j);
-    sfVector2f v = diff(b, a);
+    Vector2f a = get_position(i);
+    Vector2f b = get_position(j);
+    Vector2f v = diff(b, a);
     float d = norm(v);
 
     if (d > WaypointComponent_get(i)->range) {
@@ -169,7 +169,7 @@ void draw_waypoints(int camera, bool draw_neighbors) {
         if (!waypoint) continue;
         if (ImageComponent_get(i)) continue;
 
-        sfVector2f pos = get_position(i);
+        Vector2f pos = get_position(i);
         float radius = ColliderComponent_get(i)->radius;
         draw_circle(camera, shape, pos, radius, sfWhite);
 

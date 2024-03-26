@@ -10,11 +10,11 @@ void save_json(cJSON* json, Filename directory, Filename filename);
 
 cJSON* load_json(Filename directory, Filename filename);
 
-cJSON* serialize_entities(List* entities, sfVector2f offset);
+cJSON* serialize_entities(List* entities, Vector2f offset);
 
 void serialize_map(cJSON* json, bool preserve_id);
 
-void deserialize_entities(cJSON* json, sfVector2f offset, float rotation);
+void deserialize_entities(cJSON* json, Vector2f offset, float rotation);
 
 void save_game(ButtonText map_name);
 

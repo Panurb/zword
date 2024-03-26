@@ -42,7 +42,7 @@ void die(int entity) {
         for (int j = 1; j < player->ammo_size; j++) {
             AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
             while (ammo && ammo->size > 0) {
-                sfVector2f pos = get_position(entity);
+                Vector2f pos = get_position(entity);
                 int k = create_ammo(sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
                 int size = mini(AmmoComponent_get(k)->size, ammo->size);
                 AmmoComponent* drop = AmmoComponent_get(k);
@@ -96,7 +96,7 @@ void die(int entity) {
             co->position = get_position(i);
             co->angle = get_angle(i);
 
-            sfVector2f r = normalized(diff(co->position, get_position(entity)));
+            Vector2f r = normalized(diff(co->position, get_position(entity)));
             if (!non_zero(r)) {
                 r = rand_vector();
             }
@@ -118,7 +118,7 @@ void die(int entity) {
 }
 
 
-void damage(int entity, sfVector2f pos, sfVector2f dir, int dmg, int dealer) {
+void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
     HealthComponent* health = HealthComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     if (health) {
@@ -127,7 +127,7 @@ void damage(int entity, sfVector2f pos, sfVector2f dir, int dmg, int dealer) {
 
         if (health->decal[0] != '\0') {
             // TODO: use decal
-            sfVector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
+            Vector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
             if (dmg < 40) {
                 create_decal(pos, "blood", 60.0f);
             } else {
@@ -174,7 +174,7 @@ void damage(int entity, sfVector2f pos, sfVector2f dir, int dmg, int dealer) {
 }
 
 
-void blunt_damage(int entity, sfVector2f vel) {
+void blunt_damage(int entity, Vector2f vel) {
     HealthComponent* health = HealthComponent_get(entity);
     float v = norm(vel);
     if (health) {

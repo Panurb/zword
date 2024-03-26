@@ -9,7 +9,7 @@
 #include "player.h"
 
 
-int create_flashlight(sfVector2f position) {
+int create_flashlight(Vector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
@@ -24,7 +24,7 @@ int create_flashlight(sfVector2f position) {
 }
 
 
-int create_gas(sfVector2f position) {
+int create_gas(Vector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
@@ -38,7 +38,7 @@ int create_gas(sfVector2f position) {
 }
 
 
-int create_bandage(sfVector2f position) {
+int create_bandage(Vector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
@@ -54,7 +54,7 @@ int create_bandage(sfVector2f position) {
 }
 
 
-void create_item(sfVector2f position, int tier) {
+void create_item(Vector2f position, int tier) {
     switch (tier) {
         case 0:
             if (randi(0, 1) == 0) {
@@ -130,7 +130,7 @@ void pick_up_item(int entity) {
 
             player->inventory[i] = player->target;
             coord->parent = entity;
-            coord->position = (sfVector2f) { 0.75f, 0.0f };
+            coord->position = (Vector2f) { 0.75f, 0.0f };
             coord->angle = 0.0f;
             ColliderComponent_get(player->target)->enabled = false;
             change_layer(player->target, LAYER_WEAPONS);
@@ -163,7 +163,7 @@ void drop_item(int entity) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         coord->parent = -1;
 
-        sfVector2f r = polar_to_cartesian(1.0, get_angle(entity));
+        Vector2f r = polar_to_cartesian(1.0, get_angle(entity));
         coord->position = sum(get_position(entity), r);
 
         physics->velocity = mult(7.0, r);
@@ -237,7 +237,7 @@ void draw_items() {
         ImageComponent* image = ImageComponent_get(player->target);
 
         sfShader_setFloatUniform(CameraComponent_get(game_data->camera)->shaders[1], "offset", 0.05f);
-        sfVector2f pos = get_position(player->target);
+        Vector2f pos = get_position(player->target);
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
             draw_sprite(game_data->camera, image->sprite, pos, angle, image->scale, SHADER_OUTLINE);

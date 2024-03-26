@@ -30,7 +30,7 @@ void bring_to_top(int entity) {
 }
 
 
-int create_window(sfVector2f position, ButtonText text, int width, OnClick on_close) {
+int create_window(Vector2f position, ButtonText text, int width, OnClick on_close) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, width * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
@@ -43,7 +43,7 @@ int create_window(sfVector2f position, ButtonText text, int width, OnClick on_cl
 }
 
 
-int create_label(ButtonText text, sfVector2f position) {
+int create_label(ButtonText text, Vector2f position) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
@@ -53,7 +53,7 @@ int create_label(ButtonText text, sfVector2f position) {
 }
 
 
-int create_button(ButtonText text, sfVector2f position, OnClick on_click) {
+int create_button(ButtonText text, Vector2f position, OnClick on_click) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
@@ -63,7 +63,7 @@ int create_button(ButtonText text, sfVector2f position, OnClick on_click) {
 }
 
 
-int create_button_small(ButtonText text, sfVector2f position, OnClick on_click) {
+int create_button_small(ButtonText text, Vector2f position, OnClick on_click) {
     int i = create_entity();
     CoordinateComponent_add(i, sum(position, vec(0.0f, 0.25f * BORDER_WIDTH)), 0.0f);
     float height = BUTTON_HEIGHT - 0.5f * BORDER_WIDTH;
@@ -74,7 +74,7 @@ int create_button_small(ButtonText text, sfVector2f position, OnClick on_click) 
 }
 
 
-int create_container(sfVector2f position, int width, int height) {
+int create_container(Vector2f position, int width, int height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, width * BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
@@ -87,7 +87,7 @@ int create_container(sfVector2f position, int width, int height) {
 
 void increment_value(int entity, int direction) {
     WidgetComponent* button = WidgetComponent_get(entity);
-    sfVector2f v = vec(0.0f, direction * BUTTON_HEIGHT);
+    Vector2f v = vec(0.0f, direction * BUTTON_HEIGHT);
     button->value += direction;
 
     if (button->value > button->max_value) {
@@ -115,7 +115,7 @@ void increment_value(int entity, int direction) {
         CoordinateComponent* coord_child = CoordinateComponent_get(node->value);
         coord_child->position = sum(coord_child->position, v);
 
-        sfVector2f pos = coord_child->position;
+        Vector2f pos = coord_child->position;
         WidgetComponent_get(node->value)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
     }
 
@@ -144,7 +144,7 @@ void add_widget_to_container(int container, int entity) {
 
     int columns = collider->width / BUTTON_WIDTH;
     int rows = coord->children->size / columns;
-    sfVector2f pos = vec(0.0f, 0.5f * collider->height - rows * BUTTON_HEIGHT - 0.5f * BUTTON_HEIGHT);
+    Vector2f pos = vec(0.0f, 0.5f * collider->height - rows * BUTTON_HEIGHT - 0.5f * BUTTON_HEIGHT);
     CoordinateComponent* coord_child = CoordinateComponent_get(entity);
     coord_child->position = pos;
     add_child(container, entity);
@@ -171,7 +171,7 @@ void add_row_to_container(int container, int left, int right) {
 
     add_child(container, right);
     CoordinateComponent* coord_right = CoordinateComponent_get(right);
-    sfVector2f pos = sum(coord_left->position, vec(BUTTON_WIDTH, 0.0f));
+    Vector2f pos = sum(coord_left->position, vec(BUTTON_WIDTH, 0.0f));
     float height = ColliderComponent_get(container)->height;
     coord_right->position = pos;
     WidgetComponent_get(right)->enabled = (pos.y > -0.5f * height && pos.y < 0.5f * height);
@@ -261,7 +261,7 @@ void add_scrollbar_to_container(int container) {
     int parent = coord->parent;
     int height = collider->height / BUTTON_HEIGHT;
     float w = ColliderComponent_get(parent)->width;
-    sfVector2f pos = vec(0.5f * w - 0.5f * SCROLLBAR_WIDTH, -0.5f * (height + 1) * BUTTON_HEIGHT);
+    Vector2f pos = vec(0.5f * w - 0.5f * SCROLLBAR_WIDTH, -0.5f * (height + 1) * BUTTON_HEIGHT);
     int scrollbar = create_scrollbar(pos, height, widget->max_value, scroll_container);
     add_child(parent, scrollbar);
 }
@@ -291,7 +291,7 @@ void toggle_dropdown(int entity) {
 }
 
 
-int create_dropdown(sfVector2f position, ButtonText* strings, int size) {
+int create_dropdown(Vector2f position, ButtonText* strings, int size) {
     int i = create_button(strings[0], position, toggle_dropdown);
     WidgetComponent* widget = WidgetComponent_get(i);
     widget->strings = strings;
@@ -302,7 +302,7 @@ int create_dropdown(sfVector2f position, ButtonText* strings, int size) {
 }
 
 
-void set_slider(int entity, sfVector2f mouse_position) {
+void set_slider(int entity, Vector2f mouse_position) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     ColliderComponent* collider = ColliderComponent_get(entity);
     float x = mouse_position.x - get_position(entity).x + 0.5f * collider->width;
@@ -316,7 +316,7 @@ void set_slider(int entity, sfVector2f mouse_position) {
 }
 
 
-int create_slider(sfVector2f position, int min_value, int max_value, int value, 
+int create_slider(Vector2f position, int min_value, int max_value, int value, 
         OnChange on_change) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
@@ -331,7 +331,7 @@ int create_slider(sfVector2f position, int min_value, int max_value, int value,
 }
 
 
-void set_scrollbar(int entity, sfVector2f mouse_position) {
+void set_scrollbar(int entity, Vector2f mouse_position) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     ColliderComponent* collider = ColliderComponent_get(entity);
     float y = mouse_position.y - get_position(entity).y + 0.5f * collider->height;
@@ -345,7 +345,7 @@ void set_scrollbar(int entity, sfVector2f mouse_position) {
 }
 
 
-int create_scrollbar(sfVector2f position, int height, int max_value, OnChange on_change) {
+int create_scrollbar(Vector2f position, int height, int max_value, OnChange on_change) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(i, SCROLLBAR_WIDTH, 
@@ -359,7 +359,7 @@ int create_scrollbar(sfVector2f position, int height, int max_value, OnChange on
 }
 
 
-int create_textbox(sfVector2f position, int width) {
+int create_textbox(Vector2f position, int width) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(i, BUTTON_WIDTH * width, 
@@ -380,7 +380,7 @@ void update_widgets(int camera) {
         WidgetComponent* widget = WidgetComponent_get(i);
         if (!widget->enabled) continue;
 
-        sfVector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
+        Vector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
         widget->selected = false;
         if (point_inside_collider(i, mouse)) {
             last_selected = i;
@@ -392,10 +392,10 @@ void update_widgets(int camera) {
 }
 
 
-void draw_button(int camera, sfVector2f position, float width, 
+void draw_button(int camera, Vector2f position, float width, 
         float height, bool selected) {
     draw_rectangle(camera, NULL, position, width, height, 0.0f, COLOR_SHADOW);
-    sfVector2f r = sum(position, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
+    Vector2f r = sum(position, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
     draw_rectangle(camera, NULL, r, width - BORDER_WIDTH, height - BORDER_WIDTH, 0.0f, 
         COLOR_SELECTED);
     sfColor color = selected ? COLOR_SELECTED : COLOR_BUTTON;
@@ -411,13 +411,13 @@ void draw_widgets(int camera) {
         WidgetComponent* widget = WidgetComponent_get(i);
         if (!widget->enabled) continue;
 
-        sfVector2f pos = get_position(i);
+        Vector2f pos = get_position(i);
         CoordinateComponent* coord = CoordinateComponent_get(i);
         ColliderComponent* collider = ColliderComponent_get(i);
 
         float w = collider->width;
         float h = collider->height;
-        sfVector2f r = zeros();
+        Vector2f r = zeros();
         switch (widget->type) {
         case WIDGET_WINDOW:
             draw_rectangle(camera, NULL, pos, w + BORDER_WIDTH, h + BORDER_WIDTH, 0.0f, 
@@ -486,10 +486,10 @@ void draw_widgets(int camera) {
 
 
 bool input_widgets(int camera, sfEvent event) {
-    static sfVector2f mouse_position = { 0.0f, 0.0f };
+    static Vector2f mouse_position = { 0.0f, 0.0f };
     static bool mouse_down = false;
     static int grabbed_window = -1;
-    static sfVector2f grab_offset = { 0.0f, 0.0f };
+    static Vector2f grab_offset = { 0.0f, 0.0f };
     
     if (event.type == sfEvtMouseMoved) {
         sfVector2i mouse_screen = { event.mouseMove.x, event.mouseMove.y };

@@ -13,10 +13,10 @@
 #include "health.h"
 
 
-void apply_force(int entity, sfVector2f force) {
+void apply_force(int entity, Vector2f force) {
     PhysicsComponent* physics = PhysicsComponent_get(entity);
 
-    sfVector2f a = mult(1.0f / physics->mass, force);
+    Vector2f a = mult(1.0f / physics->mass, force);
     physics->acceleration = sum(physics->acceleration, a);
 }
 
@@ -49,22 +49,22 @@ void update_physics(float time_step) {
         if (physics->collision.entities->size > 0) {
             physics->velocity = physics->collision.velocity;
 
-            sfVector2f v_n = proj(physics->velocity, physics->collision.overlap);
-            sfVector2f v_t = diff(physics->velocity, v_n);
+            Vector2f v_n = proj(physics->velocity, physics->collision.overlap);
+            Vector2f v_t = diff(physics->velocity, v_n);
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0f - physics->friction, v_t));
 
             blunt_damage(i, v_n);
         }
 
-        sfVector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
+        Vector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
         float delta_angle = time_step * physics->angular_velocity;
 
         JointComponent* joint = JointComponent_get(i);
         if (joint && joint->parent != -1) {
-            sfVector2f r = diff(get_position(joint->parent), get_position(i));
+            Vector2f r = diff(get_position(joint->parent), get_position(i));
             float d = norm(r);
 
-            sfVector2f f = zeros();
+            Vector2f f = zeros();
             if (d > joint->max_length) {
                 f = mult(d - joint->max_length, normalized(r));
             } else if (d < joint->min_length) {
@@ -91,10 +91,10 @@ void update_physics(float time_step) {
             update_grid(i);
         }
 
-        sfVector2f v_hat = normalized(physics->velocity);
-        sfVector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
-        sfVector2f v_sideways = diff(v_hat, v_forward);
-        sfVector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
+        Vector2f v_hat = normalized(physics->velocity);
+        Vector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
+        Vector2f v_sideways = diff(v_hat, v_forward);
+        Vector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
         physics->acceleration = sum(physics->acceleration, a);
         physics->velocity = sum(physics->velocity, mult(time_step, physics->acceleration));
         physics->acceleration = zeros();

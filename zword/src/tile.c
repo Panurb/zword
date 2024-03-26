@@ -10,7 +10,7 @@
 #include "enemy.h"
 
 
-void create_ground(sfVector2f position, float width, float height, sfTexture* noise_texture) {
+void create_ground(Vector2f position, float width, float height, sfTexture* noise_texture) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0);
     ImageComponent_add(i, "grass_tile", width, height, LAYER_GROUND);
@@ -19,7 +19,7 @@ void create_ground(sfVector2f position, float width, float height, sfTexture* no
         i = create_entity();
         CoordinateComponent_add(i, position, 0.0);
         ImageComponent* image = ImageComponent_add(i, "", 16.0, 16.0, LAYER_GROUND);
-        image->scale = (sfVector2f) { 8.0, 8.0 };
+        image->scale = (Vector2f) { 8.0, 8.0 };
         image->texture_changed = false;
         image->alpha = 1.0f;
         sfSprite_setTexture(image->sprite, noise_texture, false);
@@ -27,7 +27,7 @@ void create_ground(sfVector2f position, float width, float height, sfTexture* no
 }
 
 
-void create_water(sfVector2f position, float width, float height, sfTexture* noise_texture) {
+void create_water(Vector2f position, float width, float height, sfTexture* noise_texture) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ImageComponent_add(i, "water_tile", width, height, LAYER_GROUND);
@@ -37,7 +37,7 @@ void create_water(sfVector2f position, float width, float height, sfTexture* noi
         i = create_entity();
         CoordinateComponent_add(i, position, 0.0);
         ImageComponent* image = ImageComponent_add(i, "", 16.0, 16.0, LAYER_GROUND);
-        image->scale = (sfVector2f) { 8.0f, 8.0f };
+        image->scale = (Vector2f) { 8.0f, 8.0f };
         image->texture_changed = false;
         image->alpha = 0.3f;
         sfSprite_setTexture(image->sprite, noise_texture, false);
@@ -45,21 +45,21 @@ void create_water(sfVector2f position, float width, float height, sfTexture* noi
 }
 
 
-void create_beach(sfVector2f position, float length, float angle) {
+void create_beach(Vector2f position, float length, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "beach_tile", 16.0f, length, LAYER_ROADS);
 }
 
 
-void create_beach_corner(sfVector2f position, float angle) {
+void create_beach_corner(Vector2f position, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
     ImageComponent_add(i, "beach_corner", 0, 0, LAYER_ROADS);
 }
 
 
-int create_wall(sfVector2f pos, float angle, float width, float height, Filename filename) {
+int create_wall(Vector2f pos, float angle, float width, float height, Filename filename) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_rectangle(i, width, height, GROUP_WALLS);
@@ -77,7 +77,7 @@ int create_wall(sfVector2f pos, float angle, float width, float height, Filename
 }
 
 
-void create_fence(sfVector2f pos, float angle, float width, float height) {
+void create_fence(Vector2f pos, float angle, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_rectangle(i, width, height, GROUP_BARRIERS);
@@ -85,14 +85,14 @@ void create_fence(sfVector2f pos, float angle, float width, float height) {
 }
 
 
-void create_glass(sfVector2f pos, float angle) {
+void create_glass(Vector2f pos, float angle) {
     create_fence(pos, angle, 1.0f, 4.0f);
     create_waypoint(sum(pos, polar_to_cartesian(1.5f, angle)));
     create_waypoint(diff(pos, polar_to_cartesian(1.5f, angle)));
 }
 
 
-int create_floor(sfVector2f pos, float width, float height, float angle, Filename filename) {
+int create_floor(Vector2f pos, float width, float height, float angle, Filename filename) {
     printf("%f, %f, %f, %f\n", pos.x, pos.y, width, height);
     int i = create_entity();
 
@@ -104,7 +104,7 @@ int create_floor(sfVector2f pos, float width, float height, float angle, Filenam
 }
 
 
-void create_roof(sfVector2f pos, float width, float height, float angle) {
+void create_roof(Vector2f pos, float width, float height, float angle) {
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, angle);
@@ -113,7 +113,7 @@ void create_roof(sfVector2f pos, float width, float height, float angle) {
 }
 
 
-void create_tile(Tile tile, sfVector2f position, float angle, float width, float height) {
+void create_tile(Tile tile, Vector2f position, float angle, float width, float height) {
     switch (tile) {
         case TILE_ALTAR:
             create_wall(position, angle, width, height, "altar_tile");

@@ -12,7 +12,7 @@
 
 
 typedef struct {
-    sfVector2f position;
+    Vector2f position;
     float angle;
     int parent;
     List* children;
@@ -46,19 +46,19 @@ typedef struct {
     sfSprite* sprite;
     float shine;
     Layer layer;
-    sfVector2f scale;
+    Vector2f scale;
     float alpha;
     float stretch;
     float stretch_speed;
 } ImageComponent;
 
 typedef struct {
-    sfVector2f velocity;
-    sfVector2f acceleration;
+    Vector2f velocity;
+    Vector2f acceleration;
     struct {
         List* entities;
-        sfVector2f overlap;
-        sfVector2f velocity;
+        Vector2f overlap;
+        Vector2f velocity;
     } collision;
     float angular_velocity;
     float angular_acceleration;
@@ -140,9 +140,9 @@ typedef struct {
     bool buttons_pressed[12];
     bool buttons_released[12];
     int axes[8];
-    sfVector2f left_stick;
-    sfVector2f right_stick;
-    sfVector2f dpad;
+    Vector2f left_stick;
+    Vector2f right_stick;
+    Vector2f dpad;
     float left_trigger;
     float right_trigger;
 } Controller;
@@ -236,8 +236,8 @@ typedef struct {
     float speed_spread;
     float speed;
     float max_time;
-    sfVector2f position[100];
-    sfVector2f velocity[100];
+    Vector2f position[100];
+    Vector2f velocity[100];
     float time[100];
     float start_size;
     float end_size;
@@ -246,7 +246,7 @@ typedef struct {
     sfCircleShape* shape;
     float rate;
     float timer;
-    sfVector2f origin;
+    Vector2f origin;
 } ParticleComponent;
 
 typedef struct {
@@ -258,7 +258,7 @@ typedef struct {
     float turning;
     int size;
     int riders[4];
-    sfVector2f seats[4];
+    Vector2f seats[4];
 } VehicleComponent;
 
 typedef enum {
@@ -332,8 +332,8 @@ typedef struct {
     Matrix2f inv_matrix;
     sfView* view;
     struct {
-        sfVector2f position;
-        sfVector2f velocity;
+        Vector2f position;
+        Vector2f velocity;
     } shake;
 } CameraComponent;
 
@@ -462,7 +462,7 @@ struct ComponentData {
 
 ComponentData* ComponentData_create();
 
-CoordinateComponent* CoordinateComponent_add(int entity, sfVector2f pos, float angle);
+CoordinateComponent* CoordinateComponent_add(int entity, Vector2f pos, float angle);
 CoordinateComponent* CoordinateComponent_get(int entity);
 void CoordinateComponent_remove(int entity);
 
@@ -560,7 +560,7 @@ void remove_children(int parent);
 
 void ComponentData_clear();
 
-sfVector2f get_position(int i);
+Vector2f get_position(int i);
 float get_angle(int i);
 
 bool entity_exists(int entity);

@@ -11,20 +11,20 @@
 
 void update_enemies(float time_step);
 
-int create_zombie(sfVector2f pos, float angle);
+int create_zombie(Vector2f pos, float angle);
 
-int create_farmer(sfVector2f pos, float angle);
+int create_farmer(Vector2f pos, float angle);
 
-int create_priest(sfVector2f pos, float angle);
+int create_priest(Vector2f pos, float angle);
 
-int create_big_boy(sfVector2f pos, float angle);
+int create_big_boy(Vector2f pos, float angle);
 
-int create_boss(sfVector2f pos, float angle);
+int create_boss(Vector2f pos, float angle);
 
 void draw_enemies(int camera);
 
 void alert_enemies(int player, float range);
 
-void create_spawner(sfVector2f position, float angle, float width, float height);
+void create_spawner(Vector2f position, float angle, float width, float height);
 
 void draw_spawners(sfRenderWindow* window, GameData data);

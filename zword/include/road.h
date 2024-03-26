@@ -11,9 +11,9 @@
 #include "image.h"
 
 
-void create_road(ComponentData* components, sfVector2f start, sfVector2f end);
+void create_road(ComponentData* components, Vector2f start, Vector2f end);
 
-void create_river(ComponentData* components, sfVector2f start, sfVector2f end);
+void create_river(ComponentData* components, Vector2f start, Vector2f end);
 
 void draw_road(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures, int entity);
 

@@ -22,11 +22,11 @@
 #include "game.h"
 
 
-bool point_inside_collider(int i, sfVector2f point) {
+bool point_inside_collider(int i, Vector2f point) {
     // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
     ColliderComponent* col = ColliderComponent_get(i);
     if (col->type == COLLIDER_RECTANGLE) {
-        sfVector2f pos = get_position(i);
+        Vector2f pos = get_position(i);
         float angle = get_angle(i);
         return point_inside_rectangle(pos, angle, col->width, col->height, point);
     } else if (col->type == COLLIDER_CIRCLE) {
@@ -38,11 +38,11 @@ bool point_inside_collider(int i, sfVector2f point) {
 }
 
 
-void get_corners(int i, sfVector2f* corners) {
-    sfVector2f pos = get_position(i);
+void get_corners(int i, Vector2f* corners) {
+    Vector2f pos = get_position(i);
 
-    sfVector2f hw = half_width(i);
-    sfVector2f hh = half_height(i);
+    Vector2f hw = half_width(i);
+    Vector2f hh = half_height(i);
 
     corners[0] = sum(pos, sum(hw, hh));
     corners[1] = diff(corners[0], mult(2, hh));
@@ -51,24 +51,24 @@ void get_corners(int i, sfVector2f* corners) {
 }
 
 
-sfVector2f half_width(int i) {
+Vector2f half_width(int i) {
     ColliderComponent* col = ColliderComponent_get(i);
     return polar_to_cartesian(0.5 * col->width, get_angle(i));
 }
 
 
-sfVector2f half_height(int i) {
+Vector2f half_height(int i) {
     ColliderComponent* col = ColliderComponent_get(i);
     return polar_to_cartesian(0.5 * col->height, get_angle(i) + 0.5 * M_PI);
 }
 
 
-float axis_half_width(int i, sfVector2f axis) {
+float axis_half_width(int i, Vector2f axis) {
     ColliderComponent* col = ColliderComponent_get(i);
 
     if (col->type == COLLIDER_RECTANGLE) {
-        sfVector2f hw = half_width(i);
-        sfVector2f hh = half_height(i);
+        Vector2f hw = half_width(i);
+        Vector2f hh = half_height(i);
         return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
     } else {
         return col->radius;
@@ -77,7 +77,7 @@ float axis_half_width(int i, sfVector2f axis) {
 }
 
 
-float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f axis) {
+float axis_overlap(float w1, Vector2f r1, float w2, Vector2f r2, Vector2f axis) {
     float r = dot(diff(r1, r2), axis);
     float o = w1 + w2 - fabs(r);
     if (o > 0.0) {
@@ -92,42 +92,42 @@ float axis_overlap(float w1, sfVector2f r1, float w2, sfVector2f r2, sfVector2f 
 }
 
 
-sfVector2f overlap_circle_circle(int i, int j) {
-    sfVector2f a = get_position(i);
-    sfVector2f b = get_position(j);
+Vector2f overlap_circle_circle(int i, int j) {
+    Vector2f a = get_position(i);
+    Vector2f b = get_position(j);
 
     float d = dist(a, b);
     float r = ColliderComponent_get(i)->radius + ColliderComponent_get(j)->radius;
 
     if (d > r) {
-        return (sfVector2f) { 0.0, 0.0 };
+        return (Vector2f) { 0.0, 0.0 };
     }
 
     if (d == 0.0) {
-        return (sfVector2f) { 0.0, r };
+        return (Vector2f) { 0.0, r };
     }
 
     return mult(r / d - 1, diff(a, b));
 }
 
 
-sfVector2f overlap_rectangle_circle(int i, int j) {
+Vector2f overlap_rectangle_circle(int i, int j) {
     bool near_corner = true;
 
     float overlaps[2] = { 0.0, 0.0 };
-    sfVector2f axes[2];
+    Vector2f axes[2];
     axes[0] = polar_to_cartesian(1.0, get_angle(i));
     axes[1] = perp(axes[0]);
 
-    sfVector2f a = get_position(i);
-    sfVector2f b = get_position(j);
+    Vector2f a = get_position(i);
+    Vector2f b = get_position(j);
     float radius = ColliderComponent_get(j)->radius;
 
     for (int k = 0; k < 2; k++) {
         overlaps[k] = axis_overlap(axis_half_width(i, axes[k]), a, radius, b, axes[k]);
 
         if (fabs(overlaps[k]) < 1e-6) {
-            return (sfVector2f) { 0.0, 0.0 };
+            return (Vector2f) { 0.0, 0.0 };
         }
 
         if (fabs(overlaps[k]) >= radius) {
@@ -140,12 +140,12 @@ sfVector2f overlap_rectangle_circle(int i, int j) {
         return mult(overlaps[k], axes[k]);
     }
 
-    sfVector2f hw = half_width(i);
-    sfVector2f hh = half_height(i);
+    Vector2f hw = half_width(i);
+    Vector2f hh = half_height(i);
 
-    sfVector2f corner = diff(a, sum(mult(sign(overlaps[0]), hw), mult(sign(overlaps[1]), hh)));
+    Vector2f corner = diff(a, sum(mult(sign(overlaps[0]), hw), mult(sign(overlaps[1]), hh)));
 
-    sfVector2f axis = normalized(diff(corner, b));
+    Vector2f axis = normalized(diff(corner, b));
 
     float overlap = axis_overlap(axis_half_width(i, axis), a, radius, b, axis);
 
@@ -153,29 +153,29 @@ sfVector2f overlap_rectangle_circle(int i, int j) {
         return mult(overlap, axis);
     }
 
-    return (sfVector2f) { 0.0, 0.0 };
+    return (Vector2f) { 0.0, 0.0 };
 }
 
-sfVector2f overlap_circle_rectangle(int i, int j) {
+Vector2f overlap_circle_rectangle(int i, int j) {
     return mult(-1.0, overlap_rectangle_circle(j, i));
 }
 
-sfVector2f overlap_rectangle_rectangle(int i, int j) {
-    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
-    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
+Vector2f overlap_rectangle_rectangle(int i, int j) {
+    Vector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
+    Vector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
 
     float overlaps[4];
-    sfVector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
+    Vector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
 
-    sfVector2f a = get_position(i);
-    sfVector2f b = get_position(j);
+    Vector2f a = get_position(i);
+    Vector2f b = get_position(j);
 
     for (int k = 0; k < 4; k++) {
         overlaps[k] = axis_overlap(axis_half_width(i, axes[k]), a,
                                    axis_half_width(j, axes[k]), b, axes[k]);
 
         if (fabs(overlaps[k]) < 1e-6) {
-            return (sfVector2f) { 0.0, 0.0 };
+            return (Vector2f) { 0.0, 0.0 };
         }
     }
 
@@ -185,8 +185,8 @@ sfVector2f overlap_rectangle_rectangle(int i, int j) {
 }
 
 
-sfVector2f overlap_collider_collider(int i, int j) {
-    sfVector2f ol = zeros();
+Vector2f overlap_collider_collider(int i, int j) {
+    Vector2f ol = zeros();
 
     ColliderComponent* a = ColliderComponent_get(i);
     ColliderComponent* b = ColliderComponent_get(j);
@@ -213,21 +213,21 @@ sfVector2f overlap_collider_collider(int i, int j) {
 }
 
 
-sfVector2f overlap_rectangle_image(int i, int j) {
+Vector2f overlap_rectangle_image(int i, int j) {
     ImageComponent* image = ImageComponent_get(j);
 
-    sfVector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
-    sfVector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
+    Vector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
+    Vector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
 
     float overlaps[4];
-    sfVector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
+    Vector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
 
-    sfVector2f a = get_position(i);
-    sfVector2f b = get_position(j);
+    Vector2f a = get_position(i);
+    Vector2f b = get_position(j);
 
     for (int k = 0; k < 4; k++) {
-        sfVector2f hw = polar_to_cartesian(0.5 * image->width, get_angle(i));
-        sfVector2f hh = polar_to_cartesian(0.5 * image->height, get_angle(i) + 0.5 * M_PI);
+        Vector2f hw = polar_to_cartesian(0.5 * image->width, get_angle(i));
+        Vector2f hh = polar_to_cartesian(0.5 * image->height, get_angle(i) + 0.5 * M_PI);
         float image_axis_half_width = fabs(dot(hw, axes[k])) + fabs(dot(hh, axes[k]));
 
         overlaps[k] = axis_overlap(axis_half_width(i, axes[k]), a,
@@ -265,7 +265,7 @@ bool collides_with(int i, List* entities) {
                 }
                 collider->last_collision = i;
 
-                sfVector2f ol = overlap_collider_collider(i, n);
+                Vector2f ol = overlap_collider_collider(i, n);
 
                 if (non_zero(ol)) {
                     if (entities) {
@@ -337,12 +337,12 @@ void collide() {
                         continue;
                     }
 
-                    sfVector2f ol = overlap_collider_collider(i, n);
+                    Vector2f ol = overlap_collider_collider(i, n);
 
                     if (!non_zero(ol)) continue;
 
-                    sfVector2f dv = physics->velocity;
-                    sfVector2f no = normalized(ol);
+                    Vector2f dv = physics->velocity;
+                    Vector2f no = normalized(ol);
 
                     float m = 1.0f;
 
@@ -352,7 +352,7 @@ void collide() {
                         m = physics_other->mass / (physics->mass + physics_other->mass);
                     }
 
-                    sfVector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
+                    Vector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
 
                     switch (collision_type) {
                         case 0:
@@ -382,13 +382,13 @@ void draw_occupied_tiles(int camera) {
     ColliderGrid* grid = game_data->grid;
     sfRectangleShape* shape = sfRectangleShape_create();
     sfText* text = sfText_create();
-    sfVector2f w = { 0.5f * grid->tile_width, 0.0f };
-    sfVector2f h = { 0.0f, 0.5f * grid->tile_height };
+    Vector2f w = { 0.5f * grid->tile_width, 0.0f };
+    Vector2f h = { 0.0f, 0.5f * grid->tile_height };
     float linewidth = 0.01f;
     sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
     for (int i = 0; i < grid->width; i++) {
         for (int j = 0; j < grid->height; j++) {
-            sfVector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
+            Vector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
             if (on_screen(camera, r, grid->tile_width, grid->tile_height)) {
                 draw_line(camera, shape, sum(sum(r, w), h), sum(diff(r, w), h), linewidth, color);
                 draw_line(camera, shape, sum(diff(r, w), h), diff(diff(r, w), h), linewidth, color);
@@ -412,7 +412,7 @@ void draw_colliders(int camera) {
         ColliderComponent* col = game_data->components->collider[i];
         if (!col) continue;
 
-        sfVector2f pos = get_position(i);
+        Vector2f pos = get_position(i);
         if (col->type == COLLIDER_CIRCLE) {
             draw_circle(camera, NULL, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
             draw_line(camera, NULL, pos, sum(pos, half_width(i)), 0.05f, sfWhite);

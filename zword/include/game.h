@@ -83,8 +83,8 @@ void draw_game_over();
 
 void draw_game_mode();
 
-int create_tutorial(sfVector2f position);
+int create_tutorial(Vector2f position);
 
-int create_level_end(sfVector2f position, float angle, float width, float height);
+int create_level_end(Vector2f position, float angle, float width, float height);
 
 void draw_tutorials();

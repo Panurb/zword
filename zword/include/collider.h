@@ -36,21 +36,21 @@ static const int COLLISION_MATRIX[18][18] = { { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                               { 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } };   // ENERGY
 
 
-bool point_inside_collider(int i, sfVector2f point);
+bool point_inside_collider(int i, Vector2f point);
 
-void get_corners(int i, sfVector2f* corners) ;
+void get_corners(int i, Vector2f* corners) ;
 
-sfVector2f half_width(int i);
+Vector2f half_width(int i);
 
-sfVector2f half_height(int i);
+Vector2f half_height(int i);
 
-float axis_half_width(int i, sfVector2f axis);
+float axis_half_width(int i, Vector2f axis);
 
-sfVector2f overlap_rectangle_rectangle(int i, int j);
+Vector2f overlap_rectangle_rectangle(int i, int j);
 
-sfVector2f overlap_collider_collider(int i, int j);
+Vector2f overlap_collider_collider(int i, int j);
 
-sfVector2f overlap_rectangle_image(int i, int j);
+Vector2f overlap_rectangle_image(int i, int j);
 
 bool collides_with(int entity, List* entities);
 

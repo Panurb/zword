@@ -4,7 +4,7 @@
 #include "grid.h"
 
 
-int create_car(sfVector2f pos, float angle);
+int create_car(Vector2f pos, float angle);
 
 bool enter_vehicle(int i);
 

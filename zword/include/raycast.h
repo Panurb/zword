@@ -5,9 +5,9 @@
 
 
 typedef struct {
-    sfVector2f position;
+    Vector2f position;
     int entity;
-    sfVector2f normal;
+    Vector2f normal;
 } HitInfo;
 
-HitInfo raycast(sfVector2f start, sfVector2f velocity, float range, ColliderGroup group);
+HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup group);

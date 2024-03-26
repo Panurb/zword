@@ -11,7 +11,7 @@
 #define MAX_PATH_LENGTH 50
 
 
-int create_waypoint(sfVector2f pos);
+int create_waypoint(Vector2f pos);
 
 bool a_star(int start, int goal, List* path);
 

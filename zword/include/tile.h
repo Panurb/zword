@@ -23,22 +23,22 @@ typedef enum {
 } Tile;
 
 
-void create_ground(sfVector2f position, float width, float height, sfTexture* noise_texture);
+void create_ground(Vector2f position, float width, float height, sfTexture* noise_texture);
 
-void create_water(sfVector2f position, float width, float height, sfTexture* noise_texture);
+void create_water(Vector2f position, float width, float height, sfTexture* noise_texture);
 
-void create_beach(sfVector2f position, float length, float angle);
+void create_beach(Vector2f position, float length, float angle);
 
-void create_beach_corner(sfVector2f position, float angle);
+void create_beach_corner(Vector2f position, float angle);
 
-int create_wall(sfVector2f pos, float angle, float width, float height, Filename filename);
+int create_wall(Vector2f pos, float angle, float width, float height, Filename filename);
 
-void create_fence(sfVector2f pos, float angle, float width, float height);
+void create_fence(Vector2f pos, float angle, float width, float height);
 
-void create_glass(sfVector2f pos, float angle);
+void create_glass(Vector2f pos, float angle);
 
-int create_floor(sfVector2f pos, float width, float height, float angle, Filename filename);
+int create_floor(Vector2f pos, float width, float height, float angle, Filename filename);
 
-void create_roof(sfVector2f pos, float width, float height, float angle);
+void create_roof(Vector2f pos, float width, float height, float angle);
 
-void create_tile(Tile tile, sfVector2f position, float angle, float width, float height);
+void create_tile(Tile tile, Vector2f position, float angle, float width, float height);

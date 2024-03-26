@@ -10,7 +10,7 @@
 #include "game.h"
 
 
-int create_car(sfVector2f pos, float angle) {
+int create_car(Vector2f pos, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_circle(i, 1.5f, GROUP_VEHICLES);
@@ -25,30 +25,30 @@ int create_car(sfVector2f pos, float angle) {
     JointComponent_add(j, i, 3.0f, 3.0f, 1.0f);
 
     int k = create_entity();
-    CoordinateComponent_add(k, (sfVector2f) {1.5f, 0.0f }, 0.0f);
+    CoordinateComponent_add(k, (Vector2f) {1.5f, 0.0f }, 0.0f);
     ImageComponent_add(k, "car", 6.0f, 3.0f, LAYER_VEHICLES);
     add_child(j, k);
 
     k = create_entity();
-    CoordinateComponent_add(k, (sfVector2f) { 3.8f, 1.0f }, 0.0f);
+    CoordinateComponent_add(k, (Vector2f) { 3.8f, 1.0f }, 0.0f);
     LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(j, k);
 
     k = create_entity();
-    CoordinateComponent_add(k, (sfVector2f) { 3.8f, -1.0f }, 0.0f);
+    CoordinateComponent_add(k, (Vector2f) { 3.8f, -1.0f }, 0.0f);
     LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
     add_child(j, k);
 
-    k = create_waypoint((sfVector2f) { 5.0f, 2.5f });
+    k = create_waypoint((Vector2f) { 5.0f, 2.5f });
     add_child(j, k);
 
-    k = create_waypoint((sfVector2f) { 5.0f, -2.5f });
+    k = create_waypoint((Vector2f) { 5.0f, -2.5f });
     add_child(j, k);
 
-    k = create_waypoint((sfVector2f) { -2.0f, 2.5f });
+    k = create_waypoint((Vector2f) { -2.0f, 2.5f });
     add_child(j, k);
 
-    k = create_waypoint((sfVector2f) { -2.0f, -2.5f });
+    k = create_waypoint((Vector2f) { -2.0f, -2.5f });
     add_child(j, k);
 
     return i;
@@ -65,7 +65,7 @@ bool enter_vehicle(int i) {
         float min_d = 3.0;
         int closest = 0;
         for (int k = 0; k < 4; k++) {
-            sfVector2f r = sum(get_position(j), rotate(vehicle->seats[k], get_angle(j)));
+            Vector2f r = sum(get_position(j), rotate(vehicle->seats[k], get_angle(j)));
             float d = dist(get_position(i), r);
 
             if (d < min_d) {
@@ -116,7 +116,7 @@ void exit_vehicle(int i) {
     int k = find(i, vehicle->riders, vehicle->size);
 
     CoordinateComponent* coord = CoordinateComponent_get(i);
-    sfVector2f r = vehicle->seats[k];
+    Vector2f r = vehicle->seats[k];
     r.y *= 2.0;
     r = rotate(r, get_angle(j));
     coord->position = sum(get_position(j), r);

@@ -15,6 +15,11 @@
 #define LENGTH(x) (int)(sizeof(x)/sizeof(x[0]))
 
 typedef struct {
+    float x;
+    float y;
+} Vector2f;
+
+typedef struct {
     float a;
     float b;
     float c;
@@ -29,29 +34,29 @@ typedef char Filename[128];
 #define BUTTON_TEXT_SIZE 128
 typedef char ButtonText[BUTTON_TEXT_SIZE];
 
-sfVector2f zeros();
+Vector2f zeros();
 
-sfVector2f ones();
+Vector2f ones();
 
-sfVector2f vec(float x, float y);
+Vector2f vec(float x, float y);
 
-float norm(sfVector2f v);
+float norm(Vector2f v);
 
-float norm2(sfVector2f v);
+float norm2(Vector2f v);
 
-float dist(sfVector2f a, sfVector2f b);
+float dist(Vector2f a, Vector2f b);
 
-sfVector2f normalized(sfVector2f v);
+Vector2f normalized(Vector2f v);
 
 double to_degrees(double radians);
 
-float dot(sfVector2f a, sfVector2f b);
+float dot(Vector2f a, Vector2f b);
 
-float signed_angle(sfVector2f a, sfVector2f b);
+float signed_angle(Vector2f a, Vector2f b);
 
-sfVector2f bisector(sfVector2f a, sfVector2f b);
+Vector2f bisector(Vector2f a, Vector2f b);
 
-sfVector2f polar_to_cartesian(float length, float angle);
+Vector2f polar_to_cartesian(float length, float angle);
 
 int abs_argmin(float* a, int n);
 
@@ -59,19 +64,19 @@ int argmax(float* a, int n);
 
 float mean(float* array, int size);
 
-sfVector2f perp(sfVector2f v);
+Vector2f perp(Vector2f v);
 
 float sign(float x);
 
-sfVector2f sum(sfVector2f v, sfVector2f u);
+Vector2f sum(Vector2f v, Vector2f u);
 
-sfVector2f diff(sfVector2f v, sfVector2f u);
+Vector2f diff(Vector2f v, Vector2f u);
 
-sfVector2f mult(float c, sfVector2f v);
+Vector2f mult(float c, Vector2f v);
 
-sfVector2f proj(sfVector2f a, sfVector2f b);
+Vector2f proj(Vector2f a, Vector2f b);
 
-sfVector2f lin_comb(float a, sfVector2f v, float b, sfVector2f u);
+Vector2f lin_comb(float a, Vector2f v, float b, Vector2f u);
 
 float randf(float min, float max);
 
@@ -79,7 +84,7 @@ int randi(int low, int upp);
 
 float rand_angle();
 
-sfVector2f rand_vector();
+Vector2f rand_vector();
 
 int rand_choice(float* probs, int size);
 
@@ -93,15 +98,15 @@ int maxi(int a, int b);
 
 float mod(float x, float y);
 
-float cross(sfVector2f v, sfVector2f u);
+float cross(Vector2f v, Vector2f u);
 
-sfVector2f rotate(sfVector2f v, float angle);
+Vector2f rotate(Vector2f v, float angle);
 
-float polar_angle(sfVector2f v);
+float polar_angle(Vector2f v);
 
 Matrix2f rotation_matrix(float angle);
 
-sfVector2f matrix_mult(Matrix2f m, sfVector2f v);
+Vector2f matrix_mult(Matrix2f m, Vector2f v);
 
 Matrix2f transpose(Matrix2f m);
 
@@ -117,12 +122,12 @@ float smoothstep(float x, float mu, float nu);
 
 int binary_search_filename(Filename filename, char** array, int size);
 
-bool non_zero(sfVector2f v);
+bool non_zero(Vector2f v);
 
 float clamp(float val, float min_val, float max_val);
 
 float angle_diff(float a, float b);
 
-bool collides_aabb(sfVector2f pos1, float w1, float h1, sfVector2f pos2, float w2, float h2);
+bool collides_aabb(Vector2f pos1, float w1, float h1, Vector2f pos2, float w2, float h2);
 
-bool point_inside_rectangle(sfVector2f position, float angle, float width, float height, sfVector2f point);
+bool point_inside_rectangle(Vector2f position, float angle, float width, float height, Vector2f point);

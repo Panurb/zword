@@ -41,7 +41,7 @@ void ColliderGrid_clear(ColliderGrid* grid) {
 }
 
 
-sfVector2i world_to_grid(sfVector2f position) {
+sfVector2i world_to_grid(Vector2f position) {
     int x = floorf((position.x + 0.5 * game_data->grid->width) / game_data->grid->tile_width);
     int y = floorf((position.y + 0.5 * game_data->grid->height) / game_data->grid->tile_height);
     
@@ -50,13 +50,13 @@ sfVector2i world_to_grid(sfVector2f position) {
 
 
 Bounds get_bounds(int i) {
-    sfVector2f pos = get_position(i);
+    Vector2f pos = get_position(i);
     
     float x = (pos.x + 0.5 * game_data->grid->width) / game_data->grid->tile_width;
     float y = (pos.y + 0.5 * game_data->grid->height) / game_data->grid->tile_height;
 
-    float w = axis_half_width(i, (sfVector2f) { 1.0, 0.0 }) / game_data->grid->tile_width;
-    float h = axis_half_width(i, (sfVector2f) { 0.0, 1.0 }) / game_data->grid->tile_height;
+    float w = axis_half_width(i, (Vector2f) { 1.0, 0.0 }) / game_data->grid->tile_width;
+    float h = axis_half_width(i, (Vector2f) { 0.0, 1.0 }) / game_data->grid->tile_height;
 
     Bounds bounds;
     bounds.left = maxi(0, floorf(x - w));
@@ -68,7 +68,7 @@ Bounds get_bounds(int i) {
 }
 
 
-List* get_entities(sfVector2f origin, float radius) {
+List* get_entities(Vector2f origin, float radius) {
     List* list = List_create();
 
     static int id = 2 * MAX_ENTITIES;
@@ -160,7 +160,7 @@ void draw_grid(int camera, float tile_width, float tile_height) {
     CameraComponent* cam = CameraComponent_get(camera);
     float width = cam->resolution.x / cam->zoom;
     float height = cam->resolution.y / cam->zoom;
-    sfVector2f pos = get_position(camera);
+    Vector2f pos = get_position(camera);
     float major_lines = 16.0f;
     float left = pos.x - 0.5f * width;
     float right = pos.x + 0.5f * width;
@@ -184,14 +184,14 @@ void draw_grid(int camera, float tile_width, float tile_height) {
 }
 
 
-sfVector2f snap_to_grid(sfVector2f vector, float tile_width, float tile_height) {
+Vector2f snap_to_grid(Vector2f vector, float tile_width, float tile_height) {
     vector.x = tile_width * roundf(vector.x / tile_width);
     vector.y = tile_height * roundf(vector.y / tile_height);
     return vector;
 }
 
 
-sfVector2f snap_to_grid_center(sfVector2f vector, float tile_width, float tile_height) {
+Vector2f snap_to_grid_center(Vector2f vector, float tile_width, float tile_height) {
     vector.x = tile_width * roundf((vector.x + 0.5f) / tile_width) - 0.5f * tile_width;
     vector.y = tile_height * roundf((vector.y + 0.5f) / tile_height) - 0.5f * tile_height;
     return vector;

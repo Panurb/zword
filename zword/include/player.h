@@ -5,7 +5,7 @@
 #include "component.h"
 
 
-int create_player(sfVector2f pos, float angle);
+int create_player(Vector2f pos, float angle);
 
 int get_slot(int i, int size);
 

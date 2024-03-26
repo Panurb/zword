@@ -10,7 +10,7 @@
 #include "game.h"
 
 
-int create_door(sfVector2f pos, float angle) {
+int create_door(Vector2f pos, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, angle + M_PI);
     ImageComponent_add(i, "door", 2.0f, 1.0f, LAYER_ITEMS);

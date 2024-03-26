@@ -183,8 +183,8 @@ void update_controller(int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(i);
     int joystick = player->controller.joystick;
 
-    sfVector2f left_stick = zeros();
-    sfVector2f right_stick = zeros();
+    Vector2f left_stick = zeros();
+    Vector2f right_stick = zeros();
     if (player->controller.joystick == -1) {
         if (keybind_pressed(ACTION_LEFT)) {
             left_stick.x -= 1.0f;
@@ -200,7 +200,7 @@ void update_controller(int camera, int i) {
         }
         player->controller.left_stick = normalized(left_stick);
 
-        sfVector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
+        Vector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
         right_stick = diff(mouse, get_position(i));
         player->controller.right_stick = normalized(right_stick);
 

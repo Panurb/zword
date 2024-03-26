@@ -139,7 +139,7 @@ int updated_id(int id, int ids[MAX_ENTITIES]) {
 
 
 void CoordinateComponent_serialize(cJSON* entity_json, int entity,
-        sfVector2f offset) {
+        Vector2f offset) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (!coord) return;
 
@@ -153,9 +153,9 @@ void CoordinateComponent_serialize(cJSON* entity_json, int entity,
 
 
 void CoordinateComponent_deserialize(cJSON* entity_json, int entity,
-        sfVector2f offset, float rotation) {
+        Vector2f offset, float rotation) {
     cJSON* coord_json = cJSON_GetObjectItem(entity_json, "Coordinate");
-    sfVector2f pos;
+    Vector2f pos;
     pos.x = cJSON_GetObjectItem(coord_json, "x")->valuedouble + offset.x;
     pos.y = cJSON_GetObjectItem(coord_json, "y")->valuedouble + offset.y;
     float angle = deserialize_float(coord_json, "angle", 0.0f) + rotation;
@@ -711,7 +711,7 @@ void TextComponent_deserialize(cJSON* entity_json, int entity) {
 
 
 bool serialize_entity(cJSON* entities_json, int entity, int id,
-        sfVector2f offset) {
+        Vector2f offset) {
     if (!CoordinateComponent_get(entity)) return false;
     if (WidgetComponent_get(entity)) return false;
     if (CameraComponent_get(entity)) return false;
@@ -745,7 +745,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
 
 
 int deserialize_entity(cJSON* entity_json, bool preserve_id,
-        sfVector2f offset, float rotation) {
+        Vector2f offset, float rotation) {
     int entity;
     if (preserve_id) {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
@@ -801,7 +801,7 @@ void update_deserialized_ids(int ids[MAX_ENTITIES]) {
 }
 
 
-cJSON* serialize_entities(List* entities, sfVector2f offset) {
+cJSON* serialize_entities(List* entities, Vector2f offset) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         serialized_ids[i] = NULL;
     }
@@ -838,7 +838,7 @@ void serialize_map(cJSON* json, bool preserve_id) {
 
     int ids[MAX_ENTITIES];
     int id = 0;
-    sfVector2f offset = zeros();
+    Vector2f offset = zeros();
     for (int i = 0; i < game_data->components->entities; i++) {
         if (preserve_id) {
             serialize_entity(entities_json, i, i, offset);
@@ -868,7 +868,7 @@ void deserialize_map(cJSON* json, bool preserve_id) {
         ids[i] = -1;
     }
     int i = 0;
-    sfVector2f offset = zeros();
+    Vector2f offset = zeros();
     cJSON_ArrayForEach(entity, entities) {
         if (!preserve_id) {
             i = cJSON_GetObjectItem(entity, "id")->valueint;
@@ -902,7 +902,7 @@ cJSON* serialize_game(bool preserve_id) {
 }
 
 
-void deserialize_entities(cJSON* json, sfVector2f offset, float rotation) {
+void deserialize_entities(cJSON* json, Vector2f offset, float rotation) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         deserialized_ids[i] = NULL;
     }

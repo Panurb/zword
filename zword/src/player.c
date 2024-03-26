@@ -25,7 +25,7 @@
 #include "health.h"
 
 
-int create_player(sfVector2f pos, float angle) {
+int create_player(Vector2f pos, float angle) {
     int joystick = -1;
     int i = create_entity();
 
@@ -42,7 +42,7 @@ int create_player(sfVector2f pos, float angle) {
     SoundComponent_add(i, "squish");
 
     int j = create_entity();
-    CoordinateComponent_add(j, (sfVector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
+    CoordinateComponent_add(j, (Vector2f) { 0.75f, 0.0f }, 0.0f)->parent = i;
     ImageComponent_add(j, "", 0.0f, 0.0f, LAYER_WEAPONS);
     AnimationComponent* animation = AnimationComponent_add(j, 1);
     animation->play_once = true;
@@ -56,7 +56,7 @@ int create_player(sfVector2f pos, float angle) {
 int get_slot(int i, int size) {
     PlayerComponent* player = PlayerComponent_get(i);
 
-    sfVector2f rs = player->controller.right_stick;
+    Vector2f rs = player->controller.right_stick;
     float angle = mod(polar_angle(rs) + 0.25 * M_PI, 2 * M_PI);
 
     return floor(size * angle / (2 * M_PI));
@@ -72,7 +72,7 @@ int get_attachment(int i) {
         int size = ItemComponent_get(item)->size;
         if (size > 0) {
             float slot_angle = 2 * M_PI / player->inventory_size;
-            sfVector2f rs = player->controller.right_stick;
+            Vector2f rs = player->controller.right_stick;
             float angle = polar_angle(rs) + 0.25 * M_PI;
             angle = mod(angle, slot_angle);
 
@@ -91,8 +91,8 @@ void update_players(float time_step) {
 
         PhysicsComponent* phys = PhysicsComponent_get(i);
         CoordinateComponent* coord = CoordinateComponent_get(i);
-        sfVector2f left_stick = player->controller.left_stick;
-        sfVector2f right_stick = player->controller.right_stick;
+        Vector2f left_stick = player->controller.left_stick;
+        Vector2f right_stick = player->controller.right_stick;
         int slot = get_slot(i, player->inventory_size);
         int atch = get_attachment(i);
 
@@ -135,7 +135,7 @@ void update_players(float time_step) {
         
         switch (player->state) {
             case PLAYER_ON_FOOT:;
-                sfVector2f pos = get_position(i);
+                Vector2f pos = get_position(i);
 
                 player->target = -1;
 

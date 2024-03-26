@@ -26,12 +26,12 @@
 #include "tile.h"
 
 
-void create_forest(ComponentData* components, ColliderGrid* grid, sfVector2f position, Permutation p, float forestation) {
+void create_forest(ComponentData* components, ColliderGrid* grid, Vector2f position, Permutation p, float forestation) {
     int n = 8;
     float m = n - 1;
     for (int i = 1; i < n; i++) {
         for (int j = 1; j < n; j++) {
-            sfVector2f r = { (i - n / 2) * CHUNK_WIDTH / m, (j - n / 2) * CHUNK_HEIGHT / m };
+            Vector2f r = { (i - n / 2) * CHUNK_WIDTH / m, (j - n / 2) * CHUNK_HEIGHT / m };
             r = sum(sum(position, r), rand_vector());
 
             if ((1.0f - forestation) < perlin(0.03f * r.x, 0.03f * r.y, 0.0, p, -1)) {
@@ -71,7 +71,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
 
     for (int i = 0; i < LEVEL_WIDTH; i++) {
         for (int j = 0; j < LEVEL_HEIGHT; j++) {
-            sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
+            Vector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
             if (i == 0 || j == 0 || i == LEVEL_WIDTH - 1 || j == LEVEL_WIDTH - 1) {
                 create_water(pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
             } else {
@@ -80,8 +80,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
         }
     }
 
-    sfVector2f pos = { (1.5f - 0.5f * LEVEL_WIDTH) * CHUNK_WIDTH, (1.0f - 0.5f * LEVEL_HEIGHT) * CHUNK_HEIGHT };
-    sfVector2f r = { 0.5f * CHUNK_WIDTH, 0.0f };
+    Vector2f pos = { (1.5f - 0.5f * LEVEL_WIDTH) * CHUNK_WIDTH, (1.0f - 0.5f * LEVEL_HEIGHT) * CHUNK_HEIGHT };
+    Vector2f r = { 0.5f * CHUNK_WIDTH, 0.0f };
     float angle = 1.5f * M_PI;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 2 * LEVEL_WIDTH - 5; j++) {
@@ -94,7 +94,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
         pos = sum(pos, r);
     }
 
-    sfVector2f start = zeros();
+    Vector2f start = zeros();
     create_house(components, start);
 
     angle = rand_angle();
@@ -103,7 +103,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     permute(buildings, n);
     float rad = 0.5f * (LEVEL_WIDTH - 3) * CHUNK_WIDTH;
 
-    sfVector2f prev_pos = zeros();
+    Vector2f prev_pos = zeros();
     int i = 0;
     while (i < n) {
         int m = randi(1, n - i);
@@ -148,12 +148,12 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     float f = 0.5f;
     for (int i = 1; i < LEVEL_WIDTH - 1; i++) {
         for (int j = 1; j < LEVEL_HEIGHT - 1; j++) {
-            sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
+            Vector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - LEVEL_WIDTH) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - LEVEL_HEIGHT) * CHUNK_HEIGHT };
 
             create_forest(components, grid, pos, perm, f);
 
             for (int i = 0; i < 2; i++) {
-                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+                Vector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
                 if (randf(0.0f, 1.0f) < 0.6f) {
                     create_zombie(sum(pos, r), 0.0f);
                 } else if (randf(0.0f, 1.0f) < 0.5f) {
@@ -167,7 +167,7 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
             }
 
             for (int i = 0; i < 2; i++) {
-                sfVector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
+                Vector2f r = { randf(-0.5, 0.5) * CHUNK_WIDTH, randf(-0.5, 0.5) * CHUNK_HEIGHT };
                 create_uranium(sum(pos, r));
             }
         }
@@ -178,8 +178,8 @@ void create_level(ComponentData* components, ColliderGrid* grid, int seed) {
     resize_roads(components);
 
     create_player(start, -1);
-    // create_player(sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
-    // create_player(sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
+    // create_player(sum(start, (Vector2f) { 0.0, -5.0 }), 0);
+    // create_player(sum(start, (Vector2f) { 4.0, -5.0 }), 1);
 }
 
 
@@ -194,7 +194,7 @@ void test(ComponentData* components) {
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
-            sfVector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - 5) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - 5) * CHUNK_HEIGHT };
+            Vector2f pos = { CHUNK_WIDTH * i + 0.5f * (1 - 5) * CHUNK_WIDTH, CHUNK_HEIGHT * j + 0.5f * (1 - 5) * CHUNK_HEIGHT };
             if (i == 0 || j == 0 || i == 5 - 1 || j == 5 - 1) {
                 create_water(pos, CHUNK_WIDTH, CHUNK_HEIGHT, noise_texture);
             } else {
@@ -203,7 +203,7 @@ void test(ComponentData* components) {
         }
     }
 
-    sfVector2f start = zeros();
+    Vector2f start = zeros();
     create_mansion(components, start);
     // create_school(components, start);
     create_fire(vec(0.0f, 1.0f));
@@ -215,6 +215,6 @@ void test(ComponentData* components) {
     create_ammo(sum(start, rand_vector()), AMMO_RIFLE);
     create_axe(sum(start, rand_vector()));
     // create_big_boy(components, sum(start, vec(-3.0f, 1.0f)), 0.0f);
-    // create_player(sum(start, (sfVector2f) { 0.0, -5.0 }), 0);
-    // create_player(sum(start, (sfVector2f) { 4.0, -5.0 }), 1);
+    // create_player(sum(start, (Vector2f) { 0.0, -5.0 }), 0);
+    // create_player(sum(start, (Vector2f) { 4.0, -5.0 }), 1);
 }

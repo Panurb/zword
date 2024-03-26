@@ -16,11 +16,11 @@
 #include "tile.h"
 
 
-void create_church(sfVector2f pos) {
+void create_church(Vector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
 
     create_floor(pos, 30.0f, 10.0f, angle, "tiles_tile");
     create_floor(sum(pos, mult(5.0f, w)), 10.0f, 20.0f, angle, "tiles_tile");
@@ -94,11 +94,11 @@ void create_church(sfVector2f pos) {
 }
 
 
-void create_barn(sfVector2f pos) {
+void create_barn(Vector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = polar_to_cartesian(1.0f, angle + 0.5f * M_PI);
 
     create_floor(pos, 25.0f, 14.0f, angle, "board_tile");
 
@@ -107,7 +107,7 @@ void create_barn(sfVector2f pos) {
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 3; j++) {
-            sfVector2f r = sum(mult(3.0f * i - 4.5f, h), mult(6.5f + 2.0f * j, w));
+            Vector2f r = sum(mult(3.0f * i - 4.5f, h), mult(6.5f + 2.0f * j, w));
             create_hay_bale(sum(pos, r), angle + 0.5f * M_PI + randf(-0.1f, 0.1f));
         }
     }
@@ -158,11 +158,11 @@ void create_barn(sfVector2f pos) {
 }
 
 
-void create_house(sfVector2f pos) {
+void create_house(Vector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = perp(w);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = perp(w);
 
     create_floor(pos, 16.0f, 16.0f, angle, "board_tile");
     // create_roof(sum(pos, mult(4.0f, h)), 16.0f, 8.0f, angle);
@@ -240,11 +240,11 @@ void create_house(sfVector2f pos) {
 }
 
 
-void create_outhouse(sfVector2f pos) {
+void create_outhouse(Vector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = perp(w);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = perp(w);
 
     create_floor(pos, 3.0f, 3.0f, angle, "board_tile");
 
@@ -266,11 +266,11 @@ void create_outhouse(sfVector2f pos) {
 }
 
 
-void create_garage(sfVector2f pos) {
+void create_garage(Vector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = perp(w);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = perp(w);
 
     create_floor(pos, 9.0f, 6.0f, angle, "board_tile");
 
@@ -288,11 +288,11 @@ void create_garage(sfVector2f pos) {
 }
 
 
-void create_mansion(sfVector2f pos) {
+void create_mansion(Vector2f pos) {
     float angle = 0.0f;
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = perp(w);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = perp(w);
 
     create_floor(sum(pos, mult(14.0f, w)), 20.0f, 16.0f, angle, "board_tile");
     create_floor(sum(pos, lin_comb(-4.0, w, -16.0f, h)), 40.0f, 16.0f, angle, "board_tile");
@@ -371,11 +371,11 @@ void create_mansion(sfVector2f pos) {
 }
 
 
-void create_school(sfVector2f pos) {
+void create_school(Vector2f pos) {
     float angle = rand_angle();
 
-    sfVector2f w = polar_to_cartesian(1.0f, angle);
-    sfVector2f h = perp(w);
+    Vector2f w = polar_to_cartesian(1.0f, angle);
+    Vector2f h = perp(w);
 
     create_floor(pos, 32.0f, 26.0f, angle, "board_tile");
 
@@ -403,7 +403,7 @@ void create_school(sfVector2f pos) {
     create_lamp(sum(pos, lin_comb(-14.0f, w, -11.0f, h)));
 
     for (int i = 0; i < 10; i++) {
-        sfVector2f r = { randf(-14.0f, 14.0f), randf(-11.0f, 11.0f) };
+        Vector2f r = { randf(-14.0f, 14.0f), randf(-11.0f, 11.0f) };
         create_decal(sum(pos, lin_comb(r.x, w, r.y, h)), "blood_large", -1);
     }
     
@@ -411,7 +411,7 @@ void create_school(sfVector2f pos) {
 
     for (int i = -2; i < 3; i++) {
         for (int j = -2; j < 3; j++) {
-            sfVector2f r = sum(pos, lin_comb(4.0f * (i + 1), w, 4.0f * j, h));
+            Vector2f r = sum(pos, lin_comb(4.0f * (i + 1), w, 4.0f * j, h));
             create_desk(r, angle + randf(-0.1f, 0.1f));
         }
     }

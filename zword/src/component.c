@@ -48,7 +48,7 @@ ComponentData* ComponentData_create() {
 }
 
 
-CoordinateComponent* CoordinateComponent_add(int entity, sfVector2f pos, float angle) {
+CoordinateComponent* CoordinateComponent_add(int entity, Vector2f pos, float angle) {
     CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
     coord->position = pos;
     coord->angle = mod(angle, 2.0f * M_PI);
@@ -452,10 +452,10 @@ VehicleComponent* VehicleComponent_add(int entity, float max_fuel) {
     for (int i = 0; i < vehicle->size; i++) {
         vehicle->riders[i] = -1;
     }
-    vehicle->seats[0] = (sfVector2f) { 1.5f, 0.75f };
-    vehicle->seats[1] = (sfVector2f) { 1.5f, -0.75f };
-    vehicle->seats[2] = (sfVector2f) { 0.0f, 0.75f };
-    vehicle->seats[3] = (sfVector2f) { 0.0f, -0.75f };
+    vehicle->seats[0] = (Vector2f) { 1.5f, 0.75f };
+    vehicle->seats[1] = (Vector2f) { 1.5f, -0.75f };
+    vehicle->seats[2] = (Vector2f) { 0.0f, 0.75f };
+    vehicle->seats[3] = (Vector2f) { 0.0f, -0.75f };
 
     game_data->components->vehicle[entity] = vehicle;
 
@@ -1001,9 +1001,9 @@ void ComponentData_clear() {
 }
 
 
-sfVector2f get_position(int entity) {
+Vector2f get_position(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
-    sfVector2f position = coord->position;
+    Vector2f position = coord->position;
 
     int parent = coord->parent;
     if (parent != -1) {

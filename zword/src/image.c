@@ -102,7 +102,7 @@ static const char* IMAGES[] = {
 };
 
 
-int create_decal(sfVector2f pos, Filename filename, float lifetime) {
+int create_decal(Vector2f pos, Filename filename, float lifetime) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle())->lifetime = 60.0f;
     ImageComponent_add(i, filename, 0.0f, 0.0f, LAYER_DECALS);
@@ -170,7 +170,7 @@ void draw_ground(int camera) {
             image->texture_changed = false;
         }
 
-        sfVector2f pos = get_position(i);
+        Vector2f pos = get_position(i);
         float w = image->scale.x * image->width;
         float h = image->scale.y * image->height;
         float r = sqrtf(w * w + h * h);
@@ -201,7 +201,7 @@ void draw_image(int entity, int camera) {
     image->scale.x = 1.0f - image->stretch;
     image->scale.y = 1.0f + image->stretch;
 
-    sfVector2f pos = get_position(entity);
+    Vector2f pos = get_position(entity);
     float w = image->scale.x * image->width;
     float h = image->scale.y * image->height;
     float r = sqrtf(w * w + h * h);
@@ -301,7 +301,7 @@ void color_pixel(sfUint8* pixels, int width, int x, int y, sfColor color, float 
 }
 
 
-void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfColor color, float sharpness, Permutation p) {
+void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, sfColor color, float sharpness, Permutation p) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;
@@ -318,8 +318,8 @@ void create_noise(sfUint8* pixels, int width, int height, sfVector2f origin, sfC
 }
 
 
-bool point_inside_image(int entity, sfVector2f point) {
-    sfVector2f position = get_position(entity);
+bool point_inside_image(int entity, Vector2f point) {
+    Vector2f position = get_position(entity);
     float angle = get_angle(entity);
     ImageComponent* image = ImageComponent_get(entity);
     return point_inside_rectangle(position, angle, image->width, image->height, point);

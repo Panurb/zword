@@ -10,7 +10,7 @@
 
 void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f pos = get_position(entity);
+    Vector2f pos = get_position(entity);
 
     float gap = 0.2;
     float slice = (2 * M_PI / player->inventory_size);
@@ -31,7 +31,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
 
         sfSprite* sprite = ImageComponent_get(i)->sprite;
 
-        sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
+        Vector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
         float angle = (slot - 1) * 0.5f * M_PI;
 
         if (i == player->grabbed_item) {
@@ -49,7 +49,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
 
 void draw_menu_attachment(int camera, int entity, int slot, int atch, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f pos = get_position(entity);
+    Vector2f pos = get_position(entity);
     ItemComponent* item = ItemComponent_get(player->inventory[slot]);
 
     float gap = 0.2;
@@ -69,7 +69,7 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
 
         sfSprite* sprite = ImageComponent_get(a)->sprite;
 
-        sfVector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + (atch + 1.5) * slice / (item->size + 1));
+        Vector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + (atch + 1.5) * slice / (item->size + 1));
 
         if (a == player->grabbed_item) {
             r = mult(2.5, player->controller.right_stick);
@@ -82,7 +82,7 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
 
 void draw_ammo_slot(int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f pos = get_position(entity);
+    Vector2f pos = get_position(entity);
 
     float gap = 0.2f;
     float slice = (2 * M_PI / (player->ammo_size - 1));
@@ -126,7 +126,7 @@ void draw_ammo_menu(int camera, int entity) {
 
 
 void draw_item_use(int camera, int entity) {
-    sfVector2f position = get_position(entity);
+    Vector2f position = get_position(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
     int i = player->inventory[player->item];
     ItemComponent* item = ItemComponent_get(i);
@@ -139,7 +139,7 @@ void draw_item_use(int camera, int entity) {
 
 void draw_money(int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    sfVector2f position = sum(get_position(entity), 
+    Vector2f position = sum(get_position(entity), 
         vec(0.0f, (1.0f - player->money_timer) * sign(player->money_increment)));
 
     char buffer[256];
@@ -155,7 +155,7 @@ void draw_hud(int camera) {
     for (int i = 0; i < game_data->components->entities; i++) {
         if (!CoordinateComponent_get(i)) continue;
 
-        sfVector2f position = get_position(i);
+        Vector2f position = get_position(i);
 
         TextComponent* text = TextComponent_get(i);
         if (text) {
@@ -180,7 +180,7 @@ void draw_hud(int camera) {
             weapon = WeaponComponent_get(item);
         }
 
-        sfVector2f pos;
+        Vector2f pos;
         if (player->controller.joystick == -1) {
             pos = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
         } else {

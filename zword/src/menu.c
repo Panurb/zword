@@ -118,7 +118,7 @@ void toggle_play(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_play = create_window(pos, "PLAY", 1, toggle_play);
 
     int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
@@ -138,7 +138,7 @@ void toggle_new_map(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_new_map = create_window(pos, "NEW MAP", 2, toggle_new_map);
 
     int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 2, 2);
@@ -159,7 +159,7 @@ void toggle_editor(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_editor = create_window(pos, "EDITOR", 1, toggle_editor);
 
     int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
@@ -191,7 +191,7 @@ void toggle_settings(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_settings = create_window(pos, "SETTINGS", 2, toggle_settings);
 
     int container = create_container(vec(0.0f, -2.5f * BUTTON_HEIGHT), 2, 4);
@@ -222,7 +222,7 @@ void toggle_keyboard_controls(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_keyboard_controls = create_window(pos, "KEYBOARD CONTROLS", 2, toggle_keyboard_controls);
 
     int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
@@ -245,7 +245,7 @@ void toggle_xbox_controls(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_xbox_controls = create_window(pos, "CONTROLS", 2, toggle_xbox_controls);
 
     int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
@@ -268,7 +268,7 @@ void toggle_controls(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_controls = create_window(pos, "CONTROLS", 1, toggle_controls);
 
     int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
@@ -287,7 +287,7 @@ void toggle_credits(int entity) {
         return;
     }
 
-    sfVector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_credits = create_window(pos, "CREDITS", 2, toggle_credits);
 
     int container = create_container(vec(0.0f, -3.5f * BUTTON_HEIGHT), 2, 6);
@@ -347,7 +347,7 @@ void input_menu(int camera, sfEvent event) {
 void draw_menu() {
     draw_widgets(game_data->menu_camera);
 
-    sfVector2f pos = screen_to_world(game_data->menu_camera, sfMouse_getPosition((sfWindow*) game_window));
+    Vector2f pos = screen_to_world(game_data->menu_camera, sfMouse_getPosition((sfWindow*) game_window));
     draw_circle(game_data->menu_camera, NULL, pos, 0.1f, sfWhite);
 }
 

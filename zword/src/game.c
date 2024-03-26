@@ -188,7 +188,7 @@ void end_game() {
 }
 
 
-int spawn_enemy(sfVector2f position, float probs[4]) {
+int spawn_enemy(Vector2f position, float probs[4]) {
     int j = -1;
     float angle = rand_angle();
     switch (rand_choice(probs, 4)) {
@@ -249,7 +249,7 @@ int spawn_enemies(int camera, float time_step, int max_enemies) {
         float x = randf(-1.0f, 1.0f);
         float y = randf(-1.0f, 1.0f);
 
-        sfVector2f pos = get_position(spawner);
+        Vector2f pos = get_position(spawner);
         pos = sum(pos, lin_comb(x, half_width(spawner), y, half_height(spawner)));
 
         if (on_screen(camera, pos, 2.0f, 2.0f)) {
@@ -433,8 +433,8 @@ void draw_parents() {
     for (int i = 0; i < game_data->components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         if (coord && coord->parent != -1) {
-            sfVector2f start = get_position(i);
-            sfVector2f end = get_position(coord->parent);
+            Vector2f start = get_position(i);
+            Vector2f end = get_position(coord->parent);
             draw_line(game_data->camera, NULL, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
         }
     }
@@ -499,7 +499,7 @@ void draw_game_over() {
 }
 
 
-int create_tutorial(sfVector2f position) {
+int create_tutorial(Vector2f position) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, 0.0f);
     ColliderComponent_add_circle(entity, 1.0f, GROUP_CORPSES);
@@ -509,7 +509,7 @@ int create_tutorial(sfVector2f position) {
 }
 
 
-int create_level_end(sfVector2f position, float angle, float width, float height) {
+int create_level_end(Vector2f position, float angle, float width, float height) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, angle);
     ColliderComponent* collider = ColliderComponent_add_rectangle(entity, width, height, GROUP_WALLS);
@@ -528,7 +528,7 @@ void draw_tutorials() {
 
         ColliderComponent* collider = ColliderComponent_get(i);
         if (collider && collider->trigger_type == TRIGGER_WIN) {
-            sfVector2f pos = get_position(i);
+            Vector2f pos = get_position(i);
             sfColor color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
             float angle = get_angle(i);
             draw_rectangle(game_data->camera, NULL, pos, collider->width, collider->height, angle, 

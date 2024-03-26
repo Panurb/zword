@@ -58,7 +58,7 @@ void reload(int i) {
 }
 
 
-void create_energy(sfVector2f position, sfVector2f velocity) {
+void create_energy(Vector2f position, Vector2f velocity) {
     int i = create_entity();
     CoordinateComponent_add(i, position, rand_angle());
     ImageComponent_add(i, "energy", 1.0f, 1.0f, LAYER_PARTICLES);
@@ -101,8 +101,8 @@ void update_energy() {
 }
 
 
-int create_rope(sfVector2f start, sfVector2f end) {
-    sfVector2f r = diff(end, start);
+int create_rope(Vector2f start, Vector2f end) {
+    Vector2f r = diff(end, start);
     float seg_len = 0.5f;
     float len = norm(r);
 
@@ -110,7 +110,7 @@ int create_rope(sfVector2f start, sfVector2f end) {
     int n = len / seg_len;
     for (int i = 0; i < n; i++) {
         int current = create_entity();
-        sfVector2f pos = sum(start, mult((i * seg_len) / len, r));
+        Vector2f pos = sum(start, mult((i * seg_len) / len, r));
         CoordinateComponent_add(current, pos, 0.0f);
         PhysicsComponent_add(current, 0.2f);
         JointComponent_add(current, prev, 0.0f, seg_len, 1.0f);
@@ -160,7 +160,7 @@ void attack(int entity) {
         AnimationComponent_get(player->arms)->framerate = 20.0f;
     }
 
-    sfVector2f pos = get_position(parent);
+    Vector2f pos = get_position(parent);
 
     switch (weapon->ammo_type) {
         case AMMO_MELEE: {
@@ -174,7 +174,7 @@ void attack(int entity) {
             int rays = 7;
             for (int i = 0; i < rays; i++) {
                 float angle = i * weapon->spread / (rays - 1) - 0.5f * weapon->spread;
-                sfVector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
+                Vector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
                 HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
                 float d = dist(info.position, pos);
@@ -205,7 +205,7 @@ void attack(int entity) {
                 if (enemy && enemy->state == ENEMY_IDLE) {
                     dmg *= 2;
                 }
-                sfVector2f dir = normalized(diff(min_info[i].position, pos));
+                Vector2f dir = normalized(diff(min_info[i].position, pos));
                 damage(min_info[i].entity, min_info[i].position, dir, dmg, parent);
                 shake_camera(0.0125f * weapon->damage);
             }
@@ -216,13 +216,13 @@ void attack(int entity) {
                 if (weapon->spread > 0.0f) {
                     angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                 }
-                sfVector2f vel = polar_to_cartesian(7.0f, get_angle(parent) + angle);
+                Vector2f vel = polar_to_cartesian(7.0f, get_angle(parent) + angle);
                 create_energy(sum(get_position(entity), mult(1.0f / 14.0f, vel)), vel);
             }
             break;
         } case AMMO_ROPE: {
             float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-            sfVector2f dir = polar_to_cartesian(1.0f, get_angle(parent) + angle);
+            Vector2f dir = polar_to_cartesian(1.0f, get_angle(parent) + angle);
             HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
             int i = create_rope(info.position, get_position(parent));
@@ -244,7 +244,7 @@ void attack(int entity) {
                 if (weapon->spread > 0.0f) {
                     angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
                 }
-                sfVector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
+                Vector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
                 HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
                 int dmg = weapon->damage;
@@ -311,7 +311,7 @@ void update_weapons(float time_step) {
 }
 
 
-int create_pistol(sfVector2f position) {
+int create_pistol(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -328,7 +328,7 @@ int create_pistol(sfVector2f position) {
 }
 
 
-int create_shotgun(sfVector2f position) {
+int create_shotgun(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -345,7 +345,7 @@ int create_shotgun(sfVector2f position) {
 }
 
 
-int create_sawed_off(sfVector2f position) {
+int create_sawed_off(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -362,7 +362,7 @@ int create_sawed_off(sfVector2f position) {
 }
 
 
-int create_rifle(sfVector2f position) {
+int create_rifle(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -379,7 +379,7 @@ int create_rifle(sfVector2f position) {
 }
 
 
-int create_assault_rifle(sfVector2f position) {
+int create_assault_rifle(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -396,7 +396,7 @@ int create_assault_rifle(sfVector2f position) {
 }
 
 
-int create_smg(sfVector2f position) {
+int create_smg(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -413,7 +413,7 @@ int create_smg(sfVector2f position) {
 }
 
 
-int create_axe(sfVector2f position) {
+int create_axe(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
@@ -428,7 +428,7 @@ int create_axe(sfVector2f position) {
 }
 
 
-int create_sword(sfVector2f position) {
+int create_sword(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, 0.0f);
@@ -443,7 +443,7 @@ int create_sword(sfVector2f position) {
 }
  
 
-int create_rope_gun(sfVector2f position) {
+int create_rope_gun(Vector2f position) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());
@@ -458,7 +458,7 @@ int create_rope_gun(sfVector2f position) {
 }
 
 
-int create_lasersight(sfVector2f pos) {
+int create_lasersight(Vector2f pos) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle());
     PhysicsComponent_add(i, 0.5f);
@@ -470,7 +470,7 @@ int create_lasersight(sfVector2f pos) {
 }
 
 
-int create_ammo(sfVector2f position, AmmoType type) {
+int create_ammo(Vector2f position, AmmoType type) {
     int i = create_entity();
 
     CoordinateComponent_add(i, position, rand_angle());

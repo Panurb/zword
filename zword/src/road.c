@@ -3,24 +3,24 @@
 #include "road.h"
 
 
-sfVector2f perlin_grad(sfVector2f position, Permutation perm) {
+Vector2f perlin_grad(Vector2f position, Permutation perm) {
     float dx = 0.1;
     float dy = 0.1;
     float x1 = perlin(position.x - dx, position.y, 0.0, perm, -1);
     float x2 = perlin(position.x + dx, position.y, 0.0, perm, -1);
     float y1 = perlin(position.x, position.y - dy, 0.0, perm, -1);
     float y2 = perlin(position.x, position.y + dy, 0.0, perm, -1);
-    sfVector2f grad = { (x2 - x1) / dx, (y2 - y1) / dy };
+    Vector2f grad = { (x2 - x1) / dx, (y2 - y1) / dy };
 
     return grad;
 }
 
 
-int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f end, float curviness, float width, Filename filename) {
+int create_road_curves(ComponentData* components, Vector2f start, Vector2f end, float curviness, float width, Filename filename) {
     int n = dist(start, end) / 5.0;
 
-    sfVector2f position = end;
-    sfVector2f delta = mult(1.0 / n, diff(start, end));
+    Vector2f position = end;
+    Vector2f delta = mult(1.0 / n, diff(start, end));
 
     int next = -1;
     int current = -1;
@@ -28,8 +28,8 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
     for (int i = 0; i < n; i++) {
         current = create_entity();
 
-        sfVector2f grad = rand_vector();
-        sfVector2f pos = diff(position, mult(curviness, grad));
+        Vector2f grad = rand_vector();
+        Vector2f pos = diff(position, mult(curviness, grad));
 
         CoordinateComponent_add(current, pos, 0.0);
         RoadComponent* road = RoadComponent_add(current, width, filename);
@@ -41,13 +41,13 @@ int create_road_curves(ComponentData* components, sfVector2f start, sfVector2f e
             next_road->prev = current;
 
             if (next_road->next != -1) {
-                sfVector2f next_pos = get_position(road->next);
-                sfVector2f next_next_pos = get_position(next_road->next);
-                sfVector2f r1 = diff(next_pos, pos);
-                sfVector2f r2 = diff(next_next_pos, next_pos);
+                Vector2f next_pos = get_position(road->next);
+                Vector2f next_next_pos = get_position(next_road->next);
+                Vector2f r1 = diff(next_pos, pos);
+                Vector2f r2 = diff(next_next_pos, next_pos);
                 next_road->curve = signed_angle(r1, r2);
 
-                sfVector2f v = rotate(bisector(r1, r2), -0.5 * M_PI * sign(next_road->curve));
+                Vector2f v = rotate(bisector(r1, r2), -0.5 * M_PI * sign(next_road->curve));
                 CoordinateComponent_get(next)->angle = polar_angle(v);
             }
         }
@@ -70,8 +70,8 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 
         int i = create_entity();
 
-        sfVector2f pos = get_position(current);
-        sfVector2f next_pos = get_position(road->next);
+        Vector2f pos = get_position(current);
+        Vector2f next_pos = get_position(road->next);
 
         float margin_1 = 0.5 * road->width * tanf(0.5 * fabs(road->curve));
         float margin_2 = 0.5 * road->width * tanf(0.5 * fabs(next_road->curve));
@@ -79,7 +79,7 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
         float d = dist(next_pos, pos);
         float length = d - margin_1 - margin_2;
 
-        sfVector2f r = sum(pos, mult((0.5 * length + margin_1) / d, diff(next_pos, pos)));
+        Vector2f r = sum(pos, mult((0.5 * length + margin_1) / d, diff(next_pos, pos)));
 
         float angle = polar_angle(diff(next_pos, pos));
         CoordinateComponent_add(i, r, angle);
@@ -107,14 +107,14 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 }
 
 
-void create_road(ComponentData* components, sfVector2f start, sfVector2f end) {
-    sfVector2f r = mult(10.0f, normalized(diff(end, start)));
+void create_road(ComponentData* components, Vector2f start, Vector2f end) {
+    Vector2f r = mult(10.0f, normalized(diff(end, start)));
     int current = create_road_curves(components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
     create_road_segments(components, current, GROUP_ROADS);
 }
 
 
-void create_river(ComponentData* components, sfVector2f start, sfVector2f end) {
+void create_river(ComponentData* components, Vector2f start, Vector2f end) {
     int current = create_road_curves(components, start, end, 1.0, 8.0, "river");
     create_road_segments(components, current, GROUP_BARRIERS);
 }
@@ -137,13 +137,13 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
         float h = PIXELS_PER_UNIT * road->width * sinf(fabs(road->curve));
         sfConvexShape_setTextureRect(road->shape, (sfIntRect) { 0, 0, w, h });
 
-        sfConvexShape_setPoint(road->shape, 0, zeros());
-        sfConvexShape_setPoint(road->shape, road->points - 1, zeros());
+        sfConvexShape_setPoint(road->shape, 0, (sfVector2f) { 0.0f, 0.0f });
+        sfConvexShape_setPoint(road->shape, road->points - 1, (sfVector2f) { 0.0f, 0.0f });
 
         float ang = 0.0;
         for (int i = 1; i < road->points - 1; i++) {
-            sfVector2f point = polar_to_cartesian(road->width, ang);
-            sfConvexShape_setPoint(road->shape, i, point);
+            Vector2f point = polar_to_cartesian(road->width, ang);
+            sfConvexShape_setPoint(road->shape, i, (sfVector2f) { point.x, point.y });
             ang += fabs(road->curve) / (road->points - 3);
         }
 
@@ -151,7 +151,7 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
         road->texture_changed = false;
     }
 
-    sfVector2f pos = get_position(entity);
+    Vector2f pos = get_position(entity);
     float margin = 0.5 * road->width * tanf(0.5 * spread);
     pos = diff(pos, polar_to_cartesian(sqrtf(margin * margin + 0.25 * road->width * road->width), angle));
 
