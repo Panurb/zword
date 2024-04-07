@@ -41,7 +41,7 @@ void draw_slice(int camera, sfVertexArray* verts, int verts_size, Vector2f posit
 void draw_slice_outline(int camera, sfRectangleShape* shape, Vector2f position, float min_range, float max_range, 
     float angle, float spread);
 
-void draw_sprite(int camera, sfSprite* sprite, Vector2f position, float angle, Vector2f scale, int shader_index);
+void draw_sprite(int camera, Filename filename, float width, float height, int offset, Vector2f position, float angle, Vector2f scale, float alpha, int shader_index);
 
 void draw_text(int camera, sfText* text, Vector2f position, char string[100], int size, sfColor color);
 

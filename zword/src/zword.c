@@ -82,13 +82,6 @@ int main() {
     sfMusic_setLoop(music, true);
     float music_fade = 0.0f;
 
-    sfSprite* menu_sprite = sfSprite_create();
-    sfTexture* menu_texture = sfTexture_createFromFile("data/images/menu.png", NULL);
-    sfSprite_setTexture(menu_sprite, menu_texture, sfTrue);
-
-    sfSprite* title_sprite = sfSprite_create();
-    sfTexture* title_texture = sfTexture_createFromFile("data/images/title.png", NULL);
-    sfSprite_setTexture(title_sprite, title_texture, sfTrue);
     float title_scale = 2.0f;
 
     while (sfRenderWindow_isOpen(game_window)) {
@@ -201,10 +194,8 @@ int main() {
 
         switch (game_state) {
             case STATE_MENU:
-                draw_sprite(game_data->menu_camera, menu_sprite, zeros(), 0.0f, 
-                    mult(3.5f, ones()), 0);
-                draw_sprite(game_data->menu_camera, title_sprite, vec(0.0f, 9.0f), 0.0f, 
-                    vec(title_scale, title_scale), 0);
+                draw_sprite(game_data->menu_camera, "menu", 0, 0, 0, zeros(), 0.0f, mult(3.5f, ones()), 1.0f, 0);
+                draw_sprite(game_data->menu_camera, "title", 0, 0, 0, vec(0.0f, 9.0f), 0.0f, vec(title_scale, title_scale), 1.0f, 0);
                 draw_menu();
 
                 String buffer;
@@ -243,8 +234,9 @@ int main() {
 
         if (debug_level) {
             draw_debug(debug_level);
-            draw_fps(game_window, fps, delta_time);
         }
+
+        draw_fps(game_window, fps, delta_time);
 
         sfRenderWindow_display(game_window);
 

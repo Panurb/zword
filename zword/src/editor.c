@@ -848,8 +848,7 @@ void draw_editor() {
             ColliderComponent* collider = ColliderComponent_get(i);
             if (image) {
                 if (image->layer > LAYER_WALLS) {
-                    draw_sprite(game_data->camera, image->sprite, pos, angle, image->scale, 
-                        SHADER_OUTLINE);
+                    draw_sprite(game_data->camera, image->filename, image->width, image->height, 0, pos, angle, image->scale, image->alpha, SHADER_OUTLINE);
                 } else {
                     draw_rectangle_outline(game_data->camera, NULL, pos, image->width, 
                         image->height, angle, 0.05f, sfWhite);

@@ -29,7 +29,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
     if (i != -1) {
         ItemComponent* item = ItemComponent_get(i);
 
-        sfSprite* sprite = ImageComponent_get(i)->sprite;
+        ImageComponent* image = ImageComponent_get(i);
 
         Vector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
         float angle = (slot - 1) * 0.5f * M_PI;
@@ -39,10 +39,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
             angle = polar_angle(r) - 0.5f * M_PI;
         }
 
-        float alpha = sfSprite_getColor(sprite).a;
-        sfSprite_setColor(sprite, sfWhite);
-        draw_sprite(camera, sprite, sum(pos, r), angle, ones(), 0);
-        sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
+        draw_sprite(camera, image->filename, image->width, image->height, 0, sum(pos, r), angle, ones(), 1.0f, 0);
     }
 }
 
@@ -67,7 +64,7 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
 
         draw_slice(camera, NULL, 50, pos, 1.2 + offset, 1.8 + offset, angle, spread, color);
 
-        sfSprite* sprite = ImageComponent_get(a)->sprite;
+        ImageComponent* image = ImageComponent_get(a);
 
         Vector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + (atch + 1.5) * slice / (item->size + 1));
 
@@ -75,7 +72,9 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
             r = mult(2.5, player->controller.right_stick);
         }
 
-        draw_sprite(camera, sprite, sum(pos, r), (slot - 1) * 0.5f * M_PI, mult(0.75, ones()), 0);
+        float angle = (slot - 1) * 0.5f * M_PI;
+        Vector2f scale = mult(0.75, ones());
+        draw_sprite(camera, image->filename, image->width, image->height, 0, sum(pos, r), angle, scale, 1.0f, 0);
     }
 }
 
@@ -99,11 +98,8 @@ void draw_ammo_slot(int camera, int entity, int slot, float offset, float alpha)
 
     int i = player->ammo[slot + 1];
     if (i != -1) {
-        sfSprite* sprite = ImageComponent_get(i)->sprite;
-        float alpha = sfSprite_getColor(sprite).a;
-        sfSprite_setColor(sprite, sfWhite);
-        draw_sprite(camera, sprite, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 0);
-        sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
+        ImageComponent* image = ImageComponent_get(i);
+        draw_sprite(camera, image->filename, image->width, image->height, 0, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 1.0f, 0);
 
         char buffer[20];
         snprintf(buffer, 20, "%i", AmmoComponent_get(i)->size);

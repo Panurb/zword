@@ -61,7 +61,7 @@ void animate(float time_step) {
         int width = PIXELS_PER_UNIT * image->width;
         int height = PIXELS_PER_UNIT * image->height;
         sfIntRect rect = { animation->current_frame * width, 0, width, height };
-        sfSprite_setTextureRect(image->sprite, rect);
+        // sfSprite_setTextureRect(image->sprite, rect);
     }
 }
 

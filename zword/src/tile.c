@@ -22,7 +22,7 @@ void create_ground(Vector2f position, float width, float height, sfTexture* nois
         image->scale = (Vector2f) { 8.0, 8.0 };
         image->texture_changed = false;
         image->alpha = 1.0f;
-        sfSprite_setTexture(image->sprite, noise_texture, false);
+        // sfSprite_setTexture(image->sprite, noise_texture, false);
     }
 }
 
@@ -40,7 +40,7 @@ void create_water(Vector2f position, float width, float height, sfTexture* noise
         image->scale = (Vector2f) { 8.0f, 8.0f };
         image->texture_changed = false;
         image->alpha = 0.3f;
-        sfSprite_setTexture(image->sprite, noise_texture, false);
+        // sfSprite_setTexture(image->sprite, noise_texture, false);
     }
 }
 

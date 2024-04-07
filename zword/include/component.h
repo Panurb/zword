@@ -41,9 +41,9 @@ typedef enum {
 typedef struct {
     bool texture_changed;
     Filename filename;
+    int texture_index;
     float width;
     float height;
-    sfSprite* sprite;
     float shine;
     Layer layer;
     Vector2f scale;

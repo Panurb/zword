@@ -16,11 +16,9 @@ int create_decal(Vector2f pos, Filename filename, float lifetime);
 
 sfTexture** load_textures();
 
-int texture_index(Filename filename);
+int get_texture_index(Filename filename);
 
 void set_texture(ImageComponent* image);
-
-sfTexture* load_texture(Filename filename);
 
 void draw_ground(int camera);
 

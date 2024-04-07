@@ -134,25 +134,13 @@ sfTexture** load_textures() {
 }
 
 
-int texture_index(Filename filename) {
+int get_texture_index(Filename filename) {
     return binary_search_filename(filename, (char**) IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
 }
 
 
 void set_texture(ImageComponent* image) {
-    int i = texture_index(image->filename);
-    
-    if (i != -1) {
-        sfSprite_setTexture(image->sprite, game_data->textures[i], sfTrue);
-        if (image->width != 0.0f && image->height != 0.0f) {
-            sfIntRect rect = { 0, 0, image->width * PIXELS_PER_UNIT, image->height * PIXELS_PER_UNIT };
-            sfSprite_setTextureRect(image->sprite, rect);
-        } else {
-            sfFloatRect bounds = sfSprite_getLocalBounds(image->sprite);
-            image->width = bounds.width / PIXELS_PER_UNIT;
-            image->height = bounds.height / PIXELS_PER_UNIT;
-        }
-    }
+    image->texture_index = get_texture_index(image->filename);
 }
 
 
@@ -183,8 +171,7 @@ void draw_ground(int camera) {
         }
 
         if (image->alpha > 0.0f) {
-            sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
-            draw_sprite(camera, image->sprite, pos, get_angle(i), image->scale, 0);
+            draw_sprite(camera, image->filename, image->width, image->height, 0, pos, get_angle(i), image->scale, image->alpha, 0);
         }
     }
 }
@@ -208,10 +195,15 @@ void draw_image(int entity, int camera) {
     if (!on_screen(camera, pos, r, r)) {
         return;
     }
+    
+    int offset = 0;
+    AnimationComponent* animation = AnimationComponent_get(entity);
+    if (animation) {
+        offset = animation->current_frame;
+    }
 
-    sfSprite_setColor(image->sprite, get_color(1.0f, 1.0f, 1.0f, image->alpha));
     if (image->alpha > 0.0f) {
-        draw_sprite(camera, image->sprite, pos, get_angle(entity), image->scale, 0);
+        draw_sprite(camera, image->filename, image->width, image->height, offset, pos, get_angle(entity), image->scale, image->alpha, SHADER_NONE);
     }
 }
 

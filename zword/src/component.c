@@ -93,7 +93,6 @@ ImageComponent* ImageComponent_add(int entity, Filename filename, float width, f
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
-    image->sprite = sfSprite_create();
     image->shine = 1.0;
     image->layer = layer;
     image->scale = ones();
@@ -118,8 +117,6 @@ ImageComponent* ImageComponent_get(int entity) {
 void ImageComponent_remove(int entity) {
     ImageComponent* image = ImageComponent_get(entity);
     if (image) {
-        sfSprite_destroy(image->sprite);
-
         free(image);
         game_data->components->image.array[entity] = NULL;
 

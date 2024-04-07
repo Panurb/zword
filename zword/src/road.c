@@ -130,7 +130,7 @@ void draw_road(ComponentData* components, sfRenderWindow* window, int camera, Te
     if (road->texture_changed) {
         Filename filename;
         snprintf(filename, 20, "%s%s", road->filename, "_curve");
-        int i = texture_index(filename);
+        int i = get_texture_index(filename);
 
         sfConvexShape_setTexture(road->shape, textures[i], false);
         float w = PIXELS_PER_UNIT * road->width;

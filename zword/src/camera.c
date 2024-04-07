@@ -287,8 +287,27 @@ void draw_slice_outline(int camera, sfRectangleShape* shape, Vector2f position, 
 }
 
 
-void draw_sprite(int camera, sfSprite* sprite, Vector2f position, float angle, Vector2f scale, int shader_index) {
+void draw_sprite(int camera, Filename filename, float width, float height, int offset, Vector2f position, float angle, Vector2f scale, float alpha, int shader_index) {
     CameraComponent* cam = CameraComponent_get(camera);
+
+    sfSprite* sprite = sfSprite_create();
+    // TODO: don't get texture index every frame
+    int i = get_texture_index(filename);
+    if (i == -1) {
+        printf("Texture not found: %s\n", filename);
+        return;
+    }
+    sfSprite_setTexture(sprite, game_data->textures[i], sfTrue);
+
+    if (width != 0.0f && height != 0.0f) {
+        sfIntRect rect = { 0, 0, width * PIXELS_PER_UNIT, height * PIXELS_PER_UNIT };
+        sfSprite_setTextureRect(sprite, rect);
+    }
+
+    if (offset != 0) {
+        sfIntRect rect = { offset * width * PIXELS_PER_UNIT, 0, width * PIXELS_PER_UNIT, height * PIXELS_PER_UNIT };
+        sfSprite_setTextureRect(sprite, rect);
+    }
 
     sfSprite_setPosition(sprite, world_to_screen(camera, position));
     Vector2f r = mult(cam->zoom / PIXELS_PER_UNIT, scale);
@@ -299,10 +318,14 @@ void draw_sprite(int camera, sfSprite* sprite, Vector2f position, float angle, V
     sfVector2f origin = { 0.5 * gb.width, 0.5 * gb.height };
     sfSprite_setOrigin(sprite, origin);
 
+    sfSprite_setColor(sprite, get_color(1.0f, 1.0f, 1.0f, alpha));
+
     sfShader* shader = cam->shaders[shader_index];
 
     sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, shader };
     sfRenderWindow_drawSprite(game_window, sprite, &state);
+
+    sfSprite_destroy(sprite);
 }
 
 
