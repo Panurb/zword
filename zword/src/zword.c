@@ -13,6 +13,9 @@
 #include <SFML/Window/Keyboard.h>
 #include <SFML/Audio/Music.h>
 
+#include <SDL.h>
+#include <SDL_image.h>
+
 #include "sound.h"
 #include "game.h"
 #include "interface.h"
@@ -46,11 +49,18 @@ void create_game_window(sfVideoMode* mode) {
     }
 
     game_window = window;
+
+    app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN );
+    app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
 }
 
 
 int main() {
     setbuf(stdout, NULL);
+
+    SDL_Init(SDL_INIT_VIDEO);
+    IMG_Init(IMG_INIT_PNG);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     
     load_settings();
 
@@ -74,6 +84,7 @@ int main() {
 
     sfClock* game_clock = sfClock_create();
 
+    load_resources();
     create_game(mode);
     create_menu();
 
@@ -119,6 +130,20 @@ int main() {
                     if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
                         input_menu(game_data->menu_camera, event);
                     }
+                    break;
+            }
+        }
+
+        SDL_Event sdl_event;
+        while (SDL_PollEvent(&sdl_event))
+        {
+            switch (sdl_event.type)
+            {
+                case SDL_QUIT:
+                    exit(0);
+                    break;
+
+                default:
                     break;
             }
         }
@@ -191,6 +216,9 @@ int main() {
         }
 
         sfRenderWindow_clear(game_window, get_color(0.05f, 0.05f, 0.05f, 1.0f));
+        
+        SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
+        SDL_RenderClear(app.renderer);
 
         switch (game_state) {
             case STATE_MENU:
@@ -240,6 +268,8 @@ int main() {
 
         sfRenderWindow_display(game_window);
 
+        SDL_RenderPresent(app.renderer);
+
         play_sounds(game_data->camera, channels);
         sfMusic_setVolume(music, 0.5f * game_settings.music * music_fade);
         if (!music_playing) {
@@ -250,6 +280,9 @@ int main() {
     }
 
     sfRenderWindow_destroy(game_window);
+
+    SDL_DestroyWindow(app.window);
+    SDL_Quit();
 
     return 0;
 }

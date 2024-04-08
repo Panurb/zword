@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 #include "component.h"
 #include "collider.h"
 #include "image.h"
@@ -33,6 +35,17 @@ extern ButtonText GAME_MODES[];
 
 
 typedef struct {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+} App;
+
+
+typedef struct {
+    SDL_Texture** textures;
+} Resources;
+
+
+typedef struct {
     sfTexture** textures;
     sfSoundBuffer** sounds;
     ComponentData* components;
@@ -56,8 +69,13 @@ extern GameState game_state;
 extern GameData* game_data;
 extern sfRenderWindow* game_window;
 
+extern Resources resources;
+extern App app;
+
 
 void change_state_win();
+
+void load_resources();
 
 void create_game(sfVideoMode mode);
 

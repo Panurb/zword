@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <SFML/System/Vector2.h>
 #include <SFML/Window.h>
@@ -47,6 +48,16 @@ sfVector2f world_to_screen(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
+    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
+    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
+    return b;
+}
+
+
+Vector2f sdl_world_to_screen(int camera, Vector2f a) {
+    CameraComponent* cam = CameraComponent_get(camera);
+    Vector2f pos = sum(get_position(camera), cam->shake.position);
+    Vector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
     b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
     return b;
@@ -326,6 +337,47 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
     sfRenderWindow_drawSprite(game_window, sprite, &state);
 
     sfSprite_destroy(sprite);
+
+    SDL_Texture* texture = resources.textures[i];
+    SDL_SetTextureAlphaMod(texture, 255 * alpha);
+
+    SDL_Rect src = { 0, 0, width * PIXELS_PER_UNIT, height * PIXELS_PER_UNIT };
+    if (offset != 0) {
+        src.x = offset * width * PIXELS_PER_UNIT;
+    }
+
+    if (strstr(filename, "tile")) {
+        SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+        float tile_width = (float)src.w / PIXELS_PER_UNIT;
+        float tile_height = (float)src.h / PIXELS_PER_UNIT;
+
+        SDL_FRect dest;
+        dest.w = tile_width * r.x * PIXELS_PER_UNIT;
+        dest.h = tile_height * r.y * PIXELS_PER_UNIT;
+
+        Vector2f x = polar_to_cartesian(1.0f, angle);
+        Vector2f y = perp(x);
+        
+        for (int i = 0; i < ceil(width / tile_width); i++) {
+            for (int j = 0; j < ceil(height / tile_height); j++) {
+                Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - tile_width), x, j * tile_height - 0.5f * (height - tile_height), y));
+                Vector2f pos = sdl_world_to_screen(camera, p);
+                dest.x = pos.x - 0.5f * dest.w;
+                dest.y = pos.y - 0.5f * dest.h;
+                SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+            }
+        }
+    } else {
+        Vector2f pos = sdl_world_to_screen(camera, position);
+
+        SDL_FRect dest;
+        dest.w = width * r.x * PIXELS_PER_UNIT;
+        dest.h = height * r.y * PIXELS_PER_UNIT;
+        dest.x = pos.x - 0.5f * dest.w;
+        dest.y = pos.y - 0.5f * dest.h;
+
+        SDL_RenderCopyExF(app.renderer, texture, NULL, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+    }
 }
 
 

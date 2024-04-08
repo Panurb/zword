@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <SDL.h>
+
 #include "game.h"
 #include "camera.h"
 #include "player.h"
@@ -31,6 +33,9 @@
 GameState game_state = STATE_MENU;
 GameData* game_data;
 sfRenderWindow* game_window;
+
+Resources resources;
+App app;
 
 ButtonText GAME_MODES[] = {
     "SURVIVAL",
@@ -66,6 +71,11 @@ void change_state_win() {
     level_won = true;
     destroy_menu();
     create_win_menu();
+}
+
+
+void load_resources() {
+    resources.textures = sdl_load_textures();
 }
 
 

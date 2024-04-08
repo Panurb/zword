@@ -2,6 +2,9 @@
 #include <string.h>
 #include <math.h>
 
+#include <SDL.h>
+#include <SDL_image.h>
+
 #include <SFML/Graphics.h>
 #include <SFML/System/Vector2.h>
 
@@ -126,6 +129,27 @@ sfTexture** load_textures() {
         if (strstr(IMAGES[i], "tile")) {
             sfTexture_setRepeated(texture, sfTrue);
         }
+
+        textures[i] = texture;
+    }
+
+    return textures;
+}
+
+
+SDL_Texture** sdl_load_textures() {
+    int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
+
+    SDL_Texture** textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
+    for (int i = 0; i < n; i++) {
+        char path[100];
+        snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");
+
+        SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
+
+        // if (strstr(IMAGES[i], "tile")) {
+        //     sfTexture_setRepeated(texture, sfTrue);
+        // }
 
         textures[i] = texture;
     }

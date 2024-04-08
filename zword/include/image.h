@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 #include <SFML/Graphics.h>
 
 #include "component.h"
@@ -15,6 +17,8 @@ typedef sfTexture* TextureArray[100];
 int create_decal(Vector2f pos, Filename filename, float lifetime);
 
 sfTexture** load_textures();
+
+SDL_Texture** sdl_load_textures();
 
 int get_texture_index(Filename filename);
 
