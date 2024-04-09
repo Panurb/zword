@@ -38,6 +38,8 @@ extern ButtonText GAME_MODES[];
 typedef struct {
     SDL_Window* window;
     SDL_Renderer* renderer;
+    SDL_Texture* shadow_texture;
+    SDL_Texture* light_texture;
 } App;
 
 

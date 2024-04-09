@@ -18,6 +18,8 @@ Vector2f camera_size(int camera);
 
 sfVector2f world_to_screen(int camera, Vector2f a);
 
+Vector2f sdl_world_to_screen(int camera, Vector2f a);
+
 Vector2f screen_to_world(int camera, sfVector2i a);
 
 sfVector2f world_to_texture(int camera, Vector2f a);

@@ -52,6 +52,10 @@ void create_game_window(sfVideoMode* mode) {
 
     app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN );
     app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
+    app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
+    SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
+    app.light_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
+    SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_BLEND);
 }
 
 

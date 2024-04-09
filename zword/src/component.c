@@ -201,6 +201,7 @@ ColliderComponent* ColliderComponent_add_rectangle(int entity, float width, floa
     col->type = COLLIDER_RECTANGLE;
     col->group = group;
     col->last_collision = -1;
+    // TODO: divide by 2?
     col->radius = sqrtf(width * width + height * height);
     col->width = width;
     col->height = height;

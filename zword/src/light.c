@@ -63,8 +63,83 @@ void draw_shine(int camera, int entity, HitInfo info, Vector2f velocity) {
 }
 
 
+void draw_shadow_circle(int camera, Vector2f position , float radius, sfColor color) {
+    Vector2f points[20];
+    get_circle_points(position, radius, 20, points);
+
+    SDL_Vertex vertices[20];
+    for (int i = 0; i < 20; i++) {
+        Vector2f v = sdl_world_to_screen(camera, points[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, 0 };
+    }
+    vertices[0].color.a = 128;
+
+    int indices[60];
+    for (int i = 0; i < 20; i++) {
+        indices[3 * i] = 0;
+        indices[3 * i + 1] = i;
+        indices[3 * i + 2] = (i + 1) % 20;
+    }
+    indices[59] = 1;
+    SDL_RenderGeometry(app.renderer, NULL, vertices, 20, indices, 60);
+}
+
+
+void draw_shadow_rectangle(int camera, Vector2f position, float width, float height, float angle, sfColor color) {
+    // 7 ----------- 4
+    // |\           /|
+    // |  3 ----- 0  |
+    // |  |       |  |
+    // |  2 ----- 1  |
+    // |/           \|
+    // 6 ----------- 5
+
+    Vector2f corners[8];
+    get_rect_corners(position, angle, width, height, corners);
+
+    float radius = sqrtf(width * width + height * height);
+    float r = fminf(0.5f * radius, 1.0f);
+    for (int j = 0; j < 4; j++) {
+        Vector2f corner = corners[j];
+        corners[j + 4] = sum(corner, polar_to_cartesian(r, angle + (0.25f - j * 0.5f) * M_PI));
+    }
+
+    SDL_Vertex vertices[8];
+    for (int i = 0; i < 8; i++) {
+        Vector2f v = sdl_world_to_screen(camera, corners[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        int alpha = i < 4 ? 64 : 0;
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, alpha };
+    }
+
+    // Triangle strip
+    int order[10] = { 3, 7, 2, 6, 1, 5, 0, 4, 3, 7 };
+    int indices[30];
+    for (int i = 0; i < 8; i++) {
+        indices[3 * i] = order[i];
+        indices[3 * i + 1] = order[i + 1];
+        indices[3 * i + 2] = order[i + 2];
+    }
+    indices[24] = 0;
+    indices[25] = 1;
+    indices[26] = 2;
+    indices[27] = 0;
+    indices[28] = 2;
+    indices[29] = 3;
+
+    SDL_RenderGeometry(app.renderer, NULL, vertices, 8, indices, 30);
+}
+
+
 void draw_shadows(sfRenderTexture* texture, int camera) {
     sfRenderTexture_clear(texture, sfWhite);
+
+    SDL_SetRenderTarget(app.renderer, app.shadow_texture);
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 0);
+    SDL_RenderClear(app.renderer);
+
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
     sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
@@ -105,6 +180,8 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
 
                     velocity = matrix_mult(rot, velocity);
                 }
+
+                draw_shadow_circle(camera, start, radius, color);
                 break;
             } case COLLIDER_RECTANGLE: {
                 Vector2f corners[8];
@@ -138,12 +215,15 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
                     v->color = color;
                 }
 
+                draw_shadow_rectangle(camera, start, collider->width, collider->height, angle, color);
                 break;
             }
         }
 
         sfRenderTexture_drawVertexArray(texture, collider->verts, &state);
     }
+
+    SDL_SetRenderTarget(app.renderer, NULL);
 }
 
 
