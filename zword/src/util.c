@@ -300,3 +300,36 @@ bool point_inside_rectangle(Vector2f position, float angle, float width, float h
     }
     return false;
 }
+
+void get_circle_points(Vector2f position, float radius, int n, Vector2f* points) {
+    points[0] = position;
+    for (int i = 0; i < n - 1; i++) {
+        float angle = 2.0f * M_PI * i / (n - 1);
+        points[i + 1] = sum(position, polar_to_cartesian(radius, angle));
+    }
+}
+
+void get_ellipse_points(Vector2f position, float major, float minor, float angle, int n, Vector2f* points) {
+    points[0] = position;
+    Matrix2f rot = rotation_matrix(angle);
+
+    for (int i = 0; i < n - 1; i++) {
+        float a = 2.0f * M_PI * i / (n - 1);
+        points[i + 1] = sum(position, matrix_mult(rot, vec(major * cosf(a), minor * sinf(a))));
+    }
+}
+
+void get_rect_corners(Vector2f position, float angle, float width, float height, Vector2f* corners) {
+    Vector2f hw = polar_to_cartesian(0.5f * width, angle);
+    Vector2f hh = mult(height / width, perp(hw));
+
+    Vector2f a = sum(position, sum(hw, hh));
+    Vector2f b = diff(a, mult(2, hh));
+    Vector2f c = diff(b, mult(2, hw));
+    Vector2f d = sum(c, mult(2, hh));
+
+    corners[0] = a;
+    corners[1] = b;
+    corners[2] = c;
+    corners[3] = d;
+}

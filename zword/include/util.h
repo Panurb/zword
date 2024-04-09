@@ -131,3 +131,9 @@ float angle_diff(float a, float b);
 bool collides_aabb(Vector2f pos1, float w1, float h1, Vector2f pos2, float w2, float h2);
 
 bool point_inside_rectangle(Vector2f position, float angle, float width, float height, Vector2f point);
+
+void get_circle_points(Vector2f position, float radius, int n, Vector2f* points);
+
+void get_ellipse_points(Vector2f position, float major, float minor, float angle, int n, Vector2f* points);
+
+void get_rect_corners(Vector2f position, float angle, float width, float height, Vector2f* corners);

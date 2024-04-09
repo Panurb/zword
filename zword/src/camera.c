@@ -104,6 +104,20 @@ void draw_line(int camera, sfRectangleShape* line, Vector2f start, Vector2f end,
     if (created) {
         sfRectangleShape_destroy(line);
     }
+
+    Vector2f corners[4];
+    get_rect_corners(sum(start, mult(0.5f, r)), atan2(r.y, r.x), dist(start, end), width, corners);
+
+    SDL_Vertex vertices[4];
+    for (int i = 0; i < 4; i++) {
+        Vector2f v = sdl_world_to_screen(camera, corners[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+    }
+
+    int indices[6] = { 0, 1, 2, 2, 3, 0 };
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderGeometry(app.renderer, NULL, vertices, 4, indices, 6);
 }
 
 
@@ -125,6 +139,26 @@ void draw_circle(int camera, sfCircleShape* shape, Vector2f position, float radi
     if (created) {
         sfCircleShape_destroy(shape);
     }
+
+    Vector2f points[20];
+    get_circle_points(position, radius, 20, points);
+
+    SDL_Vertex vertices[20];
+    for (int i = 0; i < 20; i++) {
+        Vector2f v = sdl_world_to_screen(camera, points[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+    }
+
+    int indices[60];
+    for (int i = 0; i < 20; i++) {
+        indices[3 * i] = 0;
+        indices[3 * i + 1] = i;
+        indices[3 * i + 2] = (i + 1) % 20;
+    }
+    indices[59] = 1;
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderGeometry(app.renderer, NULL, vertices, 20, indices, 60);
 }
 
 
@@ -148,6 +182,26 @@ void draw_ellipse(int camera, sfCircleShape* shape, Vector2f position, float maj
     if (created) {
         sfCircleShape_destroy(shape);
     }
+
+    Vector2f points[20];
+    get_ellipse_points(position, major, minor, angle, 20, points);
+
+    SDL_Vertex vertices[20];
+    for (int i = 0; i < 20; i++) {
+        Vector2f v = sdl_world_to_screen(camera, points[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+    }
+
+    int indices[60];
+    for (int i = 0; i < 20; i++) {
+        indices[3 * i] = 0;
+        indices[3 * i + 1] = i;
+        indices[3 * i + 2] = (i + 1) % 20;
+    }
+    indices[59] = 1;
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderGeometry(app.renderer, NULL, vertices, 20, indices, 60);
 }
 
 
@@ -171,6 +225,20 @@ void draw_rectangle(int camera, sfRectangleShape* shape, Vector2f position, floa
     if (created) {
         sfRectangleShape_destroy(shape);
     }
+
+    Vector2f corners[4];
+    get_rect_corners(position, angle, width, height, corners);
+
+    SDL_Vertex vertices[4];
+    for (int i = 0; i < 4; i++) {
+        Vector2f v = sdl_world_to_screen(camera, corners[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+    }
+
+    int indices[6] = { 0, 1, 2, 2, 3, 0 };
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderGeometry(app.renderer, NULL, vertices, 4, indices, 6);
 }
 
 
@@ -376,7 +444,7 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
         dest.x = pos.x - 0.5f * dest.w;
         dest.y = pos.y - 0.5f * dest.h;
 
-        SDL_RenderCopyExF(app.renderer, texture, NULL, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
     }
 }
 
