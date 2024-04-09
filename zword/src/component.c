@@ -26,8 +26,8 @@ ComponentData* ComponentData_create() {
     components->widget.order = List_create();
 
     for (int i = 0; i < MAX_ENTITIES; i++) {
-        components->image.array[i] = NULL;
         components->coordinate[i] = NULL;
+        components->image.array[i] = NULL;
         components->physics[i] = NULL;
         components->collider[i] = NULL;
         components->player.array[i] = NULL;
@@ -39,6 +39,11 @@ ComponentData* ComponentData_create() {
         components->item[i] = NULL;
         components->waypoint[i] = NULL;
         components->health[i] = NULL;
+        components->camera[i] = NULL;
+        components->road[i] = NULL;
+        components->sound[i] = NULL;
+        components->ammo[i] = NULL;
+        components->animation[i] = NULL;
         components->door[i] = NULL;
         components->joint[i] = NULL;
         components->widget.array[i] = NULL;

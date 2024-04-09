@@ -2,6 +2,7 @@
 #include <time.h>
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #include "game.h"
 #include "camera.h"
@@ -76,8 +77,16 @@ void change_state_win() {
 
 void load_resources() {
     resources.textures = sdl_load_textures();
+    resources.fonts[0] = NULL;
+    for (int size = 1; size <= 300; size++) {
+        resources.fonts[size] = TTF_OpenFont("data/Helvetica.ttf", size);
+        if (!resources.fonts[size]) {
+            fprintf(stderr, "Error loading font: %s\n", TTF_GetError());
+            exit(1);
+        }
+    }
 }
-
+    
 
 void create_game(sfVideoMode mode) {
     game_data = malloc(sizeof(GameData));

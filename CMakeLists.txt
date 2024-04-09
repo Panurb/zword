@@ -14,6 +14,8 @@ include_directories(SDL/include)
 
 include_directories(SDL_image/include)
 
+include_directories(SDL_ttf/include)
+
 set(SOURCES
     cJSON/src/cJSON.c
     zword/src/animation.c
@@ -71,6 +73,7 @@ set(LIBS
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.lib
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2main.lib
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.lib
+    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.lib
 )
 
 target_link_libraries(notk ${LIBS})
@@ -82,6 +85,7 @@ set(DLLS
 	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-window-2.dll
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.dll
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.dll
+    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.dll
 )
 
 install(FILES ${DLLS}
@@ -116,6 +120,6 @@ set(CONFIG
     ${CMAKE_SOURCE_DIR}/zword/config.cfg
 )
 
-install(FILES ${CONFIG}
-    DESTINATION ${CMAKE_BINARY_DIR}
-)
+# install(FILES ${CONFIG}
+#     DESTINATION ${CMAKE_BINARY_DIR}
+# )

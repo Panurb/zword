@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #include "component.h"
 #include "collider.h"
@@ -42,6 +43,7 @@ typedef struct {
 
 typedef struct {
     SDL_Texture** textures;
+    TTF_Font* fonts[301];
 } Resources;
 
 

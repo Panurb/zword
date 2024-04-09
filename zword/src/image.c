@@ -147,10 +147,6 @@ SDL_Texture** sdl_load_textures() {
 
         SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
 
-        // if (strstr(IMAGES[i], "tile")) {
-        //     sfTexture_setRepeated(texture, sfTrue);
-        // }
-
         textures[i] = texture;
     }
 

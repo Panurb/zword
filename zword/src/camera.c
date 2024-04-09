@@ -426,9 +426,28 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
         Vector2f x = polar_to_cartesian(1.0f, angle);
         Vector2f y = perp(x);
         
-        for (int i = 0; i < ceil(width / tile_width); i++) {
-            for (int j = 0; j < ceil(height / tile_height); j++) {
-                Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - tile_width), x, j * tile_height - 0.5f * (height - tile_height), y));
+        int nx = ceil(width / tile_width);
+        int ny = ceil(height / tile_height);
+        float current_tile_width = tile_width;
+        for (int i = 0; i < nx; i++) {
+            if (i == nx - 1) {
+                current_tile_width = (width - tile_width * (nx - 1));
+                src.w = current_tile_width * PIXELS_PER_UNIT;
+                dest.w = src.w * r.x;
+            }
+
+            float current_tile_height = tile_height;
+            src.h = tile_height * PIXELS_PER_UNIT;
+            dest.h = src.h * r.y;
+            for (int j = 0; j < ny; j++) {
+                if (j == ny - 1) {
+                    current_tile_height = (height - tile_height * (ny - 1));
+                    src.h = current_tile_height * PIXELS_PER_UNIT;
+                    dest.h = src.h * r.y;
+                }
+
+                Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
+                                                    j * tile_height - 0.5f * (height - current_tile_height), y));
                 Vector2f pos = sdl_world_to_screen(camera, p);
                 dest.x = pos.x - 0.5f * dest.w;
                 dest.y = pos.y - 0.5f * dest.h;
@@ -472,6 +491,25 @@ void draw_text(int camera, sfText* text, Vector2f position, char string[100], in
     if (created) {
         sfText_destroy(text);
     }
+
+    if (string[0] == '\0') {
+        return;
+    }
+
+    int font_size = size * cam->zoom / 40.0f;
+    TTF_Font* font = resources.fonts[font_size];
+    if (!font) {
+        return;
+    }
+
+    Vector2f pos = sdl_world_to_screen(camera, position);
+    SDL_Color c = { color.r, color.g, color.b, color.a };
+    SDL_Surface* surface = TTF_RenderText_Blended(font, string, c);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(app.renderer, surface);
+    SDL_FRect dest = { pos.x - 0.5f * surface->w, pos.y - 0.5f * surface->h, surface->w, surface->h };
+    SDL_RenderCopyF(app.renderer, texture, NULL, &dest);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 

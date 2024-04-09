@@ -55,12 +55,13 @@ void create_game_window(sfVideoMode* mode) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
     setbuf(stdout, NULL);
 
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    TTF_Init();
     
     load_settings();
 
