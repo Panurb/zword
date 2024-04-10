@@ -441,13 +441,11 @@ void draw_game() {
     draw_ground(game_data->camera);
     sfRenderWindow_drawSprite(game_window, game_data->shadow_sprite, &state);
 
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(app.renderer, app.shadow_texture, NULL, NULL);
 
     draw(game_data->camera);
     sfRenderWindow_drawSprite(game_window, game_data->light_sprite, &state);
 
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
 
     draw_roofs(game_data->camera);

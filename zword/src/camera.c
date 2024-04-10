@@ -200,7 +200,6 @@ void draw_ellipse(int camera, sfCircleShape* shape, Vector2f position, float maj
         indices[3 * i + 2] = (i + 1) % 20;
     }
     indices[59] = 1;
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderGeometry(app.renderer, NULL, vertices, 20, indices, 60);
 }
 
@@ -237,7 +236,6 @@ void draw_rectangle(int camera, sfRectangleShape* shape, Vector2f position, floa
     }
 
     int indices[6] = { 0, 1, 2, 2, 3, 0 };
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderGeometry(app.renderer, NULL, vertices, 4, indices, 6);
 }
 
@@ -473,6 +471,10 @@ void draw_text(int camera, sfText* text, Vector2f position, char string[100], in
     if (!text) {
         text = sfText_create();
         created = true;
+    }
+
+    if (color.a == 0) {
+        return;
     }
 
     CameraComponent* cam = CameraComponent_get(camera);

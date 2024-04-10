@@ -136,7 +136,6 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
     sfRenderTexture_clear(texture, sfWhite);
 
     SDL_SetRenderTarget(app.renderer, app.shadow_texture);
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 0);
     SDL_RenderClear(app.renderer);
 
@@ -228,7 +227,14 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
 
 
 void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
-    sfRenderTexture_clear(texture, get_color(ambient_light, ambient_light, ambient_light, 1.0f));
+    sfColor color = get_color(ambient_light, ambient_light, ambient_light, 1.0f);
+    sfRenderTexture_clear(texture, color);
+
+    SDL_SetRenderTarget(app.renderer, app.light_texture);
+    SDL_SetRenderDrawColor(app.renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderClear(app.renderer);
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_ADD);
+
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
     sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
@@ -257,6 +263,10 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
         color.a = 255 * brightness;
         v->color = color;
 
+        SDL_Vertex* vertices = malloc((light->rays + 1) * sizeof(SDL_Vertex));
+        Vector2f pos = sdl_world_to_screen(camera, start);
+        vertices[0] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+
         float angle = get_angle(i) - 0.5 * light->angle;
         Vector2f velocity = polar_to_cartesian(1.0, angle);
 
@@ -274,9 +284,26 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
             color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
             v->color = color;
 
+            pos = sdl_world_to_screen(camera, end);
+            vertices[j] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+
             velocity = matrix_mult(rot, velocity);
         }
 
         sfRenderTexture_drawVertexArray(texture, light->verts, &state);
+
+        int* indices = malloc(3 * (light->rays + 1) * sizeof(int));
+        for (int j = 0; j < light->rays + 1; j++) {
+            indices[3 * j] = 0;
+            indices[3 * j + 1] = j;
+            indices[3 * j + 2] = (j + 1)  % (light->rays + 1);
+        }
+
+        SDL_RenderGeometry(app.renderer, NULL, vertices, light->rays + 1, indices, 3 * (light->rays + 1));
+
+        free(vertices);
+        free(indices);
     }
+
+    SDL_SetRenderTarget(app.renderer, NULL);
 }

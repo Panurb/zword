@@ -55,7 +55,7 @@ void create_game_window(sfVideoMode* mode) {
     app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
     app.light_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
-    SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_MUL);
 }
 
 
@@ -222,6 +222,7 @@ int main(int argc, char *argv[]) {
 
         sfRenderWindow_clear(game_window, get_color(0.05f, 0.05f, 0.05f, 1.0f));
         
+        SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
         SDL_RenderClear(app.renderer);
 
