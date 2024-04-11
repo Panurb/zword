@@ -476,6 +476,12 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
             }
         }
     } else {
+        if (width == 0.0f || height == 0.0f) {
+            SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+            width = (float)src.w / PIXELS_PER_UNIT;
+            height = (float)src.h / PIXELS_PER_UNIT;
+        }
+
         Vector2f pos = sdl_world_to_screen(camera, position);
 
         SDL_FRect dest;
@@ -484,7 +490,11 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
         dest.x = pos.x - 0.5f * dest.w;
         dest.y = pos.y - 0.5f * dest.h;
 
-        SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+        SDL_Rect* psrc = &src;
+        if (width == 0.0f || height == 0.0f) {
+            SDL_Rect* psrc = NULL;
+        }
+        SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
     }
 }
 

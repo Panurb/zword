@@ -142,14 +142,18 @@ int main(int argc, char *argv[]) {
         SDL_Event sdl_event;
         while (SDL_PollEvent(&sdl_event))
         {
-            switch (sdl_event.type)
-            {
-                case SDL_QUIT:
-                    exit(0);
-                    break;
-
-                default:
-                    break;
+            if (sdl_event.type == SDL_WINDOWEVENT) {
+                switch (sdl_event.window.event)
+                {
+                    case SDL_WINDOWEVENT_FOCUS_LOST:
+                        // focus = false;
+                        break;
+                    case SDL_WINDOWEVENT_FOCUS_GAINED:
+                        // focus = true;
+                        break;
+                }
+            } else if (sdl_event.type == SDL_QUIT) {
+                exit(0);
             }
         }
 
