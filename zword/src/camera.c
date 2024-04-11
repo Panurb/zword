@@ -84,6 +84,31 @@ sfVector2f world_to_texture(int camera, Vector2f a) {
 }
 
 
+void draw_triangle_fan(int camera, SDL_Vertex* vertices, int verts_size) {
+    int* indices = malloc(3 * verts_size * sizeof(int));
+    for (int i = 0; i < verts_size; i++) {
+        indices[3 * i] = 0;
+        indices[3 * i + 1] = i;
+        indices[3 * i + 2] = (i + 1) % verts_size;
+    }
+    indices[verts_size * 3 - 1] = 1;
+    SDL_RenderGeometry(app.renderer, NULL, vertices, verts_size, indices, 3 * verts_size);
+    free(indices);
+}
+
+
+void draw_triangle_strip(int camera, SDL_Vertex* vertices, int verts_size) {
+    int* indices = malloc(3 * (verts_size - 2) * sizeof(int));
+    for (int i = 0; i < verts_size - 2; i++) {
+        indices[3 * i] = i;
+        indices[3 * i + 1] = i + 1;
+        indices[3 * i + 2] = i + 2;
+    }
+    SDL_RenderGeometry(app.renderer, NULL, vertices, verts_size, indices, 3 * (verts_size - 2));
+    free(indices);
+}
+
+
 void draw_line(int camera, sfRectangleShape* line, Vector2f start, Vector2f end, float width, sfColor color) {
     CameraComponent* cam = CameraComponent_get(camera);
     
@@ -150,15 +175,7 @@ void draw_circle(int camera, sfCircleShape* shape, Vector2f position, float radi
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
 
-    int indices[60];
-    for (int i = 0; i < 20; i++) {
-        indices[3 * i] = 0;
-        indices[3 * i + 1] = i;
-        indices[3 * i + 2] = (i + 1) % 20;
-    }
-    indices[59] = 1;
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
-    SDL_RenderGeometry(app.renderer, NULL, vertices, 20, indices, 60);
+    draw_triangle_fan(camera, vertices, 20);
 }
 
 
@@ -193,14 +210,7 @@ void draw_ellipse(int camera, sfCircleShape* shape, Vector2f position, float maj
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
 
-    int indices[60];
-    for (int i = 0; i < 20; i++) {
-        indices[3 * i] = 0;
-        indices[3 * i + 1] = i;
-        indices[3 * i + 2] = (i + 1) % 20;
-    }
-    indices[59] = 1;
-    SDL_RenderGeometry(app.renderer, NULL, vertices, 20, indices, 60);
+    draw_triangle_fan(camera, vertices, 20);
 }
 
 
@@ -305,6 +315,8 @@ void draw_slice(int camera, sfVertexArray* verts, int verts_size, Vector2f posit
         created = true;
     }
 
+    SDL_Vertex* vertices = malloc(verts_size * sizeof(SDL_Vertex));
+
     Vector2f start = polar_to_cartesian(min_range, angle - 0.5 * spread);
     Vector2f end = polar_to_cartesian(max_range, angle - 0.5 * spread);
 
@@ -319,11 +331,22 @@ void draw_slice(int camera, sfVertexArray* verts, int verts_size, Vector2f posit
         v->position = world_to_screen(camera, sum(position, end));
         v->color = color;
 
+        Vector2f pos = sdl_world_to_screen(camera, sum(position, start));
+        vertices[2 * k].position = (SDL_FPoint) { pos.x, pos.y };
+        vertices[2 * k].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+        
+        pos = sdl_world_to_screen(camera, sum(position, end));
+        vertices[2 * k + 1].position = (SDL_FPoint) { pos.x, pos.y };
+        vertices[2 * k + 1].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+
         start = matrix_mult(rot, start);
         end = matrix_mult(rot, end);
     }
 
     sfRenderWindow_drawVertexArray(game_window, verts, NULL);
+
+    draw_triangle_strip(camera, vertices, verts_size);
+    free(vertices);
 
     if (created) {
         sfVertexArray_destroy(verts);
