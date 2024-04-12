@@ -137,3 +137,5 @@ void get_circle_points(Vector2f position, float radius, int n, Vector2f* points)
 void get_ellipse_points(Vector2f position, float major, float minor, float angle, int n, Vector2f* points);
 
 void get_rect_corners(Vector2f position, float angle, float width, float height, Vector2f* corners);
+
+float map_to_range(int x, int min_x, int max_x, float min_y, float max_y);

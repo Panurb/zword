@@ -42,6 +42,8 @@ typedef enum {
     ACTION_AMMO
 } PlayerAction;
 
+Vector2f get_mouse_position(int camera);
+
 char* key_to_string(sfKeyCode key);
 
 char* keybind_to_string(Keybind keybind);

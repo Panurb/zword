@@ -74,6 +74,16 @@ Vector2f screen_to_world(int camera, sfVector2i a) {
 }
 
 
+Vector2f sdl_screen_to_world(int camera, Vector2f a) {
+    CameraComponent* cam = CameraComponent_get(camera);
+    Vector2f pos = sum(get_position(camera), cam->shake.position);
+    Vector2f b;
+    b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + pos.x;
+    b.y = (0.5 * cam->resolution.y - a.y) / cam->zoom + pos.y;
+    return b;
+}
+
+
 sfVector2f world_to_texture(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
@@ -394,7 +404,8 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
     // TODO: don't get texture index every frame
     int i = get_texture_index(filename);
     if (i == -1) {
-        printf("Texture not found: %s\n", filename);
+        // FIXME
+        // printf("Texture not found: %s\n", filename);
         return;
     }
     sfSprite_setTexture(sprite, game_data->textures[i], sfTrue);

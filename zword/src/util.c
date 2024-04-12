@@ -333,3 +333,8 @@ void get_rect_corners(Vector2f position, float angle, float width, float height,
     corners[2] = c;
     corners[3] = d;
 }
+
+
+float map_to_range(int x, int min_x, int max_x, float min_y, float max_y) {
+    return min_y + (max_y - min_y) * (x - min_x) / (max_x - min_x);
+}

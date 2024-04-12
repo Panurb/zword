@@ -6,6 +6,7 @@
 #include "player.h"
 #include "weapon.h"
 #include "game.h"
+#include "input.h"
 
 
 void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha) {
@@ -178,7 +179,8 @@ void draw_hud(int camera) {
 
         Vector2f pos;
         if (player->controller.joystick == -1) {
-            pos = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
+            // pos = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
+            pos = get_mouse_position(camera);
         } else {
             pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(i));
             pos = sum(position, pos);

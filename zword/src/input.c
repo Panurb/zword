@@ -153,6 +153,18 @@ bool keybind_pressed(PlayerAction i) {
 }
 
 
+bool sdl_keybind_pressed(PlayerAction i) {
+    Keybind keybind = game_settings.keybinds[i];
+    if (keybind.device == DEVICE_KEYBOARD) {
+        return SDL_GetKeyboardState(NULL)[keybind.key];
+    } else if (keybind.device == DEVICE_MOUSE) {
+        return SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(keybind.key);
+    } else {
+        return false;
+    }
+}
+
+
 void replace_actions(String output, String input) {
     output[0] = '\0';
     char* start = strchr(input, '[');
@@ -179,6 +191,14 @@ void replace_actions(String output, String input) {
 }
 
 
+Vector2f get_mouse_position(int camera) {
+    int x;
+    int y;
+    SDL_GetMouseState(&x, &y);
+    return sdl_screen_to_world(camera, (Vector2f) {x, y});
+}
+
+
 void update_controller(int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(i);
     int joystick = player->controller.joystick;
@@ -186,56 +206,56 @@ void update_controller(int camera, int i) {
     Vector2f left_stick = zeros();
     Vector2f right_stick = zeros();
     if (player->controller.joystick == -1) {
-        if (keybind_pressed(ACTION_LEFT)) {
+        if (sdl_keybind_pressed(ACTION_LEFT)) {
             left_stick.x -= 1.0f;
         }
-        if (keybind_pressed(ACTION_RIGHT)) {
+        if (sdl_keybind_pressed(ACTION_RIGHT)) {
             left_stick.x += 1.0f;
         }
-        if (keybind_pressed(ACTION_DOWN)) {
+        if (sdl_keybind_pressed(ACTION_DOWN)) {
             left_stick.y -= 1.0f;
         }
-        if (keybind_pressed(ACTION_UP)) {
+        if (sdl_keybind_pressed(ACTION_UP)) {
             left_stick.y += 1.0f;
         }
         player->controller.left_stick = normalized(left_stick);
 
-        Vector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
+        Vector2f mouse = get_mouse_position(camera);
         right_stick = diff(mouse, get_position(i));
         player->controller.right_stick = normalized(right_stick);
 
-        player->controller.left_trigger = keybind_pressed(ACTION_ATTACK) ? 1.0f : 0.0f;
-        player->controller.right_trigger = keybind_pressed(ACTION_PICKUP) ? 1.0f : 0.0f;
+        player->controller.left_trigger = sdl_keybind_pressed(ACTION_ATTACK) ? 1.0f : 0.0f;
+        player->controller.right_trigger = sdl_keybind_pressed(ACTION_PICKUP) ? 1.0f : 0.0f;
 
         for (ControllerButton b = BUTTON_A; b <= BUTTON_R; b++) {
             bool down = false;
             switch (b) {
                 case BUTTON_A:
-                    down = keybind_pressed(ACTION_ENTER);
+                    down = sdl_keybind_pressed(ACTION_ENTER);
                     break;
                 case BUTTON_B:
                     break;
                 case BUTTON_X:
-                    down = keybind_pressed(ACTION_RELOAD);
+                    down = sdl_keybind_pressed(ACTION_RELOAD);
                     break;
                 case BUTTON_Y:
-                    down = keybind_pressed(ACTION_ATTACHMENT);
+                    down = sdl_keybind_pressed(ACTION_ATTACHMENT);
                     break;
                 case BUTTON_LB:
-                    down = keybind_pressed(ACTION_AMMO);
+                    down = sdl_keybind_pressed(ACTION_AMMO);
                     break;
                 case BUTTON_RB:
-                    down = keybind_pressed(ACTION_PICKUP);
+                    down = sdl_keybind_pressed(ACTION_PICKUP);
                     break;
                 case BUTTON_START:
                     break;
                 case BUTTON_BACK:
                     break;
                 case BUTTON_LT:
-                    down = keybind_pressed(ACTION_INVENTORY);
+                    down = sdl_keybind_pressed(ACTION_INVENTORY);
                     break;
                 case BUTTON_RT:
-                    down = keybind_pressed(ACTION_ATTACK);
+                    down = sdl_keybind_pressed(ACTION_ATTACK);
                     break;
                 case BUTTON_L:
                     break;
@@ -248,10 +268,12 @@ void update_controller(int camera, int i) {
             player->controller.buttons_down[b] = down;
         }
     } else {
-        int* axes = player->controller.axes;
+        SDL_GameController* controller = app.controllers[joystick];
 
-        left_stick.x = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickX]);
-        left_stick.y = -0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickY]);
+        left_stick.x = map_to_range(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX), 
+            SDL_JOYSTICK_AXIS_MIN, SDL_JOYSTICK_AXIS_MAX, -1.0f, 1.0f);
+        left_stick.y = -map_to_range(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY), 
+            SDL_JOYSTICK_AXIS_MIN, SDL_JOYSTICK_AXIS_MAX, -1.0f, 1.0f);
         if (fabsf(left_stick.x) < 0.05f) {
             left_stick.x = 0.0f;
         }
@@ -260,8 +282,10 @@ void update_controller(int camera, int i) {
         }
         player->controller.left_stick = left_stick;
 
-        right_stick.x = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickZ]);
-        right_stick.y = -0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickR]);
+        right_stick.x = map_to_range(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX), 
+            SDL_JOYSTICK_AXIS_MIN, SDL_JOYSTICK_AXIS_MAX, -1.0f, 1.0f);
+        right_stick.y = -map_to_range(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY),
+            SDL_JOYSTICK_AXIS_MIN, SDL_JOYSTICK_AXIS_MAX, -1.0f, 1.0f);
         if (norm(right_stick) < 0.25f) {
             right_stick = zeros();
         }
@@ -270,30 +294,24 @@ void update_controller(int camera, int i) {
         }
         player->controller.right_stick = right_stick;
 
-        if (axes[sfJoystickU] == axes[sfJoystickV]) {
-            float trigger = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickU]);
-            if (fabsf(trigger) < 0.1f) {
-                trigger = 0.0f;
-            }
-
-            if (trigger > 0) {
-                player->controller.left_trigger = trigger;
-            } else if (trigger < 0) {
-                player->controller.right_trigger = -trigger;
-            } else {
-                player->controller.left_trigger = 0.0f;
-                player->controller.right_trigger = 0.0f;
-            }
-        } else {
-            player->controller.left_trigger = 0.005f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickU]) + 0.5f;
-            player->controller.right_trigger = 0.005f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickV]) + 0.5f;
+        float trigger = 0.01f * SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+        if (fabsf(trigger) < 0.1f) {
+            trigger = 0.0f;
         }
+        player->controller.left_trigger = trigger;
 
-        player->controller.dpad.x = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickPovX]);
-        player->controller.dpad.y = 0.01f * sfJoystick_getAxisPosition(joystick, axes[sfJoystickPovY]);
+        trigger = 0.01f * SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        if (fabsf(trigger) < 0.1f) {
+            trigger = 0.0f;
+        }
+        player->controller.right_trigger = trigger;
+
+        // player->controller.dpad.x = 0.01f * SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+        // player->controller.dpad.y = 0.01f * SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
 
         for (int b = BUTTON_A; b <= BUTTON_R; b++) {
-            bool down = sfJoystick_isButtonPressed(joystick, player->controller.buttons[b]);
+            SDL_GameControllerButton button = player->controller.buttons[b];
+            bool down = SDL_GameControllerGetButton(controller, player->controller.buttons[b]);
             if (b == BUTTON_LT) {
                 down = (player->controller.left_trigger > 0.5f);
             } else if (b == BUTTON_RT) {
@@ -309,8 +327,6 @@ void update_controller(int camera, int i) {
 
 
 void input(int camera) {
-    sfJoystick_update();
-
     for (int i = 0; i < game_data->components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;

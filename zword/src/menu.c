@@ -347,7 +347,8 @@ void input_menu(int camera, sfEvent event) {
 void draw_menu() {
     draw_widgets(game_data->menu_camera);
 
-    Vector2f pos = screen_to_world(game_data->menu_camera, sfMouse_getPosition((sfWindow*) game_window));
+    // Vector2f pos = screen_to_world(game_data->menu_camera, sfMouse_getPosition((sfWindow*) game_window));
+    Vector2f pos = get_mouse_position(game_data->menu_camera);
     draw_circle(game_data->menu_camera, NULL, pos, 0.1f, sfWhite);
 }
 

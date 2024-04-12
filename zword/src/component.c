@@ -263,18 +263,17 @@ PlayerComponent* PlayerComponent_add(int entity, int joystick) {
 
     if (joystick == -1) {
         
-    } else if (strstr(sfJoystick_getIdentification(joystick).name, "Xbox")) {
-        int buttons[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-        memcpy(player->controller.buttons, buttons, sizeof(buttons));
-        int axes[8] = { 0, 1, 4, 5, 2, 2, 6, 7 };
-        memcpy(player->controller.axes, axes, sizeof(axes));
     } else {
-        int buttons[12] = { 1, 2, 0, 3, 4, 5, 9, 8, 10, 11, 6, 7 };
+        int buttons[12] = { SDL_CONTROLLER_BUTTON_A, SDL_CONTROLLER_BUTTON_B, SDL_CONTROLLER_BUTTON_X, SDL_CONTROLLER_BUTTON_Y,
+                            SDL_CONTROLLER_BUTTON_LEFTSHOULDER, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, SDL_CONTROLLER_BUTTON_START,
+                            SDL_CONTROLLER_BUTTON_BACK, SDL_CONTROLLER_BUTTON_LEFTSTICK, SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+                            SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN};
         memcpy(player->controller.buttons, buttons, sizeof(buttons));
-        int axes[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-        memcpy(player->controller.axes, axes, sizeof(axes));
+        app.controllers[joystick] = SDL_GameControllerOpen(joystick);
     }
 
+    player->controller.left_stick = zeros();
+    player->controller.right_stick = zeros();
     for (int i = 0; i < 12; i++) {
         player->controller.buttons_down[i] = false;
         player->controller.buttons_pressed[i] = false;
@@ -302,6 +301,10 @@ void PlayerComponent_remove(int entity) {
     if (player) {
         sfConvexShape_destroy(player->shape);
         sfRectangleShape_destroy(player->line);
+        if (player->controller.joystick != -1) {
+            SDL_GameControllerClose(app.controllers[player->controller.joystick]);
+            controllers[player->controller.joystick] = NULL;
+        }
         free(player);
         game_data->components->player.array[entity] = NULL;
         List_remove(game_data->components->player.order, entity);

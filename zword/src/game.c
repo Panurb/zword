@@ -31,7 +31,7 @@
 #include "widget.h"
 
 
-GameState game_state = STATE_MENU;
+GameState game_state = STATE_START;
 GameData* game_data;
 sfRenderWindow* game_window;
 
@@ -90,6 +90,8 @@ void load_resources() {
 
 void create_game(sfVideoMode mode) {
     game_data = malloc(sizeof(GameData));
+
+    strcpy(game_data->map_name, "Tutorial");
 
     game_data->components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();

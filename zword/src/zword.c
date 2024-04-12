@@ -56,13 +56,18 @@ void create_game_window(sfVideoMode* mode) {
     SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
     app.light_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_MUL);
+    for (int i = 0; i < 4; i++) {
+        app.controllers[i] = NULL;
+    }
 }
 
 
 int main(int argc, char *argv[]) {
     setbuf(stdout, NULL);
 
-    SDL_Init(SDL_INIT_VIDEO);
+    // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
+    // SDL_SetHint(SDL_HINT_JOYSTICK_THREAD, "1");
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
     IMG_Init(IMG_INIT_PNG);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     TTF_Init();
@@ -74,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     bool focus = true;
     int debug_level = 0;
-    sfJoystick_update();
+    // sfJoystick_update();
 
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
@@ -146,10 +151,10 @@ int main(int argc, char *argv[]) {
                 switch (sdl_event.window.event)
                 {
                     case SDL_WINDOWEVENT_FOCUS_LOST:
-                        // focus = false;
+                        focus = false;
                         break;
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
-                        // focus = true;
+                        focus = true;
                         break;
                 }
             } else if (sdl_event.type == SDL_QUIT) {

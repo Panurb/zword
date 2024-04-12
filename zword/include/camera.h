@@ -22,6 +22,8 @@ Vector2f sdl_world_to_screen(int camera, Vector2f a);
 
 Vector2f screen_to_world(int camera, sfVector2i a);
 
+Vector2f sdl_screen_to_world(int camera, Vector2f a);
+
 sfVector2f world_to_texture(int camera, Vector2f a);
 
 void draw_line(int camera, sfRectangleShape* line, Vector2f start, Vector2f end, float width, sfColor color);
