@@ -15,6 +15,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 
 #include "sound.h"
 #include "game.h"
@@ -65,12 +66,11 @@ void create_game_window(sfVideoMode* mode) {
 int main(int argc, char *argv[]) {
     setbuf(stdout, NULL);
 
-    // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
-    // SDL_SetHint(SDL_HINT_JOYSTICK_THREAD, "1");
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
     IMG_Init(IMG_INIT_PNG);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     TTF_Init();
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     
     load_settings();
 
@@ -98,9 +98,8 @@ int main(int argc, char *argv[]) {
     create_game(mode);
     create_menu();
 
-    sfMusic* music = sfMusic_createFromFile("data/music/zsong.ogg");
+    Mix_Music* music = Mix_LoadMUS("data/music/zsong.ogg");
     bool music_playing = false;
-    sfMusic_setLoop(music, true);
     float music_fade = 0.0f;
 
     float title_scale = 2.0f;
@@ -272,10 +271,10 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(app.renderer);
 
         play_sounds(game_data->camera, channels);
-        sfMusic_setVolume(music, 0.5f * game_settings.music * music_fade);
+        Mix_VolumeMusic(0.5f * game_settings.music * music_fade);
         if (!music_playing) {
-            sfMusic_play(music);
-            sfMusic_setVolume(music, 0.0f);
+            Mix_VolumeMusic(0);
+            Mix_PlayMusic(music, -1);
             music_playing = true;
         }
     }

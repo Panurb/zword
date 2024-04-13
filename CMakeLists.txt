@@ -16,6 +16,8 @@ include_directories(SDL_image/include)
 
 include_directories(SDL_ttf/include)
 
+include_directories(SDL_mixer/include)
+
 set(SOURCES
     cJSON/src/cJSON.c
     zword/src/animation.c
@@ -74,6 +76,7 @@ set(LIBS
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2main.lib
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.lib
     ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.lib
+    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x86/SDL2_mixer.lib
 )
 
 target_link_libraries(notk ${LIBS})
@@ -86,6 +89,7 @@ set(DLLS
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.dll
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.dll
     ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.dll
+    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x86/SDL2_mixer.dll
 )
 
 install(FILES ${DLLS}

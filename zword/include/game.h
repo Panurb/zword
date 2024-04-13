@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 #include "component.h"
 #include "collider.h"
@@ -47,6 +48,7 @@ typedef struct {
 typedef struct {
     SDL_Texture** textures;
     TTF_Font* fonts[301];
+    Mix_Chunk* sounds[100];
 } Resources;
 
 

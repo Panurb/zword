@@ -41,6 +41,8 @@ sfSoundBuffer** load_sounds() {
         char path[100];
         snprintf(path, 100, "%s%s%s", "data/sfx/", SOUNDS[i], ".wav");
 
+        resources.sounds[i] = Mix_LoadWAV(path);
+
         sfSoundBuffer* sound = sfSoundBuffer_createFromFile(path);
 
         sounds[i] = sound;
@@ -121,17 +123,6 @@ void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
 
             int chan = event->channel;
 
-            if (chan == -1) {
-                for (int k = 0; k < MAX_SOUNDS; k++) {
-                    if (sfSound_getStatus(channels[k]) != sfPlaying) {
-                        chan = k;
-                        break;
-                    }
-                }
-            }
-
-            sfSound* channel = channels[chan];
-
             float vol = event->volume;
             CameraComponent* cam = CameraComponent_get(camera);
             float radius = 0.5f * cam->resolution.x / cam->zoom;
@@ -143,22 +134,19 @@ void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
                 vol = fmaxf(0.0f, (radius - dist) / radius) * event->volume;
             }
 
-            sfSound_setVolume(channel, vol * game_settings.volume);
-            sfSound_setPitch(channel, event->pitch);
-
-            if (event->channel != -1) {
+            if (chan != -1) {
                 if (!event->loop) {
                     event->volume *= 0.95;
                     if (event->volume < 0.01) {
-                        sfSound_stop(channel);
+                        Mix_HaltChannel(chan);
+                        // sfSound_stop(channel);
                         free(event);
                         scomp->events[j] = NULL;
                     }
                 }
             } else {
-                sfSound_setBuffer(channel, game_data->sounds[sound_index(event->filename)]);
-                sfSound_setLoop(channel, event->loop);
-                sfSound_play(channel);
+                int loops = event->loop ? -1 : 0;
+                chan = Mix_PlayChannel(chan, resources.sounds[sound_index(event->filename)], loops);
 
                 if (event->loop) {
                     event->channel = chan;
@@ -167,6 +155,9 @@ void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
                     scomp->events[j] = NULL;
                 }
             }
+
+            Mix_Volume(chan, vol * MIX_MAX_VOLUME * game_settings.volume / 100.0f);
+            // TODO: pitch
         }
     }
 }
