@@ -179,7 +179,6 @@ void draw_hud(int camera) {
 
         Vector2f pos;
         if (player->controller.joystick == -1) {
-            // pos = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
             pos = get_mouse_position(camera);
         } else {
             pos = polar_to_cartesian(fmaxf(2.0f, 5.0f * norm(player->controller.right_stick)), get_angle(i));
@@ -192,8 +191,12 @@ void draw_hud(int camera) {
                 if (weapon->ammo_type == AMMO_MELEE) {
                     r = 0.1f;
                 }
-                sfColor color = (r == 0.1f) ? sfWhite : sfTransparent;
-                draw_circle(camera, player->crosshair, pos, r, color);
+
+                if (r > 0.1f) {
+                    draw_circle_outline(camera, pos, r, 0.03f, sfWhite);
+                } else {
+                    draw_circle(camera, player->crosshair, pos, r, sfWhite);
+                }
             } else {
                 draw_circle(camera, player->crosshair, pos, 0.1f, sfWhite);
             }

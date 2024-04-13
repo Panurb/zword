@@ -24,7 +24,7 @@ char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
     "F12", "F13", "F14", "F15", "Pause"};
 
 
-char* MOUSE_NAMES[] = {"Mouse left", "Mouse right", "Mouse middle", "Mouse extra 1", "Mouse extra 2"};
+char* MOUSE_NAMES[] = {"Mouse left", "Mouse middle", "Mouse right", "Mouse extra 1", "Mouse extra 2"};
 
 
 char* LETTERS[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", 
@@ -79,12 +79,12 @@ char* ACTION_BUTTONS_XBOX[] = {
 };
 
 
-char* key_to_string(sfKeyCode key) {
-    return (0 <= key && key < LENGTH(KEY_NAMES)) ? KEY_NAMES[key] : "unknown";
+char* key_to_string(SDL_Scancode key) {
+    return SDL_GetScancodeName(key);
 }
 
-char* mouse_to_string(sfMouseButton button) {
-    return (0 <= button && button < LENGTH(MOUSE_NAMES)) ? MOUSE_NAMES[button] : "unknown";
+char* mouse_to_string(int button) {
+    return (1 <= button && button < LENGTH(MOUSE_NAMES)) ? MOUSE_NAMES[button - 1] : "unknown";
 }
 
 
@@ -102,19 +102,20 @@ char* keybind_to_string(Keybind keybind) {
 Keybind string_to_keybind(String string) {
     Keybind keybind = {DEVICE_UNBOUND, 0};
 
-    for (int i = 0; i < LENGTH(KEY_NAMES); i++) {
-        if (strcmp(string, KEY_NAMES[i]) == 0) {
-            keybind.device = DEVICE_KEYBOARD;
-            keybind.key = i;
-            printf("Keybind: %s\n", string);
-        }
-    }
-
     for (int i = 0; i < LENGTH(MOUSE_NAMES); i++) {
         if (strcmp(string, MOUSE_NAMES[i]) == 0) {
             keybind.device = DEVICE_MOUSE;
             keybind.key = i;
+            return keybind;
         }
+    }
+
+    SDL_Scancode scancode = SDL_GetScancodeFromName(string);
+
+    if (scancode != SDL_SCANCODE_UNKNOWN) {
+        keybind.device = DEVICE_KEYBOARD;
+        keybind.key = scancode;
+        return keybind;
     }
 
     return keybind;

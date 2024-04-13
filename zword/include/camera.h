@@ -30,6 +30,8 @@ void draw_line(int camera, sfRectangleShape* line, Vector2f start, Vector2f end,
 
 void draw_circle(int camera, sfCircleShape* shape, Vector2f position, float radius, sfColor color);
 
+void draw_circle_outline(int camera, Vector2f position, float radius, float line_width, sfColor color);
+
 void draw_ellipse(int camera, sfCircleShape* shape, Vector2f position, float major, float minor, float angle, sfColor color);
 
 void draw_rectangle(int camera, sfRectangleShape* shape, Vector2f position, float width, float height, float angle, sfColor color);

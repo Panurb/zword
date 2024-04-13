@@ -303,7 +303,7 @@ void PlayerComponent_remove(int entity) {
         sfRectangleShape_destroy(player->line);
         if (player->controller.joystick != -1) {
             SDL_GameControllerClose(app.controllers[player->controller.joystick]);
-            controllers[player->controller.joystick] = NULL;
+            app.controllers[player->controller.joystick] = NULL;
         }
         free(player);
         game_data->components->player.array[entity] = NULL;

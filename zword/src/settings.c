@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <SFML/Graphics.h>
+#include <SDL.h>
 
 #include "settings.h"
 #include "input.h"
@@ -11,17 +12,17 @@
 
 Settings game_settings = { 1920, 1080, 8, false, true, 0, 100, 100, false,
     {
-        { DEVICE_KEYBOARD, sfKeyW },
-        { DEVICE_KEYBOARD, sfKeyA },
-        { DEVICE_KEYBOARD, sfKeyS },
-        { DEVICE_KEYBOARD, sfKeyD },
-        { DEVICE_MOUSE, sfMouseLeft },
-        { DEVICE_KEYBOARD, sfKeyE },
-        { DEVICE_MOUSE, sfMouseRight },
-        { DEVICE_KEYBOARD, sfKeyR },
-        { DEVICE_KEYBOARD, sfKeyF },
-        { DEVICE_KEYBOARD, sfKeySpace },
-        { DEVICE_KEYBOARD, sfKeyLShift }
+        { DEVICE_KEYBOARD, SDL_SCANCODE_W },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_A },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_S },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_D },
+        { DEVICE_MOUSE, SDL_BUTTON_LEFT },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_E },
+        { DEVICE_MOUSE, SDL_BUTTON_RIGHT },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_R },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_F },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_SPACE },
+        { DEVICE_KEYBOARD, SDL_SCANCODE_LSHIFT }
     }
 };
 
