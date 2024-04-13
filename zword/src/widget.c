@@ -380,7 +380,7 @@ void update_widgets(int camera) {
         WidgetComponent* widget = WidgetComponent_get(i);
         if (!widget->enabled) continue;
 
-        Vector2f mouse = screen_to_world(camera, sfMouse_getPosition((sfWindow*) game_window));
+        Vector2f mouse = get_mouse_position(camera);
         widget->selected = false;
         if (point_inside_collider(i, mouse)) {
             last_selected = i;
@@ -485,18 +485,18 @@ void draw_widgets(int camera) {
 }
 
 
-bool input_widgets(int camera, sfEvent event) {
+bool input_widgets(int camera, SDL_Event event) {
     static Vector2f mouse_position = { 0.0f, 0.0f };
     static bool mouse_down = false;
     static int grabbed_window = -1;
     static Vector2f grab_offset = { 0.0f, 0.0f };
     
-    if (event.type == sfEvtMouseMoved) {
-        sfVector2i mouse_screen = { event.mouseMove.x, event.mouseMove.y };
-        mouse_position = screen_to_world(camera, mouse_screen);
-    } else if (event.type == sfEvtMouseButtonPressed && event.mouseButton.button == sfMouseLeft) {
+    if (event.type == SDL_MOUSEMOTION) {
+        Vector2f mouse_screen = { event.motion.x, event.motion.y };
+        mouse_position = sdl_screen_to_world(camera, mouse_screen);
+    } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         mouse_down = true;
-    } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
+    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         mouse_down = false;
         grabbed_window = -1;
     }
@@ -513,7 +513,7 @@ bool input_widgets(int camera, sfEvent event) {
 
         CoordinateComponent* coord = CoordinateComponent_get(i);
 
-        if (event.type == sfEvtMouseMoved) {
+        if (event.type == SDL_MOUSEMOTION) {
             if (widget->type == WIDGET_WINDOW) {
                 if (i == grabbed_window) {
                     coord->position = sum(mouse_position, grab_offset);
@@ -527,7 +527,7 @@ bool input_widgets(int camera, sfEvent event) {
                     set_scrollbar(i, mouse_position);
                 }
             }
-        } else if (event.type == sfEvtMouseButtonPressed && event.mouseButton.button == sfMouseLeft) {
+        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
             if (widget->type == WIDGET_WINDOW) {
                 grabbed_window = i;
                 grab_offset = diff(coord->position, mouse_position);
@@ -536,12 +536,12 @@ bool input_widgets(int camera, sfEvent event) {
             }
             int root = get_root(i);
             bring_to_top(root);
-        } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
+        } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
             if (widget->on_click) {
                 widget->on_click(i);
             }
-        } else if (event.type == sfEvtMouseWheelScrolled) {
-            int delta = -event.mouseWheelScroll.delta;
+        } else if (event.type == SDL_MOUSEWHEEL) {
+            int delta = -event.wheel.y;
             if (widget->type == WIDGET_CONTAINER || widget->type == WIDGET_SPINBOX 
                     || widget->type == WIDGET_SCROLLBAR) {
                 increment_value(i, delta);
@@ -562,21 +562,20 @@ bool input_widgets(int camera, sfEvent event) {
 
     if (top_textbox != -1) {
         WidgetComponent* widget = WidgetComponent_get(top_textbox);
-        if (event.type == sfEvtTextEntered) {
-            char* character = (char*) &event.text.unicode;
+        if (event.type == SDL_TEXTINPUT) {
+            char* character = (char*) &event.text.text;
             int len = strlen(widget->string);
-            if (character[0] == '\b') {
+            if (len < widget->max_value - 1) {
+                strcat(widget->string, character);
+            }
+
+            input_detected = true;
+        } else if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_BACKSPACE) {
+                int len = strlen(widget->string);
                 if (len > 0) {
                     widget->string[len - 1] = '\0';
                 }
-            } else {
-                if (len < widget->max_value - 1) {
-                    strcat(widget->string, character);
-                }
-            }
-
-            if (widget->on_change) {
-                widget->on_change(top_textbox, event.text.unicode);
             }
 
             input_detected = true;

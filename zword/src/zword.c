@@ -108,57 +108,43 @@ int main(int argc, char *argv[]) {
     while (sfRenderWindow_isOpen(game_window)) {
         float delta_time = sfTime_asSeconds(sfClock_restart(clock));
 
-        sfEvent event;
-        while (sfRenderWindow_pollEvent(game_window, &event)) {
-            switch (event.type) {
-                case sfEvtLostFocus:
-                    focus = false;
-                    break;
-                case sfEvtGainedFocus:
-                    focus = true;
-                    sfClock_restart(clock);
-                    break;
-                case sfEvtClosed:
-                    sfRenderWindow_close(game_window);
-                    break;
-                case sfEvtKeyPressed:
-                    if (event.key.code == sfKeyEscape) {
-                        if (game_state == STATE_GAME) {
-                            game_state = STATE_PAUSE;
-                        } else if (game_state == STATE_PAUSE) {
-                            game_state = STATE_GAME;
-                        }
-                    } else if (event.key.code == sfKeyF1) {
-                        if (game_settings.debug) {
-                            debug_level = (debug_level + 1) % 4;
-                        }
-                    }
-                default:
-                    if (game_state == STATE_EDITOR) {
-                        input_editor(event);
-                    }
-                    if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
-                        input_menu(game_data->menu_camera, event);
-                    }
-                    break;
-            }
-        }
-
         SDL_Event sdl_event;
         while (SDL_PollEvent(&sdl_event))
         {
-            if (sdl_event.type == SDL_WINDOWEVENT) {
-                switch (sdl_event.window.event)
-                {
-                    case SDL_WINDOWEVENT_FOCUS_LOST:
-                        focus = false;
-                        break;
-                    case SDL_WINDOWEVENT_FOCUS_GAINED:
-                        focus = true;
-                        break;
-                }
-            } else if (sdl_event.type == SDL_QUIT) {
-                exit(0);
+            switch (sdl_event.type) {
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                    focus = false;
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    focus = true;
+                    break;
+                case SDL_QUIT:
+                    exit(0);
+                    break;
+                default:
+                    if (game_state == STATE_GAME) {
+                        if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
+                            if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                                game_state = STATE_PAUSE;
+                            } else if (sdl_event.key.keysym.sym == SDLK_F1) {
+                                if (game_settings.debug) {
+                                    debug_level = (debug_level + 1) % 4;
+                                }
+                            }
+                        }
+                    }
+                    if (game_state == STATE_PAUSE) {
+                        if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                            game_state = STATE_GAME;
+                        }
+                    }
+                    if (game_state == STATE_EDITOR) {
+                        input_editor(sdl_event);
+                    }
+                    if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
+                        input_menu(game_data->menu_camera, sdl_event);
+                    }
+                    break;
             }
         }
 
@@ -184,7 +170,7 @@ int main(int argc, char *argv[]) {
                         game_state = STATE_START;
                         break;
                     case STATE_GAME:
-                        input(game_data->camera);
+                        input_players(game_data->camera);
                         update_game(time_step);
                         update_game_mode(time_step);
                         break;

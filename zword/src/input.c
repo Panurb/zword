@@ -105,7 +105,7 @@ Keybind string_to_keybind(String string) {
     for (int i = 0; i < LENGTH(MOUSE_NAMES); i++) {
         if (strcmp(string, MOUSE_NAMES[i]) == 0) {
             keybind.device = DEVICE_MOUSE;
-            keybind.key = i;
+            keybind.key = i + 1;
             return keybind;
         }
     }
@@ -327,7 +327,7 @@ void update_controller(int camera, int i) {
 }
 
 
-void input(int camera) {
+void input_players(int camera) {
     for (int i = 0; i < game_data->components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;

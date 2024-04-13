@@ -31,7 +31,7 @@
 #include "widget.h"
 
 
-GameState game_state = STATE_START;
+GameState game_state = STATE_MENU;
 GameData* game_data;
 sfRenderWindow* game_window;
 

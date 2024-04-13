@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 #include "component.h"
 
 
@@ -55,6 +57,6 @@ void update_widgets(int camera);
 
 void draw_widgets(int camera);
 
-bool input_widgets(int camera, sfEvent event);
+bool input_widgets(int camera, SDL_Event event);
 
 void destroy_widgets();

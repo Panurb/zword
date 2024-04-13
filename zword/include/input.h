@@ -56,4 +56,4 @@ char* action_to_keybind(char* action);
 
 void replace_actions(String output, String input);
 
-void input(int camera);
+void input_players(int camera);

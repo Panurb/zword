@@ -546,10 +546,10 @@ void update_editor(float time_step) {
 }
 
 
-void input_tool_select(sfEvent event) {
+void input_tool_select(SDL_Event event) {
     static bool grabbed = false;
 
-    if (event.type == sfEvtMouseMoved) {
+    if (event.type == SDL_MOUSEMOTION) {
         if (selection_box != -1) {
             CoordinateComponent* coord = CoordinateComponent_get(selection_box);
             ColliderComponent* collider = ColliderComponent_get(selection_box);
@@ -570,8 +570,8 @@ void input_tool_select(sfEvent event) {
 
             move_selections(delta_pos);
         }
-    } else if (event.type == sfEvtMouseButtonPressed) {
-        if (event.mouseButton.button == sfMouseLeft) {
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
             tile_start = mouse_world;
 
             if (selections) {
@@ -597,12 +597,12 @@ void input_tool_select(sfEvent event) {
                 CoordinateComponent_add(selection_box, tile_start, 0.0f);
                 ColliderComponent_add_rectangle(selection_box, 0.0f, 0.0f, GROUP_ALL);
             }
-        } else if (event.mouseButton.button == sfMouseRight) {
+        } else if (event.button.button == SDL_BUTTON_RIGHT) {
             if (selections) {
                 rotate_selections(game_data);
             }
         }
-    } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
+    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         if (selection_box != -1) {
             destroy_entity(selection_box);
             selection_box = -1;
@@ -614,25 +614,25 @@ void input_tool_select(sfEvent event) {
         } else {
             double_click_time = 0.2f;
         }
-    } else if (event.type == sfEvtKeyPressed) {
+    } else if (event.type == SDL_KEYDOWN) {
         if (selections) {
-            switch (event.key.code) {
-            case sfKeyDelete:
+            switch (event.key.keysym.sym) {
+            case SDL_SCANCODE_DELETE:
                 destroy_selections(game_data);
                 break;
-            case sfKeyS:
+            case SDL_SCANCODE_S:
                 save_prefab("prefab.json");
                 break;
-            case sfKeyLeft:
+            case SDL_SCANCODE_LEFT:
                 move_selections(vec(-grid_sizes[grid_size_index], 0.0f));
                 break;
-            case sfKeyRight:
+            case SDL_SCANCODE_RIGHT:
                 move_selections(vec(grid_sizes[grid_size_index], 0.0f));
                 break;
-            case sfKeyDown:
+            case SDL_SCANCODE_DOWN:
                 move_selections(vec(0.0f, -grid_sizes[grid_size_index]));
                 break;
-            case sfKeyUp:
+            case SDL_SCANCODE_UP:
                 move_selections(vec(0.0f, grid_sizes[grid_size_index]));
                 break;
             default:
@@ -643,15 +643,15 @@ void input_tool_select(sfEvent event) {
 }
 
 
-void input_tool_tile(sfEvent event) {
-    if (event.type == sfEvtMouseMoved) {
+void input_tool_tile(SDL_Event event) {
+    if (event.type == SDL_MOUSEMOTION) {
         tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-    } else if (event.type == sfEvtMouseButtonPressed) {
-        if (event.mouseButton.button == sfMouseLeft) {
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
             tile_start = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
             tile_started = true;
         }
-    } else if (event.type == sfEvtMouseButtonReleased && event.mouseButton.button == sfMouseLeft) {
+    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         float width = fabsf(tile_end.x - tile_start.x);
         float height = fabsf(tile_end.y - tile_start.y);
         Vector2f pos = mult(0.5f, sum(tile_end, tile_start));
@@ -672,9 +672,9 @@ void input_tool_tile(sfEvent event) {
 }
 
 
-void input_tool_object(sfEvent event) {
-    if (event.type == sfEvtMouseButtonPressed) {
-        if (event.mouseButton.button == sfMouseLeft) {
+void input_tool_object(SDL_Event event) {
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
             game_data->components->added_entities = List_create();
             Vector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
             create_object(selected_object_name, pos, 0.0f);
@@ -691,9 +691,9 @@ void input_tool_object(sfEvent event) {
 }
 
 
-void input_tool_prefab(sfEvent event) {
-    if (event.type == sfEvtMouseButtonPressed) {
-        if (event.mouseButton.button == sfMouseLeft) {
+void input_tool_prefab(SDL_Event event) {
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
             Vector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
             load_prefab(prefab_name, pos, 0.0f);
         }
@@ -701,7 +701,7 @@ void input_tool_prefab(sfEvent event) {
 }
 
 
-void input_editor(sfEvent event) {
+void input_editor(SDL_Event event) {
     static sfVector2i mouse_screen = { 0, 0 };
 
     if (input_widgets(game_data->menu_camera, event)) {
@@ -726,25 +726,24 @@ void input_editor(sfEvent event) {
             break;
     }
 
-    if (event.type == sfEvtMouseMoved) {
-        sfVector2i mouse_new = { event.mouseMove.x, event.mouseMove.y };
-        Vector2f mouse_delta = { mouse_new.x - mouse_screen.x, mouse_screen.y - mouse_new.y };
-        mouse_screen = mouse_new;
+    if (event.type == SDL_MOUSEMOTION) {
+        Vector2f mouse_delta = { event.motion.xrel, event.motion.yrel };
+        mouse_screen = (sfVector2i) { event.motion.x, event.motion.y };
         mouse_world = screen_to_world(game_data->camera, mouse_screen);
 
         if (sfMouse_isButtonPressed(sfMouseMiddle)) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
         }
-    } else if (event.type == sfEvtMouseWheelScrolled) {
-        cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.mouseWheelScroll.delta), 10.0f, 100.0f);
-    } else if (event.type == sfEvtMouseButtonPressed) {
-        if (event.mouseButton.button == sfMouseRight) {
+    } else if (event.type == SDL_MOUSEWHEEL) {
+        cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.wheel.y), 10.0f, 100.0f);
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_RIGHT) {
             tool = TOOL_SELECT;
         }
-    } else if (event.type == sfEvtKeyPressed) {
+    } else if (event.type == SDL_KEYDOWN) {
         if (entity_settings_entity != -1) {
-            switch (event.key.code) {
-            case sfKeyEscape:
+            switch (event.key.keysym.sym) {
+            case SDL_SCANCODE_ESCAPE:
                 close_entity_settings(entity_settings_id);
                 break;
             default:
@@ -752,31 +751,31 @@ void input_editor(sfEvent event) {
             }
         }
 
-        switch (event.key.code) {
-            case sfKeyNum1:
-            case sfKeyNum2:
-            case sfKeyNum3:
-            case sfKeyNum4:
-            case sfKeyNum5:
-            case sfKeyNum6:
-                selected_categories[event.key.code - 27] = !selected_categories[event.key.code - 27];
+        switch (event.key.keysym.sym) {
+            case SDL_SCANCODE_1:
+            case SDL_SCANCODE_2:
+            case SDL_SCANCODE_3:
+            case SDL_SCANCODE_4:
+            case SDL_SCANCODE_5:
+            case SDL_SCANCODE_6:
+                selected_categories[event.key.keysym.sym - SDL_SCANCODE_1] = !selected_categories[event.key.keysym.sym - SDL_SCANCODE_1];
                 break;
-            case sfKeyO:
+            case SDL_SCANCODE_0:
                 toggle_objects(-1);
                 break;
-            case sfKeyP:
+            case SDL_SCANCODE_P:
                 toggle_prefabs(-1);
                 break;
-            case sfKeyT:
+            case SDL_SCANCODE_T:
                 toggle_tiles(-1);
                 break;
-            case sfKeyW:
+            case SDL_SCANCODE_W:
                 toggle_weapons(-1);
                 break;
-            case sfKeyDash:
+            case SDL_SCANCODE_KP_PLUS:
                 grid_size_index = maxi(grid_size_index - 1, 0);
                 break;
-            case sfKeyEqual:
+            case SDL_SCANCODE_KP_MINUS:
                 grid_size_index = mini(grid_size_index + 1, LENGTH(grid_sizes) - 1);
                 break;
             default:
