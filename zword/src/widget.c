@@ -394,12 +394,12 @@ void update_widgets(int camera) {
 
 void draw_button(int camera, Vector2f position, float width, 
         float height, bool selected) {
-    draw_rectangle(camera, NULL, position, width, height, 0.0f, COLOR_SHADOW);
+    draw_rectangle(camera, position, width, height, 0.0f, COLOR_SHADOW);
     Vector2f r = sum(position, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
-    draw_rectangle(camera, NULL, r, width - BORDER_WIDTH, height - BORDER_WIDTH, 0.0f, 
+    draw_rectangle(camera, r, width - BORDER_WIDTH, height - BORDER_WIDTH, 0.0f, 
         COLOR_SELECTED);
     sfColor color = selected ? COLOR_SELECTED : COLOR_BUTTON;
-    draw_rectangle(camera, NULL, position, width - 2.0f * BORDER_WIDTH, 
+    draw_rectangle(camera, position, width - 2.0f * BORDER_WIDTH, 
         height - 2.0f * BORDER_WIDTH, 0.0f, color);
 }
 
@@ -420,17 +420,17 @@ void draw_widgets(int camera) {
         Vector2f r = zeros();
         switch (widget->type) {
         case WIDGET_WINDOW:
-            draw_rectangle(camera, NULL, pos, w + BORDER_WIDTH, h + BORDER_WIDTH, 0.0f, 
+            draw_rectangle(camera, pos, w + BORDER_WIDTH, h + BORDER_WIDTH, 0.0f, 
                 COLOR_BORDER);
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
             break;
         case WIDGET_CONTAINER:
-            draw_rectangle(camera, NULL, pos, w + BORDER_WIDTH, h + BORDER_WIDTH, 0.0f, 
+            draw_rectangle(camera, pos, w + BORDER_WIDTH, h + BORDER_WIDTH, 0.0f, 
                 COLOR_BORDER);
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_CONTAINER);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_CONTAINER);
             if (coord->children->size > h / BUTTON_HEIGHT) {
                 r = sum(pos, vec(0.5f * w - 0.5f * BUTTON_HEIGHT, 0.0f));
-                draw_rectangle(camera, NULL, r, BUTTON_HEIGHT, h, 0.0f, COLOR_CONTAINER);
+                draw_rectangle(camera, r, BUTTON_HEIGHT, h, 0.0f, COLOR_CONTAINER);
             }
             break;
         case WIDGET_LABEL:
@@ -439,29 +439,29 @@ void draw_widgets(int camera) {
             draw_button(camera, pos, w, h, widget->selected);
             break;
         case WIDGET_DROPDOWN:
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
 
             r = sum(pos, vec(-0.1f, 0.1f));
-            draw_rectangle(camera, NULL, r, w - 0.2f, h - 0.2f, 0.0f, COLOR_BUTTON);
+            draw_rectangle(camera, r, w - 0.2f, h - 0.2f, 0.0f, COLOR_BUTTON);
 
             r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
             if (CoordinateComponent_get(i)->children->size == 0) {
-                draw_text(camera, NULL, r, "v", 20, sfWhite);
+                draw_text(camera, r, "v", 20, sfWhite);
             } else {
-                draw_text(camera, NULL, r, "^", 20, sfWhite);
+                draw_text(camera, r, "^", 20, sfWhite);
             }
             break;
         case WIDGET_SLIDER:
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
             float x = widget->value / (float) (widget->max_value - widget->min_value);
-            draw_rectangle(camera, NULL, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 
+            draw_rectangle(camera, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 
                 0.0f, COLOR_BUTTON);
             char buffer[256];
             sprintf(buffer, "%d", widget->value);
-            draw_text(camera, NULL, pos, buffer, 20, COLOR_TEXT);
+            draw_text(camera, pos, buffer, 20, COLOR_TEXT);
             break;
         case WIDGET_SCROLLBAR:
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_CONTAINER);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_CONTAINER);
             float n = widget->max_value - widget->min_value + 1;
             float y = widget->value / n;
             float bar = h / n;
@@ -469,17 +469,17 @@ void draw_widgets(int camera) {
             draw_button(camera, r, w, bar, widget->selected);
             break;
         case WIDGET_TEXTBOX:
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
-            draw_text(camera, widget->text, pos, widget->string, 20, sfWhite);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_text(camera, pos, widget->string, 20, sfWhite);
             break;
         default:
-            draw_rectangle(camera, NULL, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
         }
 
         if (widget->strings) {
-            draw_text(camera, widget->text, pos, widget->strings[widget->value], 20, COLOR_TEXT);
+            draw_text(camera, pos, widget->strings[widget->value], 20, COLOR_TEXT);
         } else {
-            draw_text(camera, widget->text, pos, widget->string, 20, COLOR_TEXT);
+            draw_text(camera, pos, widget->string, 20, COLOR_TEXT);
         }
     }
 }

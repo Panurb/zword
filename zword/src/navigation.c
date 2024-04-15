@@ -161,9 +161,6 @@ void update_waypoints(int camera) {
 
 
 void draw_waypoints(int camera, bool draw_neighbors) {
-    sfCircleShape* shape = sfCircleShape_create();
-    sfRectangleShape* line = sfRectangleShape_create();
-
     for (int i = 0; i < game_data->components->entities; i++) {
         WaypointComponent* waypoint = WaypointComponent_get(i);
         if (!waypoint) continue;
@@ -171,18 +168,15 @@ void draw_waypoints(int camera, bool draw_neighbors) {
 
         Vector2f pos = get_position(i);
         float radius = ColliderComponent_get(i)->radius;
-        draw_circle(camera, shape, pos, radius, sfWhite);
+        draw_circle(camera, pos, radius, sfWhite);
 
         if (draw_neighbors) {
             for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
                 int k = node->value;
                 sfColor color = sfWhite;
                 color.a = 64;
-                draw_line(camera, line, pos, get_position(k), 0.04f, color);
+                draw_line(camera, pos, get_position(k), 0.04f, color);
             }
         }
     }
-
-    sfCircleShape_destroy(shape);
-    sfRectangleShape_destroy(line);
 }

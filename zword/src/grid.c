@@ -167,20 +167,16 @@ void draw_grid(int camera, float tile_width, float tile_height) {
     float bottom = pos.y - 0.5f * height;
     float top = pos.y + 0.5f * height;
     sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.25f);
-
-    sfRectangleShape* shape = sfRectangleShape_create();
     
     for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
         float linewidth = mod(x, major_lines) == 0.0f ? 0.05f : 0.01f;
-        draw_line(camera, shape, vec(x, bottom), vec(x, top), linewidth, color);
+        draw_line(camera, vec(x, bottom), vec(x, top), linewidth, color);
     }
 
     for (float y = bottom - mod(bottom, tile_height); y < top; y += tile_height) {
         float linewidth = mod(y, major_lines) == 0.0f ? 0.05f : 0.01f;
-        draw_line(camera, shape, vec(left, y), vec(right, y), linewidth, color);
+        draw_line(camera, vec(left, y), vec(right, y), linewidth, color);
     }
-    
-    sfRectangleShape_destroy(shape);
 }
 
 

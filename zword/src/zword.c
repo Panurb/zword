@@ -244,12 +244,12 @@ int main(int argc, char *argv[]) {
                 String buffer;
                 snprintf(buffer, STRING_SIZE, "v%s", version);
                 sfColor color = get_color(1.0f, 1.0f, 0.0f, 0.5f);
-                draw_text(game_data->menu_camera, NULL, vec(24.5f, -13.5f), buffer, 20, color);
+                draw_text(game_data->menu_camera, vec(24.5f, -13.5f), buffer, 20, color);
                 break;
             case STATE_START:
             case STATE_END:
             case STATE_RESET:
-                draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
+                draw_text(game_data->menu_camera, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_GAME:
                 draw_game();
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
                 draw_menu();
                 break;
             case STATE_LOAD:
-                draw_text(game_data->menu_camera, NULL, zeros(), "LOADING", 20, sfWhite);
+                draw_text(game_data->menu_camera, zeros(), "LOADING", 20, sfWhite);
                 break;
             case STATE_EDITOR:
                 draw_editor();

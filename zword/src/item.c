@@ -228,7 +228,6 @@ void use_item(int entity, float time_step) {
 
 
 void draw_items() {
-    sfText* text = sfText_create();
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
@@ -248,12 +247,11 @@ void draw_items() {
             char buffer[256];
             if (item->price > 0) {
                 snprintf(buffer, 256, "%d", item->price);
-                draw_text(game_data->camera, text, pos, buffer, 20, sfYellow);
+                draw_text(game_data->camera, pos, buffer, 20, sfYellow);
                 pos = sum(pos, vec(0.0f, 1.0f));
             }
 
-            draw_text(game_data->camera, text, pos, item->name, 20, sfYellow);
+            draw_text(game_data->camera, pos, item->name, 20, sfYellow);
         }
     }
-    sfText_destroy(text);
 }
