@@ -4,6 +4,8 @@
 #include <SFML/Graphics.h>
 
 #include "interface.h"
+#include "camera.h"
+#include "game.h"
 
 
 FpsCounter* FpsCounter_create() {
@@ -13,19 +15,12 @@ FpsCounter* FpsCounter_create() {
     }
     fps->frame_avg = 1.0 / 60.0;
     fps->iterator = 0;
-    fps->text = sfText_create();
-
-    sfFont* font = sfFont_createFromFile("data/Helvetica.ttf");
-    
-    sfText_setFont(fps->text, font);
-    sfText_setCharacterSize(fps->text, 20);
-    sfText_setColor(fps->text, sfWhite);
 
     return fps;
 }
 
 
-void draw_fps(sfRenderWindow* window, FpsCounter* fps, float delta_time) {
+void FPSCounter_draw(FpsCounter* fps, float delta_time) {
     fps->frame_avg -= fps->frame_times[fps->iterator] / FRAME_WINDOW;
     fps->frame_times[fps->iterator] = delta_time;
     fps->frame_avg += fps->frame_times[fps->iterator] / FRAME_WINDOW;
@@ -34,7 +29,8 @@ void draw_fps(sfRenderWindow* window, FpsCounter* fps, float delta_time) {
 
     char buffer[20];
     snprintf(buffer, 20, "%.0f", 1.0 / fps->frame_avg);
-    sfText_setString(fps->text, buffer);
 
-    sfRenderWindow_drawText(window, fps->text, NULL);
+    Vector2f size = camera_size(game_data->menu_camera);
+    Vector2f pos = vec(-0.49f * size.x, 0.49f * size.y);
+    draw_text(game_data->menu_camera, NULL, pos, buffer, 20, sfWhite);
 }

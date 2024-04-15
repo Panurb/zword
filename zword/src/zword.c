@@ -52,6 +52,8 @@ void create_game_window(sfVideoMode* mode) {
     game_window = window;
 
     app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN );
+    SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "1" : "0");
     app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
     app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
@@ -60,6 +62,24 @@ void create_game_window(sfVideoMode* mode) {
     for (int i = 0; i < 4; i++) {
         app.controllers[i] = NULL;
     }
+}
+
+
+void destroy_game_window() {
+    SDL_DestroyRenderer(app.renderer);
+    SDL_DestroyWindow(app.window);
+}
+
+
+float get_delta_time() {
+    static int start_time = 0;
+    if (start_time == 0) {
+        start_time = SDL_GetTicks();
+    }
+    int current_time = SDL_GetTicks();
+    float delta_time = (current_time - start_time) / 1000.0f;
+    start_time = current_time;
+    return delta_time;
 }
 
 
@@ -79,7 +99,6 @@ int main(int argc, char *argv[]) {
 
     bool focus = true;
     int debug_level = 0;
-    // sfJoystick_update();
 
     sfSound* channels[MAX_SOUNDS];
     for (int i = 0; i < MAX_SOUNDS; i++) {
@@ -88,11 +107,8 @@ int main(int argc, char *argv[]) {
 
     FpsCounter* fps = FpsCounter_create();
 
-    sfClock* clock = sfClock_create();
     float time_step = 1.0f / 60.0f;
     float elapsed_time = 0.0f;
-
-    sfClock* game_clock = sfClock_create();
 
     load_resources();
     create_game(mode);
@@ -104,8 +120,8 @@ int main(int argc, char *argv[]) {
 
     float title_scale = 2.0f;
 
-    while (sfRenderWindow_isOpen(game_window)) {
-        float delta_time = sfTime_asSeconds(sfClock_restart(clock));
+    while (true) {
+        float delta_time = get_delta_time();
 
         SDL_Event sdl_event;
         while (SDL_PollEvent(&sdl_event))
@@ -178,7 +194,7 @@ int main(int argc, char *argv[]) {
                         break;
                     case STATE_APPLY:
                         if (game_settings.width != (int)mode.width || game_settings.height != (int)mode.height) {
-                            sfRenderWindow_destroy(game_window);
+                            destroy_game_window();
                             create_game_window(&mode);
                             resize_game(mode);
                         }
@@ -209,12 +225,11 @@ int main(int argc, char *argv[]) {
 
             elapsed_time += delta_time;
 
-            title_scale = 2.5f + 0.1f * sinf(2.0f * sfTime_asSeconds(sfClock_getElapsedTime(game_clock)));
+            float time = SDL_GetTicks() / 1000.0f;
+            title_scale = 2.5f + 0.1f * sinf(2.0f * time);
 
             music_fade = fminf(1.0f, music_fade + 0.01f);
         }
-
-        sfRenderWindow_clear(game_window, get_color(0.05f, 0.05f, 0.05f, 1.0f));
         
         SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
@@ -264,9 +279,7 @@ int main(int argc, char *argv[]) {
             draw_debug(debug_level);
         }
 
-        draw_fps(game_window, fps, delta_time);
-
-        sfRenderWindow_display(game_window);
+        FPSCounter_draw(fps, delta_time);
 
         SDL_RenderPresent(app.renderer);
 
@@ -278,8 +291,6 @@ int main(int argc, char *argv[]) {
             music_playing = true;
         }
     }
-
-    sfRenderWindow_destroy(game_window);
 
     SDL_DestroyWindow(app.window);
     SDL_Quit();
