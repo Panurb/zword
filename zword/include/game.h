@@ -53,19 +53,12 @@ typedef struct {
 
 
 typedef struct {
-    sfTexture** textures;
-    sfSoundBuffer** sounds;
     ComponentData* components;
     ColliderGrid* grid;
     float ambient_light;
     int seed;
     int camera;
     int menu_camera;
-    sfRenderTexture* light_texture;
-    sfSprite* light_sprite;
-    sfRenderTexture* shadow_texture;
-    sfSprite* shadow_sprite;
-    sfVideoMode mode;
     ButtonText map_name;
     GameMode game_mode;
 } GameData;

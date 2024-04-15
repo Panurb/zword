@@ -531,8 +531,8 @@ void update_editor(float time_step) {
     update_lights(time_step);
     update_camera(game_data->camera, time_step, false);
 
-    draw_shadows(game_data->shadow_texture, game_data->camera);
-    draw_lights(game_data->light_texture, game_data->camera, game_data->ambient_light);
+    draw_shadows(game_data->camera);
+    draw_lights(game_data->camera, game_data->ambient_light);
 
     animate(time_step);
 

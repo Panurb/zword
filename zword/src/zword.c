@@ -7,12 +7,6 @@
 #include <time.h>
 #include <math.h>
 
-#include <SFML/Audio.h>
-#include <SFML/Graphics.h>
-#include <SFML/System/Vector2.h>
-#include <SFML/Window/Keyboard.h>
-#include <SFML/Audio/Music.h>
-
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
@@ -34,23 +28,6 @@ static String version = "0.1";
 
 
 void create_game_window(sfVideoMode* mode) {
-    mode->width = game_settings.width;
-    mode->height = game_settings.height;
-    sfContext* context = sfContext_create();
-    sfContextSettings settings = sfContext_getSettings(context);
-    sfContext_destroy(context);
-    settings.antialiasingLevel = game_settings.antialiasing;
-    sfUint32 style = game_settings.fullscreen ? sfFullscreen : sfClose;
-    sfRenderWindow* window = sfRenderWindow_create(*mode, "zword", style, &settings);
-    sfRenderWindow_setKeyRepeatEnabled(window, false);
-    sfRenderWindow_setMouseCursorVisible(window, false);
-    sfWindow_setVerticalSyncEnabled((sfWindow*) window, game_settings.vsync);
-    if (game_settings.max_fps) {
-        sfWindow_setFramerateLimit((sfWindow*) window, game_settings.max_fps);
-    }
-
-    game_window = window;
-
     app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN );
     SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "1" : "0");
@@ -87,6 +64,7 @@ int main(int argc, char *argv[]) {
     setbuf(stdout, NULL);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
+    SDL_ShowCursor(SDL_DISABLE);
     IMG_Init(IMG_INIT_PNG);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     TTF_Init();
@@ -99,11 +77,6 @@ int main(int argc, char *argv[]) {
 
     bool focus = true;
     int debug_level = 0;
-
-    sfSound* channels[MAX_SOUNDS];
-    for (int i = 0; i < MAX_SOUNDS; i++) {
-        channels[i] = sfSound_create();
-    }
 
     FpsCounter* fps = FpsCounter_create();
 
@@ -176,12 +149,12 @@ int main(int argc, char *argv[]) {
                         break;
                     case STATE_END:
                         end_game();
-                        clear_sounds(channels);
+                        clear_sounds();
                         game_state = STATE_MENU;
                         break;
                     case STATE_RESET:
                         end_game();
-                        clear_sounds(channels);
+                        clear_sounds();
                         game_state = STATE_START;
                         break;
                     case STATE_GAME:
@@ -283,7 +256,7 @@ int main(int argc, char *argv[]) {
 
         SDL_RenderPresent(app.renderer);
 
-        play_sounds(game_data->camera, channels);
+        play_sounds(game_data->camera);
         Mix_VolumeMusic(0.5f * game_settings.music * music_fade);
         if (!music_playing) {
             Mix_VolumeMusic(0);

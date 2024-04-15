@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Audio.h>
-
 #include "component.h"
 
 // https://freesound.org/people/RSilveira_88/sounds/216316/
@@ -20,12 +18,8 @@
 // https://freesound.org/people/MCOcontentcreation/sounds/258289/
 // https://freesound.org/people/aerror/sounds/350757/
 
-// Max 256
-#define MAX_SOUNDS 255
 
-typedef sfSoundBuffer* SoundArray[100];
-
-sfSoundBuffer** load_sounds();
+void load_sounds();
 
 void add_sound(int entity, Filename filename, float volume, float pitch);
 
@@ -33,6 +27,6 @@ void loop_sound(int entity, Filename filename, float volume, float pitch);
 
 void stop_loop(int entity);
 
-void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]);
+void play_sounds(int camera);
 
-void clear_sounds(sfSound* channels[MAX_SOUNDS]);
+void clear_sounds();

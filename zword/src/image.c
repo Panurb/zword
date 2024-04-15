@@ -184,7 +184,7 @@ void draw_ground(int camera) {
         float r = sqrtf(w * w + h * h);
 
         // TODO: check if on screen
-        draw_road(game_data->components, game_window, camera, game_data->textures, i);
+        draw_road(camera, i);
 
         if (!on_screen(camera, pos, r, r)) {
             continue;

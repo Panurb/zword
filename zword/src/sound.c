@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <SFML/Audio.h>
-
 #include "sound.h"
 #include "util.h"
 #include "component.h"
@@ -33,22 +31,15 @@ static const char* SOUNDS[] = {
 };
 
 
-sfSoundBuffer** load_sounds() {
+void load_sounds() {
     int n = sizeof(SOUNDS) / sizeof(SOUNDS[0]);
-    sfSoundBuffer** sounds = malloc(n * sizeof(sfSoundBuffer*));
 
     for (int i = 0; i < n; i++) {
         char path[100];
         snprintf(path, 100, "%s%s%s", "data/sfx/", SOUNDS[i], ".wav");
 
         resources.sounds[i] = Mix_LoadWAV(path);
-
-        sfSoundBuffer* sound = sfSoundBuffer_createFromFile(path);
-
-        sounds[i] = sound;
     }
-
-    return sounds;
 }
 
 
@@ -104,7 +95,7 @@ void stop_loop(int entity) {
 }
 
 
-void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
+void play_sounds(int camera) {
     for (int i = 0; i < game_data->components->entities; i++) {
         SoundComponent* scomp = SoundComponent_get(i);
         if (!scomp) continue;
@@ -139,7 +130,6 @@ void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
                     event->volume *= 0.95;
                     if (event->volume < 0.01) {
                         Mix_HaltChannel(chan);
-                        // sfSound_stop(channel);
                         free(event);
                         scomp->events[j] = NULL;
                     }
@@ -163,8 +153,6 @@ void play_sounds(int camera, sfSound* channels[MAX_SOUNDS]) {
 }
 
 
-void clear_sounds(sfSound* channels[MAX_SOUNDS]) {
-    for (int i = 0; i < MAX_SOUNDS; i++) {
-        sfSound_stop(channels[i]);
-    }
+void clear_sounds() {
+    Mix_HaltChannel(-1);
 }

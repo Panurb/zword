@@ -85,7 +85,7 @@ void load_resources() {
             exit(1);
         }
     }
-    
+    load_sounds();
 }
     
 
@@ -101,31 +101,11 @@ void create_game(sfVideoMode mode) {
     int camera = create_camera(mode);
     int menu_camera = create_menu_camera(mode);
 
-    sfTexture** textures = load_textures();
-    sfSoundBuffer** sounds = load_sounds();
-
-    sfRenderTexture* light_texture = sfRenderTexture_create(mode.width, mode.height, false);
-    sfSprite* light_sprite = sfSprite_create();
-    sfSprite_setTexture(light_sprite, sfRenderTexture_getTexture(light_texture), true);
-
-    sfRenderTexture* shadow_texture = sfRenderTexture_create(mode.width, mode.height, false);
-    sfSprite* shadow_sprite = sfSprite_create();
-    sfSprite_setTexture(shadow_sprite, sfRenderTexture_getTexture(shadow_texture), true);
-
     game_data->grid = grid;
     game_data->ambient_light = ambient_light;
     game_data->seed = seed;
     game_data->camera = camera;
     game_data->menu_camera = menu_camera;
-
-    game_data->light_texture = light_texture;
-    game_data->light_sprite = light_sprite;
-
-    game_data->shadow_texture = shadow_texture;
-    game_data->shadow_sprite = shadow_sprite;
-
-    game_data->textures = textures;
-    game_data->sounds = sounds;
 
     game_data->game_mode = MODE_SURVIVAL;
 }
@@ -140,10 +120,12 @@ void resize_game(sfVideoMode mode) {
             camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
         }
     }
-    sfRenderTexture_destroy(game_data->light_texture);
-    game_data->light_texture = sfRenderTexture_create(mode.width, mode.height, false);
-    sfRenderTexture_destroy(game_data->shadow_texture);
-    game_data->shadow_texture = sfRenderTexture_create(mode.width, mode.height, false);
+
+    // TODO
+    // sfRenderTexture_destroy(game_data->light_texture);
+    // game_data->light_texture = sfRenderTexture_create(mode.width, mode.height, false);
+    // sfRenderTexture_destroy(game_data->shadow_texture);
+    // game_data->shadow_texture = sfRenderTexture_create(mode.width, mode.height, false);
 }
 
 
@@ -431,26 +413,18 @@ void update_game(float time_step) {
     update_lights(time_step);
     update_camera(game_data->camera, time_step, true);
 
-    draw_shadows(game_data->shadow_texture, game_data->camera);
-    draw_lights(game_data->light_texture, game_data->camera, game_data->ambient_light);
+    draw_shadows(game_data->camera);
+    draw_lights(game_data->camera, game_data->ambient_light);
 
     animate(time_step);
 }
 
 
 void draw_game() {
-    sfRenderStates state = { sfBlendMultiply, sfTransform_Identity, NULL, NULL };
-
     draw_ground(game_data->camera);
-    sfRenderWindow_drawSprite(game_window, game_data->shadow_sprite, &state);
-
     SDL_RenderCopy(app.renderer, app.shadow_texture, NULL, NULL);
-
     draw(game_data->camera);
-    sfRenderWindow_drawSprite(game_window, game_data->light_sprite, &state);
-
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
-
     draw_roofs(game_data->camera);
     draw_items();
 }

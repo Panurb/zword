@@ -10,6 +10,6 @@
 
 void update_lights(float delta_time);
 
-void draw_shadows(sfRenderTexture* texture, int camera);
+void draw_shadows(int camera);
 
-void draw_lights(sfRenderTexture* texture, int camera, float ambient_light);
+void draw_lights(int camera, float ambient_light);

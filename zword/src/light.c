@@ -63,7 +63,7 @@ void draw_shine(int camera, int entity, HitInfo info, Vector2f velocity) {
 }
 
 
-void draw_shadow_circle(int camera, Vector2f position , float radius, sfColor color) {
+void draw_shadow_circle(int camera, Vector2f position , float radius) {
     Vector2f points[20];
     get_circle_points(position, radius, 20, points);
 
@@ -71,7 +71,7 @@ void draw_shadow_circle(int camera, Vector2f position , float radius, sfColor co
     for (int i = 0; i < 20; i++) {
         Vector2f v = sdl_world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
-        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, 0 };
+        vertices[i].color = (SDL_Color) { 0, 0, 0, 0 };
     }
     vertices[0].color.a = 128;
 
@@ -86,7 +86,7 @@ void draw_shadow_circle(int camera, Vector2f position , float radius, sfColor co
 }
 
 
-void draw_shadow_rectangle(int camera, Vector2f position, float width, float height, float angle, sfColor color) {
+void draw_shadow_rectangle(int camera, Vector2f position, float width, float height, float angle) {
     // 7 ----------- 4
     // |\           /|
     // |  3 ----- 0  |
@@ -110,7 +110,7 @@ void draw_shadow_rectangle(int camera, Vector2f position, float width, float hei
         Vector2f v = sdl_world_to_screen(camera, corners[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         int alpha = i < 4 ? 64 : 0;
-        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, alpha };
+        vertices[i].color = (SDL_Color) { 0, 0, 0, alpha };
     }
 
     // Triangle strip
@@ -132,16 +132,13 @@ void draw_shadow_rectangle(int camera, Vector2f position, float width, float hei
 }
 
 
-void draw_shadows(sfRenderTexture* texture, int camera) {
-    sfRenderTexture_clear(texture, sfWhite);
-
+void draw_shadows(int camera) {
     SDL_SetRenderTarget(app.renderer, app.shadow_texture);
     SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 0);
     SDL_RenderClear(app.renderer);
 
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
-    sfRenderStates state = { sfBlendAlpha, sfTransform_Identity, NULL, NULL };
     for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
@@ -158,77 +155,22 @@ void draw_shadows(sfRenderTexture* texture, int camera) {
         
         switch (collider->type) {
             case COLLIDER_CIRCLE: {
-                sfVertex* v = sfVertexArray_getVertex(collider->verts, 0);
-                v->position = world_to_texture(camera, start);
-                sfColor color = sfBlack;
-                color.a = 128;
-                v->color = color;
-
-                Vector2f velocity = polar_to_cartesian(radius, 0.0f);
-
-                float delta_angle = 2.0f * M_PI / (collider->verts_size - 2);
-                Matrix2f rot = rotation_matrix(delta_angle);
-
-                color.a = 0;
-                for (int j = 1; j < collider->verts_size; j++) {
-                    Vector2f end = sum(start, velocity);
-
-                    v = sfVertexArray_getVertex(collider->verts, j);
-                    v->position = world_to_texture(camera, end);
-                    v->color = color;
-
-                    velocity = matrix_mult(rot, velocity);
-                }
-
-                draw_shadow_circle(camera, start, radius, color);
+                draw_shadow_circle(camera, start, radius);
                 break;
             } case COLLIDER_RECTANGLE: {
-                Vector2f corners[8];
-                get_corners(i, corners);
-
-                float r = fminf(0.5f * radius, 1.0f);
                 float angle = get_angle(i);
-                for (int j = 0; j < 4; j++) {
-                    Vector2f corner = corners[j];
-                    corners[j + 4] = sum(corner, polar_to_cartesian(r, angle + (0.25f - j * 0.5f) * M_PI));
-                }
-
-                // 7 ----------- 4
-                // |\           /|
-                // |  3 ----- 0  |
-                // |  |       |  |
-                // |  2 ----- 1  |
-                // |/           \|
-                // 6 ----------- 5
-
-                sfColor color = sfBlack;
-                int quads[20] = { 2, 3, 7, 6,
-                                  3, 0, 4, 7,
-                                  0, 1, 5, 4,
-                                  1, 2, 6, 5,
-                                  3, 2, 1, 0 };
-                for (int j = 0; j < collider->verts_size; j++) {
-                    sfVertex* v = sfVertexArray_getVertex(collider->verts, j);
-                    v->position = world_to_texture(camera, corners[quads[j]]);
-                    color.a = j % 4 < 2 || j > 15 ? 64 : 0;
-                    v->color = color;
-                }
-
-                draw_shadow_rectangle(camera, start, collider->width, collider->height, angle, color);
+                draw_shadow_rectangle(camera, start, collider->width, collider->height, angle);
                 break;
             }
         }
-
-        sfRenderTexture_drawVertexArray(texture, collider->verts, &state);
     }
 
     SDL_SetRenderTarget(app.renderer, NULL);
 }
 
 
-void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
+void draw_lights(int camera, float ambient_light) {
     sfColor color = get_color(ambient_light, ambient_light, ambient_light, 1.0f);
-    sfRenderTexture_clear(texture, color);
 
     SDL_SetRenderTarget(app.renderer, app.light_texture);
     SDL_SetRenderDrawColor(app.renderer, color.r, color.g, color.b, color.a);
@@ -237,7 +179,6 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
 
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 
-    sfRenderStates state = { sfBlendAdd, sfTransform_Identity, NULL, NULL };
     for (int i = 0; i < game_data->components->entities; i++) {
         LightComponent* light = LightComponent_get(i);
         if (!light) continue;
@@ -257,11 +198,8 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
             range *= f;
         }
 
-        sfVertex* v = sfVertexArray_getVertex(light->verts, 0);
-        v->position = world_to_texture(camera, start);
         sfColor color = light->color;
         color.a = 255 * brightness;
-        v->color = color;
 
         SDL_Vertex* vertices = malloc((light->rays + 1) * sizeof(SDL_Vertex));
         Vector2f pos = sdl_world_to_screen(camera, start);
@@ -279,18 +217,13 @@ void draw_lights(sfRenderTexture* texture, int camera, float ambient_light) {
 
             end = sum(end, mult(0.25, velocity));
 
-            v = sfVertexArray_getVertex(light->verts, j);
-            v->position = world_to_texture(camera, end);
             color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
-            v->color = color;
 
             pos = sdl_world_to_screen(camera, end);
             vertices[j] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
 
             velocity = matrix_mult(rot, velocity);
         }
-
-        sfRenderTexture_drawVertexArray(texture, light->verts, &state);
 
         int* indices = malloc(3 * (light->rays + 1) * sizeof(int));
         for (int j = 0; j < light->rays + 1; j++) {

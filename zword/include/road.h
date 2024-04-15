@@ -15,6 +15,6 @@ void create_road(ComponentData* components, Vector2f start, Vector2f end);
 
 void create_river(ComponentData* components, Vector2f start, Vector2f end);
 
-void draw_road(ComponentData* components, sfRenderWindow* window, int camera, TextureArray textures, int entity);
+void draw_road(int camera, int entity);
 
 void resize_roads(ComponentData* components);
