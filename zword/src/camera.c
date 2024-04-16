@@ -11,12 +11,13 @@
 #include "util.h"
 #include "image.h"
 #include "game.h"
+#include "settings.h"
 
 
-int create_camera(sfVideoMode mode) {
+int create_camera() {
     int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
-    CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 40.0f);
+    CameraComponent_add(i, (Resolution) { game_settings.width, game_settings.height }, 40.0f);
     // ParticleComponent* part = ParticleComponent_add(i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, sfWhite, sfWhite);
     // part->enabled = true;
     // part->loop = true;
@@ -24,19 +25,19 @@ int create_camera(sfVideoMode mode) {
 }
 
 
-int create_menu_camera(sfVideoMode mode) {
+int create_menu_camera() {
     int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
-    CameraComponent_add(i, (sfVector2i) { mode.width, mode.height }, 25.0f);
+    CameraComponent_add(i, (Resolution) { game_settings.width, game_settings.height }, 25.0f);
     return i;
 }
 
 
 Vector2f camera_size(int camera) {
     CameraComponent* cam = CameraComponent_get(camera);
-    sfVector2i res = cam->resolution;
+    Resolution res = cam->resolution;
     float zoom = cam->zoom;
-    return (Vector2f) { res.x / zoom, res.y / zoom };
+    return (Vector2f) { res.w / zoom, res.h / zoom };
 }
 
 
@@ -44,8 +45,8 @@ sfVector2f world_to_screen(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
-    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
-    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
+    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
+    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.h;
     return b;
 }
 
@@ -54,8 +55,8 @@ Vector2f sdl_world_to_screen(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     Vector2f b;
-    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
-    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.y;
+    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
+    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.h;
     return b;
 }
 
@@ -64,8 +65,8 @@ Vector2f screen_to_world(int camera, sfVector2i a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     Vector2f b;
-    b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + pos.x;
-    b.y = (0.5 * cam->resolution.y - a.y) / cam->zoom + pos.y;
+    b.x = (a.x - 0.5 * cam->resolution.w) / cam->zoom + pos.x;
+    b.y = (0.5 * cam->resolution.h - a.y) / cam->zoom + pos.y;
     return b;
 }
 
@@ -74,8 +75,8 @@ Vector2f sdl_screen_to_world(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     Vector2f b;
-    b.x = (a.x - 0.5 * cam->resolution.x) / cam->zoom + pos.x;
-    b.y = (0.5 * cam->resolution.y - a.y) / cam->zoom + pos.y;
+    b.x = (a.x - 0.5 * cam->resolution.w) / cam->zoom + pos.x;
+    b.y = (0.5 * cam->resolution.h - a.y) / cam->zoom + pos.y;
     return b;
 }
 
@@ -84,8 +85,8 @@ sfVector2f world_to_texture(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     sfVector2f b;
-    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.x;
-    b.y = (a.y - pos.y) * cam->zoom + 0.5 * cam->resolution.y;
+    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
+    b.y = (a.y - pos.y) * cam->zoom + 0.5 * cam->resolution.h;
     return b;
 }
 
@@ -276,7 +277,7 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
 
     Vector2f r = mult(cam->zoom / PIXELS_PER_UNIT, scale);
 
-    sfShader* shader = cam->shaders[shader_index];
+    // sfShader* shader = cam->shaders[shader_index];
 
     SDL_Texture* texture = resources.textures[i];
     SDL_SetTextureAlphaMod(texture, 255 * alpha);
@@ -400,7 +401,7 @@ void update_camera(int camera, float time_step, bool follow_players) {
         }
     }
 
-    cam->zoom += 10.0 * time_step * (cam->zoom_target * cam->resolution.y / 720.0 - cam->zoom);
+    cam->zoom += 10.0 * time_step * (cam->zoom_target * cam->resolution.h / 720.0 - cam->zoom);
     cam->shake.velocity = diff(cam->shake.velocity, lin_comb(5.0f, cam->shake.position, 0.1f, cam->shake.velocity));
     cam->shake.position = sum(cam->shake.position, mult(time_step, cam->shake.velocity));
 }
@@ -410,8 +411,8 @@ bool on_screen(int camera, Vector2f position, float width, float height) {
     Vector2f pos = get_position(camera);
     CameraComponent* cam = CameraComponent_get(camera);
 
-    if (fabsf(position.x - pos.x) < 0.5f * (width + cam->resolution.x / cam->zoom)) {
-        if (fabsf(position.y - pos.y) < 0.5f * (height + cam->resolution.y / cam->zoom)) {
+    if (fabsf(position.x - pos.x) < 0.5f * (width + cam->resolution.w / cam->zoom)) {
+        if (fabsf(position.y - pos.y) < 0.5f * (height + cam->resolution.h / cam->zoom)) {
             return true;
         }
     }
@@ -431,8 +432,8 @@ void shake_camera(float speed) {
 
 void draw_overlay(int camera, float alpha) {
     CameraComponent* cam = CameraComponent_get(camera);
-    float width = cam->resolution.x / cam->zoom;
-    float height = cam->resolution.y / cam->zoom;
+    float width = cam->resolution.w / cam->zoom;
+    float height = cam->resolution.h / cam->zoom;
     Vector2f pos = get_position(camera);
     sfColor color = get_color(0.0f, 0.0f, 0.0f, alpha);
     draw_rectangle(camera, pos, width, height, 0.0f, color);

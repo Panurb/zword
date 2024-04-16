@@ -8,9 +8,9 @@ typedef enum {
     SHADER_OUTLINE
 } CameraShader;
 
-int create_camera(sfVideoMode mode);
+int create_camera();
 
-int create_menu_camera(sfVideoMode mode);
+int create_menu_camera();
 
 Vector2f camera_size(int camera);
 

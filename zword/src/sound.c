@@ -116,7 +116,7 @@ void play_sounds(int camera) {
 
             float vol = event->volume;
             CameraComponent* cam = CameraComponent_get(camera);
-            float radius = 0.5f * cam->resolution.x / cam->zoom;
+            float radius = 0.5f * cam->resolution.w / cam->zoom;
             if (dist > radius) {
                 vol = expf(-(dist - radius)) * event->volume;
             }

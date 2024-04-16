@@ -5,9 +5,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SFML/Graphics.h>
-#include <SFML/System/Vector2.h>
-
 #include "component.h"
 #include "image.h"
 #include "util.h"
@@ -183,11 +180,6 @@ ColliderComponent* ColliderComponent_add_circle(int entity, float radius, Collid
     col->width = 2 * radius;
     col->height = 2 * radius;
 
-    col->verts_size = 21;
-    col->verts = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(col->verts, sfTriangleFan);
-    sfVertexArray_resize(col->verts, col->verts_size);
-
     game_data->components->collider[entity] = col;
 
     return col;
@@ -205,11 +197,6 @@ ColliderComponent* ColliderComponent_add_rectangle(int entity, float width, floa
     col->radius = sqrtf(width * width + height * height);
     col->width = width;
     col->height = height;
-
-    col->verts_size = 20;
-    col->verts = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(col->verts, sfQuads);
-    sfVertexArray_resize(col->verts, col->verts_size);
 
     game_data->components->collider[entity] = col;
 
@@ -255,10 +242,6 @@ PlayerComponent* PlayerComponent_add(int entity, int joystick) {
     player->money_timer = 0.0f;
     player->won = false;
 
-    player->shape = sfConvexShape_create();
-    sfConvexShape_setPointCount(player->shape, 4);
-
-    player->line = sfRectangleShape_create();
     player->controller.joystick = joystick;
 
     if (joystick == -1) {
@@ -280,9 +263,6 @@ PlayerComponent* PlayerComponent_add(int entity, int joystick) {
         player->controller.buttons_released[i] = false;
     }
 
-    player->crosshair = sfCircleShape_create();
-    sfCircleShape_setOutlineThickness(player->crosshair, 1.0f);
-
     game_data->components->player.array[entity] = player;
     List_add(game_data->components->player.order, entity);
 
@@ -299,8 +279,6 @@ PlayerComponent* PlayerComponent_get(int entity) {
 void PlayerComponent_remove(int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
     if (player) {
-        sfConvexShape_destroy(player->shape);
-        sfRectangleShape_destroy(player->line);
         if (player->controller.joystick != -1) {
             SDL_GameControllerClose(app.controllers[player->controller.joystick]);
             app.controllers[player->controller.joystick] = NULL;
@@ -323,11 +301,6 @@ LightComponent* LightComponent_add(int entity, float range, float angle, sfColor
 
     light->color = color;
 
-    light->verts = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(light->verts, sfTriangleFan);
-    sfVertexArray_resize(light->verts, light->rays + 1);
-
-    light->shine = sfCircleShape_create();
     light->flicker = 0.0;
     light->speed = speed;
     light->time = randf(0.0, 1.0);
@@ -347,8 +320,6 @@ LightComponent* LightComponent_get(int entity) {
 void LightComponent_remove(int entity) {
     LightComponent* light = LightComponent_get(entity);
     if (light) {
-        sfVertexArray_destroy(light->verts);
-        sfCircleShape_destroy(light->shine);
         free(light);
         game_data->components->light[entity] = NULL;
     }
@@ -417,7 +388,6 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
         particle->velocity[i] = zeros();
         particle->time[i] = 0.0;
     }
-    particle->shape = sfCircleShape_create();
     particle->rate = rate;
     particle->timer = 0.0;
     particle->outer_color = outer_color;
@@ -439,7 +409,6 @@ ParticleComponent* ParticleComponent_get(int entity) {
 void ParticleComponent_remove(int entity) {
     ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
-        sfCircleShape_destroy(particle->shape);
         free(particle);
         game_data->components->particle[entity] = NULL;
     }
@@ -628,17 +597,12 @@ void HealthComponent_remove(int entity) {
 }
 
 
-CameraComponent* CameraComponent_add(int entity, sfVector2i resolution, float zoom) {
+CameraComponent* CameraComponent_add(int entity, Resolution resolution, float zoom) {
     CameraComponent* camera = malloc(sizeof(CameraComponent));
 
     camera->resolution = resolution;
     camera->zoom_target = zoom;
-    camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
-
-    camera->shaders[0] = NULL;
-    camera->shaders[1] = sfShader_createFromFile(NULL, NULL, "outline.frag");
-
-    camera->fonts[0] = sfFont_createFromFile("data/Helvetica.ttf");
+    camera->zoom = camera->zoom_target * camera->resolution.h / 720.0;
 
     camera->matrix = (Matrix2f) { 0.0f, 0.0f, 0.0f, 0.0f };
     camera->inv_matrix = (Matrix2f) { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -672,9 +636,6 @@ RoadComponent* RoadComponent_add(int entity, float width, Filename filename) {
     road->next = -1;
     road->curve = 0.0;
     road->width = width;
-    road->shape = sfConvexShape_create();
-    road->points = 12;
-    sfConvexShape_setPointCount(road->shape, road->points);
     strcpy(road->filename, filename);
     road->texture_changed = true;
 
@@ -692,7 +653,6 @@ RoadComponent* RoadComponent_get(int entity) {
 void RoadComponent_remove(int entity) {
     RoadComponent* road = RoadComponent_get(entity);
     if (road) {
-        sfConvexShape_destroy(road->shape);
         free(road);
         game_data->components->road[entity] = NULL;
     }
@@ -852,7 +812,6 @@ WidgetComponent* WidgetComponent_add(int entity, ButtonText string, WidgetType t
     widget->type = type;
     widget->selected = false;
     strcpy(widget->string, string);
-    widget->text = sfText_create();
     widget->on_click = NULL;
     widget->on_change = NULL;
     widget->value = 0;

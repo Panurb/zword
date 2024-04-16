@@ -26,6 +26,11 @@ typedef struct {
     float d;
 } Matrix2f;
 
+typedef struct {
+    int w;
+    int h;
+} Resolution;
+
 #define STRING_SIZE 1024
 typedef char String[STRING_SIZE];
 

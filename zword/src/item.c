@@ -235,7 +235,7 @@ void draw_items() {
         ItemComponent* item = ItemComponent_get(player->target);
         ImageComponent* image = ImageComponent_get(player->target);
 
-        sfShader_setFloatUniform(CameraComponent_get(game_data->camera)->shaders[1], "offset", 0.05f);
+        // sfShader_setFloatUniform(CameraComponent_get(game_data->camera)->shaders[1], "offset", 0.05f);
         Vector2f pos = get_position(player->target);
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {

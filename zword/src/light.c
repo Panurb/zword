@@ -49,15 +49,10 @@ void draw_shine(int camera, int entity, HitInfo info, Vector2f velocity) {
     if (image->shine > 0.0) {
         float vn = dot(velocity, info.normal);
         if (vn < -0.98) {
-            sfCircleShape_setPosition(light->shine, world_to_screen(camera, sum(info.position, mult(0.05, info.normal))));
-
             sfColor color = sfWhite;
             color.a = (1 - 50 * (1 + vn)) * 128;
-            sfCircleShape_setFillColor(light->shine, color);
             float radius = 0.05 * (1 - 5 * (1 + vn)) * CameraComponent_get(camera)->zoom;
-            sfCircleShape_setRadius(light->shine, radius);
-            sfCircleShape_setOrigin(light->shine, (sfVector2f) { radius, radius });
-            sfRenderWindow_drawCircleShape(game_window, light->shine, NULL);
+            draw_circle(camera, info.position, radius, color);
         }
     }
 }

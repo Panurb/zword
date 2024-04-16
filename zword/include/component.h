@@ -113,8 +113,6 @@ typedef struct {
     float radius;
     float width;
     float height;
-    sfVertexArray* verts;
-    int verts_size;
     TriggerType trigger_type;
 } ColliderComponent;
 
@@ -156,12 +154,9 @@ typedef struct {
     int inventory[4];
     int grabbed_item;
     PlayerState state;
-    sfConvexShape* shape;
-    sfRectangleShape* line;
     Controller controller;
     int ammo_size;
     int ammo[4];
-    sfCircleShape* crosshair;
     int arms;
     int money;
     float use_timer;
@@ -178,8 +173,6 @@ typedef struct {
     sfColor color;
     float brightness;
     float max_brightness;
-    sfVertexArray* verts;
-    sfCircleShape* shine;
     float flicker;
     float speed;
     float time;
@@ -243,7 +236,6 @@ typedef struct {
     float end_size;
     sfColor outer_color;
     sfColor inner_color;
-    sfCircleShape* shape;
     float rate;
     float timer;
     Vector2f origin;
@@ -323,11 +315,9 @@ typedef struct {
 } HealthComponent;
 
 typedef struct {
-    sfVector2i resolution;
+    Resolution resolution;
     float zoom;
     float zoom_target;
-    sfShader* shaders[10];
-    sfFont* fonts[1];
     Matrix2f matrix;
     Matrix2f inv_matrix;
     sfView* view;
@@ -344,8 +334,6 @@ typedef struct {
     float curve;
     float width;
     Filename filename;
-    sfConvexShape* shape;
-    int points;
 } RoadComponent;
 
 typedef struct {
@@ -411,7 +399,6 @@ typedef struct {
     WidgetType type;
     bool selected;
     ButtonText string;
-    sfText* text;
     OnClick on_click;
     OnChange on_change;
     int value;
@@ -515,7 +502,7 @@ HealthComponent* HealthComponent_add(int entity, int health, Filename dead_image
 HealthComponent* HealthComponent_get(int entity);
 void HealthComponent_remove(int entity);
 
-CameraComponent* CameraComponent_add(int entity, sfVector2i resolution, float zoom);
+CameraComponent* CameraComponent_add(int entity, Resolution resolution, float zoom);
 CameraComponent* CameraComponent_get(int entity);
 void CameraComponent_remove(int entity);
 

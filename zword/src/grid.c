@@ -158,8 +158,8 @@ void get_neighbors(int entity, int entities[100]) {
 
 void draw_grid(int camera, float tile_width, float tile_height) {
     CameraComponent* cam = CameraComponent_get(camera);
-    float width = cam->resolution.x / cam->zoom;
-    float height = cam->resolution.y / cam->zoom;
+    float width = cam->resolution.w / cam->zoom;
+    float height = cam->resolution.h / cam->zoom;
     Vector2f pos = get_position(camera);
     float major_lines = 16.0f;
     float left = pos.x - 0.5f * width;

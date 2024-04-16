@@ -115,9 +115,9 @@ void resize_game(sfVideoMode mode) {
     for (int i = 0; i < game_data->components->entities; i++) {
         CameraComponent* camera = CameraComponent_get(i);
         if (camera) {
-            camera->resolution.x = mode.width;
-            camera->resolution.y = mode.height;
-            camera->zoom = camera->zoom_target * camera->resolution.y / 720.0;
+            camera->resolution.w = mode.width;
+            camera->resolution.h = mode.height;
+            camera->zoom = camera->zoom_target * camera->resolution.h / 720.0;
         }
     }
 
@@ -156,7 +156,7 @@ void init_tutorial() {
 void start_game(Filename map_name) {
     ColliderGrid_clear(game_data->grid);
     CameraComponent* cam = CameraComponent_get(game_data->camera);
-    sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
+    sfVideoMode mode = { cam->resolution.w, cam->resolution.h, 32 };
     ComponentData_clear();
     game_data->camera = create_camera(mode);
     game_data->menu_camera = create_menu_camera(mode);
@@ -184,7 +184,7 @@ void start_game(Filename map_name) {
 void end_game() {
     ColliderGrid_clear(game_data->grid);
     CameraComponent* cam = CameraComponent_get(game_data->camera);
-    sfVideoMode mode = { cam->resolution.x, cam->resolution.y, 32 };
+    sfVideoMode mode = { cam->resolution.w, cam->resolution.h, 32 };
     ComponentData_clear();
     game_data->camera = create_camera(mode);
     game_data->menu_camera = create_menu_camera(mode);

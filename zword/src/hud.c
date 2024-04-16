@@ -16,9 +16,8 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
     float gap = 0.2;
     float slice = (2 * M_PI / player->inventory_size);
 
-    sfColor color = sfConvexShape_getFillColor(player->shape);
+    sfColor color = sfWhite;
     color.a = alpha * 255;
-    sfConvexShape_setFillColor(player->shape, color);
 
     if (alpha == 0.0) {
         draw_slice_outline(camera, pos, 1.0 + offset, 2.0 + offset, slot * slice, slice - gap);
@@ -59,9 +58,8 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
 
     int a = item->attachments[atch];
     if (a != -1) {
-        sfColor color = sfConvexShape_getFillColor(player->shape);
+        sfColor color = sfWhite;
         color.a = alpha * 255;
-        sfConvexShape_setFillColor(player->shape, color);
 
         draw_slice(camera, pos, 1.2 + offset, 1.8 + offset, angle, spread, color);
 
@@ -87,9 +85,8 @@ void draw_ammo_slot(int camera, int entity, int slot, float offset, float alpha)
     float gap = 0.2f;
     float slice = (2 * M_PI / (player->ammo_size - 1));
 
-    sfColor color = sfConvexShape_getFillColor(player->shape);
+    sfColor color = sfWhite;
     color.a = alpha * 255;
-    sfConvexShape_setFillColor(player->shape, color);
 
     if (alpha == 0.0f) {
         draw_slice_outline(camera, pos, 1.0f + offset, 2.0f + offset, slot * slice, slice - gap);
@@ -220,7 +217,6 @@ void draw_hud(int camera) {
                 draw_item_use(camera, i);
                 break;
             case PLAYER_RELOAD:
-                sfConvexShape_setFillColor(player->shape, sfWhite);
                 int akimbo = get_akimbo(item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
                 draw_slice(camera, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, sfWhite);
