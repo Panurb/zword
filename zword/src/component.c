@@ -290,7 +290,7 @@ void PlayerComponent_remove(int entity) {
 }
 
 
-LightComponent* LightComponent_add(int entity, float range, float angle, sfColor color, float brightness, float speed) {
+LightComponent* LightComponent_add(int entity, float range, float angle, Color color, float brightness, float speed) {
     LightComponent* light = malloc(sizeof(LightComponent));
     light->enabled = true;
     light->range = range;
@@ -368,7 +368,7 @@ void EnemyComponent_remove(int entity) {
 
 
 ParticleComponent* ParticleComponent_add(int entity, float angle, float spread, 
-        float start_size, float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color) {
+        float start_size, float end_size, float speed, float rate, Color outer_color, Color inner_color) {
     ParticleComponent* particle = malloc(sizeof(ParticleComponent));
     particle->type = PARTICLE_NONE;
     particle->enabled = false;
@@ -842,7 +842,7 @@ void WidgetComponent_remove(int entity) {
 }
 
 
-TextComponent* TextComponent_add(int entity, String string, int size, sfColor color) {
+TextComponent* TextComponent_add(int entity, String string, int size, Color color) {
     TextComponent* text = malloc(sizeof(TextComponent));
     strcpy(text->source_string, string);
     text->string[0] = '\0';

@@ -464,7 +464,7 @@ int create_lasersight(Vector2f pos) {
     PhysicsComponent_add(i, 0.5f);
     ImageComponent_add(i, "flashlight", 1.0, 1.0, LAYER_ITEMS);
     ItemComponent_add(i, 0, 500, "Laser sight");
-    LightComponent_add(i, 20.0, 0.01, sfRed, 1.0, 10.0)->enabled = false;
+    LightComponent_add(i, 20.0, 0.01, COLOR_RED, 1.0, 10.0)->enabled = false;
 
     return i;
 }

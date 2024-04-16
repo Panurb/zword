@@ -14,7 +14,7 @@
 #define COLOR_BUTTON get_color(0.3f, 0.3f, 0.3f, 1.0f)
 #define COLOR_SELECTED get_color(0.4f, 0.4f, 0.4f, 1.0f)
 #define COLOR_BORDER get_color(0.1f, 0.1f, 0.1f, 1.0f)
-#define COLOR_TEXT sfWhite
+#define COLOR_TEXT COLOR_WHITE
 
 void bring_to_top(int entity);
 

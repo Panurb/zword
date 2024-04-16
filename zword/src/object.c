@@ -145,7 +145,7 @@ int create_candle(Vector2f pos) {
 
     CoordinateComponent_add(i, pos, rand_angle());
     ColliderComponent_add_circle(i, 0.5f, LAYER_WALLS);
-    sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
+    Color orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(i, 7.5f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
     ParticleComponent_add_type(i, PARTICLE_FIRE, 0.25f);
     ImageComponent_add(i, "candle", 1.0f, 1.0f, LAYER_ITEMS);
@@ -161,7 +161,7 @@ int create_lamp(Vector2f position) {
     ImageComponent_add(i, "lamp", 1.0f, 1.0f, LAYER_ITEMS);
     ParticleComponent_add_type(i, PARTICLE_SPLINTER, 0.0f);
     SoundComponent_add(i, "wood_hit");
-    LightComponent_add(i, 10.0f, 2.0f * M_PI, sfWhite, 0.5f, 5.0f)->flicker = 0.1f;
+    LightComponent_add(i, 10.0f, 2.0f * M_PI, COLOR_WHITE, 0.5f, 5.0f)->flicker = 0.1f;
     ColliderComponent_add_circle(i, 0.5f, GROUP_VEHICLES);
 
     return i;
@@ -201,7 +201,7 @@ int create_fire(Vector2f pos) {
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, 0.0);
-    sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
+    Color orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(i, 18.0f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
     ParticleComponent_add_type(i, PARTICLE_FIRE, 0.6f);
     ColliderComponent_add_circle(i, 0.35, GROUP_BARRIERS);

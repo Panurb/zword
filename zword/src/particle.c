@@ -10,60 +10,65 @@
 #include "game.h"
 
 
-sfColor color_lerp(sfColor s, sfColor e, float t) {
-    return sfColor_fromRGBA(lerp(s.r, e.r, t), lerp(s.g, e.g, t), lerp(s.b, e.b, t), lerp(s.a, e.a, t));
+Color color_lerp(Color s, Color e, float t) {
+    Color color;
+    color.r = lerp(s.r, e.r, t);
+    color.g = lerp(s.g, e.g, t);
+    color.b = lerp(s.b, e.b, t);
+    color.a = lerp(s.a, e.a, t);
+    return color;
 }
 
 
 void ParticleComponent_add_bullet(int entity, float size) {
-    ParticleComponent_add(entity, 0.0f, 0.0f, size, size, 200.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite)->speed_spread = 0.0f;
+    ParticleComponent_add(entity, 0.0f, 0.0f, size, size, 200.0f, 1, get_color(1.0f, 1.0f, 0.5f, 0.5f), COLOR_WHITE)->speed_spread = 0.0f;
 }
 
 
 void ParticleComponent_add_blood(int entity) {
-    sfColor color = get_color(0.78, 0.0, 0.0, 1.0);
-    sfColor inner_color = color_lerp(color, sfWhite, 0.25f);
+    Color color = get_color(0.78, 0.0, 0.0, 1.0);
+    Color inner_color = color_lerp(color, COLOR_WHITE, 0.25f);
     ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.3f, 0.0, 3.0, 10.0, color, inner_color);
 }
 
 
 void ParticleComponent_add_sparks(int entity) {
-    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.15, 0.0, 5.0, 5.0, get_color(1.0f, 1.0f, 0.5f, 0.5f), sfWhite);
+    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.15, 0.0, 5.0, 5.0, get_color(1.0f, 1.0f, 0.5f, 0.5f), COLOR_WHITE);
 }
 
 
 void ParticleComponent_add_dirt(int entity) {
-    sfColor color = get_color(0.4, 0.25, 0.13, 0.5f);
-    sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
+    Color color = get_color(0.4, 0.25, 0.13, 0.5f);
+    Color inner_color = color_lerp(color, COLOR_WHITE, 0.5f);
     ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.25, 0.0, 2.5, 10.0, color, inner_color);
 }
 
 
 void ParticleComponent_add_rock(int entity) {
-    sfColor color = get_color(0.4f, 0.4f, 0.4f, 1.0f);
-    sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
+    Color color = get_color(0.4f, 0.4f, 0.4f, 1.0f);
+    Color inner_color = color_lerp(color, COLOR_WHITE, 0.5f);
     ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.3f, 0.0f, 1.5f, 5.0f, color, inner_color);
 }
 
 
 void ParticleComponent_add_splinter(int entity) {
-    sfColor color = get_color(0.5f, 0.4f, 0.3f, 1.0f);
-    sfColor inner_color = color_lerp(color, sfWhite, 0.5f);
+    Color color = get_color(0.5f, 0.4f, 0.3f, 1.0f);
+    Color inner_color = color_lerp(color, COLOR_WHITE, 0.5f);
     ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.15f, 0.0f, 5.0f, 10.0f, color, inner_color);
 }
 
 
 void ParticleComponent_add_fire(int entity, float size) {
-    sfColor orange = get_color(1.0, 0.6, 0.0, 1.0);
+    Color orange = get_color(1.0, 0.6, 0.0, 1.0);
     float angle = 0.5f * M_PI - get_angle(entity);
-    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, sfYellow);
+    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, COLOR_YELLOW);
     particle->loop = true;
     particle->enabled = true;
 }
 
 
 void ParticleComponent_add_energy(int entity) {
-    sfColor green = get_color(0.5f, 1.0f, 0.0f, 1.0f);
+    Color green = get_color(0.5f, 1.0f, 0.0f, 1.0f);
     ParticleComponent_add(entity, 0.0, 2.0 * M_PI, 0.1, 0.05, 2.0, 5.0, green, green);
 }
 
@@ -160,7 +165,7 @@ void draw_particles(int camera, int entity) {
     for (int i = part->particles - 1; i >= 0; i--) {
         if (part->time[i] == 0.0) continue;
 
-        sfColor color = part->outer_color;
+        Color color = part->outer_color;
 
         float t = 1.0f - part->time[i] / part->max_time;
         float r = lerp(part->start_size, part->end_size, t);
@@ -172,7 +177,7 @@ void draw_particles(int camera, int entity) {
     for (int i = part->particles - 1; i >= 0; i--) {
         if (part->time[i] == 0.0) continue;
 
-        sfColor color = part->inner_color;
+        Color color = part->inner_color;
 
         float t = 1.0f - part->time[i] / part->max_time;
         float r = 0.5f * lerp(part->start_size, part->end_size, t);

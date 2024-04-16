@@ -348,7 +348,7 @@ void draw_menu() {
     draw_widgets(game_data->menu_camera);
 
     Vector2f pos = get_mouse_position(game_data->menu_camera);
-    draw_circle(game_data->menu_camera, pos, 0.1f, sfWhite);
+    draw_circle(game_data->menu_camera, pos, 0.1f, COLOR_WHITE);
 }
 
 

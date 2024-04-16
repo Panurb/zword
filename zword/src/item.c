@@ -247,11 +247,11 @@ void draw_items() {
             char buffer[256];
             if (item->price > 0) {
                 snprintf(buffer, 256, "%d", item->price);
-                draw_text(game_data->camera, pos, buffer, 20, sfYellow);
+                draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
                 pos = sum(pos, vec(0.0f, 1.0f));
             }
 
-            draw_text(game_data->camera, pos, item->name, 20, sfYellow);
+            draw_text(game_data->camera, pos, item->name, 20, COLOR_YELLOW);
         }
     }
 }

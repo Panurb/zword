@@ -170,7 +170,7 @@ typedef struct {
     float range;
     float angle;
     int rays;
-    sfColor color;
+    Color color;
     float brightness;
     float max_brightness;
     float flicker;
@@ -234,8 +234,8 @@ typedef struct {
     float time[100];
     float start_size;
     float end_size;
-    sfColor outer_color;
-    sfColor inner_color;
+    Color outer_color;
+    Color inner_color;
     float rate;
     float timer;
     Vector2f origin;
@@ -412,7 +412,7 @@ typedef struct {
     String source_string;
     String string;
     int size;
-    sfColor color;
+    Color color;
 } TextComponent;
 
 typedef struct {
@@ -470,7 +470,7 @@ PlayerComponent* PlayerComponent_add(int entity, int joystick);
 PlayerComponent* PlayerComponent_get(int entity);
 void PlayerComponent_remove(int entity);
 
-LightComponent* LightComponent_add(int entity, float range, float angle, sfColor color, float brightness, float speed);
+LightComponent* LightComponent_add(int entity, float range, float angle, Color color, float brightness, float speed);
 LightComponent* LightComponent_get(int entity);
 void LightComponent_remove(int entity);
 
@@ -478,7 +478,7 @@ EnemyComponent* EnemyComponent_add(int entity);
 EnemyComponent* EnemyComponent_get(int entity);
 void EnemyComponent_remove(int entity);
 
-ParticleComponent* ParticleComponent_add(int entity, float angle, float spread, float start_size, float end_size, float speed, float rate, sfColor outer_color, sfColor inner_color);
+ParticleComponent* ParticleComponent_add(int entity, float angle, float spread, float start_size, float end_size, float speed, float rate, Color outer_color, Color inner_color);
 ParticleComponent* ParticleComponent_get(int entity);
 void ParticleComponent_remove(int entity);
 
@@ -534,7 +534,7 @@ WidgetComponent* WidgetComponent_add(int entity, ButtonText text, WidgetType typ
 WidgetComponent* WidgetComponent_get(int entity);
 void WidgetComponent_remove(int entity);
 
-TextComponent* TextComponent_add(int entity, String string, int size, sfColor color);
+TextComponent* TextComponent_add(int entity, String string, int size, Color color);
 TextComponent* TextComponent_get(int entity);
 void TextComponent_remove(int entity);
 

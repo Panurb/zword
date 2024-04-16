@@ -31,12 +31,12 @@ int create_car(Vector2f pos, float angle) {
 
     k = create_entity();
     CoordinateComponent_add(k, (Vector2f) { 3.8f, 1.0f }, 0.0f);
-    LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    LightComponent_add(k, 10.0, 1.0, COLOR_WHITE, 0.4, 1.0)->enabled = false;
     add_child(j, k);
 
     k = create_entity();
     CoordinateComponent_add(k, (Vector2f) { 3.8f, -1.0f }, 0.0f);
-    LightComponent_add(k, 10.0, 1.0, sfWhite, 0.4, 1.0)->enabled = false;
+    LightComponent_add(k, 10.0, 1.0, COLOR_WHITE, 0.4, 1.0)->enabled = false;
     add_child(j, k);
 
     k = create_waypoint((Vector2f) { 5.0f, 2.5f });

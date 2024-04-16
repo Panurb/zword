@@ -398,7 +398,7 @@ void draw_button(int camera, Vector2f position, float width,
     Vector2f r = sum(position, vec(-0.5f * BORDER_WIDTH, 0.5f * BORDER_WIDTH));
     draw_rectangle(camera, r, width - BORDER_WIDTH, height - BORDER_WIDTH, 0.0f, 
         COLOR_SELECTED);
-    sfColor color = selected ? COLOR_SELECTED : COLOR_BUTTON;
+    Color color = selected ? COLOR_SELECTED : COLOR_BUTTON;
     draw_rectangle(camera, position, width - 2.0f * BORDER_WIDTH, 
         height - 2.0f * BORDER_WIDTH, 0.0f, color);
 }
@@ -446,9 +446,9 @@ void draw_widgets(int camera) {
 
             r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
             if (CoordinateComponent_get(i)->children->size == 0) {
-                draw_text(camera, r, "v", 20, sfWhite);
+                draw_text(camera, r, "v", 20, COLOR_WHITE);
             } else {
-                draw_text(camera, r, "^", 20, sfWhite);
+                draw_text(camera, r, "^", 20, COLOR_WHITE);
             }
             break;
         case WIDGET_SLIDER:
@@ -470,7 +470,7 @@ void draw_widgets(int camera) {
             break;
         case WIDGET_TEXTBOX:
             draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
-            draw_text(camera, pos, widget->string, 20, sfWhite);
+            draw_text(camera, pos, widget->string, 20, COLOR_WHITE);
             break;
         default:
             draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);

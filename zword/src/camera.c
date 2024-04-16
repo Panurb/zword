@@ -18,7 +18,7 @@ int create_camera() {
     int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
     CameraComponent_add(i, (Resolution) { game_settings.width, game_settings.height }, 40.0f);
-    // ParticleComponent* part = ParticleComponent_add(i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, sfWhite, sfWhite);
+    // ParticleComponent* part = ParticleComponent_add(i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, COLOR_WHITE, COLOR_WHITE);
     // part->enabled = true;
     // part->loop = true;
     return i;
@@ -116,7 +116,7 @@ void draw_triangle_strip(int camera, SDL_Vertex* vertices, int verts_size) {
 }
 
 
-void draw_line(int camera, Vector2f start, Vector2f end, float width, sfColor color) {
+void draw_line(int camera, Vector2f start, Vector2f end, float width, Color color) {
     Vector2f r = diff(end, start);
 
     Vector2f corners[4];
@@ -135,7 +135,7 @@ void draw_line(int camera, Vector2f start, Vector2f end, float width, sfColor co
 }
 
 
-void draw_circle(int camera, Vector2f position, float radius, sfColor color) {
+void draw_circle(int camera, Vector2f position, float radius, Color color) {
     Vector2f points[20];
     get_circle_points(position, radius, 20, points);
 
@@ -150,7 +150,7 @@ void draw_circle(int camera, Vector2f position, float radius, sfColor color) {
 }
 
 
-void draw_circle_outline(int camera, Vector2f position, float radius, float line_width, sfColor color) {
+void draw_circle_outline(int camera, Vector2f position, float radius, float line_width, Color color) {
     Vector2f points[20];
     get_circle_points(position, radius, 20, points);
     points[0] = points[19];
@@ -161,7 +161,7 @@ void draw_circle_outline(int camera, Vector2f position, float radius, float line
 }
 
 
-void draw_ellipse(int camera, Vector2f position, float major, float minor, float angle, sfColor color) {
+void draw_ellipse(int camera, Vector2f position, float major, float minor, float angle, Color color) {
     Vector2f points[20];
     get_ellipse_points(position, major, minor, angle, 20, points);
 
@@ -176,7 +176,7 @@ void draw_ellipse(int camera, Vector2f position, float major, float minor, float
 }
 
 
-void draw_rectangle(int camera, Vector2f position, float width, float height, float angle, sfColor color) {
+void draw_rectangle(int camera, Vector2f position, float width, float height, float angle, Color color) {
     Vector2f corners[4];
     get_rect_corners(position, angle, width, height, corners);
 
@@ -194,7 +194,7 @@ void draw_rectangle(int camera, Vector2f position, float width, float height, fl
 
 
 void draw_rectangle_outline(int camera, Vector2f position, float width, float height, 
-        float angle, float line_width, sfColor color) {
+        float angle, float line_width, Color color) {
     Vector2f corners[4];
     get_rect_corners(position, angle, width, height, corners);
 
@@ -205,7 +205,7 @@ void draw_rectangle_outline(int camera, Vector2f position, float width, float he
 
 
 void draw_slice(int camera, Vector2f position, float min_range, float max_range, 
-        float angle, float spread, sfColor color) {
+        float angle, float spread, Color color) {
     int points = 10 * ceil(max_range * spread);
     SDL_Vertex* vertices = malloc(points * sizeof(SDL_Vertex));
 
@@ -241,7 +241,7 @@ void draw_arc(int camera, Vector2f position, float range, float angle, float spr
 
     for (int k = 0; k < n; k++) {
         end = matrix_mult(rot, end);
-        draw_line(camera, sum(position, start), sum(position, end), 0.05, sfWhite);
+        draw_line(camera, sum(position, start), sum(position, end), 0.05, COLOR_WHITE);
         start = end;
     }
 }
@@ -251,7 +251,7 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
     Vector2f start = polar_to_cartesian(max_range, angle - 0.5 * spread);
     Vector2f end = mult(min_range / max_range, start);
 
-    draw_line(camera, sum(position, start), sum(position, end), 0.05, sfWhite);
+    draw_line(camera, sum(position, start), sum(position, end), 0.05, COLOR_WHITE);
 
     draw_arc(camera, position, min_range, angle, spread);
 
@@ -260,7 +260,7 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
     start = polar_to_cartesian(min_range, angle + 0.5 * spread);
     end = mult(max_range / min_range, start);    
     
-    draw_line(camera, sum(position, start), sum(position, end), 0.05, sfWhite);
+    draw_line(camera, sum(position, start), sum(position, end), 0.05, COLOR_WHITE);
 }
 
 
@@ -351,7 +351,7 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
 }
 
 
-void draw_text(int camera, Vector2f position, char string[100], int size, sfColor color) {
+void draw_text(int camera, Vector2f position, char string[100], int size, Color color) {
     if (color.a == 0) {
         return;
     }
@@ -435,6 +435,6 @@ void draw_overlay(int camera, float alpha) {
     float width = cam->resolution.w / cam->zoom;
     float height = cam->resolution.h / cam->zoom;
     Vector2f pos = get_position(camera);
-    sfColor color = get_color(0.0f, 0.0f, 0.0f, alpha);
+    Color color = get_color(0.0f, 0.0f, 0.0f, alpha);
     draw_rectangle(camera, pos, width, height, 0.0f, color);
 }

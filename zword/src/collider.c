@@ -384,7 +384,7 @@ void draw_occupied_tiles(int camera) {
     Vector2f w = { 0.5f * grid->tile_width, 0.0f };
     Vector2f h = { 0.0f, 0.5f * grid->tile_height };
     float linewidth = 0.01f;
-    sfColor color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
+    Color color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
     for (int i = 0; i < grid->width; i++) {
         for (int j = 0; j < grid->height; j++) {
             Vector2f r = { (i + 0.5f) * grid->tile_width - 0.5f * grid->width, (j + 0.5f) * grid->tile_height - 0.5f * grid->height };
@@ -396,7 +396,7 @@ void draw_occupied_tiles(int camera) {
                 if (grid->array[i][j]->size > 0) {
                     char size[10];
                     snprintf(size, 10, "%i", grid->array[i][j]->size);
-                    draw_text(camera, r, size, 20, sfWhite);
+                    draw_text(camera, r, size, 20, COLOR_WHITE);
                 }
             }
         }
@@ -413,9 +413,9 @@ void draw_colliders(int camera) {
         Vector2f pos = get_position(i);
         if (col->type == COLLIDER_CIRCLE) {
             draw_circle(camera, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
-            draw_line(camera, pos, sum(pos, half_width(i)), 0.05f, sfWhite);
+            draw_line(camera, pos, sum(pos, half_width(i)), 0.05f, COLOR_WHITE);
         } else {
-            sfColor color = get_color(0.0, 1.0, 1.0, 0.25);
+            Color color = get_color(0.0, 1.0, 1.0, 0.25);
             draw_rectangle(camera, get_position(i), col->width, col->height, get_angle(i), color);
         }
     }

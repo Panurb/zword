@@ -32,5 +32,5 @@ void FPSCounter_draw(FpsCounter* fps, float delta_time) {
 
     Vector2f size = camera_size(game_data->menu_camera);
     Vector2f pos = vec(-0.49f * size.x, 0.49f * size.y);
-    draw_text(game_data->menu_camera, pos, buffer, 20, sfWhite);
+    draw_text(game_data->menu_camera, pos, buffer, 20, COLOR_WHITE);
 }

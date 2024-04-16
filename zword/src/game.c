@@ -367,7 +367,7 @@ void draw_game_mode() {
             if (wave_delay > 0.0f) {
                 char buffer[256];
                 snprintf(buffer, 256, "WAVE %d", wave);
-                draw_text(game_data->menu_camera, zeros(), buffer, 300, sfWhite);
+                draw_text(game_data->menu_camera, zeros(), buffer, 300, COLOR_WHITE);
             }
             break;
         default:
@@ -449,7 +449,7 @@ void draw_entities() {
         if (!coord) continue;
 
         snprintf(buffer, 10, "%d", i);
-        draw_text(game_data->camera, coord->position, buffer, 20, sfWhite);
+        draw_text(game_data->camera, coord->position, buffer, 20, COLOR_WHITE);
     }
 }
 
@@ -482,7 +482,7 @@ void draw_game_over() {
     draw_game();
     float alpha = 1.0f - game_over_timer / 2.0f;
     draw_overlay(game_data->menu_camera, alpha);
-    sfColor color = get_color(1.0f, 0.0f, 0.0f, alpha);
+    Color color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
         if (level_won) {
             draw_text(game_data->menu_camera, vec(0.0f, 5.0f), "YOU WON", 300, color);
@@ -503,7 +503,7 @@ int create_tutorial(Vector2f position) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, 0.0f);
     ColliderComponent_add_circle(entity, 1.0f, GROUP_CORPSES);
-    TextComponent_add(entity, "", 30, sfWhite);
+    TextComponent_add(entity, "", 30, COLOR_WHITE);
 
     return entity;
 }
@@ -523,17 +523,17 @@ void draw_tutorials() {
     for (int i = 0; i < game_data->components->entities; i++) {
         TextComponent* text = TextComponent_get(i);
         if (text) {
-            draw_text(game_data->camera, get_position(i), "?", 50, sfMagenta);
+            draw_text(game_data->camera, get_position(i), "?", 50, COLOR_MAGENTA);
         }
 
         ColliderComponent* collider = ColliderComponent_get(i);
         if (collider && collider->trigger_type == TRIGGER_WIN) {
             Vector2f pos = get_position(i);
-            sfColor color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
+            Color color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
             float angle = get_angle(i);
             draw_rectangle(game_data->camera, pos, collider->width, collider->height, angle, 
                 color);
-            draw_text(game_data->camera, pos, "level_end", 20, sfGreen);
+            draw_text(game_data->camera, pos, "level_end", 20, COLOR_GREEN);
         }
     }
 }

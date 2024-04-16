@@ -303,7 +303,7 @@ void change_layer(int entity, Layer layer) {
 }
 
 
-void color_pixel(sfUint8* pixels, int width, int x, int y, sfColor color, float alpha) {
+void color_pixel(sfUint8* pixels, int width, int x, int y, Color color, float alpha) {
     int k = (x + y * width) * 4;
 
     pixels[k] = color.r;
@@ -313,7 +313,7 @@ void color_pixel(sfUint8* pixels, int width, int x, int y, sfColor color, float 
 }
 
 
-void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, sfColor color, float sharpness, Permutation p) {
+void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;

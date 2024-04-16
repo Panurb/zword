@@ -5,9 +5,6 @@
 #include <time.h>
 #include <string.h>
 
-#include <SFML/System/Vector2.h>
-#include <SFML/Graphics.h>
-
 #include "util.h"
 
 
@@ -221,8 +218,13 @@ Matrix2f matrix_inverse(Matrix2f m) {
     return (Matrix2f) { m.d / det, -m.b / det, -m.c / det, m.a / det };
 }
 
-sfColor get_color(float r, float g, float b, float a) {
-    return sfColor_fromRGBA(r * 255, g * 255, b * 255, a * 255);
+Color get_color(float r, float g, float b, float a) {
+    Color color;
+    color.r = (int) (r * 255);
+    color.g = (int) (g * 255);
+    color.b = (int) (b * 255);
+    color.a = (int) (a * 255);
+    return color;
 }
 
 void permute(int* array, int size) {

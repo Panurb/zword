@@ -49,7 +49,7 @@ void draw_shine(int camera, int entity, HitInfo info, Vector2f velocity) {
     if (image->shine > 0.0) {
         float vn = dot(velocity, info.normal);
         if (vn < -0.98) {
-            sfColor color = sfWhite;
+            Color color = COLOR_WHITE;
             color.a = (1 - 50 * (1 + vn)) * 128;
             float radius = 0.05 * (1 - 5 * (1 + vn)) * CameraComponent_get(camera)->zoom;
             draw_circle(camera, info.position, radius, color);
@@ -165,7 +165,7 @@ void draw_shadows(int camera) {
 
 
 void draw_lights(int camera, float ambient_light) {
-    sfColor color = get_color(ambient_light, ambient_light, ambient_light, 1.0f);
+    Color color = get_color(ambient_light, ambient_light, ambient_light, 1.0f);
 
     SDL_SetRenderTarget(app.renderer, app.light_texture);
     SDL_SetRenderDrawColor(app.renderer, color.r, color.g, color.b, color.a);
@@ -193,7 +193,7 @@ void draw_lights(int camera, float ambient_light) {
             range *= f;
         }
 
-        sfColor color = light->color;
+        Color color = light->color;
         color.a = 255 * brightness;
 
         SDL_Vertex* vertices = malloc((light->rays + 1) * sizeof(SDL_Vertex));

@@ -288,7 +288,7 @@ void LightComponent_deserialize(cJSON* entity_json, int entity) {
 
     float range = cJSON_GetObjectItem(json, "range")->valuedouble;
     float angle = cJSON_GetObjectItem(json, "angle")->valuedouble;
-    sfColor color = sfWhite;
+    Color color = COLOR_WHITE;
     color.r = cJSON_GetObjectItem(json, "color_r")->valuedouble;
     color.g = cJSON_GetObjectItem(json, "color_g")->valuedouble;
     color.b = cJSON_GetObjectItem(json, "color_b")->valuedouble;
@@ -339,11 +339,11 @@ void ParticleComponent_deserialize(cJSON* entity_json, int entity) {
         float end_size = cJSON_GetObjectItem(json, "end_size")->valuedouble;
         float speed = cJSON_GetObjectItem(json, "speed")->valuedouble;
         float rate = cJSON_GetObjectItem(json, "rate")->valuedouble;
-        sfColor outer_color = sfWhite;
+        Color outer_color = COLOR_WHITE;
         outer_color.r = cJSON_GetObjectItem(json, "outer_r")->valueint;
         outer_color.g = cJSON_GetObjectItem(json, "outer_g")->valueint;
         outer_color.b = cJSON_GetObjectItem(json, "outer_b")->valueint;
-        sfColor inner_color = sfWhite;
+        Color inner_color = COLOR_WHITE;
         inner_color.r = cJSON_GetObjectItem(json, "inner_r")->valueint;
         inner_color.g = cJSON_GetObjectItem(json, "inner_g")->valueint;
         inner_color.b = cJSON_GetObjectItem(json, "inner_b")->valueint;
@@ -702,7 +702,7 @@ void TextComponent_deserialize(cJSON* entity_json, int entity) {
 
     char* source_string = cJSON_GetObjectItem(json, "source_string")->valuestring;
     int size = cJSON_GetObjectItem(json, "size")->valueint;
-    sfColor color = sfWhite;
+    Color color = COLOR_WHITE;
     color.r = deserialize_int(json, "color_r", 255);
     color.g = deserialize_int(json, "color_g", 255);
     color.b = deserialize_int(json, "color_b", 255);

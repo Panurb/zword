@@ -2,9 +2,6 @@
 
 #include <stdbool.h>
 
-#include <SFML/System/Vector2.h>
-#include <SFML/Graphics.h>
-
 
 #define PRINT(x) printf("%d\n", x);
 
@@ -30,6 +27,19 @@ typedef struct {
     int w;
     int h;
 } Resolution;
+
+typedef struct {
+    int r;
+    int g;
+    int b;
+    int a;
+} Color;
+
+#define COLOR_WHITE get_color(1.0f, 1.0f, 1.0f, 1.0f)
+#define COLOR_YELLOW get_color(1.0f, 1.0f, 0.0f, 1.0f)
+#define COLOR_RED get_color(1.0f, 0.0f, 0.0f, 1.0f)
+#define COLOR_GREEN get_color(0.0f, 1.0f, 0.0f, 1.0f)
+#define COLOR_MAGENTA get_color(1.0f, 0.0f, 1.0f, 1.0f)
 
 #define STRING_SIZE 1024
 typedef char String[STRING_SIZE];
@@ -117,7 +127,7 @@ Matrix2f transpose(Matrix2f m);
 
 Matrix2f matrix_inverse(Matrix2f m);
 
-sfColor get_color(float r, float g, float b, float a);
+Color get_color(float r, float g, float b, float a);
 
 void permute(int* array, int size);
 
