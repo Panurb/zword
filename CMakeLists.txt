@@ -37,7 +37,6 @@ set(SOURCES
     zword/src/item.c
     zword/src/input.c
     zword/src/interface.c
-    zword/src/level.c
     zword/src/light.c
     zword/src/list.c
     zword/src/menu.c

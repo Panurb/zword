@@ -493,7 +493,7 @@ bool input_widgets(int camera, SDL_Event event) {
     
     if (event.type == SDL_MOUSEMOTION) {
         Vector2f mouse_screen = { event.motion.x, event.motion.y };
-        mouse_position = sdl_screen_to_world(camera, mouse_screen);
+        mouse_position = screen_to_world(camera, mouse_screen);
     } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         mouse_down = true;
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {

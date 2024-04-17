@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics.h>
-
 
 #define FRAME_WINDOW 100
 

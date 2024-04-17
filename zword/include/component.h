@@ -2,9 +2,6 @@
 
 #include <stdbool.h>
 
-#include <SFML/Graphics.h>
-#include <SFML/Audio.h>
-
 #include "util.h"
 #include "list.h"
 
@@ -320,7 +317,6 @@ typedef struct {
     float zoom_target;
     Matrix2f matrix;
     Matrix2f inv_matrix;
-    sfView* view;
     struct {
         Vector2f position;
         Vector2f velocity;

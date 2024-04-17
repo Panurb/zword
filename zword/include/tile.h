@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/System.h>
-
 #include "component.h"
 
 
@@ -23,9 +21,9 @@ typedef enum {
 } Tile;
 
 
-void create_ground(Vector2f position, float width, float height, sfTexture* noise_texture);
+void create_ground(Vector2f position, float width, float height);
 
-void create_water(Vector2f position, float width, float height, sfTexture* noise_texture);
+void create_water(Vector2f position, float width, float height);
 
 void create_beach(Vector2f position, float length, float angle);
 

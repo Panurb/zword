@@ -27,7 +27,7 @@
 static String version = "0.1";
 
 
-void create_game_window(sfVideoMode* mode) {
+void create_game_window() {
     app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN );
     SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "1" : "0");
@@ -72,8 +72,7 @@ int main(int argc, char *argv[]) {
     
     load_settings();
 
-    sfVideoMode mode = { game_settings.width, game_settings.height, 32 };
-    create_game_window(&mode);
+    create_game_window();
 
     bool focus = true;
     int debug_level = 0;
@@ -84,7 +83,7 @@ int main(int argc, char *argv[]) {
     float elapsed_time = 0.0f;
 
     load_resources();
-    create_game(mode);
+    create_game();
     create_menu();
 
     Mix_Music* music = Mix_LoadMUS("data/music/zsong.ogg");
@@ -163,13 +162,16 @@ int main(int argc, char *argv[]) {
                         update_game_mode(time_step);
                         break;
                     case STATE_PAUSE:
-                        update_menu(game_window);
+                        update_menu();
                         break;
-                    case STATE_APPLY:
-                        if (game_settings.width != (int)mode.width || game_settings.height != (int)mode.height) {
+                    case STATE_APPLY:;
+                        int w;
+                        int h;
+                        SDL_GetWindowSize(app.window, &w, &h);
+                        if (game_settings.width != w || game_settings.height != h) {
                             destroy_game_window();
-                            create_game_window(&mode);
-                            resize_game(mode);
+                            create_game_window();
+                            resize_game();
                         }
                         game_state = STATE_MENU;
                         break;
@@ -191,7 +193,7 @@ int main(int argc, char *argv[]) {
                         update_game_over(time_step);
                         break;
                     case STATE_QUIT:
-                        sfRenderWindow_close(game_window);
+                        return 0;
                         break;
                 }
             }

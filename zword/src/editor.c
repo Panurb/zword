@@ -702,8 +702,6 @@ void input_tool_prefab(SDL_Event event) {
 
 
 void input_editor(SDL_Event event) {
-    static sfVector2i mouse_screen = { 0, 0 };
-
     if (input_widgets(game_data->menu_camera, event)) {
         return;
     }
@@ -728,10 +726,9 @@ void input_editor(SDL_Event event) {
 
     if (event.type == SDL_MOUSEMOTION) {
         Vector2f mouse_delta = { event.motion.xrel, event.motion.yrel };
-        mouse_screen = (sfVector2i) { event.motion.x, event.motion.y };
-        mouse_world = screen_to_world(game_data->camera, mouse_screen);
+        mouse_world = get_mouse_position(game_data->camera);
 
-        if (sfMouse_isButtonPressed(sfMouseMiddle)) {
+        if (event.button.button == SDL_BUTTON_MIDDLE) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
@@ -789,7 +786,7 @@ void draw_editor() {
     draw_game();
     draw_grid(game_data->camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
 
-    Vector2f mouse_pos = screen_to_world(game_data->camera, sfMouse_getPosition((sfWindow*) game_window));
+    Vector2f mouse_pos = get_mouse_position(game_data->camera);
     Vector2f mouse_grid = snap_to_grid(mouse_pos, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     Vector2f mouse_grid_center = snap_to_grid_center(mouse_pos, grid_sizes[grid_size_index], 
         grid_sizes[grid_size_index]);
@@ -865,9 +862,9 @@ void draw_editor() {
 
     draw_waypoints(game_data->camera, waypoint_selected);
 
-    draw_spawners(game_window, *game_data);
+    draw_spawners();
 
-    draw_tutorials(game_window, *game_data);
+    draw_tutorials();
 
     draw_widgets(game_data->menu_camera);
 

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <SFML/Window.h>
-#include <SFML/System/Vector2.h>
-
 #include "component.h"
 #include "grid.h"
 #include "camera.h"
@@ -27,4 +24,4 @@ void alert_enemies(int player, float range);
 
 void create_spawner(Vector2f position, float angle, float width, float height);
 
-void draw_spawners(sfRenderWindow* window, GameData data);
+void draw_spawners();

@@ -67,7 +67,6 @@ typedef struct {
 // Globals
 extern GameState game_state;
 extern GameData* game_data;
-extern sfRenderWindow* game_window;
 
 extern Resources resources;
 extern App app;
@@ -77,9 +76,9 @@ void change_state_win();
 
 void load_resources();
 
-void create_game(sfVideoMode mode);
+void create_game();
 
-void resize_game(sfVideoMode mode);
+void resize_game();
 
 void start_game(Filename map_name);
 

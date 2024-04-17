@@ -64,7 +64,7 @@ void draw_shadow_circle(int camera, Vector2f position , float radius) {
 
     SDL_Vertex vertices[20];
     for (int i = 0; i < 20; i++) {
-        Vector2f v = sdl_world_to_screen(camera, points[i]);
+        Vector2f v = world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { 0, 0, 0, 0 };
     }
@@ -102,7 +102,7 @@ void draw_shadow_rectangle(int camera, Vector2f position, float width, float hei
 
     SDL_Vertex vertices[8];
     for (int i = 0; i < 8; i++) {
-        Vector2f v = sdl_world_to_screen(camera, corners[i]);
+        Vector2f v = world_to_screen(camera, corners[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         int alpha = i < 4 ? 64 : 0;
         vertices[i].color = (SDL_Color) { 0, 0, 0, alpha };
@@ -197,7 +197,7 @@ void draw_lights(int camera, float ambient_light) {
         color.a = 255 * brightness;
 
         SDL_Vertex* vertices = malloc((light->rays + 1) * sizeof(SDL_Vertex));
-        Vector2f pos = sdl_world_to_screen(camera, start);
+        Vector2f pos = world_to_screen(camera, start);
         vertices[0] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
 
         float angle = get_angle(i) - 0.5 * light->angle;
@@ -214,7 +214,7 @@ void draw_lights(int camera, float ambient_light) {
 
             color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
 
-            pos = sdl_world_to_screen(camera, end);
+            pos = world_to_screen(camera, end);
             vertices[j] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
 
             velocity = matrix_mult(rot, velocity);

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics.h>
-
 #include "component.h"
 #include "camera.h"
 #include "grid.h"

@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <SFML/Window/Keyboard.h>
-
 #include "input.h"
 #include "util.h"
 #include "component.h"
@@ -79,7 +77,7 @@ char* ACTION_BUTTONS_XBOX[] = {
 };
 
 
-char* key_to_string(SDL_Scancode key) {
+const char* key_to_string(SDL_Scancode key) {
     return SDL_GetScancodeName(key);
 }
 
@@ -137,11 +135,6 @@ char* action_to_keybind(char* action) {
 }
 
 
-char* key_to_letter(sfKeyCode key) {
-    return (0 <= key && key < LENGTH(LETTERS)) ? LETTERS[key] : "";
-}
-
-
 bool keybind_pressed(PlayerAction i) {
     Keybind keybind = game_settings.keybinds[i];
     if (keybind.device == DEVICE_KEYBOARD) {
@@ -196,7 +189,7 @@ Vector2f get_mouse_position(int camera) {
     int x;
     int y;
     SDL_GetMouseState(&x, &y);
-    return sdl_screen_to_world(camera, (Vector2f) {x, y});
+    return screen_to_world(camera, (Vector2f) {x, y});
 }
 
 

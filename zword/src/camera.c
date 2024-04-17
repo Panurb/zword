@@ -41,17 +41,7 @@ Vector2f camera_size(int camera) {
 }
 
 
-sfVector2f world_to_screen(int camera, Vector2f a) {
-    CameraComponent* cam = CameraComponent_get(camera);
-    Vector2f pos = sum(get_position(camera), cam->shake.position);
-    sfVector2f b;
-    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
-    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.h;
-    return b;
-}
-
-
-Vector2f sdl_world_to_screen(int camera, Vector2f a) {
+Vector2f world_to_screen(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     Vector2f b;
@@ -61,32 +51,12 @@ Vector2f sdl_world_to_screen(int camera, Vector2f a) {
 }
 
 
-Vector2f screen_to_world(int camera, sfVector2i a) {
+Vector2f screen_to_world(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
     Vector2f pos = sum(get_position(camera), cam->shake.position);
     Vector2f b;
     b.x = (a.x - 0.5 * cam->resolution.w) / cam->zoom + pos.x;
     b.y = (0.5 * cam->resolution.h - a.y) / cam->zoom + pos.y;
-    return b;
-}
-
-
-Vector2f sdl_screen_to_world(int camera, Vector2f a) {
-    CameraComponent* cam = CameraComponent_get(camera);
-    Vector2f pos = sum(get_position(camera), cam->shake.position);
-    Vector2f b;
-    b.x = (a.x - 0.5 * cam->resolution.w) / cam->zoom + pos.x;
-    b.y = (0.5 * cam->resolution.h - a.y) / cam->zoom + pos.y;
-    return b;
-}
-
-
-sfVector2f world_to_texture(int camera, Vector2f a) {
-    CameraComponent* cam = CameraComponent_get(camera);
-    Vector2f pos = sum(get_position(camera), cam->shake.position);
-    sfVector2f b;
-    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
-    b.y = (a.y - pos.y) * cam->zoom + 0.5 * cam->resolution.h;
     return b;
 }
 
@@ -124,7 +94,7 @@ void draw_line(int camera, Vector2f start, Vector2f end, float width, Color colo
 
     SDL_Vertex vertices[4];
     for (int i = 0; i < 4; i++) {
-        Vector2f v = sdl_world_to_screen(camera, corners[i]);
+        Vector2f v = world_to_screen(camera, corners[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
@@ -141,7 +111,7 @@ void draw_circle(int camera, Vector2f position, float radius, Color color) {
 
     SDL_Vertex vertices[20];
     for (int i = 0; i < 20; i++) {
-        Vector2f v = sdl_world_to_screen(camera, points[i]);
+        Vector2f v = world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
@@ -167,7 +137,7 @@ void draw_ellipse(int camera, Vector2f position, float major, float minor, float
 
     SDL_Vertex vertices[20];
     for (int i = 0; i < 20; i++) {
-        Vector2f v = sdl_world_to_screen(camera, points[i]);
+        Vector2f v = world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
@@ -182,7 +152,7 @@ void draw_rectangle(int camera, Vector2f position, float width, float height, fl
 
     SDL_Vertex vertices[4];
     for (int i = 0; i < 4; i++) {
-        Vector2f v = sdl_world_to_screen(camera, corners[i]);
+        Vector2f v = world_to_screen(camera, corners[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
@@ -215,11 +185,11 @@ void draw_slice(int camera, Vector2f position, float min_range, float max_range,
     Matrix2f rot = rotation_matrix(spread / (points / 2.0f - 1));
 
     for (int k = 0; k < points / 2; k += 1) {
-        Vector2f pos = sdl_world_to_screen(camera, sum(position, start));
+        Vector2f pos = world_to_screen(camera, sum(position, start));
         vertices[2 * k].position = (SDL_FPoint) { pos.x, pos.y };
         vertices[2 * k].color = (SDL_Color) { color.r, color.g, color.b, color.a };
         
-        pos = sdl_world_to_screen(camera, sum(position, end));
+        pos = world_to_screen(camera, sum(position, end));
         vertices[2 * k + 1].position = (SDL_FPoint) { pos.x, pos.y };
         vertices[2 * k + 1].color = (SDL_Color) { color.r, color.g, color.b, color.a };
 
@@ -277,6 +247,7 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
 
     Vector2f r = mult(cam->zoom / PIXELS_PER_UNIT, scale);
 
+    // TODO: use shaders
     // sfShader* shader = cam->shaders[shader_index];
 
     SDL_Texture* texture = resources.textures[i];
@@ -321,7 +292,7 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
 
                 Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
                                                     j * tile_height - 0.5f * (height - current_tile_height), y));
-                Vector2f pos = sdl_world_to_screen(camera, p);
+                Vector2f pos = world_to_screen(camera, p);
                 dest.x = pos.x - 0.5f * dest.w;
                 dest.y = pos.y - 0.5f * dest.h;
                 SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
@@ -334,7 +305,7 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
             height = (float)src.h / PIXELS_PER_UNIT;
         }
 
-        Vector2f pos = sdl_world_to_screen(camera, position);
+        Vector2f pos = world_to_screen(camera, position);
 
         SDL_FRect dest;
         dest.w = width * r.x * PIXELS_PER_UNIT;
@@ -367,7 +338,7 @@ void draw_text(int camera, Vector2f position, char string[100], int size, Color 
         return;
     }
 
-    Vector2f pos = sdl_world_to_screen(camera, position);
+    Vector2f pos = world_to_screen(camera, position);
     SDL_Color c = { color.r, color.g, color.b, color.a };
     SDL_Surface* surface = TTF_RenderText_Blended(font, string, c);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app.renderer, surface);

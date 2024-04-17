@@ -115,29 +115,7 @@ int create_decal(Vector2f pos, Filename filename, float lifetime) {
 }
 
 
-sfTexture** load_textures() {
-    int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
-
-    sfTexture** textures = malloc(sizeof(IMAGES) * sizeof(sfTexture*));
-    for (int i = 0; i < n; i++) {
-        char path[100];
-        snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");
-
-        sfTexture* texture = sfTexture_createFromFile(path, NULL);
-        sfTexture_setSmooth(texture, sfTrue);
-
-        if (strstr(IMAGES[i], "tile")) {
-            sfTexture_setRepeated(texture, sfTrue);
-        }
-
-        textures[i] = texture;
-    }
-
-    return textures;
-}
-
-
-SDL_Texture** sdl_load_textures() {
+SDL_Texture** load_textures() {
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
 
     SDL_Texture** textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
@@ -313,21 +291,21 @@ void color_pixel(sfUint8* pixels, int width, int x, int y, Color color, float al
 }
 
 
-void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p) {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;
-            float y = origin.y + 4.0 * (height - j) / (float) PIXELS_PER_UNIT;
-            float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
+// void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p) {
+//     for (int i = 0; i < width; i++) {
+//         for (int j = 0; j < height; j++) {
+//             float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;
+//             float y = origin.y + 4.0 * (height - j) / (float) PIXELS_PER_UNIT;
+//             float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
 
-            if (sharpness != 0.0f) {
-                a = smoothstep(a, 0.5f, 100.0f * sharpness);
-            }
+//             if (sharpness != 0.0f) {
+//                 a = smoothstep(a, 0.5f, 100.0f * sharpness);
+//             }
 
-            color_pixel(pixels, width, i, j, color, a);
-        }
-    }
-}
+//             color_pixel(pixels, width, i, j, color, a);
+//         }
+//     }
+// }
 
 
 bool point_inside_image(int entity, Vector2f point) {

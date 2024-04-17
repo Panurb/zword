@@ -8,7 +8,6 @@
 #include "camera.h"
 #include "player.h"
 #include "component.h"
-#include "level.h"
 #include "collider.h"
 #include "physics.h"
 #include "util.h"
@@ -29,11 +28,11 @@
 #include "serialize.h"
 #include "item.h"
 #include "widget.h"
+#include "settings.h"
 
 
 GameState game_state = STATE_MENU;
 GameData* game_data;
-sfRenderWindow* game_window;
 
 Resources resources;
 App app;
@@ -76,7 +75,7 @@ void change_state_win() {
 
 
 void load_resources() {
-    resources.textures = sdl_load_textures();
+    resources.textures = load_textures();
     resources.fonts[0] = NULL;
     for (int size = 1; size <= 300; size++) {
         resources.fonts[size] = TTF_OpenFont("data/Helvetica.ttf", size);
@@ -89,7 +88,7 @@ void load_resources() {
 }
     
 
-void create_game(sfVideoMode mode) {
+void create_game() {
     game_data = malloc(sizeof(GameData));
 
     strcpy(game_data->map_name, "Tutorial");
@@ -98,8 +97,8 @@ void create_game(sfVideoMode mode) {
     ColliderGrid* grid = ColliderGrid_create();
     float ambient_light = 0.5f;
     int seed = time(NULL);
-    int camera = create_camera(mode);
-    int menu_camera = create_menu_camera(mode);
+    int camera = create_camera();
+    int menu_camera = create_menu_camera();
 
     game_data->grid = grid;
     game_data->ambient_light = ambient_light;
@@ -111,12 +110,12 @@ void create_game(sfVideoMode mode) {
 }
 
 
-void resize_game(sfVideoMode mode) {
+void resize_game() {
     for (int i = 0; i < game_data->components->entities; i++) {
         CameraComponent* camera = CameraComponent_get(i);
         if (camera) {
-            camera->resolution.w = mode.width;
-            camera->resolution.h = mode.height;
+            camera->resolution.w = game_settings.width;
+            camera->resolution.h = game_settings.height;
             camera->zoom = camera->zoom_target * camera->resolution.h / 720.0;
         }
     }
@@ -156,10 +155,9 @@ void init_tutorial() {
 void start_game(Filename map_name) {
     ColliderGrid_clear(game_data->grid);
     CameraComponent* cam = CameraComponent_get(game_data->camera);
-    sfVideoMode mode = { cam->resolution.w, cam->resolution.h, 32 };
     ComponentData_clear();
-    game_data->camera = create_camera(mode);
-    game_data->menu_camera = create_menu_camera(mode);
+    game_data->camera = create_camera();
+    game_data->menu_camera = create_menu_camera();
     game_data->ambient_light = 0.5f;
     create_pause_menu();
     // create_level(data.components, data.grid, data.seed);
@@ -184,10 +182,9 @@ void start_game(Filename map_name) {
 void end_game() {
     ColliderGrid_clear(game_data->grid);
     CameraComponent* cam = CameraComponent_get(game_data->camera);
-    sfVideoMode mode = { cam->resolution.w, cam->resolution.h, 32 };
     ComponentData_clear();
-    game_data->camera = create_camera(mode);
-    game_data->menu_camera = create_menu_camera(mode);
+    game_data->camera = create_camera();
+    game_data->menu_camera = create_menu_camera();
     create_menu();
 }
 

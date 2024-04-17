@@ -5,9 +5,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <SFML/System/Vector2.h>
-#include <SFML/Graphics.h>
-
 #include "collider.h"
 #include "component.h"
 #include "camera.h"
@@ -380,7 +377,6 @@ void collide() {
 
 void draw_occupied_tiles(int camera) {
     ColliderGrid* grid = game_data->grid;
-    sfText* text = sfText_create();
     Vector2f w = { 0.5f * grid->tile_width, 0.0f };
     Vector2f h = { 0.0f, 0.5f * grid->tile_height };
     float linewidth = 0.01f;
@@ -401,7 +397,6 @@ void draw_occupied_tiles(int camera) {
             }
         }
     }
-    sfText_destroy(text);
 }
 
 

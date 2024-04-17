@@ -7,7 +7,6 @@
 #include "collider.h"
 #include "util.h"
 #include "camera.h"
-#include "level.h"
 #include "list.h"
 #include "game.h"
 
@@ -38,14 +37,6 @@ void ColliderGrid_clear(ColliderGrid* grid) {
             List_clear(grid->array[i][j]);
         }
     }
-}
-
-
-sfVector2i world_to_grid(Vector2f position) {
-    int x = floorf((position.x + 0.5 * game_data->grid->width) / game_data->grid->tile_width);
-    int y = floorf((position.y + 0.5 * game_data->grid->height) / game_data->grid->tile_height);
-    
-    return (sfVector2i) { x, y };
 }
 
 

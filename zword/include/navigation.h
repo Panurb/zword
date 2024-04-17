@@ -1,8 +1,5 @@
 #pragma once
 
-#include <SFML/System/Vector2.h>
-#include <SFML/Graphics.h>
-
 #include "camera.h"
 #include "grid.h"
 

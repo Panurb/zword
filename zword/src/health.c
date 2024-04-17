@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "component.h"
-#include "level.h"
 #include "physics.h"
 #include "health.h"
 #include "image.h"

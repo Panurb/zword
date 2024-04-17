@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 #include "util.h"
 #include "component.h"
 #include "camera.h"
@@ -44,13 +46,11 @@ typedef enum {
 
 Vector2f get_mouse_position(int camera);
 
-char* key_to_string(sfKeyCode key);
+const char* key_to_string(SDL_Scancode key);
 
 char* keybind_to_string(Keybind keybind);
 
 Keybind string_to_keybind(String string);
-
-char* key_to_letter(sfKeyCode key);
 
 char* action_to_keybind(char* action);
 

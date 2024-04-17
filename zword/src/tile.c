@@ -10,38 +10,38 @@
 #include "enemy.h"
 
 
-void create_ground(Vector2f position, float width, float height, sfTexture* noise_texture) {
+void create_ground(Vector2f position, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0);
     ImageComponent_add(i, "grass_tile", width, height, LAYER_GROUND);
 
-    if (noise_texture) {
-        i = create_entity();
-        CoordinateComponent_add(i, position, 0.0);
-        ImageComponent* image = ImageComponent_add(i, "", 16.0, 16.0, LAYER_GROUND);
-        image->scale = (Vector2f) { 8.0, 8.0 };
-        image->texture_changed = false;
-        image->alpha = 1.0f;
-        // sfSprite_setTexture(image->sprite, noise_texture, false);
-    }
+    // if (noise_texture) {
+    //     i = create_entity();
+    //     CoordinateComponent_add(i, position, 0.0);
+    //     ImageComponent* image = ImageComponent_add(i, "", 16.0, 16.0, LAYER_GROUND);
+    //     image->scale = (Vector2f) { 8.0, 8.0 };
+    //     image->texture_changed = false;
+    //     image->alpha = 1.0f;
+    //     // sfSprite_setTexture(image->sprite, noise_texture, false);
+    // }
 }
 
 
-void create_water(Vector2f position, float width, float height, sfTexture* noise_texture) {
+void create_water(Vector2f position, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ImageComponent_add(i, "water_tile", width, height, LAYER_GROUND);
     ColliderComponent_add_rectangle(i, width, height, GROUP_WALLS);
 
-    if (noise_texture) {
-        i = create_entity();
-        CoordinateComponent_add(i, position, 0.0);
-        ImageComponent* image = ImageComponent_add(i, "", 16.0, 16.0, LAYER_GROUND);
-        image->scale = (Vector2f) { 8.0f, 8.0f };
-        image->texture_changed = false;
-        image->alpha = 0.3f;
-        // sfSprite_setTexture(image->sprite, noise_texture, false);
-    }
+    // if (noise_texture) {
+    //     i = create_entity();
+    //     CoordinateComponent_add(i, position, 0.0);
+    //     ImageComponent* image = ImageComponent_add(i, "", 16.0, 16.0, LAYER_GROUND);
+    //     image->scale = (Vector2f) { 8.0f, 8.0f };
+    //     image->texture_changed = false;
+    //     image->alpha = 0.3f;
+    //     // sfSprite_setTexture(image->sprite, noise_texture, false);
+    // }
 }
 
 
@@ -134,7 +134,7 @@ void create_tile(Tile tile, Vector2f position, float angle, float width, float h
             create_fence(position, angle, width, height);
             break;
         case TILE_GRASS:
-            create_ground(position, width, height, NULL);
+            create_ground(position, width, height);
             break;
         case TILE_LEVEL_END:
             create_level_end(position, angle, width, height);
@@ -152,7 +152,7 @@ void create_tile(Tile tile, Vector2f position, float angle, float width, float h
             create_floor(position, width, height, angle, "tiles_tile");
             break;
         case TILE_WATER:
-            create_water(position, width, height, NULL);
+            create_water(position, width, height);
             break;
         case TILE_WOOD:
             create_wall(position, angle, width, height, "wood_tile");
