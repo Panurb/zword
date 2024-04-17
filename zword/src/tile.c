@@ -1,8 +1,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <SFML/System.h>
-
 #include "tile.h"
 #include "component.h"
 #include "navigation.h"

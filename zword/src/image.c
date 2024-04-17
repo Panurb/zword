@@ -5,9 +5,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include <SFML/Graphics.h>
-#include <SFML/System/Vector2.h>
-
 #include "image.h"
 #include "camera.h"
 #include "util.h"
@@ -281,14 +278,14 @@ void change_layer(int entity, Layer layer) {
 }
 
 
-void color_pixel(sfUint8* pixels, int width, int x, int y, Color color, float alpha) {
-    int k = (x + y * width) * 4;
+// void color_pixel(sfUint8* pixels, int width, int x, int y, Color color, float alpha) {
+//     int k = (x + y * width) * 4;
 
-    pixels[k] = color.r;
-    pixels[k + 1] = color.g;
-    pixels[k + 2] = color.b;
-    pixels[k + 3] = color.a * alpha;
-}
+//     pixels[k] = color.r;
+//     pixels[k + 1] = color.g;
+//     pixels[k + 2] = color.b;
+//     pixels[k + 3] = color.a * alpha;
+// }
 
 
 // void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p) {

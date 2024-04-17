@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <SFML/System.h>
-
 #include "object.h"
 #include "component.h"
 #include "particle.h"

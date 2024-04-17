@@ -4,8 +4,6 @@ set(CMAKE_C_FLAGS "-O3")
 
 project(notk C)
 
-include_directories(CSFML/include)
-
 include_directories(cJSON/include)
 
 include_directories(zword/include)
@@ -67,10 +65,6 @@ install(TARGETS notk
     DESTINATION ${CMAKE_BINARY_DIR})
 
 set(LIBS
-    ${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-audio.lib
-	${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-graphics.lib
-	${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-system.lib
-	${CMAKE_SOURCE_DIR}/CSFML/lib/msvc/csfml-window.lib
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.lib
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2main.lib
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.lib
@@ -81,10 +75,6 @@ set(LIBS
 target_link_libraries(notk ${LIBS})
 
 set(DLLS
-	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-audio-2.dll
-	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-graphics-2.dll
-	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-system-2.dll
-	${CMAKE_SOURCE_DIR}/CSFML/bin/csfml-window-2.dll
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.dll
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.dll
     ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.dll
@@ -112,8 +102,6 @@ set(SHADERS
 install(FILES ${SHADERS}
     DESTINATION ${CMAKE_BINARY_DIR}
 )
-
-set(EXTERNAL_DLLS ${CMAKE_SOURCE_DIR}/OpenAL32.dll)
 
 install(FILES ${EXTERNAL_DLLS}
     DESTINATION ${CMAKE_BINARY_DIR}

@@ -138,18 +138,6 @@ char* action_to_keybind(char* action) {
 bool keybind_pressed(PlayerAction i) {
     Keybind keybind = game_settings.keybinds[i];
     if (keybind.device == DEVICE_KEYBOARD) {
-        return sfKeyboard_isKeyPressed(keybind.key);
-    } else if (keybind.device == DEVICE_MOUSE) {
-        return sfMouse_isButtonPressed(keybind.key);
-    } else {
-        return false;
-    }
-}
-
-
-bool sdl_keybind_pressed(PlayerAction i) {
-    Keybind keybind = game_settings.keybinds[i];
-    if (keybind.device == DEVICE_KEYBOARD) {
         return SDL_GetKeyboardState(NULL)[keybind.key];
     } else if (keybind.device == DEVICE_MOUSE) {
         return SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(keybind.key);
@@ -200,16 +188,16 @@ void update_controller(int camera, int i) {
     Vector2f left_stick = zeros();
     Vector2f right_stick = zeros();
     if (player->controller.joystick == -1) {
-        if (sdl_keybind_pressed(ACTION_LEFT)) {
+        if (keybind_pressed(ACTION_LEFT)) {
             left_stick.x -= 1.0f;
         }
-        if (sdl_keybind_pressed(ACTION_RIGHT)) {
+        if (keybind_pressed(ACTION_RIGHT)) {
             left_stick.x += 1.0f;
         }
-        if (sdl_keybind_pressed(ACTION_DOWN)) {
+        if (keybind_pressed(ACTION_DOWN)) {
             left_stick.y -= 1.0f;
         }
-        if (sdl_keybind_pressed(ACTION_UP)) {
+        if (keybind_pressed(ACTION_UP)) {
             left_stick.y += 1.0f;
         }
         player->controller.left_stick = normalized(left_stick);
@@ -218,38 +206,38 @@ void update_controller(int camera, int i) {
         right_stick = diff(mouse, get_position(i));
         player->controller.right_stick = normalized(right_stick);
 
-        player->controller.left_trigger = sdl_keybind_pressed(ACTION_ATTACK) ? 1.0f : 0.0f;
-        player->controller.right_trigger = sdl_keybind_pressed(ACTION_PICKUP) ? 1.0f : 0.0f;
+        player->controller.left_trigger = keybind_pressed(ACTION_ATTACK) ? 1.0f : 0.0f;
+        player->controller.right_trigger = keybind_pressed(ACTION_PICKUP) ? 1.0f : 0.0f;
 
         for (ControllerButton b = BUTTON_A; b <= BUTTON_R; b++) {
             bool down = false;
             switch (b) {
                 case BUTTON_A:
-                    down = sdl_keybind_pressed(ACTION_ENTER);
+                    down = keybind_pressed(ACTION_ENTER);
                     break;
                 case BUTTON_B:
                     break;
                 case BUTTON_X:
-                    down = sdl_keybind_pressed(ACTION_RELOAD);
+                    down = keybind_pressed(ACTION_RELOAD);
                     break;
                 case BUTTON_Y:
-                    down = sdl_keybind_pressed(ACTION_ATTACHMENT);
+                    down = keybind_pressed(ACTION_ATTACHMENT);
                     break;
                 case BUTTON_LB:
-                    down = sdl_keybind_pressed(ACTION_AMMO);
+                    down = keybind_pressed(ACTION_AMMO);
                     break;
                 case BUTTON_RB:
-                    down = sdl_keybind_pressed(ACTION_PICKUP);
+                    down = keybind_pressed(ACTION_PICKUP);
                     break;
                 case BUTTON_START:
                     break;
                 case BUTTON_BACK:
                     break;
                 case BUTTON_LT:
-                    down = sdl_keybind_pressed(ACTION_INVENTORY);
+                    down = keybind_pressed(ACTION_INVENTORY);
                     break;
                 case BUTTON_RT:
-                    down = sdl_keybind_pressed(ACTION_ATTACK);
+                    down = keybind_pressed(ACTION_ATTACK);
                     break;
                 case BUTTON_L:
                     break;

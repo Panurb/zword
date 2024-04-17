@@ -2,8 +2,6 @@
 
 #include <math.h>
 
-#include <SFML/System/Vector2.h>
-
 #include "component.h"
 #include "util.h"
 #include "collider.h"

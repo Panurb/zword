@@ -6,9 +6,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <SFML/System/Vector2.h>
-#include <SFML/Window/Keyboard.h>
-
 #include "util.h"
 #include "component.h"
 #include "camera.h"

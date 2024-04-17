@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <SFML/Graphics.h>
-
 #include "interface.h"
 #include "camera.h"
 #include "game.h"
