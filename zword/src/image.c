@@ -148,11 +148,6 @@ void draw_ground(int camera) {
 
         if (image->layer > LAYER_DECALS) break;
 
-        if (image->texture_changed) {
-            set_texture(image);
-            image->texture_changed = false;
-        }
-
         Vector2f pos = get_position(i);
         float w = image->scale.x * image->width;
         float h = image->scale.y * image->height;
@@ -166,7 +161,7 @@ void draw_ground(int camera) {
         }
 
         if (image->alpha > 0.0f) {
-            draw_sprite(camera, image->filename, image->width, image->height, 0, pos, get_angle(i), image->scale, image->alpha, 0);
+            draw_sprite(camera, image->texture_index, image->width, image->height, 0, pos, get_angle(i), image->scale, image->alpha);
         }
     }
 }
@@ -174,11 +169,6 @@ void draw_ground(int camera) {
 
 void draw_image(int entity, int camera) {
     ImageComponent* image = ImageComponent_get(entity);
-
-    if (image->texture_changed) {
-        set_texture(image);
-        image->texture_changed = false;
-    }
 
     image->scale.x = 1.0f - image->stretch;
     image->scale.y = 1.0f + image->stretch;
@@ -198,7 +188,7 @@ void draw_image(int entity, int camera) {
     }
 
     if (image->alpha > 0.0f) {
-        draw_sprite(camera, image->filename, image->width, image->height, offset, pos, get_angle(entity), image->scale, image->alpha, SHADER_NONE);
+        draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, get_angle(entity), image->scale, image->alpha);
     }
 }
 
@@ -238,18 +228,15 @@ void draw_roofs(int camera) {
 
 void change_texture(int entity, Filename filename, float width, float height) {
     ImageComponent* image = ImageComponent_get(entity);
-    if (strcmp(image->filename, filename) == 0) {
-        return;
-    }
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
-    image->texture_changed = true;
     if (filename[0] == '\0') {
         image->alpha = 0.0f;
     } else {
         image->alpha = 1.0f;
     }
+    image->texture_index = get_texture_index(filename);
 
     AnimationComponent* animation = AnimationComponent_get(entity);
     if (animation) {

@@ -39,7 +39,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
             angle = polar_angle(r) - 0.5f * M_PI;
         }
 
-        draw_sprite(camera, image->filename, image->width, image->height, 0, sum(pos, r), angle, ones(), 1.0f, 0);
+        draw_sprite(camera, image->texture_index, image->width, image->height, 0, sum(pos, r), angle, ones(), 1.0f);
     }
 }
 
@@ -73,7 +73,7 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
 
         float angle = (slot - 1) * 0.5f * M_PI;
         Vector2f scale = mult(0.75, ones());
-        draw_sprite(camera, image->filename, image->width, image->height, 0, sum(pos, r), angle, scale, 1.0f, 0);
+        draw_sprite(camera, image->texture_index, image->width, image->height, 0, sum(pos, r), angle, scale, 1.0f);
     }
 }
 
@@ -97,7 +97,7 @@ void draw_ammo_slot(int camera, int entity, int slot, float offset, float alpha)
     int i = player->ammo[slot + 1];
     if (i != -1) {
         ImageComponent* image = ImageComponent_get(i);
-        draw_sprite(camera, image->filename, image->width, image->height, 0, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 1.0f, 0);
+        draw_sprite(camera, image->texture_index, image->width, image->height, 0, sum(pos, polar_to_cartesian(1.5f + offset, slot * slice - 0.1f * M_PI)), 0.0f, ones(), 1.0f);
 
         char buffer[20];
         snprintf(buffer, 20, "%i", AmmoComponent_get(i)->size);
@@ -216,7 +216,7 @@ void draw_hud(int camera) {
             case PLAYER_SHOOT:
                 draw_item_use(camera, i);
                 break;
-            case PLAYER_RELOAD:
+            case PLAYER_RELOAD:;
                 int akimbo = get_akimbo(item);
                 float prog = 2 * M_PI * (1.0 - weapon->cooldown / ((1 + akimbo) * weapon->reload_time));
                 draw_slice(camera, position, 0.75, 1.0, 0.5 * M_PI - 0.5 * prog, prog, COLOR_WHITE);

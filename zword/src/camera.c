@@ -234,23 +234,17 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
 }
 
 
-void draw_sprite(int camera, Filename filename, float width, float height, int offset, Vector2f position, float angle, 
-        Vector2f scale, float alpha, int shader_index) {
-    CameraComponent* cam = CameraComponent_get(camera);
-    // TODO: don't get texture index every frame
-    int i = get_texture_index(filename);
-    if (i == -1) {
-        // FIXME
-        // printf("Texture not found: %s\n", filename);
+void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle, 
+        Vector2f scale, float alpha) {
+    if (texture_index == -1) {
         return;
     }
 
-    Vector2f r = mult(cam->zoom / PIXELS_PER_UNIT, scale);
+    CameraComponent* cam = CameraComponent_get(camera);
 
-    // TODO: use shaders
-    // sfShader* shader = cam->shaders[shader_index];
+    Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, scale);
 
-    SDL_Texture* texture = resources.textures[i];
+    SDL_Texture* texture = resources.textures[texture_index];
     SDL_SetTextureAlphaMod(texture, 255 * alpha);
 
     SDL_Rect src = { 0, 0, width * PIXELS_PER_UNIT, height * PIXELS_PER_UNIT };
@@ -258,14 +252,22 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
         src.x = offset * width * PIXELS_PER_UNIT;
     }
 
-    if (strstr(filename, "tile")) {
+    bool tile = false;
+    int texture_width;
+    int texture_height;
+    SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
+    if (texture_width < width * PIXELS_PER_UNIT || texture_height < height * PIXELS_PER_UNIT) {
+        tile = true;
+    }
+
+    if (tile) {
         SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
         float tile_width = (float)src.w / PIXELS_PER_UNIT;
         float tile_height = (float)src.h / PIXELS_PER_UNIT;
 
         SDL_FRect dest;
-        dest.w = tile_width * r.x * PIXELS_PER_UNIT;
-        dest.h = tile_height * r.y * PIXELS_PER_UNIT;
+        dest.w = tile_width * scaling.x * PIXELS_PER_UNIT;
+        dest.h = tile_height * scaling.y * PIXELS_PER_UNIT;
 
         Vector2f x = polar_to_cartesian(1.0f, angle);
         Vector2f y = perp(x);
@@ -277,17 +279,17 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
             if (i == nx - 1) {
                 current_tile_width = (width - tile_width * (nx - 1));
                 src.w = current_tile_width * PIXELS_PER_UNIT;
-                dest.w = src.w * r.x;
+                dest.w = src.w * scaling.x;
             }
 
             float current_tile_height = tile_height;
             src.h = tile_height * PIXELS_PER_UNIT;
-            dest.h = src.h * r.y;
+            dest.h = src.h * scaling.y;
             for (int j = 0; j < ny; j++) {
                 if (j == ny - 1) {
                     current_tile_height = (height - tile_height * (ny - 1));
                     src.h = current_tile_height * PIXELS_PER_UNIT;
-                    dest.h = src.h * r.y;
+                    dest.h = src.h * scaling.y;
                 }
 
                 Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
@@ -308,8 +310,8 @@ void draw_sprite(int camera, Filename filename, float width, float height, int o
         Vector2f pos = world_to_screen(camera, position);
 
         SDL_FRect dest;
-        dest.w = width * r.x * PIXELS_PER_UNIT;
-        dest.h = height * r.y * PIXELS_PER_UNIT;
+        dest.w = width * scaling.x * PIXELS_PER_UNIT;
+        dest.h = height * scaling.y * PIXELS_PER_UNIT;
         dest.x = pos.x - 0.5f * dest.w;
         dest.y = pos.y - 0.5f * dest.h;
 

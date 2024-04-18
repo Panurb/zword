@@ -91,8 +91,8 @@ void CoordinateComponent_remove(int entity) {
 
 ImageComponent* ImageComponent_add(int entity, Filename filename, float width, float height, Layer layer) {
     ImageComponent* image = malloc(sizeof(ImageComponent));
-    image->texture_changed = true;
     strcpy(image->filename, filename);
+    image->texture_index = -1;
     image->width = width;
     image->height = height;
     image->shine = 1.0;
@@ -105,6 +105,7 @@ ImageComponent* ImageComponent_add(int entity, Filename filename, float width, f
     game_data->components->image.array[entity] = image;
 
     change_layer(entity, image->layer);
+    change_texture(entity, filename, width, height);
 
     return image;
 }

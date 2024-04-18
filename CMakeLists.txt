@@ -65,8 +65,8 @@ install(TARGETS notk
     DESTINATION ${CMAKE_BINARY_DIR})
 
 set(LIBS
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.lib
     ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2main.lib
+    ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.lib
     ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.lib
     ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.lib
     ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x86/SDL2_mixer.lib

@@ -36,7 +36,6 @@ typedef enum {
 } Layer;
 
 typedef struct {
-    bool texture_changed;
     Filename filename;
     int texture_index;
     float width;

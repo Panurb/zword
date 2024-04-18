@@ -28,9 +28,9 @@ static String version = "0.1";
 
 
 void create_game_window() {
-    app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN );
+    app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game_settings.width, game_settings.height, SDL_WINDOW_SHOWN);
     SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-    SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "1" : "0");
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "0" : "0");
     app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
     app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
@@ -119,9 +119,8 @@ int main(int argc, char *argv[]) {
                                 }
                             }
                         }
-                    }
-                    if (game_state == STATE_PAUSE) {
-                        if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                    } else if (game_state == STATE_PAUSE) {
+                        if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
                             game_state = STATE_GAME;
                         }
                     }
@@ -212,8 +211,8 @@ int main(int argc, char *argv[]) {
 
         switch (game_state) {
             case STATE_MENU:
-                draw_sprite(game_data->menu_camera, "menu", 0, 0, 0, zeros(), 0.0f, mult(3.5f, ones()), 1.0f, 0);
-                draw_sprite(game_data->menu_camera, "title", 0, 0, 0, vec(0.0f, 9.0f), 0.0f, vec(title_scale, title_scale), 1.0f, 0);
+                draw_sprite(game_data->menu_camera, get_texture_index("menu"), 0, 0, 0, zeros(), 0.0f, mult(3.5f, ones()), 1.0f);
+                draw_sprite(game_data->menu_camera, get_texture_index("title"), 0, 0, 0, vec(0.0f, 9.0f), 0.0f, vec(title_scale, title_scale), 1.0f);
                 draw_menu();
 
                 String buffer;
