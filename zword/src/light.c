@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 
+#include <stdlib.h>
 #include <math.h>
 
 #include "component.h"
