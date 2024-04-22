@@ -106,27 +106,29 @@ void draw_line(int camera, Vector2f start, Vector2f end, float width, Color colo
 
 
 void draw_circle(int camera, Vector2f position, float radius, Color color) {
-    Vector2f points[20];
-    get_circle_points(position, radius, 20, points);
+    int points_size = clamp(20 * radius, 20, 100);
+    Vector2f points[100];
+    get_circle_points(position, radius, points_size, points);
 
-    SDL_Vertex vertices[20];
-    for (int i = 0; i < 20; i++) {
+    SDL_Vertex vertices[100];
+    for (int i = 0; i < points_size; i++) {
         Vector2f v = world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
 
-    draw_triangle_fan(camera, vertices, 20);
+    draw_triangle_fan(camera, vertices, points_size);
 }
 
 
 void draw_circle_outline(int camera, Vector2f position, float radius, float line_width, Color color) {
-    Vector2f points[20];
-    get_circle_points(position, radius, 20, points);
-    points[0] = points[19];
+    int points_size = clamp(20 * radius, 20, 100);
+    Vector2f points[100];
+    get_circle_points(position, radius, points_size, points);
+    points[0] = points[points_size - 1];
 
-    for (int i = 0; i < 20; i++) {
-        draw_line(camera, points[i], points[(i + 1) % 20], line_width, color);
+    for (int i = 0; i < points_size; i++) {
+        draw_line(camera, points[i], points[(i + 1) % points_size], line_width, color);
     }
 }
 
