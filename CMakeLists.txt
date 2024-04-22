@@ -59,26 +59,26 @@ set(SOURCES
 )
 
 # Enable console by removing WIN32 flag
-add_executable(notk ${SOURCES})
+add_executable(notk WIN32 ${SOURCES})
 
 install(TARGETS notk
     DESTINATION ${CMAKE_BINARY_DIR})
 
 set(LIBS
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2main.lib
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.lib
-    ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.lib
-    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.lib
-    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x86/SDL2_mixer.lib
+    ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2main.lib
+    ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.lib
+    ${CMAKE_SOURCE_DIR}/SDL_image/lib/x64/SDL2_image.lib
+    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x64/SDL2_ttf.lib
+    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x64/SDL2_mixer.lib
 )
 
 target_link_libraries(notk ${LIBS})
 
 set(DLLS
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x86/SDL2.dll
-    ${CMAKE_SOURCE_DIR}/SDL_image/lib/x86/SDL2_image.dll
-    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x86/SDL2_ttf.dll
-    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x86/SDL2_mixer.dll
+    ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.dll
+    ${CMAKE_SOURCE_DIR}/SDL_image/lib/x64/SDL2_image.dll
+    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x64/SDL2_ttf.dll
+    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x64/SDL2_mixer.dll
 )
 
 install(FILES ${DLLS}
