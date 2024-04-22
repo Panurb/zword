@@ -1,20 +1,22 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_C_FLAGS "-O3")
-
 project(notk C)
 
-include_directories(cJSON/include)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")  
+    set(USE_FLAGS "-s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\" -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
 
+include_directories(cJSON/include)
 include_directories(zword/include)
 
-include_directories(SDL/include)
-
-include_directories(SDL_image/include)
-
-include_directories(SDL_ttf/include)
-
-include_directories(SDL_mixer/include)
+if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")  
+    include_directories(SDL/include)
+    include_directories(SDL_image/include)
+    include_directories(SDL_ttf/include)
+    include_directories(SDL_mixer/include)
+endif()
 
 set(SOURCES
     cJSON/src/cJSON.c
@@ -58,21 +60,38 @@ set(SOURCES
     zword/src/outline.frag
 )
 
-# Enable console by removing WIN32 flag
-add_executable(notk WIN32 ${SOURCES})
+if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")  
+    add_executable(notk ${SOURCES})
+    set_target_properties(notk PROPERTIES LINK_FLAGS "--preload-file=data -s ALLOW_MEMORY_GROWTH=1")
+
+    file(COPY zword/data
+        DESTINATION ${CMAKE_BINARY_DIR}
+        FILES_MATCHING 
+            PATTERN "*.png"
+            PATTERN "*.ttf"
+            PATTERN "*.wav"
+            PATTERN "*.json"
+            PATTERN "*.ogg"
+    )   
+else()
+    # Enable console by removing WIN32 flag
+    add_executable(notk WIN32 ${SOURCES})
+endif()
 
 install(TARGETS notk
     DESTINATION ${CMAKE_BINARY_DIR})
 
-set(LIBS
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2main.lib
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.lib
-    ${CMAKE_SOURCE_DIR}/SDL_image/lib/x64/SDL2_image.lib
-    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x64/SDL2_ttf.lib
-    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x64/SDL2_mixer.lib
-)
+if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+    set(LIBS
+        ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2main.lib
+        ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.lib
+        ${CMAKE_SOURCE_DIR}/SDL_image/lib/x64/SDL2_image.lib
+        ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x64/SDL2_ttf.lib
+        ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x64/SDL2_mixer.lib
+    )
 
-target_link_libraries(notk ${LIBS})
+    target_link_libraries(notk ${LIBS})
+endif()
 
 set(DLLS
     ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.dll
@@ -111,6 +130,6 @@ set(CONFIG
     ${CMAKE_SOURCE_DIR}/zword/config.cfg
 )
 
-# install(FILES ${CONFIG}
-#     DESTINATION ${CMAKE_BINARY_DIR}
-# )
+install(FILES ${CONFIG}
+    DESTINATION ${CMAKE_BINARY_DIR}
+)

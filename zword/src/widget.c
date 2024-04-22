@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#define NOMINMAX
-#include <windows.h>
+#ifndef __EMSCRIPTEN__
+    #define NOMINMAX
+    #include <windows.h>
+#endif
 #include <stdlib.h>
 
 #include "widget.h"
@@ -179,27 +181,29 @@ void add_row_to_container(int container, int left, int right) {
 
 
 void add_files_to_container(int container, Filename directory, OnClick on_click) {
-    Filename path;
-    snprintf(path, 128, "%s/%s/*.*", "data", directory);
-    
-    WIN32_FIND_DATA file;
-    HANDLE handle = FindFirstFile(path, &file);
+    #ifndef __EMSCRIPTEN__
+        Filename path;
+        snprintf(path, 128, "%s/%s/*.*", "data", directory);
 
-    if (handle == INVALID_HANDLE_VALUE) {
-        printf("Path not found: %s\n", path);
-        return;
-    }
+        WIN32_FIND_DATA file;
+        HANDLE handle = FindFirstFile(path, &file);
 
-    do {
-        if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
-            continue;
+        if (handle == INVALID_HANDLE_VALUE) {
+            printf("Path not found: %s\n", path);
+            return;
         }
-        char* dot = strchr(file.cFileName, '.');
-        if (dot) {
-            *dot = '\0';
-        }
-        add_button_to_container(container, file.cFileName, on_click);
-    } while (FindNextFile(handle, &file));
+
+        do {
+            if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
+                continue;
+            }
+            char* dot = strchr(file.cFileName, '.');
+            if (dot) {
+                *dot = '\0';
+            }
+            add_button_to_container(container, file.cFileName, on_click);
+        } while (FindNextFile(handle, &file));
+    #endif
 }
 
 
