@@ -494,7 +494,7 @@ void save_map(int entity) {
 }
 
 
-void quit(int entity) {
+void quit_editor(int entity) {
     UNUSED(entity);
     game_state = STATE_END;
 }
@@ -518,7 +518,7 @@ void create_editor_menu() {
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SAVE", pos, save_map);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button("QUIT", pos, quit);
+    create_button("QUIT", pos, quit_editor);
 }
 
 

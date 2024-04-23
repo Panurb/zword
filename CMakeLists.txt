@@ -21,6 +21,7 @@ endif()
 set(SOURCES
     cJSON/src/cJSON.c
     zword/src/animation.c
+    zword/src/app.c
     zword/src/building.c
     zword/src/camera.c
     zword/src/collider.c

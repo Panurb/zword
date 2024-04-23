@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include "app.h"
 #include "game.h"
 #include "camera.h"
 #include "player.h"
@@ -36,7 +37,6 @@ GameState game_state = STATE_MENU;
 GameData* game_data;
 
 Resources resources;
-App app;
 
 ButtonText GAME_MODES[] = {
     "SURVIVAL",
@@ -86,8 +86,9 @@ void load_resources() {
         }
     }
     load_sounds();
+    resources.music[0] = Mix_LoadMUS("data/music/zsong.ogg");
 }
-    
+
 
 void create_game() {
     game_data = malloc(sizeof(GameData));
@@ -120,12 +121,6 @@ void resize_game() {
             camera->zoom = camera->zoom_target * camera->resolution.h / 720.0;
         }
     }
-
-    // TODO
-    // sfRenderTexture_destroy(game_data->light_texture);
-    // game_data->light_texture = sfRenderTexture_create(mode.width, mode.height, false);
-    // sfRenderTexture_destroy(game_data->shadow_texture);
-    // game_data->shadow_texture = sfRenderTexture_create(mode.width, mode.height, false);
 }
 
 
@@ -421,7 +416,7 @@ void update_game(float time_step) {
 void draw_game() {
     draw_ground(game_data->camera);
     SDL_RenderCopy(app.renderer, app.shadow_texture, NULL, NULL);
-    draw(game_data->camera);
+    draw_images(game_data->camera);
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
     draw_roofs(game_data->camera);
     draw_items();

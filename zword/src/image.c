@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "app.h"
 #include "image.h"
 #include "camera.h"
 #include "util.h"
@@ -193,7 +194,7 @@ void draw_image(int entity, int camera) {
 }
 
 
-void draw(int camera) {
+void draw_images(int camera) {
     ListNode* node;
     FOREACH(node, game_data->components->image.order) {
         int i = node->value;

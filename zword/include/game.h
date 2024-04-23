@@ -37,18 +37,10 @@ extern ButtonText GAME_MODES[];
 
 
 typedef struct {
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_Texture* shadow_texture;
-    SDL_Texture* light_texture;
-    SDL_GameController* controllers[4];
-} App;
-
-
-typedef struct {
     SDL_Texture** textures;
     TTF_Font* fonts[301];
     Mix_Chunk* sounds[100];
+    Mix_Music* music[10];
 } Resources;
 
 
@@ -69,7 +61,6 @@ extern GameState game_state;
 extern GameData* game_data;
 
 extern Resources resources;
-extern App app;
 
 
 void change_state_win();

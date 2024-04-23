@@ -105,7 +105,6 @@ void apply(int entity) {
     widget = WidgetComponent_get(MUSIC_ID);
     game_settings.music = widget->value;
 
-    save_settings();
     game_state = STATE_APPLY;
 }
 

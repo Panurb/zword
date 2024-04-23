@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "app.h"
 #include "input.h"
 #include "util.h"
 #include "component.h"

@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "app.h"
 #include "component.h"
 #include "image.h"
 #include "util.h"

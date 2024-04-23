@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "app.h"
 #include "component.h"
 #include "camera.h"
 #include "collider.h"

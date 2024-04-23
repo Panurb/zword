@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "app.h"
 #include "camera.h"
 #include "component.h"
 #include "util.h"

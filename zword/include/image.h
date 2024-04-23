@@ -20,7 +20,7 @@ void set_texture(ImageComponent* image);
 
 void draw_ground(int camera);
 
-void draw(int camera);
+void draw_images(int camera);
 
 void draw_roofs(int camera);
 
