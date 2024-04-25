@@ -725,7 +725,7 @@ void input_editor(SDL_Event event) {
     }
 
     if (event.type == SDL_MOUSEMOTION) {
-        Vector2f mouse_delta = { event.motion.xrel, event.motion.yrel };
+        Vector2f mouse_delta = { event.motion.xrel, -event.motion.yrel };
         mouse_world = get_mouse_position(game_data->camera);
 
         if (event.button.button == SDL_BUTTON_MIDDLE) {
@@ -842,8 +842,8 @@ void draw_editor() {
             ColliderComponent* collider = ColliderComponent_get(i);
             if (image) {
                 if (image->layer > LAYER_WALLS) {
-                    // outline
-                    draw_sprite(game_data->camera, image->texture_index, image->width, image->height, 0, pos, angle, image->scale, image->alpha);
+                    draw_sprite_outline(game_data->camera, image->texture_index, image->width, image->height, 0, pos, 
+                        angle, image->scale);
                 } else {
                     draw_rectangle_outline(game_data->camera, pos, image->width, 
                         image->height, angle, 0.05f, COLOR_WHITE);

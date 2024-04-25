@@ -76,7 +76,7 @@ void change_state_win() {
 
 
 void load_resources() {
-    resources.textures = load_textures();
+    load_textures();
     resources.fonts[0] = NULL;
     for (int size = 1; size <= 300; size++) {
         resources.fonts[size] = TTF_OpenFont("data/Helvetica.ttf", size);

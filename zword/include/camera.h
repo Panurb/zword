@@ -40,6 +40,9 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
 void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle, 
     Vector2f scale, float alpha);
 
+void draw_sprite_outline(int camera, int texture_index, float width, float height, int offset, Vector2f position, 
+        float angle, Vector2f scale);
+
 void draw_text(int camera, Vector2f position, char string[100], int size, Color color);
 
 void update_camera(int camera, float time_step, bool follow_players);

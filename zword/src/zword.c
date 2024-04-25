@@ -12,6 +12,9 @@
 #endif
 
 #include "app.h"
+#include "game.h"
+#include "settings.h"
+#include "menu.h"
 
 
 static float time_step = 1.0f / 60.0f;

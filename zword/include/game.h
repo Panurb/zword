@@ -38,6 +38,7 @@ extern ButtonText GAME_MODES[];
 
 typedef struct {
     SDL_Texture** textures;
+    SDL_Texture** outline_textures;
     TTF_Font* fonts[301];
     Mix_Chunk* sounds[100];
     Mix_Music* music[10];

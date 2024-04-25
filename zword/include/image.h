@@ -12,7 +12,7 @@
 
 int create_decal(Vector2f pos, Filename filename, float lifetime);
 
-SDL_Texture** load_textures();
+void load_textures();
 
 int get_texture_index(Filename filename);
 

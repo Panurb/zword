@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <SDL_mixer.h>
+
 #include "sound.h"
 #include "util.h"
 #include "component.h"

@@ -62,6 +62,15 @@ Vector2f screen_to_world(int camera, Vector2f a) {
 }
 
 
+SDL_FRect world_to_screen_rect(int camera, Vector2f position, float width, float height) {
+    Vector2f pos = world_to_screen(camera, position);
+    CameraComponent* cam = CameraComponent_get(camera);
+    float w = width * cam->zoom;
+    float h = height * cam->zoom;
+    return (SDL_FRect) { pos.x - 0.5f * w, pos.y - 0.5f * h, w, h };
+}
+
+
 void draw_triangle_fan(int camera, SDL_Vertex* vertices, int verts_size) {
     int* indices = malloc(3 * verts_size * sizeof(int));
     for (int i = 0; i < verts_size; i++) {
@@ -324,6 +333,57 @@ void draw_sprite(int camera, int texture_index, float width, float height, int o
         }
         SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
     }
+}
+
+
+void draw_sprite_outline(int camera, int texture_index, float width, float height, int offset, Vector2f position, 
+        float angle, Vector2f scale) {
+    if (texture_index == -1) {
+        return;
+    }
+
+    CameraComponent* cam = CameraComponent_get(camera);
+
+    Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, scale);
+
+    SDL_Texture* texture = resources.outline_textures[texture_index];
+
+    SDL_Rect src = { 0, 0, width * PIXELS_PER_UNIT, height * PIXELS_PER_UNIT };
+    if (offset != 0) {
+        src.x = offset * width * PIXELS_PER_UNIT;
+    }
+
+    bool tile = false;
+    int texture_width;
+    int texture_height;
+    SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
+    if (texture_width < width * PIXELS_PER_UNIT || texture_height < height * PIXELS_PER_UNIT) {
+        tile = true;
+    }
+
+    if (tile) {
+        draw_rectangle_outline(camera, position, width, height, angle, 0.05f, COLOR_WHITE);
+    } else {
+        if (width == 0.0f || height == 0.0f) {
+            SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+            width = (float)src.w / PIXELS_PER_UNIT;
+            height = (float)src.h / PIXELS_PER_UNIT;
+        }
+
+        Vector2f pos = world_to_screen(camera, position);
+
+        SDL_FRect dest;
+        dest.w = width * scaling.x * PIXELS_PER_UNIT;
+        dest.h = height * scaling.y * PIXELS_PER_UNIT;
+        dest.x = pos.x - 0.5f * dest.w;
+        dest.y = pos.y - 0.5f * dest.h;
+
+        SDL_Rect* psrc = &src;
+        if (width == 0.0f || height == 0.0f) {
+            SDL_Rect* psrc = NULL;
+        }
+        SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+    }  
 }
 
 

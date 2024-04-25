@@ -8,6 +8,8 @@
 #include "settings.h"
 #include "interface.h"
 #include "player.h"
+#include "menu.h"
+#include "editor.h"
 
 
 App app;
@@ -41,11 +43,11 @@ void create_game_window() {
 void destroy_game_window() {
     SDL_DestroyWindow(app.window);
     app.window = NULL;
+
+    // This will also destroy all textures
     SDL_DestroyRenderer(app.renderer);
     app.renderer = NULL;
-    SDL_DestroyTexture(app.shadow_texture);
     app.shadow_texture = NULL;
-    SDL_DestroyTexture(app.light_texture);
     app.light_texture = NULL;
 }
 

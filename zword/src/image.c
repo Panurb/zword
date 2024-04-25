@@ -103,6 +103,30 @@ static const char* IMAGES[] = {
 };
 
 
+void set_pixel(SDL_Surface *surface, int x, int y, Color color) {
+    const Uint32 pixel = SDL_MapRGBA(surface->format, color.r, color.g, color.b, color.a);
+    Uint32 * const target_pixel = (Uint32 *) ((Uint8 *) surface->pixels
+                                                + y * surface->pitch
+                                                + x * surface->format->BytesPerPixel);
+    *target_pixel = pixel;
+}
+
+
+Color get_pixel(SDL_Surface *surface, int x, int y) {
+    if (x < 0 || y < 0 || x >= surface->w || y >= surface->h) {
+        return (Color) { 0, 0, 0, 0 };
+    }
+
+    Uint32 * const target_pixel = (Uint32 *) ((Uint8 *) surface->pixels
+                                                + y * surface->pitch
+                                                + x * surface->format->BytesPerPixel);
+    Uint32 pixel = *target_pixel;
+    Uint8 r, g, b, a;
+    SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
+    return (Color) { r, g, b, a };
+}
+
+
 int create_decal(Vector2f pos, Filename filename, float lifetime) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, rand_angle())->lifetime = 60.0f;
@@ -113,10 +137,45 @@ int create_decal(Vector2f pos, Filename filename, float lifetime) {
 }
 
 
-SDL_Texture** load_textures() {
+SDL_Texture* create_outline_texture(Filename path) {
+    SDL_Surface* surface = IMG_Load(path);
+
+    // Create transparent surface
+    SDL_Surface* outline_surface = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, 
+        0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+
+    int offset = 5;
+    for (int x = 0; x < surface->w; x++) {
+        for (int y = 0; y < surface->h; y++) {
+            if (get_pixel(surface, x, y).a > 0) {
+                set_pixel(outline_surface, x, y, get_color(0.0f, 0.0f, 0.0f, 0.0f));
+                continue;
+            }
+
+            int au = get_pixel(surface, x, y - offset).a;
+            int ad = get_pixel(surface, x, y + offset).a;
+            int al = get_pixel(surface, x - offset, y).a;
+            int ar = get_pixel(surface, x + offset, y).a;
+
+            if (au > 0 || ad > 0 || al > 0 || ar > 0) {
+                set_pixel(outline_surface, x, y, COLOR_WHITE);
+            }
+        }
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(app.renderer, outline_surface);
+    SDL_FreeSurface(outline_surface);
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+
+void load_textures() {
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
 
     SDL_Texture** textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
+    SDL_Texture** outline_textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
     for (int i = 0; i < n; i++) {
         char path[100];
         snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");
@@ -124,9 +183,11 @@ SDL_Texture** load_textures() {
         SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
 
         textures[i] = texture;
+        outline_textures[i] = create_outline_texture(path);
     }
 
-    return textures;
+    resources.textures = textures;
+    resources.outline_textures = outline_textures;
 }
 
 
