@@ -312,10 +312,9 @@ void set_slider(int entity, Vector2f mouse_position) {
     float x = mouse_position.x - get_position(entity).x + 0.5f * collider->width;
     int n = widget->max_value - widget->min_value;
     int value = clamp(x  / collider->width, 0.0f, 1.0f) * n;
-    int delta = value - widget->value;
     widget->value = value;
     if (widget->on_change) {
-        widget->on_change(entity, delta);
+        widget->on_change(entity, value);
     }
 }
 

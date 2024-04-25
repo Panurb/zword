@@ -1000,3 +1000,15 @@ bool entity_exists(int entity) {
     }
     return true;
 }
+
+
+int get_parent(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    return coord->parent;
+}
+
+
+List* get_children(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    return coord->children;
+}

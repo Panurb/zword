@@ -16,6 +16,7 @@ static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x108
 int RESOLUTION_ID = -1;
 int SOUND_ID = -1;
 int MUSIC_ID = -1;
+static int map_name_textbox = -1;
 static int window_play = -1;
 static int window_new_map = -1;
 static int window_editor = -1;
@@ -47,6 +48,7 @@ void change_state_end(int entity) {
 
 void change_state_create(int entity) {
     UNUSED(entity);
+    strcpy(game_data->map_name, WidgetComponent_get(map_name_textbox)->string);
     game_state = STATE_CREATE;
     reset_ids();
 }
@@ -123,9 +125,9 @@ void toggle_play(int entity) {
     int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
     add_child(window_play, container);
 
-    add_button_to_container(container, "Tutorial", change_state_start);
-    add_button_to_container(container, "Survival", change_state_start);
-    // add_files_to_container(container, "maps", change_state_start);
+    // add_button_to_container(container, "Tutorial", change_state_start);
+    // add_button_to_container(container, "Survival", change_state_start);
+    add_files_to_container(container, "maps", change_state_start);
 }
 
 
@@ -144,8 +146,8 @@ void toggle_new_map(int entity) {
     add_child(window_new_map, container);
 
     int label = create_label("NAME", zeros());
-    int i = create_textbox(zeros(), 1);
-    add_row_to_container(container, label, i);
+    map_name_textbox = create_textbox(zeros(), 1);
+    add_row_to_container(container, label, map_name_textbox);
     add_button_to_container(container, "CREATE", change_state_create);
 }
 

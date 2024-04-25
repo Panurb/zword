@@ -546,3 +546,7 @@ Vector2f get_position(int i);
 float get_angle(int i);
 
 bool entity_exists(int entity);
+
+int get_parent(int entity);
+
+List* get_children(int entity);

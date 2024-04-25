@@ -331,6 +331,24 @@ void change_text(int textbox, int unicode) {
 }
 
 
+void change_light_r(int slider, int value) {
+    UNUSED(slider);
+    LightComponent_get(entity_settings_entity)->color.r = value;
+}
+
+
+void change_light_g(int slider, int value) {
+    UNUSED(slider);
+    LightComponent_get(entity_settings_entity)->color.g = value;
+}
+
+
+void change_light_b(int slider, int value) {
+    UNUSED(slider);
+    LightComponent_get(entity_settings_entity)->color.b = value;
+}
+
+
 void open_entity_settings(int entity) {
     if (entity_settings_id != -1) {
         close_entity_settings(entity);
@@ -343,6 +361,22 @@ void open_entity_settings(int entity) {
     entity_settings_id = create_window(vec(0.0f, 0.0f), buffer, 2, close_entity_settings);
     int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(entity_settings_id, container);
+
+    LightComponent* light = LightComponent_get(entity);
+    if (light) {
+        int left = create_label("R", zeros());
+        int right = create_slider(zeros(), 0, 255, light->color.r, change_light_r);
+        add_row_to_container(container, left, right);
+
+        left = create_label("G", zeros());
+        right = create_slider(zeros(), 0, 255, light->color.g, change_light_g);
+        add_row_to_container(container, left, right);
+
+
+        left = create_label("B", zeros());
+        right = create_slider(zeros(), 0, 255, light->color.b, change_light_b);
+        add_row_to_container(container, left, right);
+    }
 
     TextComponent* text = TextComponent_get(entity);
     if (text) {
@@ -740,39 +774,39 @@ void input_editor(SDL_Event event) {
     } else if (event.type == SDL_KEYDOWN) {
         if (entity_settings_entity != -1) {
             switch (event.key.keysym.sym) {
-            case SDL_SCANCODE_ESCAPE:
-                close_entity_settings(entity_settings_id);
-                break;
-            default:
-                return;
+                case SDL_SCANCODE_ESCAPE:
+                    close_entity_settings(entity_settings_id);
+                    break;
+                default:
+                    return;
             }
         }
 
         switch (event.key.keysym.sym) {
-            case SDL_SCANCODE_1:
-            case SDL_SCANCODE_2:
-            case SDL_SCANCODE_3:
-            case SDL_SCANCODE_4:
-            case SDL_SCANCODE_5:
-            case SDL_SCANCODE_6:
-                selected_categories[event.key.keysym.sym - SDL_SCANCODE_1] = !selected_categories[event.key.keysym.sym - SDL_SCANCODE_1];
+            case SDLK_1:
+            case SDLK_2:
+            case SDLK_3:
+            case SDLK_4:
+            case SDLK_5:
+            case SDLK_6:
+                selected_categories[event.key.keysym.sym - SDLK_1] = !selected_categories[event.key.keysym.sym - SDLK_1];
                 break;
-            case SDL_SCANCODE_0:
+            case SDLK_o:
                 toggle_objects(-1);
                 break;
-            case SDL_SCANCODE_P:
+            case SDLK_p:
                 toggle_prefabs(-1);
                 break;
-            case SDL_SCANCODE_T:
+            case SDLK_t:
                 toggle_tiles(-1);
                 break;
-            case SDL_SCANCODE_W:
+            case SDLK_w:
                 toggle_weapons(-1);
                 break;
-            case SDL_SCANCODE_KP_PLUS:
+            case SDLK_PLUS:
                 grid_size_index = maxi(grid_size_index - 1, 0);
                 break;
-            case SDL_SCANCODE_KP_MINUS:
+            case SDLK_MINUS:
                 grid_size_index = mini(grid_size_index + 1, LENGTH(grid_sizes) - 1);
                 break;
             default:

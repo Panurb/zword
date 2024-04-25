@@ -170,7 +170,7 @@ void draw_lights(int camera, float ambient_light) {
     SDL_SetRenderTarget(app.renderer, app.light_texture);
     SDL_SetRenderDrawColor(app.renderer, color.r, color.g, color.b, color.a);
     SDL_RenderClear(app.renderer);
-    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_ADD);
+    SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
 
     if (CameraComponent_get(camera)->zoom < 10.0f) return;
 

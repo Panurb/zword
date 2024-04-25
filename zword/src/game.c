@@ -93,7 +93,7 @@ void load_resources() {
 void create_game() {
     game_data = malloc(sizeof(GameData));
 
-    strcpy(game_data->map_name, "Tutorial");
+    strcpy(game_data->map_name, "");
 
     game_data->components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
