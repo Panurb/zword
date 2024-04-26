@@ -126,6 +126,8 @@ void draw_item_use(int camera, int entity) {
     ItemComponent* item = ItemComponent_get(i);
     if (!item) return;
 
+    if (item->use_time == 0.0f) return;
+    
     float x = 2.0f * M_PI * player->use_timer / item->use_time;
     draw_slice(camera, position, 1.0f, 1.2f, -0.5f * x + M_PI_2, x, COLOR_WHITE);
 }

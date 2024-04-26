@@ -172,6 +172,7 @@ typedef struct {
     float flicker;
     float speed;
     float time;
+    int bounces;
 } LightComponent;
 
 typedef enum {

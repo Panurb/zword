@@ -306,6 +306,7 @@ LightComponent* LightComponent_add(int entity, float range, float angle, Color c
     light->flicker = 0.0;
     light->speed = speed;
     light->time = randf(0.0, 1.0);
+    light->bounces = 0;
 
     game_data->components->light[entity] = light;
 
