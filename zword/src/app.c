@@ -37,6 +37,10 @@ void create_game_window() {
     app.light_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
         game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_MUL);
+
+    app.blood_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        game_settings.width, game_settings.height);
+    SDL_SetTextureBlendMode(app.blood_texture, SDL_BLENDMODE_BLEND);
 }
 
 
@@ -49,6 +53,7 @@ void destroy_game_window() {
     app.renderer = NULL;
     app.shadow_texture = NULL;
     app.light_texture = NULL;
+    app.blood_texture = NULL;
 }
 
 

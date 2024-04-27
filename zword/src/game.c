@@ -417,6 +417,7 @@ void draw_game() {
     draw_ground(game_data->camera);
     SDL_RenderCopy(app.renderer, app.shadow_texture, NULL, NULL);
     draw_images(game_data->camera);
+    draw_particles(game_data->camera);
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
     draw_roofs(game_data->camera);
     draw_items();

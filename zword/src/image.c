@@ -44,6 +44,7 @@ static const char* IMAGES[] = {
     "big_boy_dead",
     "blood",
     "blood_large",
+    "blood_particle",
     "board_tile",
     "boss_body",
     "boss_dead",
@@ -171,12 +172,40 @@ SDL_Texture* create_outline_texture(Filename path) {
 }
 
 
+SDL_Texture* create_blood_particle_texture() {
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, PIXELS_PER_UNIT, PIXELS_PER_UNIT, 32, 
+        0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
+    for (int i = 0; i < PIXELS_PER_UNIT; i++) {
+        for (int j = 0; j < PIXELS_PER_UNIT; j++) {
+            float x = 2.0f * i / (float) PIXELS_PER_UNIT - 1.0f;
+            float y = 2.0f * j / (float) PIXELS_PER_UNIT - 1.0f;
+            float r = sqrtf(x * x + y * y);
+
+            if (r == 0.0f) {
+                set_pixel(surface, i, j, get_color(1.0f, 0.0f, 0.0f, 1.0f));
+            } else {
+                float a = clamp(0.1f / r - 0.1f, 0.0f, 1.0f);
+                set_pixel(surface, i, j, get_color(1.0f, 0.0f, 0.0f, a));
+            }
+        }
+    }
+
+    return SDL_CreateTextureFromSurface(app.renderer, surface);
+}
+
+
 void load_textures() {
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
 
     SDL_Texture** textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
     SDL_Texture** outline_textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
     for (int i = 0; i < n; i++) {
+        if (strcmp(IMAGES[i], "blood_particle") == 0) {
+            textures[i] = create_blood_particle_texture();
+            continue;
+        }
+
         char path[100];
         snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");
 
@@ -266,10 +295,6 @@ void draw_images(int camera) {
         if (image->layer >= LAYER_ROOFS) break;
 
         draw_image(i, camera);
-    }
-
-    FOREACH(node, game_data->components->image.order) {
-        draw_particles(camera, node->value);
     }
 }
 

@@ -351,11 +351,15 @@ void ParticleComponent_deserialize(cJSON* entity_json, int entity) {
             rate, outer_color, inner_color);
         particle->loop = deserialize_int(json, "loop", particle->loop);
         if (particle->loop) {
-        particle->enabled = true;
+            particle->enabled = true;
         }
     } else {
         float size = cJSON_GetObjectItem(json, "start_size")->valuedouble;
-        ParticleComponent_add_type(entity, type, size);
+        ParticleComponent* particle = ParticleComponent_add_type(entity, type, size);
+        particle->loop = deserialize_int(json, "loop", particle->loop);
+        if (particle->loop) {
+            particle->enabled = true;
+        }
     }
 }
 

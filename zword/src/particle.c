@@ -3,11 +3,13 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include "app.h"
 #include "particle.h"
 #include "component.h"
 #include "util.h"
 #include "camera.h"
 #include "game.h"
+#include "settings.h"
 
 
 Color color_lerp(Color s, Color e, float t) {
@@ -26,9 +28,9 @@ void ParticleComponent_add_bullet(int entity, float size) {
 
 
 void ParticleComponent_add_blood(int entity) {
-    Color color = get_color(0.78, 0.0, 0.0, 1.0);
-    Color inner_color = color_lerp(color, COLOR_WHITE, 0.25f);
-    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.3f, 0.0, 3.0, 10.0, color, inner_color);
+    Color color = COLOR_BLOOD;
+    Color inner_color = COLOR_BLOOD;
+    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.5f, 0.0f, 2.0, 10.0, color, inner_color);
 }
 
 
@@ -73,7 +75,7 @@ void ParticleComponent_add_energy(int entity) {
 }
 
 
-void ParticleComponent_add_type(int entity, ParticleType type, float size) {
+ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, float size) {
     switch (type) {
         case PARTICLE_NONE:
             return;
@@ -102,7 +104,9 @@ void ParticleComponent_add_type(int entity, ParticleType type, float size) {
             ParticleComponent_add_energy(entity);
             break;
     }
-    ParticleComponent_get(entity)->type = type;
+    ParticleComponent* particle = ParticleComponent_get(entity);
+    particle->type = type;
+    return particle;
 }
 
 
@@ -129,8 +133,7 @@ void update_particles(int camera, float delta_time) {
         if (!part) continue;
 
         float w = 3.0f * part->max_time * part->speed;
-        bool visible = on_screen(camera, 
-            get_position(i), w, w);
+        bool visible = on_screen(camera, get_position(i), w, w);
         if (part->loop && !visible) {
             
             continue;
@@ -158,31 +161,87 @@ void update_particles(int camera, float delta_time) {
 }
 
 
-void draw_particles(int camera, int entity) {
-    ParticleComponent* part = ParticleComponent_get(entity);
-    if (!part) return;
+void draw_particles(int camera) {
+    SDL_SetRenderTarget(app.renderer, app.blood_texture);
+    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 0);
+    SDL_RenderClear(app.renderer);
+    SDL_SetRenderTarget(app.renderer, NULL);
 
-    for (int i = part->particles - 1; i >= 0; i--) {
-        if (part->time[i] == 0.0) continue;
+    ListNode* node;
+    FOREACH(node, game_data->components->image.order) {
+        int entity = node->value;
 
-        Color color = part->outer_color;
+        ParticleComponent* part = ParticleComponent_get(entity);
+        if (!part) continue;
 
-        float t = 1.0f - part->time[i] / part->max_time;
-        float r = lerp(part->start_size, part->end_size, t);
-        float angle = polar_angle(part->velocity[i]);
+        if (part->type == PARTICLE_BLOOD) {
+            SDL_SetRenderTarget(app.renderer, app.blood_texture);
 
-        draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.06f * norm(part->velocity[i])) * r, r, angle, color);
+            for (int i = part->particles - 1; i >= 0; i--) {
+                if (part->time[i] == 0.0) continue;
+
+                float t = 1.0f - part->time[i] / part->max_time;
+                float r = lerp(part->start_size, part->end_size, t);
+                float angle = polar_angle(part->velocity[i]);
+                Vector2f scale = mult(2.0f * r, ones());
+
+                draw_sprite(camera, get_texture_index("blood_particle"), 1.0f, 1.0f, 0, part->position[i], 
+                    angle, scale, 1.0f);
+            }
+
+            SDL_SetRenderTarget(app.renderer, NULL);
+            continue;
+        }
+
+        for (int i = part->particles - 1; i >= 0; i--) {
+            if (part->time[i] == 0.0) continue;
+
+            Color color = part->outer_color;
+
+            float t = 1.0f - part->time[i] / part->max_time;
+            float r = lerp(part->start_size, part->end_size, t);
+            float angle = polar_angle(part->velocity[i]);
+
+            draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.06f * norm(part->velocity[i])) * r, r, angle, color);
+        }
+
+        for (int i = part->particles - 1; i >= 0; i--) {
+            if (part->time[i] == 0.0) continue;
+
+            Color color = part->inner_color;
+
+            float t = 1.0f - part->time[i] / part->max_time;
+            float r = 0.5f * lerp(part->start_size, part->end_size, t);
+            float angle = polar_angle(part->velocity[i]);
+
+            draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.1f * norm(part->velocity[i])) * r, r, angle, color);
+        }   
     }
 
-    for (int i = part->particles - 1; i >= 0; i--) {
-        if (part->time[i] == 0.0) continue;
+    SDL_SetRenderTarget(app.renderer, app.blood_texture);
+    SDL_Surface* surf = SDL_CreateRGBSurface(0, game_settings.width, game_settings.height, 32, 
+        0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    SDL_RenderReadPixels(app.renderer, NULL, 0, surf->pixels, surf->pitch);
 
-        Color color = part->inner_color;
-
-        float t = 1.0f - part->time[i] / part->max_time;
-        float r = 0.5f * lerp(part->start_size, part->end_size, t);
-        float angle = polar_angle(part->velocity[i]);
-
-        draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.1f * norm(part->velocity[i])) * r, r, angle, color);
+    float threshold = 0.1f;
+    for (int i = 0; i < surf->w * surf->h; i++) {
+        Uint32* pixel = (Uint32*)surf->pixels + i;
+        Uint8* rgba = (Uint8*)pixel;
+        if (rgba[3] > 255 * threshold) {
+            rgba[0] = COLOR_BLOOD.r;
+            rgba[1] = COLOR_BLOOD.g;
+            rgba[2] = COLOR_BLOOD.b;
+            rgba[3] = 255;
+        } else {
+            rgba[3] = 0;
+        }
     }
+
+    SDL_Texture* buffer = SDL_CreateTextureFromSurface(app.renderer, surf);
+
+    SDL_SetRenderTarget(app.renderer, NULL);
+    SDL_RenderCopy(app.renderer, buffer, NULL, NULL);
+
+    SDL_DestroyTexture(buffer);
+    SDL_FreeSurface(surf);
 }

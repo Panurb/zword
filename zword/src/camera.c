@@ -131,6 +131,24 @@ void draw_circle(int camera, Vector2f position, float radius, Color color) {
 }
 
 
+void draw_ellipse_two_color(int camera, Vector2f position, float major, float minor, float angle, 
+        Color color, Color color_center) {
+    int points_size = clamp(20 * major, 20, 100);
+    Vector2f points[100];
+    get_ellipse_points(position, major, minor, angle, 20, points);
+
+    SDL_Vertex vertices[100];
+    for (int i = 0; i < points_size; i++) {
+        Vector2f v = world_to_screen(camera, points[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
+    }
+    vertices[0].color = (SDL_Color) { color_center.r, color_center.g, color_center.b, color_center.a };
+
+    draw_triangle_fan(camera, vertices, points_size);
+}
+
+
 void draw_circle_outline(int camera, Vector2f position, float radius, float line_width, Color color) {
     int points_size = clamp(20 * radius, 20, 100);
     Vector2f points[100];

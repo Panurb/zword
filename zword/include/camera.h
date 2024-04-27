@@ -22,6 +22,9 @@ void draw_line(int camera, Vector2f start, Vector2f end, float width, Color colo
 
 void draw_circle(int camera, Vector2f position, float radius, Color color);
 
+void draw_ellipse_two_color(int camera, Vector2f position, float major, float minor, float angle, 
+    Color color, Color color_center);
+
 void draw_circle_outline(int camera, Vector2f position, float radius, float line_width, Color color);
 
 void draw_ellipse(int camera, Vector2f position, float major, float minor, float angle, Color color);

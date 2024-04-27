@@ -9,6 +9,7 @@ typedef struct {
     SDL_Renderer* renderer;
     SDL_Texture* shadow_texture;
     SDL_Texture* light_texture;
+    SDL_Texture* blood_texture;
     SDL_GameController* controllers[4];
     bool quit;
     bool focus;
