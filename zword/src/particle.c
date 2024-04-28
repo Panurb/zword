@@ -163,7 +163,7 @@ void update_particles(int camera, float delta_time) {
 
 void draw_particles(int camera) {
     SDL_SetRenderTarget(app.renderer, app.blood_texture);
-    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 0);
+    SDL_SetRenderDrawColor(app.renderer, COLOR_BLOOD.r, COLOR_BLOOD.g, COLOR_BLOOD.b, 0);
     SDL_RenderClear(app.renderer);
     SDL_SetRenderTarget(app.renderer, NULL);
 
@@ -219,29 +219,12 @@ void draw_particles(int camera) {
     }
 
     SDL_SetRenderTarget(app.renderer, app.blood_texture);
-    SDL_Surface* surf = SDL_CreateRGBSurface(0, game_settings.width, game_settings.height, 32, 
-        0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-    SDL_RenderReadPixels(app.renderer, NULL, 0, surf->pixels, surf->pitch);
+    SDL_RenderCopy(app.renderer, app.blood_threshold_texture, NULL, NULL);
 
-    float threshold = 0.1f;
-    for (int i = 0; i < surf->w * surf->h; i++) {
-        Uint32* pixel = (Uint32*)surf->pixels + i;
-        Uint8* rgba = (Uint8*)pixel;
-        if (rgba[3] > 255 * threshold) {
-            rgba[0] = COLOR_BLOOD.r;
-            rgba[1] = COLOR_BLOOD.g;
-            rgba[2] = COLOR_BLOOD.b;
-            rgba[3] = 255;
-        } else {
-            rgba[3] = 0;
-        }
+    for (int i = 0; i < 10; i++) {
+        SDL_RenderCopy(app.renderer, app.blood_multiply_texture, NULL, NULL);
     }
 
-    SDL_Texture* buffer = SDL_CreateTextureFromSurface(app.renderer, surf);
-
     SDL_SetRenderTarget(app.renderer, NULL);
-    SDL_RenderCopy(app.renderer, buffer, NULL, NULL);
-
-    SDL_DestroyTexture(buffer);
-    SDL_FreeSurface(surf);
+    SDL_RenderCopy(app.renderer, app.blood_texture, NULL, NULL);
 }

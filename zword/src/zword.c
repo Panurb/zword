@@ -15,6 +15,7 @@
 #include "game.h"
 #include "settings.h"
 #include "menu.h"
+#include "interface.h"
 
 
 static float time_step = 1.0f / 60.0f;
@@ -45,6 +46,7 @@ void main_loop() {
         }
 
         elapsed_time += delta_time;
+        FPSCounter_update(app.fps, delta_time);
     }
     
     draw();
@@ -53,9 +55,9 @@ void main_loop() {
 
 
 int main(int argc, char* argv[]) {
-    init();
-    
     load_settings();
+
+    init();
 
     load_resources();
     create_game();

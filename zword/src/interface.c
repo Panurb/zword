@@ -18,13 +18,16 @@ FpsCounter* FpsCounter_create() {
 }
 
 
-void FPSCounter_draw(FpsCounter* fps, float delta_time) {
+void FPSCounter_update(FpsCounter* fps, float delta_time) {
     fps->frame_avg -= fps->frame_times[fps->iterator] / FRAME_WINDOW;
     fps->frame_times[fps->iterator] = delta_time;
     fps->frame_avg += fps->frame_times[fps->iterator] / FRAME_WINDOW;
 
     fps->iterator = (fps->iterator + 1) % FRAME_WINDOW;
+}
 
+
+void FPSCounter_draw(FpsCounter* fps) {
     char buffer[20];
     snprintf(buffer, 20, "%.0f", 1.0 / fps->frame_avg);
 

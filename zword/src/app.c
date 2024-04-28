@@ -20,8 +20,6 @@ static float title_scale = 2.0f;
 
 static int debug_level = 0;
 
-static FpsCounter* fps = NULL;
-
 
 void create_game_window() {
     app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
@@ -41,6 +39,29 @@ void create_game_window() {
     app.blood_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
         game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.blood_texture, SDL_BLENDMODE_BLEND);
+
+    int threshold = 32;
+    app.blood_threshold_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        game_settings.width, game_settings.height);
+    SDL_SetRenderTarget(app.renderer, app.blood_threshold_texture);
+    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255 - threshold);
+    SDL_RenderClear(app.renderer);
+    SDL_SetRenderTarget(app.renderer, NULL);
+
+    SDL_BlendMode bm = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, 
+        SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD
+    );
+    SDL_SetTextureBlendMode(app.blood_threshold_texture, bm);
+
+    app.blood_multiply_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        game_settings.width, game_settings.height);
+
+    bm = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, 
+        SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_DST_ALPHA, SDL_BLENDOPERATION_ADD
+    );
+    SDL_SetTextureBlendMode(app.blood_multiply_texture, bm);
 }
 
 
@@ -54,6 +75,8 @@ void destroy_game_window() {
     app.shadow_texture = NULL;
     app.light_texture = NULL;
     app.blood_texture = NULL;
+    app.blood_threshold_texture = NULL;
+    app.blood_multiply_texture = NULL;
 }
 
 
@@ -95,7 +118,7 @@ void init() {
 
     create_game_window();
 
-    fps = FpsCounter_create();
+    app.fps = FpsCounter_create();
 
     app.quit = false;
     app.focus = true;
@@ -103,7 +126,7 @@ void init() {
 
 
 void quit() {
-    free(fps);
+    free(app.fps);
     destroy_game_window();
 
     Mix_CloseAudio();
@@ -265,7 +288,7 @@ void draw() {
         draw_debug(debug_level);
     }
 
-    // FPSCounter_draw(fps, delta_time);
+    FPSCounter_draw(app.fps);
 
     SDL_RenderPresent(app.renderer);
 }

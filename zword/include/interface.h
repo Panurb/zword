@@ -12,4 +12,6 @@ typedef struct {
 
 FpsCounter* FpsCounter_create();
 
-void FPSCounter_draw(FpsCounter* counter, float delta_time);
+void FPSCounter_update(FpsCounter* fps, float delta_time);
+
+void FPSCounter_draw(FpsCounter* counter);

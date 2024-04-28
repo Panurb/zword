@@ -4,15 +4,20 @@
 
 #include <SDL.h>
 
+#include "interface.h"
+
 typedef struct {
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* shadow_texture;
     SDL_Texture* light_texture;
     SDL_Texture* blood_texture;
+    SDL_Texture* blood_threshold_texture;
+    SDL_Texture* blood_multiply_texture;
     SDL_GameController* controllers[4];
     bool quit;
     bool focus;
+    FpsCounter* fps;
 } App;
 
 extern App app;
