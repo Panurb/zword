@@ -382,7 +382,8 @@ typedef enum {
     WIDGET_SLIDER,
     WIDGET_DROPDOWN,
     WIDGET_SCROLLBAR,
-    WIDGET_TEXTBOX
+    WIDGET_TEXTBOX,
+    WIDGET_CHECKBOX
 } WidgetType;
 
 typedef struct ComponentData ComponentData;

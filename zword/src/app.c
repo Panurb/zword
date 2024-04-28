@@ -21,13 +21,7 @@ static float title_scale = 2.0f;
 static int debug_level = 0;
 
 
-void create_game_window() {
-    app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
-        game_settings.width, game_settings.height, SDL_WINDOW_SHOWN);
-    SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-    SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "1" : "0");
-    app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
-
+void create_screen_textures() {
     app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
         game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
@@ -65,6 +59,17 @@ void create_game_window() {
 }
 
 
+void create_game_window() {
+    app.window = SDL_CreateWindow("NotK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
+        game_settings.width, game_settings.height, SDL_WINDOW_SHOWN);
+    SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, game_settings.vsync ? "1" : "0");
+    app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
+
+    create_screen_textures();
+}
+
+
 void destroy_game_window() {
     SDL_DestroyWindow(app.window);
     app.window = NULL;
@@ -86,18 +91,17 @@ void resize_game_window() {
     SDL_GetWindowSize(app.window, &w, &h);
     if (game_settings.width != w || game_settings.height != h) {
         SDL_SetWindowSize(app.window, game_settings.width, game_settings.height);
-        SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-
+        
         SDL_DestroyTexture(app.shadow_texture);
-        app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
-            game_settings.width, game_settings.height);
-        SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
-
         SDL_DestroyTexture(app.light_texture);
-        app.light_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
-            game_settings.width, game_settings.height);
-        SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_MUL);
+        SDL_DestroyTexture(app.blood_texture);
+        SDL_DestroyTexture(app.blood_threshold_texture);
+        SDL_DestroyTexture(app.blood_multiply_texture);
+
+        create_screen_textures();
     }
+
+    SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 }
 
 

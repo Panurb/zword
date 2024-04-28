@@ -12,10 +12,11 @@
 #include "input.h"
 
 
-static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "2160x3840"};
+static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
 int RESOLUTION_ID = -1;
 int SOUND_ID = -1;
 int MUSIC_ID = -1;
+int fullscreen_id = -1;
 static int map_name_textbox = -1;
 static int window_play = -1;
 static int window_new_map = -1;
@@ -31,11 +32,15 @@ void reset_ids() {
     RESOLUTION_ID = -1;
     SOUND_ID = -1;
     MUSIC_ID = -1;
+    fullscreen_id = -1;
     window_play = -1;
     window_new_map = -1;
     window_editor = -1;
     window_settings = -1;
     window_controls = -1;
+    window_credits = -1;
+    window_keyboard_controls = -1;
+    window_xbox_controls = -1;
 }
 
 
@@ -100,6 +105,9 @@ void apply(int entity) {
     char* height = strtok(NULL, "x");
     game_settings.width = strtol(width, NULL, 10);
     game_settings.height = strtol(height, NULL, 10);
+
+    widget = WidgetComponent_get(fullscreen_id);
+    game_settings.fullscreen = widget->value;
 
     widget = WidgetComponent_get(SOUND_ID);
     game_settings.volume = widget->value;
@@ -195,13 +203,17 @@ void toggle_settings(int entity) {
     Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_settings = create_window(pos, "SETTINGS", 2, toggle_settings);
 
-    int container = create_container(vec(0.0f, -2.5f * BUTTON_HEIGHT), 2, 4);
+    int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 2, 5);
     add_child(window_settings, container);
 
     int label = create_label("Resolution", zeros());
     RESOLUTION_ID = create_dropdown(zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
     WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
     add_row_to_container(container, label, RESOLUTION_ID);
+
+    label = create_label("Fullscreen", zeros());
+    fullscreen_id = create_checkbox(zeros(), game_settings.fullscreen, NULL);
+    add_row_to_container(container, label, fullscreen_id);
 
     label = create_label("Sound", zeros());
     SOUND_ID = create_slider(zeros(), 0, 100, game_settings.volume, NULL);
@@ -295,7 +307,11 @@ void toggle_credits(int entity) {
     add_child(window_credits, container);
 
     add_row_to_container(container, create_label("Programming, art, music", zeros()), create_label("Panu Keskinen", zeros()));
-    add_row_to_container(container, create_label("Made with", zeros()), create_label("C, CSFML, cJSON", zeros()));
+    #ifdef __EMSCRIPTEN__
+        add_row_to_container(container, create_label("Made with", zeros()), create_label("C, SDL2, cJSON, Emscripten", zeros()));
+    #else 
+        add_row_to_container(container, create_label("Made with", zeros()), create_label("C, SDL2, cJSON", zeros()));
+    #endif
     add_row_to_container(container, create_label("Software used", zeros()), create_label("Visual Studio Code", zeros()));
     add_row_to_container(container, create_label("", zeros()), create_label("Gimp", zeros()));
     add_row_to_container(container, create_label("", zeros()), create_label("Ableton Live Lite", zeros()));
@@ -313,7 +329,9 @@ void create_menu() {
     add_button_to_container(container, "SETTINGS", toggle_settings);
     add_button_to_container(container, "CONTROLS", toggle_controls);
     add_button_to_container(container, "CREDITS", toggle_credits);
-    add_button_to_container(container, "QUIT", change_state_quit);
+    #ifndef __EMSCRIPTEN__
+        add_button_to_container(container, "QUIT", change_state_quit);
+    #endif
 }
 
 

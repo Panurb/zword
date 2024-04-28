@@ -375,6 +375,37 @@ int create_textbox(Vector2f position, int width) {
 }
 
 
+void toggle_checkbox(int entity) {
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    widget->value = !widget->value;
+    if (widget->on_change) {
+        widget->on_change(entity, widget->value);
+    }
+}
+
+
+int create_checkbox(Vector2f position, bool value, OnChange on_change) {
+    int i = create_entity();
+    CoordinateComponent_add(i, position, 0.0f);
+    ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_CHECKBOX);
+    widget->value = value;
+    widget->on_click = toggle_checkbox;
+
+    return i;
+}
+
+
+void draw_checkbox(int camera, Vector2f position, bool value, bool selected) {
+    float height = 0.8f * BUTTON_HEIGHT;
+    Color color = selected ? COLOR_SELECTED : COLOR_BUTTON;
+    draw_rectangle(camera, position, height, height, 0.0f, color);
+    if (value) {
+        draw_text(camera, position, "X", 40, COLOR_TEXT);
+    }
+}
+
+
 void update_widgets(int camera) {
     int last_selected = -1;
     ListNode* node;
@@ -474,6 +505,9 @@ void draw_widgets(int camera) {
         case WIDGET_TEXTBOX:
             draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
             draw_text(camera, pos, widget->string, 20, COLOR_WHITE);
+            break;
+        case WIDGET_CHECKBOX:
+            draw_checkbox(camera, pos, widget->value, widget->selected);
             break;
         default:
             draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);

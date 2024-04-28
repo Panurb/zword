@@ -104,6 +104,17 @@ static const char* IMAGES[] = {
 };
 
 
+Resolution get_texture_size(Filename filename) {
+    if (filename[0] == '\0') {
+        return (Resolution) { 0, 0 };
+    }
+    Resolution resolution;
+    int index = get_texture_index(filename);
+    SDL_QueryTexture(resources.textures[index], NULL, NULL, &resolution.w, &resolution.h);
+    return resolution;
+}
+
+
 void set_pixel(SDL_Surface *surface, int x, int y, Color color) {
     const Uint32 pixel = SDL_MapRGBA(surface->format, color.r, color.g, color.b, color.a);
     Uint32 * const target_pixel = (Uint32 *) ((Uint8 *) surface->pixels
@@ -318,6 +329,13 @@ void change_texture(int entity, Filename filename, float width, float height) {
     strcpy(image->filename, filename);
     image->width = width;
     image->height = height;
+
+    if (width == 0.0f || height == 0.0f) {
+        Resolution resolution = get_texture_size(filename);
+        image->width = resolution.w / (float) PIXELS_PER_UNIT;
+        image->height = resolution.h / (float) PIXELS_PER_UNIT;
+    }
+    
     if (filename[0] == '\0') {
         image->alpha = 0.0f;
     } else {

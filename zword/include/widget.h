@@ -53,6 +53,8 @@ void add_scrollbar_to_container(int container);
 
 int create_textbox(Vector2f position, int width);
 
+int create_checkbox(Vector2f position, bool value, OnChange on_change);
+
 void update_widgets(int camera);
 
 void draw_widgets(int camera);
