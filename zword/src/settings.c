@@ -9,7 +9,7 @@
 #include "input.h"
 
 
-Settings game_settings = { 1920, 1080, 8, false, true, 0, 100, 100, false,
+Settings game_settings = { 1920, 1080, 8, false, false, 0, 100, 100, false,
     {
         { DEVICE_KEYBOARD, SDL_SCANCODE_W },
         { DEVICE_KEYBOARD, SDL_SCANCODE_A },

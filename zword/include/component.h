@@ -14,6 +14,8 @@ typedef struct {
     int parent;
     List* children;
     float lifetime;
+    Filename prefab;
+    Vector2f scale;
 } CoordinateComponent;
 
 typedef enum {

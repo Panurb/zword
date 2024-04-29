@@ -7,6 +7,7 @@
 
 #include <cJSON.h>
 
+#include "serialize.h"
 #include "game.h"
 #include "component.h"
 #include "particle.h"
@@ -121,12 +122,11 @@ void serialize_string(cJSON* json, char* name, char* value, char* default_value)
 }
 
 
-char* deserialize_string(cJSON* json, char* name, char* value) {
+void deserialize_string(cJSON* json, char* name, char* value) {
     cJSON* val = cJSON_GetObjectItem(json, name);
     if (val) {
-        return val->valuestring;
+        strcpy(value, val->valuestring);
     }
-    return value;
 }
 
 
@@ -149,6 +149,7 @@ void CoordinateComponent_serialize(cJSON* entity_json, int entity,
     cJSON_AddNumberToObject(json, "y", coord->position.y + offset.y);
     serialize_float(json, "angle", coord->angle, 0.0f);
     serialize_id(json, "parent", coord->parent);
+    serialize_string(json, "prefab", coord->prefab, "");
 }
 
 
@@ -161,6 +162,7 @@ void CoordinateComponent_deserialize(cJSON* entity_json, int entity,
     float angle = deserialize_float(coord_json, "angle", 0.0f) + rotation;
     CoordinateComponent* coord = CoordinateComponent_add(entity, pos, angle);
     deserialize_id(coord_json, "parent", &coord->parent);
+    deserialize_string(coord_json, "prefab", coord->prefab);
 }
 
 
@@ -725,6 +727,9 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
     cJSON_AddNumberToObject(json, "id", id);
 
     CoordinateComponent_serialize(json, entity, offset);
+    if (CoordinateComponent_get(entity)->prefab[0] != '\0') {
+        return true;
+    }
     ImageComponent_serialize(json, entity);
     PhysicsComponent_serialize(json, entity);
     ColliderComponent_serialize(json, entity);
@@ -748,8 +753,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
 }
 
 
-int deserialize_entity(cJSON* entity_json, bool preserve_id,
-        Vector2f offset, float rotation) {
+int deserialize_entity(cJSON* entity_json, bool preserve_id, Vector2f offset, float rotation) {
     int entity;
     if (preserve_id) {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
@@ -762,6 +766,15 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id,
     }
 
     CoordinateComponent_deserialize(entity_json, entity, offset, rotation);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (coord->prefab[0] != '\0') {
+        if (preserve_id) {
+            printf("Cannot preserve id for prefabs\n");
+        } else {
+            load_prefab(coord->prefab, coord->position, coord->angle);
+        }
+        return entity;
+    }
     ImageComponent_deserialize(entity_json, entity);
     PhysicsComponent_deserialize(entity_json, entity);
     ColliderComponent_deserialize(entity_json, entity);
@@ -917,7 +930,6 @@ void deserialize_entities(cJSON* json, Vector2f offset, float rotation) {
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
         ids[n] = deserialize_entity(entity, false, offset, rotation);
-        update_grid(ids[n]);
         n++;
     }
 
@@ -991,4 +1003,13 @@ void load_game(ButtonText map_name) {
         cJSON_Delete(json);
         strcpy(game_data->map_name, map_name);
     }
+}
+
+
+void load_prefab(Filename filename, Vector2f position, float angle) {
+    cJSON* json = load_json("prefabs", filename);
+
+    deserialize_entities(json, position, angle);
+
+    cJSON_Delete(json);
 }

@@ -58,6 +58,8 @@ CoordinateComponent* CoordinateComponent_add(int entity, Vector2f pos, float ang
     coord->parent = -1;
     coord->children = List_create();
     coord->lifetime = -1.0f;
+    coord->prefab[0] = '\0';
+    coord->scale = ones();
 
     game_data->components->coordinate[entity] = coord;
 

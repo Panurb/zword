@@ -1,6 +1,11 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include <cJSON.h>
+
+#include "util.h"
+#include "list.h"
 
 bool serialize_entity(cJSON* entities_json, int entity, int id);
 
@@ -19,3 +24,5 @@ void deserialize_entities(cJSON* json, Vector2f offset, float rotation);
 void save_game(ButtonText map_name);
 
 void load_game(ButtonText map_name);
+
+void load_prefab(Filename filename, Vector2f position, float angle);

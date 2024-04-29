@@ -400,9 +400,18 @@ void select_prefab(int entity) {
 void toggle_prefabs(int entity) {
     UNUSED(entity);
     static int window_id = -1;
-    // TODO: list files in directory
-    window_id = toggle_list_window(window_id, "PREFABS", toggle_prefabs, prefabs, LENGTH(prefabs), 
-        select_prefab);
+    if (window_id != -1) {
+        destroy_entity_recursive(window_id);
+        window_id = -1;
+        return;
+    }
+
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_id = create_window(pos, "PREFABS", 1, toggle_prefabs);
+
+    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
+    add_child(window_id, container);
+    add_files_to_container(container, "prefabs", select_prefab);
 }
 
 
@@ -414,15 +423,6 @@ void save_prefab(Filename filename) {
     cJSON* json = serialize_entities(selections, center);
 
     save_json(json, "prefabs", filename);
-    cJSON_Delete(json);
-}
-
-
-void load_prefab(Filename filename, Vector2f position, float angle) {
-    cJSON* json = load_json("prefabs", filename);
-
-    deserialize_entities(json, position, angle);
-
     cJSON_Delete(json);
 }
 
@@ -546,8 +546,8 @@ void create_editor_menu() {
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("WEAPONS", pos, toggle_weapons);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    // pos = sum(pos, vec(BUTTON_WIDTH, 0.0f));
-    // create_button("PREFABS", pos, toggle_prefabs);
+    create_button("PREFABS", pos, toggle_prefabs);
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SAVE", pos, save_map);
@@ -651,22 +651,22 @@ void input_tool_select(SDL_Event event) {
     } else if (event.type == SDL_KEYDOWN) {
         if (selections) {
             switch (event.key.keysym.sym) {
-            case SDL_SCANCODE_DELETE:
+            case SDLK_DELETE:
                 destroy_selections(game_data);
                 break;
-            case SDL_SCANCODE_S:
+            case SDLK_s:
                 save_prefab("prefab.json");
                 break;
-            case SDL_SCANCODE_LEFT:
+            case SDLK_LEFT:
                 move_selections(vec(-grid_sizes[grid_size_index], 0.0f));
                 break;
-            case SDL_SCANCODE_RIGHT:
+            case SDLK_RIGHT:
                 move_selections(vec(grid_sizes[grid_size_index], 0.0f));
                 break;
-            case SDL_SCANCODE_DOWN:
+            case SDLK_DOWN:
                 move_selections(vec(0.0f, -grid_sizes[grid_size_index]));
                 break;
-            case SDL_SCANCODE_UP:
+            case SDLK_UP:
                 move_selections(vec(0.0f, grid_sizes[grid_size_index]));
                 break;
             default:
@@ -728,8 +728,16 @@ void input_tool_object(SDL_Event event) {
 void input_tool_prefab(SDL_Event event) {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
+            game_data->components->added_entities = List_create();
             Vector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
             load_prefab(prefab_name, pos, 0.0f);
+            ListNode* node;
+            FOREACH(node, game_data->components->added_entities) {
+                if (ColliderComponent_get(node->value)) {
+                   update_grid(node->value);
+                }
+            }
+            List_delete(game_data->components->added_entities);
         }
     }
 }
@@ -774,7 +782,7 @@ void input_editor(SDL_Event event) {
     } else if (event.type == SDL_KEYDOWN) {
         if (entity_settings_entity != -1) {
             switch (event.key.keysym.sym) {
-                case SDL_SCANCODE_ESCAPE:
+                case SDLK_ESCAPE:
                     close_entity_settings(entity_settings_id);
                     break;
                 default:
