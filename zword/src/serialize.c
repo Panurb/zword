@@ -11,6 +11,7 @@
 #include "game.h"
 #include "component.h"
 #include "particle.h"
+#include "list.h"
 
 
 static cJSON* serialized_ids[MAX_ENTITIES] = { 0 };
@@ -716,20 +717,45 @@ void TextComponent_deserialize(cJSON* entity_json, int entity) {
 }
 
 
+bool is_prefab(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    return coord->prefab[0] != '\0';
+}
+
+
+bool is_prefab_child(int entity) {
+    int parent = get_parent(entity);
+    if (parent == -1) {
+        return false;
+    }
+    
+    if (is_prefab(parent)) {
+        return true;
+    }
+    
+    return is_prefab_child(parent);
+}
+
+
 bool serialize_entity(cJSON* entities_json, int entity, int id,
         Vector2f offset) {
     if (!CoordinateComponent_get(entity)) return false;
     if (WidgetComponent_get(entity)) return false;
     if (CameraComponent_get(entity)) return false;
 
+    if (is_prefab_child(entity)) {
+        return false;
+    }
+
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToArray(entities_json, json);
     cJSON_AddNumberToObject(json, "id", id);
 
     CoordinateComponent_serialize(json, entity, offset);
-    if (CoordinateComponent_get(entity)->prefab[0] != '\0') {
+    if (is_prefab(entity)) {
         return true;
     }
+
     ImageComponent_serialize(json, entity);
     PhysicsComponent_serialize(json, entity);
     ColliderComponent_serialize(json, entity);
@@ -919,21 +945,41 @@ cJSON* serialize_game(bool preserve_id) {
 }
 
 
-void deserialize_entities(cJSON* json, Vector2f offset, float rotation) {
+int deserialize_prefab(cJSON* json, Vector2f offset, float rotation) {
+    // Prefab ids can only refer to entities inside the prefab so they can be updated here and then continue
+    // deserializing the map/parent prefab
+
+    // Backup deserialized ids
+    int* old_deserialized_ids[MAX_ENTITIES];
+    memcpy(old_deserialized_ids, deserialized_ids, sizeof(old_deserialized_ids));
+
     for (int i = 0; i < MAX_ENTITIES; i++) {
         deserialized_ids[i] = NULL;
     }
 
     cJSON* entities = cJSON_GetObjectItem(json, "entities");
     cJSON* entity;
+    int root = -1;
     int ids[MAX_ENTITIES];
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
         ids[n] = deserialize_entity(entity, false, offset, rotation);
+        if (root == -1) {
+            root = ids[n];
+        }
         n++;
     }
 
     update_deserialized_ids(ids);
+
+    // Restore deserialized ids
+    memcpy(deserialized_ids, old_deserialized_ids, sizeof(old_deserialized_ids));
+
+    if (root != -1) {
+        root = get_root(root);
+    }
+
+    return root;
 }
 
 
@@ -1009,7 +1055,11 @@ void load_game(ButtonText map_name) {
 void load_prefab(Filename filename, Vector2f position, float angle) {
     cJSON* json = load_json("prefabs", filename);
 
-    deserialize_entities(json, position, angle);
+    int root = deserialize_prefab(json, position, angle);
+
+    if (root != -1) {
+        strcpy(CoordinateComponent_get(root)->prefab, filename);
+    }
 
     cJSON_Delete(json);
 }

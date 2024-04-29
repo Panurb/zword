@@ -204,6 +204,8 @@ void select_object(int entity) {
       destroy_entity(node->value);
     }
     List_delete(game_data->components->added_entities);
+    game_data->components->added_entities = NULL;
+
 }
 
 
@@ -738,6 +740,7 @@ void input_tool_prefab(SDL_Event event) {
                 }
             }
             List_delete(game_data->components->added_entities);
+            game_data->components->added_entities = NULL;
         }
     }
 }

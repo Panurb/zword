@@ -19,8 +19,6 @@ cJSON* serialize_entities(List* entities, Vector2f offset);
 
 void serialize_map(cJSON* json, bool preserve_id);
 
-void deserialize_entities(cJSON* json, Vector2f offset, float rotation);
-
 void save_game(ButtonText map_name);
 
 void load_game(ButtonText map_name);
