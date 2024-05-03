@@ -290,66 +290,80 @@ void draw_sprite(int camera, int texture_index, float width, float height, int o
         tile = true;
     }
 
-    if (tile) {
+    if (width == 0.0f || height == 0.0f) {
         SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
-        float tile_width = (float)src.w / PIXELS_PER_UNIT;
-        float tile_height = (float)src.h / PIXELS_PER_UNIT;
+        width = (float)src.w / PIXELS_PER_UNIT;
+        height = (float)src.h / PIXELS_PER_UNIT;
+    }
 
-        SDL_FRect dest;
-        dest.w = tile_width * scaling.x * PIXELS_PER_UNIT;
-        dest.h = tile_height * scaling.y * PIXELS_PER_UNIT;
+    Vector2f pos = world_to_screen(camera, position);
 
-        Vector2f x = polar_to_cartesian(1.0f, angle);
-        Vector2f y = perp(x);
-        
-        int nx = ceil(width / tile_width);
-        int ny = ceil(height / tile_height);
-        float current_tile_width = tile_width;
-        for (int i = 0; i < nx; i++) {
-            if (i == nx - 1) {
-                current_tile_width = (width - tile_width * (nx - 1));
-                src.w = current_tile_width * PIXELS_PER_UNIT;
-                dest.w = src.w * scaling.x;
+    SDL_FRect dest;
+    dest.w = width * scaling.x * PIXELS_PER_UNIT;
+    dest.h = height * scaling.y * PIXELS_PER_UNIT;
+    dest.x = pos.x - 0.5f * dest.w;
+    dest.y = pos.y - 0.5f * dest.h;
+
+    SDL_Rect* psrc = &src;
+    if (width == 0.0f || height == 0.0f) {
+        SDL_Rect* psrc = NULL;
+    }
+    SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+}
+
+
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f position, float angle, float alpha) {
+    if (texture_index == -1) {
+        return;
+    }
+
+    CameraComponent* cam = CameraComponent_get(camera);
+    
+    Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, ones());
+
+    SDL_Texture* texture = resources.textures[texture_index];
+    SDL_SetTextureAlphaMod(texture, 255 * alpha);
+
+    SDL_Rect src = { 0, 0, 0, 0 };
+    
+    SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+    float tile_width = (float)src.w / PIXELS_PER_UNIT;
+    float tile_height = (float)src.h / PIXELS_PER_UNIT;
+
+    SDL_FRect dest = { 0, 0, 0, 0 };
+    dest.w = tile_width * scaling.x * PIXELS_PER_UNIT;
+    dest.h = tile_height * scaling.y * PIXELS_PER_UNIT;
+
+    Vector2f x = polar_to_cartesian(1.0f, angle);
+    Vector2f y = perp(x);
+    
+    int nx = ceil(width / tile_width);
+    int ny = ceil(height / tile_height);
+    float current_tile_width = tile_width;
+    for (int i = 0; i < nx; i++) {
+        if (i == nx - 1) {
+            current_tile_width = (width - tile_width * (nx - 1));
+            src.w = current_tile_width * PIXELS_PER_UNIT;
+            dest.w = src.w * scaling.x;
+        }
+
+        float current_tile_height = tile_height;
+        src.h = tile_height * PIXELS_PER_UNIT;
+        dest.h = src.h * scaling.y;
+        for (int j = 0; j < ny; j++) {
+            if (j == ny - 1) {
+                current_tile_height = (height - tile_height * (ny - 1));
+                src.h = current_tile_height * PIXELS_PER_UNIT;
+                dest.h = src.h * scaling.y;
             }
 
-            float current_tile_height = tile_height;
-            src.h = tile_height * PIXELS_PER_UNIT;
-            dest.h = src.h * scaling.y;
-            for (int j = 0; j < ny; j++) {
-                if (j == ny - 1) {
-                    current_tile_height = (height - tile_height * (ny - 1));
-                    src.h = current_tile_height * PIXELS_PER_UNIT;
-                    dest.h = src.h * scaling.y;
-                }
-
-                Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
-                                                    j * tile_height - 0.5f * (height - current_tile_height), y));
-                Vector2f pos = world_to_screen(camera, p);
-                dest.x = pos.x - 0.5f * dest.w;
-                dest.y = pos.y - 0.5f * dest.h;
-                SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
-            }
+            Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
+                                                j * tile_height - 0.5f * (height - current_tile_height), y));
+            Vector2f pos = world_to_screen(camera, p);
+            dest.x = pos.x - 0.5f * dest.w;
+            dest.y = pos.y - 0.5f * dest.h;
+            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
         }
-    } else {
-        if (width == 0.0f || height == 0.0f) {
-            SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
-            width = (float)src.w / PIXELS_PER_UNIT;
-            height = (float)src.h / PIXELS_PER_UNIT;
-        }
-
-        Vector2f pos = world_to_screen(camera, position);
-
-        SDL_FRect dest;
-        dest.w = width * scaling.x * PIXELS_PER_UNIT;
-        dest.h = height * scaling.y * PIXELS_PER_UNIT;
-        dest.x = pos.x - 0.5f * dest.w;
-        dest.y = pos.y - 0.5f * dest.h;
-
-        SDL_Rect* psrc = &src;
-        if (width == 0.0f || height == 0.0f) {
-            SDL_Rect* psrc = NULL;
-        }
-        SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
     }
 }
 

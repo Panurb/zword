@@ -17,11 +17,29 @@ typedef struct {
 } Vector2f;
 
 typedef struct {
+    float x;
+    float y;
+    float z;
+} Vector3;
+
+typedef struct {
     float a;
     float b;
     float c;
     float d;
 } Matrix2f;
+
+typedef struct {
+    float a;
+    float b;
+    float c;
+    float d;
+    float e;
+    float f;
+    float g;
+    float h;
+    float i;
+} Matrix3;
 
 typedef struct {
     int w;
@@ -127,6 +145,10 @@ Vector2f matrix_mult(Matrix2f m, Vector2f v);
 Matrix2f transpose(Matrix2f m);
 
 Matrix2f matrix_inverse(Matrix2f m);
+
+Matrix3 matrix3_mult(Matrix3 m, Matrix3 n);
+
+Matrix3 transform_matrix(Vector2f position, float angle, Vector2f scale);
 
 Color get_color(float r, float g, float b, float a);
 

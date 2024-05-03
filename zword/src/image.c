@@ -241,43 +241,19 @@ void set_texture(ImageComponent* image) {
 }
 
 
-void draw_ground(int camera) {
-    ListNode* node;
-    FOREACH(node, game_data->components->image.order) {
-        int i = node->value;
-
-        ImageComponent* image = ImageComponent_get(i);
-
-        if (image->layer > LAYER_DECALS) break;
-
-        Vector2f pos = get_position(i);
-        float w = image->scale.x * image->width;
-        float h = image->scale.y * image->height;
-        float r = sqrtf(w * w + h * h);
-
-        // TODO: check if on screen
-        draw_road(camera, i);
-
-        if (!on_screen(camera, pos, r, r)) {
-            continue;
-        }
-
-        if (image->alpha > 0.0f) {
-            draw_sprite(camera, image->texture_index, image->width, image->height, 0, pos, get_angle(i), image->scale, image->alpha);
-        }
-    }
-}
-
-
 void draw_image(int entity, int camera) {
     ImageComponent* image = ImageComponent_get(entity);
+    if (image->alpha == 0.0f) {
+        return;
+    }
 
-    image->scale.x = 1.0f - image->stretch;
-    image->scale.y = 1.0f + image->stretch;
+    Vector2f scale = get_scale(entity);
+    scale.x *= 1.0f - image->stretch;
+    scale.y *= 1.0f + image->stretch;
 
     Vector2f pos = get_position(entity);
-    float w = image->scale.x * image->width;
-    float h = image->scale.y * image->height;
+    float w = scale.x * image->width;
+    float h = scale.y * image->height;
     float r = sqrtf(w * w + h * h);
     if (!on_screen(camera, pos, r, r)) {
         return;
@@ -289,8 +265,26 @@ void draw_image(int entity, int camera) {
         offset = animation->current_frame;
     }
 
-    if (image->alpha > 0.0f) {
-        draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, get_angle(entity), image->scale, image->alpha);
+    if (image->tile) {
+        draw_tiles(camera, image->texture_index, w, h, pos, get_angle(entity), image->alpha);
+        return;
+    }
+    draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, get_angle(entity), scale, image->alpha);
+}
+
+
+void draw_ground(int camera) {
+    ListNode* node;
+    FOREACH(node, game_data->components->image.order) {
+        int i = node->value;
+
+        ImageComponent* image = ImageComponent_get(i);
+        if (image->layer > LAYER_DECALS) break;
+
+        draw_image(i, camera);
+
+        // TODO: check if on screen
+        draw_road(camera, i);
     }
 }
 
@@ -342,6 +336,12 @@ void change_texture(int entity, Filename filename, float width, float height) {
         image->alpha = 1.0f;
     }
     image->texture_index = get_texture_index(filename);
+
+    if (strstr(filename, "tile") != NULL) {
+        image->tile = true;
+    } else {
+        image->tile = false;
+    }
 
     AnimationComponent* animation = AnimationComponent_get(entity);
     if (animation) {

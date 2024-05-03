@@ -218,6 +218,27 @@ Matrix2f matrix_inverse(Matrix2f m) {
     return (Matrix2f) { m.d / det, -m.b / det, -m.c / det, m.a / det };
 }
 
+Matrix3 matrix3_mult(Matrix3 m, Matrix3 n) {
+    Matrix3 mn;
+    mn.a = m.a * n.a + m.b * n.d + m.c * n.g;
+    mn.b = m.a * n.b + m.b * n.e + m.c * n.h;
+    mn.c = m.a * n.c + m.b * n.f + m.c * n.i;
+    mn.d = m.d * n.a + m.e * n.d + m.f * n.g;
+    mn.e = m.d * n.b + m.e * n.e + m.f * n.h;
+    mn.f = m.d * n.c + m.e * n.f + m.f * n.i;
+    mn.g = m.g * n.a + m.h * n.d + m.i * n.g;
+    mn.h = m.g * n.b + m.h * n.e + m.i * n.h;
+    mn.i = m.g * n.c + m.h * n.f + m.i * n.i;
+    
+    return mn;
+}
+
+Matrix3 transform_matrix(Vector2f position, float angle, Vector2f scale) {
+    float c = cosf(angle);
+    float s = sinf(angle);
+    return (Matrix3) { scale.x * c, -scale.y * s, position.x, scale.x * s, scale.y * c, position.y, 0.0f, 0.0f, 1.0f };
+}
+
 Color get_color(float r, float g, float b, float a) {
     Color color;
     color.r = (int) (r * 255);

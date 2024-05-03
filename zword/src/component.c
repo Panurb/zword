@@ -100,10 +100,10 @@ ImageComponent* ImageComponent_add(int entity, Filename filename, float width, f
     image->height = height;
     image->shine = 1.0;
     image->layer = layer;
-    image->scale = ones();
     image->alpha = 1.0;
     image->stretch = 0.0f;
     image->stretch_speed = 0.0f;
+    image->tile = false;
     
     game_data->components->image.array[entity] = image;
 
@@ -971,6 +971,16 @@ void ComponentData_clear() {
 }
 
 
+Matrix3 get_transform(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    Matrix3 transform = transform_matrix(coord->position, coord->angle, coord->scale);
+    if (coord->parent != -1) {
+        return matrix3_mult(get_transform(coord->parent), transform);
+    }
+    return transform;
+}
+
+
 Vector2f get_position(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     Vector2f position = coord->position;
@@ -993,6 +1003,15 @@ float get_angle(int entity) {
     }
 
     return mod(angle, 2.0f * M_PI);
+}
+
+
+Vector2f get_scale(int entity) {
+    Matrix3 transform = get_transform(entity);
+    Vector2f scale;
+    scale.x = norm(vec(transform.a, transform.d));
+    scale.y = norm(vec(transform.b, transform.e));
+    return scale;
 }
 
 

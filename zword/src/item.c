@@ -240,7 +240,7 @@ void draw_items() {
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
             draw_sprite_outline(game_data->camera, image->texture_index, image->width, image->height, 0, pos, angle, 
-                image->scale);
+                get_scale(player->target));
         }
 
         if (item) {

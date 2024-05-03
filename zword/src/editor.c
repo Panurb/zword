@@ -728,20 +728,39 @@ void input_tool_object(SDL_Event event) {
 
 
 void input_tool_prefab(SDL_Event event) {
-    if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (event.type == SDL_MOUSEMOTION) {
+        tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
-            game_data->components->added_entities = List_create();
-            Vector2f pos = snap_to_grid_center(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            load_prefab(prefab_name, pos, 0.0f);
-            ListNode* node;
-            FOREACH(node, game_data->components->added_entities) {
-                if (ColliderComponent_get(node->value)) {
-                   update_grid(node->value);
-                }
-            }
-            List_delete(game_data->components->added_entities);
-            game_data->components->added_entities = NULL;
+            tile_start = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+            tile_started = true;
         }
+    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+        float width = fabsf(tile_end.x - tile_start.x);
+        float height = fabsf(tile_end.y - tile_start.y);
+        Vector2f pos = mult(0.5f, sum(tile_end, tile_start));
+
+        game_data->components->added_entities = List_create();
+        int entity = load_prefab(prefab_name, pos, 0.0f, ones());
+
+        if (width > 0.0f && height > 0.0f) {
+            CoordinateComponent* coord = CoordinateComponent_get(entity);
+            ColliderComponent* collider = ColliderComponent_get(entity);
+            if (collider) {
+                coord->scale.x = width / collider->width;
+                coord->scale.y = height / collider->height;
+            }
+        }
+
+        ListNode* node;
+        FOREACH(node, game_data->components->added_entities) {
+            if (ColliderComponent_get(node->value)) {
+                update_grid(node->value);
+            }
+        }
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+        tile_started = false;
     }
 }
 
@@ -852,6 +871,7 @@ void draw_editor() {
             }
             break;
         case TOOL_TILE:
+        case TOOL_PREFAB:
             if (tile_started) {
                 Vector2f end = mouse_grid;
                 float width = fabsf(end.x - tile_start.x);
@@ -865,13 +885,9 @@ void draw_editor() {
                 draw_line(game_data->camera, vec(pos.x, pos.y - 0.2f), vec(pos.x, pos.y + 0.2f), 0.05f, COLOR_WHITE);
             }
             break;
-        case TOOL_OBJECT: {
+        case TOOL_OBJECT:
             draw_rectangle_outline(game_data->camera, mouse_grid,
                 selected_object_width, selected_object_height, 0.0f, 0.05f, COLOR_WHITE);
-            break;
-        } case TOOL_PREFAB:
-            draw_rectangle_outline(game_data->camera, mouse_grid_center,
-                1.0f, 1.0f, 0.0f, 0.05f, COLOR_WHITE);
             break;
     }
 
@@ -888,7 +904,7 @@ void draw_editor() {
             if (image) {
                 if (image->layer > LAYER_WALLS) {
                     draw_sprite_outline(game_data->camera, image->texture_index, image->width, image->height, 0, pos, 
-                        angle, image->scale);
+                        angle, get_scale(i));
                 } else {
                     draw_rectangle_outline(game_data->camera, pos, image->width, 
                         image->height, angle, 0.05f, COLOR_WHITE);

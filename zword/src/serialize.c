@@ -151,11 +151,13 @@ void CoordinateComponent_serialize(cJSON* entity_json, int entity,
     serialize_float(json, "angle", coord->angle, 0.0f);
     serialize_id(json, "parent", coord->parent);
     serialize_string(json, "prefab", coord->prefab, "");
+    serialize_float(json, "scale_x", coord->scale.x, 1.0f);
+    serialize_float(json, "scale_y", coord->scale.y, 1.0f);
 }
 
 
 void CoordinateComponent_deserialize(cJSON* entity_json, int entity,
-        Vector2f offset, float rotation) {
+        Vector2f offset, float rotation, Vector2f scale) {
     cJSON* coord_json = cJSON_GetObjectItem(entity_json, "Coordinate");
     Vector2f pos;
     pos.x = cJSON_GetObjectItem(coord_json, "x")->valuedouble + offset.x;
@@ -164,6 +166,8 @@ void CoordinateComponent_deserialize(cJSON* entity_json, int entity,
     CoordinateComponent* coord = CoordinateComponent_add(entity, pos, angle);
     deserialize_id(coord_json, "parent", &coord->parent);
     deserialize_string(coord_json, "prefab", coord->prefab);
+    coord->scale.x = deserialize_float(coord_json, "scale_x", 1.0f) * scale.x;
+    coord->scale.y = deserialize_float(coord_json, "scale_y", 1.0f) * scale.y;
 }
 
 
@@ -177,8 +181,6 @@ void ImageComponent_serialize(cJSON* entity_json, int entity) {
     cJSON_AddNumberToObject(json, "width", image->width);
     cJSON_AddNumberToObject(json, "height", image->height);
     cJSON_AddNumberToObject(json, "layer", image->layer);
-    serialize_float(json, "scale_x", image->scale.x, 1.0f);
-    serialize_float(json, "scale_y", image->scale.y, 1.0f);
     serialize_float(json, "alpha", image->alpha, 1.0f);
 }
 
@@ -192,8 +194,6 @@ void ImageComponent_deserialize(cJSON* entity_json, int entity) {
     float height = cJSON_GetObjectItem(json, "height")->valuedouble;
     float layer = cJSON_GetObjectItem(json, "layer")->valueint;
     ImageComponent* image = ImageComponent_add(entity, filename, width, height, layer);
-    image->scale.x = deserialize_float(json, "scale_x", image->scale.x);
-    image->scale.y = deserialize_float(json, "scale_y", image->scale.y);
     image->alpha = deserialize_float(json, "alpha", 1.0f);
 }
 
@@ -779,7 +779,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
 }
 
 
-int deserialize_entity(cJSON* entity_json, bool preserve_id, Vector2f offset, float rotation) {
+int deserialize_entity(cJSON* entity_json, bool preserve_id, Vector2f offset, float rotation, Vector2f scale) {
     int entity;
     if (preserve_id) {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
@@ -791,13 +791,13 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id, Vector2f offset, fl
         entity = create_entity();
     }
 
-    CoordinateComponent_deserialize(entity_json, entity, offset, rotation);
+    CoordinateComponent_deserialize(entity_json, entity, offset, rotation, scale);
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord->prefab[0] != '\0') {
         if (preserve_id) {
             printf("Cannot preserve id for prefabs\n");
         } else {
-            load_prefab(coord->prefab, coord->position, coord->angle);
+            load_prefab(coord->prefab, coord->position, coord->angle, coord->scale);
         }
         return entity;
     }
@@ -916,7 +916,7 @@ void deserialize_map(cJSON* json, bool preserve_id) {
         if (!preserve_id) {
             i = cJSON_GetObjectItem(entity, "id")->valueint;
         }
-        ids[i] = deserialize_entity(entity, preserve_id, offset, 0.0f);
+        ids[i] = deserialize_entity(entity, preserve_id, offset, 0.0f, ones());
     }
 
     if (!preserve_id) {
@@ -945,7 +945,7 @@ cJSON* serialize_game(bool preserve_id) {
 }
 
 
-int deserialize_prefab(cJSON* json, Vector2f offset, float rotation) {
+int deserialize_prefab(cJSON* json, Vector2f offset, float rotation, Vector2f scale) {
     // Prefab ids can only refer to entities inside the prefab so they can be updated here and then continue
     // deserializing the map/parent prefab
 
@@ -963,7 +963,7 @@ int deserialize_prefab(cJSON* json, Vector2f offset, float rotation) {
     int ids[MAX_ENTITIES];
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
-        ids[n] = deserialize_entity(entity, false, offset, rotation);
+        ids[n] = deserialize_entity(entity, false, offset, rotation, scale);
         if (root == -1) {
             root = ids[n];
         }
@@ -1052,14 +1052,16 @@ void load_game(ButtonText map_name) {
 }
 
 
-void load_prefab(Filename filename, Vector2f position, float angle) {
+int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scale) {
     cJSON* json = load_json("prefabs", filename);
 
-    int root = deserialize_prefab(json, position, angle);
+    int root = deserialize_prefab(json, position, angle, scale);
 
     if (root != -1) {
         strcpy(CoordinateComponent_get(root)->prefab, filename);
     }
 
     cJSON_Delete(json);
+
+    return root;
 }

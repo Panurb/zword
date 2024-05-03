@@ -213,10 +213,11 @@ int create_fire(Vector2f pos) {
 
 int create_tree(Vector2f position) {
     int i = create_entity();
-    CoordinateComponent_add(i, position, rand_angle());    
     float size = randf(1.0f, 1.5f);
-    ColliderComponent_add_circle(i, 1.25f * size, GROUP_TREES);
-    ImageComponent_add(i, "tree", 3.0, 3.0, LAYER_TREES)->scale = (Vector2f) { size, size };
+    CoordinateComponent* coord = CoordinateComponent_add(i, position, rand_angle());
+    coord->scale = vec(size, size);
+    ColliderComponent_add_circle(i, 1.25f, GROUP_TREES);
+    ImageComponent_add(i, "tree", 3.0, 3.0, LAYER_TREES);
 
     return i;
 }
@@ -224,10 +225,11 @@ int create_tree(Vector2f position) {
 
 int create_rock(Vector2f position) {
     int i = create_entity();
-    CoordinateComponent_add(i, position, rand_angle());
     float size = randf(0.75f, 2.0f);
-    ColliderComponent_add_circle(i, 1.4 * size, GROUP_WALLS);
-    ImageComponent_add(i, "rock", 3.0, 3.0, LAYER_DECALS)->scale = (Vector2f) { size, size };
+    CoordinateComponent* coord = CoordinateComponent_add(i, position, rand_angle());
+    coord->scale = vec(size, size);
+    ColliderComponent_add_circle(i, 1.4, GROUP_WALLS);
+    ImageComponent_add(i, "rock", 3.0, 3.0, LAYER_DECALS);
 
     return i;
 }

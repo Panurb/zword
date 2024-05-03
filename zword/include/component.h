@@ -44,10 +44,10 @@ typedef struct {
     float height;
     float shine;
     Layer layer;
-    Vector2f scale;
     float alpha;
     float stretch;
     float stretch_speed;
+    bool tile;
 } ImageComponent;
 
 typedef struct {
@@ -548,6 +548,7 @@ void ComponentData_clear();
 
 Vector2f get_position(int i);
 float get_angle(int i);
+Vector2f get_scale(int entity);
 
 bool entity_exists(int entity);
 
