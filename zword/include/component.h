@@ -539,6 +539,7 @@ void TextComponent_remove(int entity);
 
 int create_entity();
 void destroy_entity(int i);
+void destroy_entities(List* entities);
 void destroy_entity_recursive(int entity);
 int get_root(int entity);
 void add_child(int parent, int child);
@@ -555,3 +556,5 @@ bool entity_exists(int entity);
 int get_parent(int entity);
 
 List* get_children(int entity);
+
+Vector2f get_entities_center(List* entities);

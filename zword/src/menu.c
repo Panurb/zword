@@ -133,9 +133,13 @@ void toggle_play(int entity) {
     int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
     add_child(window_play, container);
 
-    // add_button_to_container(container, "Tutorial", change_state_start);
-    // add_button_to_container(container, "Survival", change_state_start);
-    add_files_to_container(container, "maps", change_state_start);
+    if (game_settings.debug) {
+        add_files_to_container(container, "maps", change_state_start);
+        add_scrollbar_to_container(container);
+    } else {    
+        add_button_to_container(container, "Tutorial", change_state_start);
+        add_button_to_container(container, "Survival", change_state_start);
+    }
 }
 
 

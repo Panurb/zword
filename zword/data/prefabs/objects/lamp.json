@@ -1,0 +1,37 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	3.2266354560852051
+			},
+			"Image":	{
+				"filename":	"lamp",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	5
+			},
+			"Light":	{
+				"range":	10,
+				"angle":	6.2831854820251465,
+				"color_r":	255,
+				"color_g":	255,
+				"color_b":	255,
+				"brightness":	0.5,
+				"speed":	5,
+				"flicker":	0.10000000149011612
+			},
+			"Particle":	{
+				"type":	6,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"wood_hit"
+			}
+		}]
+}

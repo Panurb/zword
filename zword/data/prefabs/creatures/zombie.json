@@ -1,0 +1,64 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0.5,
+				"y":	0,
+				"parent":	1
+			},
+			"Weapon":	{
+				"fire_rate":	0.5,
+				"recoil":	0,
+				"damage":	25,
+				"max_magazine":	-1,
+				"magazine":	1,
+				"max_recoil":	0,
+				"reload_time":	0,
+				"range":	1,
+				"sound_range":	1,
+				"spread":	1.0995573997497559,
+				"shots":	7,
+				"ammo_type":	0,
+				"sound":	"axe",
+				"automatic":	false
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	4.9217362403869629
+			},
+			"Image":	{
+				"filename":	"zombie",
+				"layer":	9
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	4
+			},
+			"Enemy":	{
+				"weapon":	0
+			},
+			"Particle":	{
+				"type":	2,
+				"start_size":	0.5
+			},
+			"Waypoint":	{
+			},
+			"Health":	{
+				"health":	100,
+				"dead_image":	"zombie_dead",
+				"decal":	"blood",
+				"die_sound":	""
+			},
+			"Sound":	{
+				"hit_sound":	"squish"
+			}
+		}]
+}

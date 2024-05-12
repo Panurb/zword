@@ -1,0 +1,26 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"bed",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	3.7999999523162842,
+				"height":	1.7999999523162842,
+				"group":	1
+			},
+			"Particle":	{
+				"type":	6,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"wood_hit"
+			}
+		}]
+}

@@ -1,0 +1,19 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	2,
+				"height":	2,
+				"group":	11
+			},
+			"Text":	{
+				"source_string":	"",
+				"size":	30
+			}
+		}]
+}

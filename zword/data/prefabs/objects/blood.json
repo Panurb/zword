@@ -1,0 +1,17 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	5.0814671516418457
+			},
+			"Image":	{
+				"filename":	"blood",
+				"layer":	3
+			},
+			"Physics":	{
+				"mass":	0
+			}
+		}]
+}

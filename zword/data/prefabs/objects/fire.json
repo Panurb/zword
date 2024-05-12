@@ -1,0 +1,37 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"fire",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	0.699999988079071,
+				"height":	0.699999988079071,
+				"group":	8
+			},
+			"Light":	{
+				"range":	18,
+				"angle":	6.2831854820251465,
+				"color_r":	255,
+				"color_g":	153,
+				"color_b":	0,
+				"brightness":	0.800000011920929,
+				"speed":	10,
+				"flicker":	0.10000000149011612
+			},
+			"Particle":	{
+				"type":	7,
+				"start_size":	0.600000023841858,
+				"loop":	1
+			},
+			"Sound":	{
+				"loop_sound":	"fire"
+			}
+		}]
+}

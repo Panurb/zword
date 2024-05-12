@@ -1,0 +1,49 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	6.2110867500305176
+			},
+			"Image":	{
+				"filename":	"uranium",
+				"layer":	3
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	0.97827696800231934,
+				"height":	0.97827696800231934,
+				"group":	6
+			},
+			"Light":	{
+				"range":	3.238166332244873,
+				"angle":	6.2831854820251465,
+				"color_r":	127,
+				"color_g":	255,
+				"color_b":	0,
+				"brightness":	0.5,
+				"speed":	1,
+				"flicker":	0.25
+			},
+			"Particle":	{
+				"angle":	0,
+				"spread":	6.2831854820251465,
+				"start_size":	0.10000000149011612,
+				"end_size":	0.05000000074505806,
+				"speed":	2,
+				"rate":	5,
+				"outer_r":	127,
+				"outer_g":	255,
+				"outer_b":	0,
+				"inner_r":	127,
+				"inner_g":	255,
+				"inner_b":	0,
+				"loop":	1
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit",
+				"loop_sound":	"geiger"
+			}
+		}]
+}

@@ -1,0 +1,34 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	3.2665200233459473
+			},
+			"Image":	{
+				"filename":	"ammo_pistol",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	0.5
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	0.5,
+				"height":	0.5,
+				"group":	2
+			},
+			"Item":	{
+				"size":	0,
+				"type":	0
+			},
+			"Sound":	{
+				"hit_sound":	"metal"
+			},
+			"Ammo":	{
+				"type":	1,
+				"size":	24
+			}
+		}]
+}

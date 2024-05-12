@@ -953,6 +953,14 @@ void destroy_entity(int entity) {
 }
 
 
+void destroy_entities(List* entities) {
+    ListNode* node;
+    FOREACH(node, entities) {
+        destroy_entity(node->value);
+    }
+}
+
+
 void destroy_entity_recursive(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
@@ -1033,4 +1041,21 @@ int get_parent(int entity) {
 List* get_children(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     return coord->children;
+}
+
+
+Vector2f get_entities_center(List* entities) {
+    Vector2f center = zeros();
+    ListNode* node;
+    FOREACH(node, entities) {
+        int i = node->value;
+        if (CoordinateComponent_get(i)->parent == -1) {
+            center = sum(center, get_position(i));
+        }
+    }
+    if (entities->size != 0) {
+        center = mult(1.0f / entities->size, center);
+    }
+
+    return center;
 }

@@ -47,13 +47,19 @@ static bool tile_started = false;
 static List* selections = NULL;
 static Tool tool = TOOL_TILE;
 static Vector2f mouse_world = { 0.0f, 0.0f };
-static ButtonText prefabs[] = { "testi.json", "prefab.json" };
 static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
 static float double_click_time = 0.0f;
 static int entity_settings_id = -1;
 static int entity_settings_entity = -1;
+
+static int tiles_window_id = -1;
+static int objects_window_id = -1;
+static int creatures_window_id = -1;
+static int weapons_window_id = -1;
+static int editor_settings_window_id = -1;
+static int prefabs_window_id = -1;
 
 
 char* category_names[] = { "terrain", "floor", "decals", "walls", "objects", "waypoints" };
@@ -129,6 +135,68 @@ static ButtonText weapon_names[] = {
 };
 
 
+void reset_editor_ids() {
+    tiles_window_id = -1;
+    objects_window_id = -1;
+    creatures_window_id = -1;
+    weapons_window_id = -1;
+    editor_settings_window_id = -1;
+    prefabs_window_id = -1;
+}
+
+
+void create_prefabs() {
+    // TODO: remove
+    for (int i = 0; i < LENGTH(object_names); i++) {
+        printf("creating prefab: %s\n", object_names[i]);
+        game_data->components->added_entities = List_create();
+        create_object(object_names[i], zeros(), 0.0f);
+        String path;
+        snprintf(path, STRING_SIZE, "objects/%s", object_names[i]);
+        save_prefab(path, game_data->components->added_entities);
+        destroy_entities(game_data->components->added_entities);
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+    }
+
+    for (int i = 0; i < LENGTH(tile_names); i++) {
+        printf("creating prefab: %s\n", tile_names[i]);
+        game_data->components->added_entities = List_create();
+        create_tile(i, zeros(), 0.0f, 1.0f, 1.0f);
+        String path;
+        snprintf(path, STRING_SIZE, "tiles/%s", tile_names[i]);
+        save_prefab(path, game_data->components->added_entities);
+        destroy_entities(game_data->components->added_entities);
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+    }
+
+    for (int i = 0; i < LENGTH(creature_names); i++) {
+        printf("creating prefab: %s\n", creature_names[i]);
+        game_data->components->added_entities = List_create();
+        create_object(creature_names[i], zeros(), 0.0f);
+        String path;
+        snprintf(path, STRING_SIZE, "creatures/%s", creature_names[i]);
+        save_prefab(path, game_data->components->added_entities);
+        destroy_entities(game_data->components->added_entities);
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+    }
+
+    for (int i = 0; i < LENGTH(weapon_names); i++) {
+        printf("creating prefab: %s\n", weapon_names[i]);
+        game_data->components->added_entities = List_create();
+        create_object(weapon_names[i], zeros(), 0.0f);
+        String path;
+        snprintf(path, STRING_SIZE, "weapons/%s", weapon_names[i]);
+        save_prefab(path, game_data->components->added_entities);
+        destroy_entities(game_data->components->added_entities);
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+    }
+}
+
+
 bool category_selected(int entity) {
     if (WaypointComponent_get(entity)) {
         return selected_categories[CATEGORY_WAYPOINTS];
@@ -163,33 +231,20 @@ bool category_selected(int entity) {
 }
 
 
-Vector2f get_selections_center() {
-    Vector2f center = zeros();
-    ListNode* node;
-    FOREACH(node, selections) {
-        int i = node->value;
-        if (CoordinateComponent_get(i)->parent == -1) {
-            center = sum(center, get_position(i));
-        }
-    }
-    if (selections->size != 0) {
-        center = mult(1.0f / selections->size, center);
-    }
-
-    return center;
-}
-
-
 void select_object(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
-    strcpy(selected_object_name, widget->string);
+    int window = get_parent(get_parent(entity));
+    WidgetComponent* window_widget = WidgetComponent_get(window);
+    sprintf(selected_object_name, "%s/%s", window_widget->string, widget->string);
+
     tool = TOOL_OBJECT;
 
     game_data->components->added_entities = List_create();
 
     printf("selected object: %s\n", selected_object_name);
 
-    int i = create_object(selected_object_name, zeros(), 0.0f);
+    int i = load_prefab(selected_object_name, zeros(), 0.0f, ones());
+    // int i = create_object(selected_object_name, zeros(), 0.0f);
     ColliderComponent* collider = ColliderComponent_get(i);
     if (collider) {
         selected_object_width = collider->width;
@@ -209,66 +264,57 @@ void select_object(int entity) {
 }
 
 
-int toggle_list_window(int window_id, ButtonText title, OnClick close, ButtonText* values, 
-        int length, OnClick select) {
+void select_tile(int entity) {
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    int window = get_parent(get_parent(entity));
+    WidgetComponent* window_widget = WidgetComponent_get(window);
+    sprintf(selected_object_name, "%s/%s", window_widget->string, widget->string);
+
+    tool = TOOL_TILE;
+}
+
+
+int toggle_prefabs(int window_id, Filename category, OnClick close, OnClick on_click) {
     if (window_id != -1) {
         destroy_entity_recursive(window_id);
         return -1;
     }
 
     Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(pos, title, 1, close);
+    window_id = create_window(pos, category, 1, close);
 
-    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 1, 5);
     add_child(window_id, container);
-
-    for (int i = 0; i < length; i++) {
-        int j = add_button_to_container(container, values[i], select);
-        WidgetComponent_get(j)->value = i;
-    }
-
+    Filename path;
+    snprintf(path, STRING_SIZE, "prefabs/%s", category);
+    add_files_to_container(container, path, on_click);
     add_scrollbar_to_container(container);
 
     return window_id;
 }
 
 
-void select_tile(int entity) {
-    WidgetComponent* widget = WidgetComponent_get(entity);
-    selected_tile = widget->value;
-    tool = TOOL_TILE;
-}
-
-
 void toggle_tiles(int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    window_id = toggle_list_window(window_id, "TILES", toggle_tiles, tile_names, LENGTH(tile_names), 
-        select_tile);
+    tiles_window_id = toggle_prefabs(tiles_window_id, "tiles", toggle_tiles, select_tile);
 }
 
 
 void toggle_objects(int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    window_id = toggle_list_window(window_id, "OBJECTS", toggle_objects, object_names, LENGTH(object_names), 
-        select_object);
+    objects_window_id = toggle_prefabs(objects_window_id, "objects", toggle_objects, select_object);
 }
 
 
 void toggle_creatures(int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    window_id = toggle_list_window(window_id, "CREATURES", toggle_creatures, creature_names, LENGTH(creature_names), 
-        select_object);
+    creatures_window_id = toggle_prefabs(creatures_window_id, "creatures", toggle_creatures, select_object);
 }
 
 
 void toggle_weapons(int entity) {
     UNUSED(entity);
-    static int window_id = -1;
-    window_id = toggle_list_window(window_id, "WEAPONS", toggle_weapons, weapon_names, LENGTH(weapon_names), 
-        select_object);
+    weapons_window_id = toggle_prefabs(weapons_window_id, "weapons", toggle_weapons, select_object);
 }
 
 
@@ -392,43 +438,6 @@ void open_entity_settings(int entity) {
 }
 
 
-void select_prefab(int entity) {
-    WidgetComponent* widget = WidgetComponent_get(entity);
-    strcpy(prefab_name, widget->string);
-    tool = TOOL_PREFAB;
-}
-
-
-void toggle_prefabs(int entity) {
-    UNUSED(entity);
-    static int window_id = -1;
-    if (window_id != -1) {
-        destroy_entity_recursive(window_id);
-        window_id = -1;
-        return;
-    }
-
-    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_id = create_window(pos, "PREFABS", 1, toggle_prefabs);
-
-    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
-    add_child(window_id, container);
-    add_files_to_container(container, "prefabs", select_prefab);
-}
-
-
-void save_prefab(Filename filename) {
-    Vector2f center = get_selections_center();
-    center = snap_to_grid_center(center, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-    center = mult(-1.0f, center);
-
-    cJSON* json = serialize_entities(selections, center);
-
-    save_json(json, "prefabs", filename);
-    cJSON_Delete(json);
-}
-
-
 void move_selections(Vector2f delta_pos) {
     if (non_zero(delta_pos)) {
         ListNode* node;
@@ -450,7 +459,7 @@ void move_selections(Vector2f delta_pos) {
 
 void rotate_selections() {
     // TODO: snap to grid after rotation
-    Vector2f center = get_selections_center();
+    Vector2f center = get_entities_center(selections);
 
     ListNode* node;
     FOREACH (node, selections) {
@@ -532,6 +541,7 @@ void save_map(int entity) {
 
 void quit_editor(int entity) {
     UNUSED(entity);
+    reset_editor_ids();
     game_state = STATE_END;
 }
 
@@ -547,8 +557,6 @@ void create_editor_menu() {
     create_button("CREATURES", pos, toggle_creatures);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("WEAPONS", pos, toggle_weapons);
-    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button("PREFABS", pos, toggle_prefabs);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
@@ -657,7 +665,7 @@ void input_tool_select(SDL_Event event) {
                 destroy_selections(game_data);
                 break;
             case SDLK_s:
-                save_prefab("prefab.json");
+                // save_prefab("prefab.json");
                 break;
             case SDLK_LEFT:
                 move_selections(vec(-grid_sizes[grid_size_index], 0.0f));
@@ -691,18 +699,27 @@ void input_tool_tile(SDL_Event event) {
         float width = fabsf(tile_end.x - tile_start.x);
         float height = fabsf(tile_end.y - tile_start.y);
         Vector2f pos = mult(0.5f, sum(tile_end, tile_start));
+
+        game_data->components->added_entities = List_create();
+        int entity = load_prefab(selected_object_name, pos, 0.0f, ones());
+
         if (width > 0.0f && height > 0.0f) {
-            game_data->components->added_entities = List_create();
-            create_tile(selected_tile, pos, 0.0f, width, height);
-            ListNode* node;
-            FOREACH(node, game_data->components->added_entities) {
-                if (ColliderComponent_get(node->value)) {
-                   update_grid(node->value);
-                }
+            CoordinateComponent* coord = CoordinateComponent_get(entity);
+            ColliderComponent* collider = ColliderComponent_get(entity);
+            if (collider) {
+                coord->scale.x = width / collider->width;
+                coord->scale.y = height / collider->height;
             }
-            List_delete(game_data->components->added_entities);
-            game_data->components->added_entities = NULL;
         }
+
+        ListNode* node;
+        FOREACH(node, game_data->components->added_entities) {
+            if (ColliderComponent_get(node->value)) {
+                update_grid(node->value);
+            }
+        }
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
         tile_started = false;
     }
 }
@@ -713,7 +730,7 @@ void input_tool_object(SDL_Event event) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             game_data->components->added_entities = List_create();
             Vector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            create_object(selected_object_name, pos, 0.0f);
+            load_prefab(selected_object_name, pos, 0.0f, ones());
             ListNode* node;
             FOREACH(node, game_data->components->added_entities) {
                 if (ColliderComponent_get(node->value)) {
@@ -823,9 +840,6 @@ void input_editor(SDL_Event event) {
                 break;
             case SDLK_o:
                 toggle_objects(-1);
-                break;
-            case SDLK_p:
-                toggle_prefabs(-1);
                 break;
             case SDLK_t:
                 toggle_tiles(-1);

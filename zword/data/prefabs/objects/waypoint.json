@@ -1,0 +1,18 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	0.5,
+				"height":	0.5,
+				"group":	0,
+				"enabled":	0
+			},
+			"Waypoint":	{
+			}
+		}]
+}

@@ -1,0 +1,47 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"sword",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	2
+			},
+			"Weapon":	{
+				"fire_rate":	3,
+				"recoil":	0,
+				"damage":	100,
+				"max_magazine":	-1,
+				"magazine":	1,
+				"max_recoil":	0,
+				"reload_time":	0,
+				"range":	2,
+				"sound_range":	2,
+				"spread":	3.1415927410125732,
+				"shots":	5,
+				"ammo_type":	0,
+				"sound":	"axe",
+				"automatic":	false
+			},
+			"Item":	{
+				"size":	0,
+				"price":	10000,
+				"name":	"Fiskalibur",
+				"type":	0
+			},
+			"Sound":	{
+				"hit_sound":	"metal"
+			}
+		}]
+}

@@ -1,0 +1,27 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	5.39690065383911
+			},
+			"Image":	{
+				"filename":	"gas",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	0.5
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	0.75,
+				"height":	0.800000011920929,
+				"group":	2
+			},
+			"Item":	{
+				"size":	0,
+				"type":	0
+			}
+		}]
+}

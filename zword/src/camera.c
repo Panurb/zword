@@ -97,6 +97,12 @@ void draw_triangle_strip(int camera, SDL_Vertex* vertices, int verts_size) {
 
 
 void draw_line(int camera, Vector2f start, Vector2f end, float width, Color color) {
+    CameraComponent* cam = CameraComponent_get(camera);
+
+    // Prevent lines from disappearing when zoomed out
+    if (width * cam->zoom < 1.0f) {
+        width = 1.0f / cam->zoom;
+    }
     Vector2f r = diff(end, start);
 
     Vector2f corners[4];

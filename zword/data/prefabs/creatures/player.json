@@ -1,0 +1,61 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0.75,
+				"y":	0,
+				"parent":	1
+			},
+			"Image":	{
+				"filename":	"",
+				"layer":	10,
+				"alpha":	0
+			},
+			"Animation":	{
+				"frames":	1,
+				"framerate":	0,
+				"play_once":	1
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"player",
+				"layer":	11
+			},
+			"Physics":	{
+				"mass":	1,
+				"bounce":	0,
+				"max_speed":	5
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	3
+			},
+			"Player":	{
+				"inventory":	[-1, -1, -1, -1],
+				"ammo":	[-1, -1, -1, -1],
+				"arms":	0
+			},
+			"Particle":	{
+				"type":	2,
+				"start_size":	0.5
+			},
+			"Waypoint":	{
+			},
+			"Health":	{
+				"health":	100,
+				"dead_image":	"player_dead",
+				"decal":	"blood",
+				"die_sound":	""
+			},
+			"Sound":	{
+				"hit_sound":	"squish"
+			}
+		}]
+}

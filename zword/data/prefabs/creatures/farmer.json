@@ -1,0 +1,105 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0.75,
+				"y":	0,
+				"parent":	1
+			},
+			"Image":	{
+				"filename":	"assault_rifle",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	0.5
+			},
+			"Light":	{
+				"enabled":	0,
+				"range":	4,
+				"angle":	6.2831854820251465,
+				"color_r":	255,
+				"color_g":	255,
+				"color_b":	255,
+				"brightness":	1,
+				"speed":	10
+			},
+			"Particle":	{
+				"type":	1,
+				"start_size":	0.15000000596046448
+			},
+			"Weapon":	{
+				"fire_rate":	0.5,
+				"recoil":	0.05000000074505806,
+				"damage":	10,
+				"max_magazine":	-1,
+				"magazine":	1,
+				"max_recoil":	0.15707963705062866,
+				"reload_time":	3,
+				"range":	30,
+				"sound_range":	30,
+				"spread":	0,
+				"shots":	1,
+				"ammo_type":	2,
+				"sound":	"assault_rifle",
+				"automatic":	true
+			},
+			"Item":	{
+				"size":	1,
+				"attachments":	[-1],
+				"type":	0
+			},
+			"Sound":	{
+				"hit_sound":	"metal"
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	3.8149352073669434
+			},
+			"Image":	{
+				"filename":	"farmer",
+				"layer":	9
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	4
+			},
+			"Light":	{
+				"range":	15,
+				"angle":	0.78539818525314331,
+				"color_r":	255,
+				"color_g":	255,
+				"color_b":	255,
+				"brightness":	0.5,
+				"speed":	10
+			},
+			"Enemy":	{
+				"fov":	0.78539818525314331,
+				"walk_speed":	3,
+				"run_speed":	3,
+				"weapon":	0
+			},
+			"Particle":	{
+				"type":	2,
+				"start_size":	0.5
+			},
+			"Waypoint":	{
+			},
+			"Health":	{
+				"health":	100,
+				"dead_image":	"farmer_dead",
+				"decal":	"blood",
+				"die_sound":	""
+			},
+			"Sound":	{
+				"hit_sound":	"squish"
+			}
+		}]
+}

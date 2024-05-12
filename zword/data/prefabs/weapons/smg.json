@@ -1,0 +1,62 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"smg",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	0.5
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	2
+			},
+			"Light":	{
+				"enabled":	0,
+				"range":	3,
+				"angle":	6.2831854820251465,
+				"color_r":	255,
+				"color_g":	255,
+				"color_b":	255,
+				"brightness":	1,
+				"speed":	10
+			},
+			"Particle":	{
+				"type":	1,
+				"start_size":	0.15000000596046448
+			},
+			"Weapon":	{
+				"fire_rate":	15,
+				"recoil":	0.15000000596046448,
+				"damage":	20,
+				"max_magazine":	20,
+				"magazine":	20,
+				"max_recoil":	0.471238911151886,
+				"reload_time":	2,
+				"range":	30,
+				"sound_range":	30,
+				"spread":	0,
+				"shots":	1,
+				"ammo_type":	1,
+				"sound":	"pistol",
+				"automatic":	true
+			},
+			"Item":	{
+				"size":	1,
+				"attachments":	[-1],
+				"price":	500,
+				"name":	"Jatimatic",
+				"type":	0
+			},
+			"Sound":	{
+				"hit_sound":	"metal"
+			}
+		}]
+}

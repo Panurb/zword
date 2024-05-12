@@ -1,0 +1,19 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"tiles_tile",
+				"layer":	2
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1,
+				"height":	1,
+				"group":	12
+			}
+		}]
+}

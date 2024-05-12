@@ -1,0 +1,79 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0.5,
+				"y":	0,
+				"parent":	1
+			},
+			"Weapon":	{
+				"fire_rate":	0.25,
+				"recoil":	0,
+				"damage":	20,
+				"max_magazine":	-1,
+				"magazine":	1,
+				"max_recoil":	0,
+				"reload_time":	0,
+				"range":	15,
+				"sound_range":	15,
+				"spread":	0.78539818525314331,
+				"shots":	5,
+				"ammo_type":	4,
+				"sound":	"energy",
+				"automatic":	false
+			},
+			"Sound":	{
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	2.2124514579772949
+			},
+			"Image":	{
+				"filename":	"priest",
+				"layer":	9
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	4
+			},
+			"Light":	{
+				"range":	2,
+				"angle":	6.2831854820251465,
+				"color_r":	127,
+				"color_g":	255,
+				"color_b":	0,
+				"brightness":	0.5,
+				"speed":	1,
+				"flicker":	0.25
+			},
+			"Enemy":	{
+				"fov":	6.2831854820251465,
+				"idle_speed":	0,
+				"run_speed":	2,
+				"weapon":	0
+			},
+			"Particle":	{
+				"type":	2,
+				"start_size":	0.5
+			},
+			"Waypoint":	{
+			},
+			"Health":	{
+				"health":	200,
+				"dead_image":	"priest_dead",
+				"decal":	"blood",
+				"die_sound":	""
+			},
+			"Sound":	{
+				"hit_sound":	"squish"
+			}
+		}]
+}

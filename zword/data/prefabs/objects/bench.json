@@ -1,0 +1,79 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0.5,
+				"parent":	2
+			},
+			"Image":	{
+				"filename":	"bench_destroyed",
+				"layer":	6,
+				"alpha":	0
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	0.800000011920929,
+				"height":	1.3999999761581421,
+				"group":	15,
+				"enabled":	0
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-1,
+				"parent":	2
+			},
+			"Image":	{
+				"filename":	"bench_debris",
+				"layer":	6,
+				"alpha":	0
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	0.800000011920929,
+				"height":	1.2000000476837158,
+				"group":	15,
+				"enabled":	0
+			}
+		}, {
+			"id":	2,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"bench",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	2
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	0.800000011920929,
+				"height":	2.7999999523162842,
+				"group":	1
+			},
+			"Particle":	{
+				"type":	6,
+				"start_size":	0.15000000596046448
+			},
+			"Health":	{
+				"health":	100,
+				"dead_image":	"",
+				"decal":	"",
+				"die_sound":	"wood_destroy"
+			},
+			"Sound":	{
+				"hit_sound":	"wood_hit"
+			}
+		}]
+}

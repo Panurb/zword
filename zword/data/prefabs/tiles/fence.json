@@ -1,0 +1,19 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"fence_tile",
+				"layer":	5
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1,
+				"height":	1,
+				"group":	8
+			}
+		}]
+}

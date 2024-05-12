@@ -19,21 +19,21 @@
 #include "game.h"
 
 
-float get_collider_width(int i) {
+float collider_width(int i) {
     Vector2f scale = get_scale(i);
     ColliderComponent* col = ColliderComponent_get(i);
     return col->width * scale.x;
 }
 
 
-float get_collider_height(int i) {
+float collider_height(int i) {
     Vector2f scale = get_scale(i);
     ColliderComponent* col = ColliderComponent_get(i);
     return col->height * scale.y;
 }
 
 
-float get_collider_radius(int i) {
+float collider_radius(int i) {
     Vector2f scale = get_scale(i);
     ColliderComponent* col = ColliderComponent_get(i);
     return col->radius * scale.x;
@@ -46,11 +46,11 @@ bool point_inside_collider(int i, Vector2f point) {
     if (col->type == COLLIDER_RECTANGLE) {
         Vector2f pos = get_position(i);
         float angle = get_angle(i);
-        float width = get_collider_width(i);
-        float height = get_collider_height(i);
+        float width = collider_width(i);
+        float height = collider_height(i);
         return point_inside_rectangle(pos, angle, width, height, point);
     } else if (col->type == COLLIDER_CIRCLE) {
-        float radius = get_collider_radius(i);
+        float radius = collider_radius(i);
         if (norm2(diff(get_position(i), point)) < radius * radius) {
             return true;
         }
@@ -74,13 +74,13 @@ void get_corners(int i, Vector2f* corners) {
 
 Vector2f half_width(int i) {
     ColliderComponent* col = ColliderComponent_get(i);
-    return polar_to_cartesian(0.5 * get_collider_width(i), get_angle(i));
+    return polar_to_cartesian(0.5 * collider_width(i), get_angle(i));
 }
 
 
 Vector2f half_height(int i) {
     ColliderComponent* col = ColliderComponent_get(i);
-    return polar_to_cartesian(0.5 * get_collider_height(i), get_angle(i) + 0.5 * M_PI);
+    return polar_to_cartesian(0.5 * collider_height(i), get_angle(i) + 0.5 * M_PI);
 }
 
 
@@ -435,8 +435,8 @@ void draw_colliders(int camera) {
             draw_line(camera, pos, sum(pos, half_width(i)), 0.05f, COLOR_WHITE);
         } else {
             Color color = get_color(0.0, 1.0, 1.0, 0.25);
-            float width = get_collider_width(i);
-            float height = get_collider_height(i);
+            float width = collider_width(i);
+            float height = collider_height(i);
             draw_rectangle(camera, get_position(i), width, height, get_angle(i), color);
         }
     }

@@ -3,6 +3,8 @@
 #include "game.h"
 
 
+void create_prefabs();
+
 void create_editor_menu();
 
 void update_editor(float time_step);

@@ -19,4 +19,6 @@ void save_game(ButtonText map_name);
 
 void load_game(ButtonText map_name);
 
+void save_prefab(Filename filename, List* entities);
+
 int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scale);

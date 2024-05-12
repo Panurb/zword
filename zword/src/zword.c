@@ -16,6 +16,7 @@
 #include "settings.h"
 #include "menu.h"
 #include "interface.h"
+#include "editor.h"
 
 
 static float time_step = 1.0f / 60.0f;
@@ -62,6 +63,7 @@ int main(int argc, char* argv[]) {
     load_resources();
     create_game();
     create_menu();
+    create_prefabs();
 
     #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop(main_loop, 0, true);
