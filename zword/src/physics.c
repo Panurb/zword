@@ -41,9 +41,6 @@ void update_physics(float time_step) {
             }
         }
 
-        CoordinateComponent* coord = CoordinateComponent_get(i);
-        if (coord->parent != -1) continue;
-
         if (physics->collision.entities->size > 0) {
             physics->velocity = physics->collision.velocity;
 
@@ -57,9 +54,11 @@ void update_physics(float time_step) {
         Vector2f delta_pos = sum(physics->collision.overlap, mult(time_step, physics->velocity));
         float delta_angle = time_step * physics->angular_velocity;
 
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         JointComponent* joint = JointComponent_get(i);
         if (joint && joint->parent != -1) {
-            Vector2f r = diff(get_position(joint->parent), get_position(i));
+            Vector2f parent_position = CoordinateComponent_get(joint->parent)->position;
+            Vector2f r = diff(parent_position, coord->position);
             float d = norm(r);
 
             Vector2f f = zeros();
@@ -72,10 +71,11 @@ void update_physics(float time_step) {
             
             delta_angle = angle_diff(polar_angle(r), coord->angle);
 
-            float angle = signed_angle(r, polar_to_cartesian(1.0f, get_angle(joint->parent)));
+            float parent_angle = CoordinateComponent_get(joint->parent)->angle;
+            float angle = signed_angle(r, polar_to_cartesian(1.0f, parent_angle));
             if (fabsf(angle) > joint->max_angle) {
-                r = polar_to_cartesian(d, get_angle(joint->parent) - sign(angle) * joint->max_angle);
-                delta_pos = sum(delta_pos, diff(diff(get_position(joint->parent), r), coord->position));
+                r = polar_to_cartesian(d, parent_angle - sign(angle) * joint->max_angle);
+                delta_pos = sum(delta_pos, diff(diff(parent_position, r), coord->position));
             }
         }
 

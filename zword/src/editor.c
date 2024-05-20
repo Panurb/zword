@@ -145,58 +145,6 @@ void reset_editor_ids() {
 }
 
 
-void create_prefabs() {
-    // TODO: remove
-    for (int i = 0; i < LENGTH(object_names); i++) {
-        printf("creating prefab: %s\n", object_names[i]);
-        game_data->components->added_entities = List_create();
-        create_object(object_names[i], zeros(), 0.0f);
-        String path;
-        snprintf(path, STRING_SIZE, "objects/%s", object_names[i]);
-        save_prefab(path, game_data->components->added_entities);
-        destroy_entities(game_data->components->added_entities);
-        List_delete(game_data->components->added_entities);
-        game_data->components->added_entities = NULL;
-    }
-
-    for (int i = 0; i < LENGTH(tile_names); i++) {
-        printf("creating prefab: %s\n", tile_names[i]);
-        game_data->components->added_entities = List_create();
-        create_tile(i, zeros(), 0.0f, 1.0f, 1.0f);
-        String path;
-        snprintf(path, STRING_SIZE, "tiles/%s", tile_names[i]);
-        save_prefab(path, game_data->components->added_entities);
-        destroy_entities(game_data->components->added_entities);
-        List_delete(game_data->components->added_entities);
-        game_data->components->added_entities = NULL;
-    }
-
-    for (int i = 0; i < LENGTH(creature_names); i++) {
-        printf("creating prefab: %s\n", creature_names[i]);
-        game_data->components->added_entities = List_create();
-        create_object(creature_names[i], zeros(), 0.0f);
-        String path;
-        snprintf(path, STRING_SIZE, "creatures/%s", creature_names[i]);
-        save_prefab(path, game_data->components->added_entities);
-        destroy_entities(game_data->components->added_entities);
-        List_delete(game_data->components->added_entities);
-        game_data->components->added_entities = NULL;
-    }
-
-    for (int i = 0; i < LENGTH(weapon_names); i++) {
-        printf("creating prefab: %s\n", weapon_names[i]);
-        game_data->components->added_entities = List_create();
-        create_object(weapon_names[i], zeros(), 0.0f);
-        String path;
-        snprintf(path, STRING_SIZE, "weapons/%s", weapon_names[i]);
-        save_prefab(path, game_data->components->added_entities);
-        destroy_entities(game_data->components->added_entities);
-        List_delete(game_data->components->added_entities);
-        game_data->components->added_entities = NULL;
-    }
-}
-
-
 bool category_selected(int entity) {
     if (WaypointComponent_get(entity)) {
         return selected_categories[CATEGORY_WAYPOINTS];

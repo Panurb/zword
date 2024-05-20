@@ -63,7 +63,6 @@ int main(int argc, char* argv[]) {
     load_resources();
     create_game();
     create_menu();
-    create_prefabs();
 
     #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop(main_loop, 0, true);

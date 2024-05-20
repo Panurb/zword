@@ -2,20 +2,29 @@
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
 				"x":	-1,
 				"y":	-8.7422776573475858e-08,
-				"angle":	3.1415925025939941
+				"angle":	3.1415925025939941,
+				"parent": 0
 			},
 			"Image":	{
 				"filename":	"hinge",
 				"layer":	7
 			}
 		}, {
-			"id":	1,
+			"id":	2,
 			"Coordinate":	{
 				"x":	0,
 				"y":	0,
-				"angle":	3.1415925025939941
+				"angle":	3.1415925025939941,
+				"parent": 0
 			},
 			"Image":	{
 				"filename":	"door",
@@ -38,7 +47,7 @@
 				"hit_sound":	"wood_hit"
 			},
 			"Joint":	{
-				"parent":	0,
+				"parent":	1,
 				"min_length":	1,
 				"max_length":	1,
 				"strength":	1,
