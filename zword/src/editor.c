@@ -40,6 +40,9 @@ typedef enum {
 } EntityCategory;
 
 
+static bool shift_down = false;
+static bool ctrl_down = false;
+
 static int selection_box = -1;
 static Vector2f tile_start = { 0.0f, 0.0f };
 static Vector2f tile_end = { 0.0f, 0.0f };
@@ -66,73 +69,12 @@ char* category_names[] = { "terrain", "floor", "decals", "walls", "objects", "wa
 bool selected_categories[] = { true, true, true, true, true, true };
 
 static int selected_tile = 0;
-static ButtonText tile_names[] = {
-    "altar",
-    "beach",
-    "beach corner",
-    "board",
-    "brick",
-    "fence",
-    "grass",
-    "level_end",
-    "roof",
-    "spawner",
-    "stone",
-    "tiles",
-    "water",
-    "wood"
-};
 
 static ButtonText selected_object_name = "";
 static float selected_object_width = 1.0f;
 static float selected_object_height = 1.0f;
-static ButtonText object_names[] = {
-    "bandage",
-    "bed",
-    "bench",
-    "blood",
-    "candle",
-    "car",
-    "desk",
-    "door",
-    "fire",
-    "flashlight",
-    "gas",
-    "hay bale",
-    "hole",
-    "lamp",
-    "rock",
-    "sink",
-    "stove",
-    "table",
-    "toilet",
-    "tree",
-    "tutorial",
-    "uranium",
-    "waypoint",
-};
-
-static ButtonText creature_names[] = {
-    "big boy",
-    "boss",
-    "farmer",
-    "player",
-    "priest",
-    "zombie"
-};
-
-static ButtonText weapon_names[] = {
-    "ammo pistol",
-    "ammo rifle",
-    "ammo shotgun",
-    "assault rifle",
-    "axe",
-    "pistol",
-    "sawed-off",
-    "shotgun",
-    "smg",
-    "sword"
-};
+static float selected_object_angle = 0.0f;
+static float selected_object_scale = 1.0f;
 
 
 void reset_editor_ids() {
@@ -194,7 +136,6 @@ void select_object(int entity) {
     printf("selected object: %s\n", selected_object_name);
 
     int i = load_prefab(selected_object_name, zeros(), 0.0f, ones());
-    // int i = create_object(selected_object_name, zeros(), 0.0f);
     ColliderComponent* collider = ColliderComponent_get(i);
     if (collider) {
         selected_object_width = collider->width;
@@ -702,7 +643,8 @@ void input_tool_object(SDL_Event event) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             game_data->components->added_entities = List_create();
             Vector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            load_prefab(selected_object_name, pos, 0.0f, ones());
+            Vector2f scale = vec(selected_object_scale, selected_object_scale);
+            load_prefab(selected_object_name, pos, selected_object_angle, scale);
             ListNode* node;
             FOREACH(node, game_data->components->added_entities) {
                 if (ColliderComponent_get(node->value)) {
@@ -711,6 +653,15 @@ void input_tool_object(SDL_Event event) {
             }
             List_delete(game_data->components->added_entities);
             game_data->components->added_entities = NULL;
+        }
+    } else if (event.type == SDL_MOUSEWHEEL) {
+        printf("wheel: %d\n", event.wheel.y);
+        printf("shift: %d\n", shift_down);
+        printf("ctrl: %d\n", ctrl_down);
+        if (shift_down) {
+            selected_object_angle += M_PI_4 * event.wheel.y;
+        } else if (ctrl_down) {
+            selected_object_scale = clamp(selected_object_scale * powf(2.0f, event.wheel.y), 0.1f, 10.0f);
         }
     }
 }
@@ -785,7 +736,9 @@ void input_editor(SDL_Event event) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
-        cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.wheel.y), 10.0f, 100.0f);
+        if (!shift_down && !ctrl_down) {
+            cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.wheel.y), 10.0f, 100.0f);
+        }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_RIGHT) {
             tool = TOOL_SELECT;
@@ -824,6 +777,23 @@ void input_editor(SDL_Event event) {
                 break;
             case SDLK_MINUS:
                 grid_size_index = mini(grid_size_index + 1, LENGTH(grid_sizes) - 1);
+                break;
+            case SDLK_LSHIFT:
+                shift_down = true;
+                break;
+            case SDLK_LCTRL:
+                ctrl_down = true;
+                break;
+            default:
+                break;
+        }
+    } else if (event.type == SDL_KEYUP) {
+        switch (event.key.keysym.sym) {
+            case SDLK_LSHIFT:
+                shift_down = false;
+                break;
+            case SDLK_LCTRL:
+                ctrl_down = false;
                 break;
             default:
                 break;
@@ -873,7 +843,9 @@ void draw_editor() {
             break;
         case TOOL_OBJECT:
             draw_rectangle_outline(game_data->camera, mouse_grid,
-                selected_object_width, selected_object_height, 0.0f, 0.05f, COLOR_WHITE);
+                selected_object_width * selected_object_scale, 
+                selected_object_height * selected_object_scale, 
+                selected_object_angle, 0.05f, COLOR_WHITE);
             break;
     }
 
