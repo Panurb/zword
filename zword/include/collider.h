@@ -33,6 +33,9 @@ static const int COLLISION_MATRIX[18][18] = { { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                               { 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },     // DOORS
                                               { 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } };   // ENERGY
 
+float collider_width(int i);
+float collider_height(int i);
+float collider_radius(int i);
 
 bool point_inside_collider(int i, Vector2f point);
 

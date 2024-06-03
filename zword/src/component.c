@@ -1000,7 +1000,6 @@ Vector2f get_position(int entity) {
     return position;
 }
 
-
 float get_angle(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     float angle = coord->angle;

@@ -104,6 +104,20 @@ static const char* IMAGES[] = {
 };
 
 
+float image_width(int entity) {
+    Vector2f scale = get_scale(entity);
+    ImageComponent* image = ImageComponent_get(entity);
+    return scale.x * image->width;
+}
+
+
+float image_height(int entity) {
+    Vector2f scale = get_scale(entity);
+    ImageComponent* image = ImageComponent_get(entity);
+    return scale.y * image->height;
+}
+
+
 Resolution get_texture_size(Filename filename) {
     if (filename[0] == '\0') {
         return (Resolution) { 0, 0 };
@@ -401,5 +415,5 @@ bool point_inside_image(int entity, Vector2f point) {
     Vector2f position = get_position(entity);
     float angle = get_angle(entity);
     ImageComponent* image = ImageComponent_get(entity);
-    return point_inside_rectangle(position, angle, image->width, image->height, point);
+    return point_inside_rectangle(position, angle, image_width(entity), image_height(entity), point);
 }

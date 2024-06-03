@@ -142,6 +142,8 @@ void reset_editor_ids() {
     weapons_window_id = -1;
     editor_settings_window_id = -1;
     prefabs_window_id = -1;
+    entity_settings_id = -1;
+    entity_settings_entity = -1;
 }
 
 
@@ -345,6 +347,14 @@ void change_light_b(int slider, int value) {
 }
 
 
+void ungroup(int entity) {
+    UNUSED(entity);
+    int root = get_root(entity_settings_entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity_settings_entity);
+    coord->prefab[0] = '\0';
+}
+
+
 void open_entity_settings(int entity) {
     if (entity_settings_id != -1) {
         close_entity_settings(entity);
@@ -357,6 +367,14 @@ void open_entity_settings(int entity) {
     entity_settings_id = create_window(vec(0.0f, 0.0f), buffer, 2, close_entity_settings);
     int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 2, 5);
     add_child(entity_settings_id, container);
+
+    Filename prefab;
+    prefab[0] = '\0';
+    int root = get_root(entity);
+    strcpy(prefab, CoordinateComponent_get(root)->prefab);
+    int left = create_button("Ungroup", zeros(), ungroup);
+    int right = create_label(prefab, zeros());
+    add_row_to_container(container, left, right);
 
     LightComponent* light = LightComponent_get(entity);
     if (light) {
@@ -434,6 +452,8 @@ void destroy_selections() {
     ListNode* node;
     FOREACH (node, selections) {
         int i = node->value;
+        if (get_parent(i) != -1) continue;
+
         if (ColliderComponent_get(i)) {
             clear_grid(i);
         }
@@ -654,9 +674,13 @@ void input_tool_tile(SDL_Event event) {
         if (width > 0.0f && height > 0.0f) {
             CoordinateComponent* coord = CoordinateComponent_get(entity);
             ColliderComponent* collider = ColliderComponent_get(entity);
+            ImageComponent* image = ImageComponent_get(entity);
             if (collider) {
                 coord->scale.x = width / collider->width;
                 coord->scale.y = height / collider->height;
+            } else if (image) {
+                coord->scale.x = width / image->width;
+                coord->scale.y = height / image->height;
             }
         }
 
@@ -868,12 +892,12 @@ void draw_editor() {
                     draw_sprite_outline(game_data->camera, image->texture_index, image->width, image->height, 0, pos, 
                         angle, get_scale(i));
                 } else {
-                    draw_rectangle_outline(game_data->camera, pos, image->width, 
-                        image->height, angle, 0.05f, COLOR_WHITE);
+                    draw_rectangle_outline(game_data->camera, pos, image_width(i), image_height(i), 
+                        angle, 0.05f, COLOR_WHITE);
                 }
             } else if (collider) {
-                draw_rectangle_outline(game_data->camera, pos, collider->width, 
-                    collider->height, angle, 0.05f, COLOR_WHITE);
+                draw_rectangle_outline(game_data->camera, pos, collider_width(i), 
+                    collider_height(i), angle, 0.05f, COLOR_WHITE);
             } else {
                 draw_circle(game_data->camera, pos, 0.1f, COLOR_WHITE);
             }

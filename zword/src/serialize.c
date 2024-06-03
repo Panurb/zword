@@ -777,6 +777,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
 int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     cJSON* coord_json = cJSON_GetObjectItem(entity_json, "Coordinate");
     Filename prefab;
+    prefab[0] = '\0';
     deserialize_string(coord_json, "prefab", prefab, "");
     Vector2f pos;
     pos.x = deserialize_float(coord_json, "x", 0.0f);

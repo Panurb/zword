@@ -10,6 +10,9 @@
 #define PIXELS_PER_UNIT 128
 
 
+float image_width(int entity);
+float image_height(int entity);
+
 int create_decal(Vector2f pos, Filename filename, float lifetime);
 
 void load_textures();

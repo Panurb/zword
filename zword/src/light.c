@@ -143,18 +143,18 @@ void draw_shadows(int camera) {
 
         Vector2f start = get_position(i);
 
-        float radius = 1.5f * collider->radius;
+        float radius = 1.5f * collider_radius(i);
         if (!on_screen(camera, start, 2.0f * radius, 2.0f * radius)) {
             continue;
         }
         
         switch (collider->type) {
             case COLLIDER_CIRCLE: {
-                draw_shadow_circle(camera, start, radius);
+                draw_shadow_circle(camera, start, collider_radius(i));
                 break;
             } case COLLIDER_RECTANGLE: {
                 float angle = get_angle(i);
-                draw_shadow_rectangle(camera, start, collider->width, collider->height, angle);
+                draw_shadow_rectangle(camera, start, collider_width(i), collider_height(i), angle);
                 break;
             }
         }

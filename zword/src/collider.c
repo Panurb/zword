@@ -36,7 +36,7 @@ float collider_height(int i) {
 float collider_radius(int i) {
     Vector2f scale = get_scale(i);
     ColliderComponent* col = ColliderComponent_get(i);
-    return col->radius * scale.x;
+    return col->radius * norm(scale);
 }
 
 
@@ -240,15 +240,15 @@ Vector2f overlap_rectangle_image(int i, int j) {
     Vector2f hw_i = polar_to_cartesian(1.0, get_angle(i));
     Vector2f hw_j = polar_to_cartesian(1.0, get_angle(j));
 
-    float overlaps[4];
+    float overlaps[4] = { 0.0, 0.0, 0.0, 0.0 };
     Vector2f axes[4] = { hw_i, perp(hw_i), hw_j, perp(hw_j) };
 
     Vector2f a = get_position(i);
     Vector2f b = get_position(j);
 
     for (int k = 0; k < 4; k++) {
-        Vector2f hw = polar_to_cartesian(0.5 * image->width, get_angle(i));
-        Vector2f hh = polar_to_cartesian(0.5 * image->height, get_angle(i) + 0.5 * M_PI);
+        Vector2f hw = polar_to_cartesian(0.5 * image_width(j), get_angle(j));
+        Vector2f hh = polar_to_cartesian(0.5 * image_height(j), get_angle(j) + 0.5 * M_PI);
         float image_axis_half_width = fabs(dot(hw, axes[k])) + fabs(dot(hh, axes[k]));
 
         overlaps[k] = axis_overlap(axis_half_width(i, axes[k]), a,

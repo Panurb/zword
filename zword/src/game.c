@@ -177,7 +177,6 @@ void start_game(Filename map_name) {
 
 void end_game() {
     ColliderGrid_clear(game_data->grid);
-    CameraComponent* cam = CameraComponent_get(game_data->camera);
     ComponentData_clear();
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
