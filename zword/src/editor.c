@@ -616,12 +616,12 @@ void input_tool_tile(SDL_Event event) {
             CoordinateComponent* coord = CoordinateComponent_get(entity);
             ColliderComponent* collider = ColliderComponent_get(entity);
             ImageComponent* image = ImageComponent_get(entity);
-            if (collider) {
-                coord->scale.x = width / collider->width;
-                coord->scale.y = height / collider->height;
-            } else if (image) {
+            if (image) {
                 coord->scale.x = width / image->width;
                 coord->scale.y = height / image->height;
+            } else if (collider) {
+                coord->scale.x = width / collider->width;
+                coord->scale.y = height / collider->height;
             }
         }
 
@@ -655,13 +655,10 @@ void input_tool_object(SDL_Event event) {
             game_data->components->added_entities = NULL;
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
-        printf("wheel: %d\n", event.wheel.y);
-        printf("shift: %d\n", shift_down);
-        printf("ctrl: %d\n", ctrl_down);
         if (shift_down) {
             selected_object_angle += M_PI_4 * event.wheel.y;
         } else if (ctrl_down) {
-            selected_object_scale = clamp(selected_object_scale * powf(2.0f, event.wheel.y), 0.1f, 10.0f);
+            selected_object_scale = clamp(selected_object_scale * powf(1.1f, event.wheel.y), 0.1f, 10.0f);
         }
     }
 }

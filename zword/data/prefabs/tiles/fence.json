@@ -11,7 +11,7 @@
 			},
 			"Collider":	{
 				"type":	1,
-				"width":	1,
+				"width":	2,
 				"height":	1,
 				"group":	8
 			}

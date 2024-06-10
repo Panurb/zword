@@ -386,7 +386,7 @@ void draw_spawners() {
             Color color = get_color(1.0f, 0.0f, 1.0f, 0.25f);
             Vector2f pos = get_position(i);
             float angle = get_angle(i);
-            draw_rectangle(game_data->camera, pos, col->width, col->height, angle, color);
+            draw_rectangle(game_data->camera, pos, collider_width(i), collider_height(i), angle, color);
             draw_text(game_data->camera, pos, "spawner", 20, COLOR_MAGENTA);
         }
     }

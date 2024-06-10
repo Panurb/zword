@@ -617,6 +617,10 @@ bool input_widgets(int camera, SDL_Event event) {
 
             input_detected = true;
         }
+
+        if (widget->on_change && input_detected) {
+            widget->on_change(top_textbox, 0);
+        }
     }
 
     return input_detected;

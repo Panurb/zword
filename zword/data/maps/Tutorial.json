@@ -1,192 +1,255 @@
 {
-	"game_mode":	2,
+	"game_mode":	0,
 	"ambient_light":	0.5,
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
 				"x":	-8,
-				"y":	-8
-			},
-			"Image":	{
-				"filename":	"board_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	16,
-				"group":	12
+				"y":	0.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	16
 			}
 		}, {
 			"id":	1,
 			"Coordinate":	{
-				"x":	-13.5,
-				"y":	-0.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	5,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	5,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	-15.5,
+				"y":	8.5,
+				"angle":	6.2831854820251465,
+				"prefab":	"tiles/brick",
+				"scale_y":	15
 			}
 		}, {
 			"id":	2,
 			"Coordinate":	{
-				"x":	-15.5,
-				"y":	-8.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	1,
-				"height":	15,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	15,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	-0.5,
+				"y":	8.5,
+				"prefab":	"tiles/brick",
+				"scale_y":	15
 			}
 		}, {
 			"id":	3,
 			"Coordinate":	{
-				"x":	-0.5,
-				"y":	-7.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	1,
-				"height":	15,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	15,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	-12,
+				"y":	15.5,
+				"angle":	6.2831854820251465,
+				"prefab":	"tiles/brick",
+				"scale_x":	6
 			}
 		}, {
 			"id":	4,
 			"Coordinate":	{
-				"x":	-3.5,
-				"y":	-0.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	5,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	5,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	-4,
+				"y":	15.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	6
 			}
 		}, {
 			"id":	5,
 			"Coordinate":	{
-				"x":	-7,
-				"y":	-28.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"player",
-				"width":	1,
-				"height":	1,
-				"layer":	11
-			},
-			"Physics":	{
-				"mass":	1,
-				"bounce":	0,
-				"max_speed":	5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	3
-			},
-			"Player":	{
-				"inventory":	[-1, -1, -1, -1],
-				"ammo":	[-1, -1, -1, -1],
-				"arms":	6
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"player_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
+				"x":	-8,
+				"y":	15.5,
+				"prefab":	"objects/door"
 			}
 		}, {
 			"id":	6,
 			"Coordinate":	{
-				"x":	0.75,
-				"y":	0,
-				"parent":	5
-			},
-			"Image":	{
-				"filename":	"",
-				"width":	0,
-				"height":	0,
-				"layer":	10
-			},
-			"Animation":	{
-				"frames":	1,
-				"framerate":	0,
-				"play_once":	1
+				"x":	-8,
+				"y":	4,
+				"prefab":	"creatures/player"
 			}
 		}, {
 			"id":	7,
 			"Coordinate":	{
-				"x":	-7,
-				"y":	-27,
-				"angle":	1.5707964897155762
+				"x":	-8,
+				"y":	8,
+				"prefab":	"tiles/board",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	8,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	2,
+				"angle":	3.1415927410125732,
+				"prefab":	"objects/bed"
+			}
+		}, {
+			"id":	9,
+			"Coordinate":	{
+				"x":	-2.5,
+				"y":	2.5,
+				"angle":	50.37823486328125,
+				"prefab":	"objects/table"
+			}
+		}, {
+			"id":	10,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	24,
+				"prefab":	"tiles/board",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	11,
+			"Coordinate":	{
+				"x":	-15.5,
+				"y":	24,
+				"prefab":	"tiles/brick",
+				"scale_y":	16
+			}
+		}, {
+			"id":	12,
+			"Coordinate":	{
+				"x":	-0.5,
+				"y":	24,
+				"prefab":	"tiles/brick",
+				"scale_y":	16
+			}
+		}, {
+			"id":	13,
+			"Coordinate":	{
+				"x":	-13,
+				"y":	31.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	4
+			}
+		}, {
+			"id":	14,
+			"Coordinate":	{
+				"x":	-3,
+				"y":	31.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	4
+			}
+		}, {
+			"id":	15,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	31.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	16,
+			"Coordinate":	{
+				"x":	-9.5,
+				"y":	30.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	17,
+			"Coordinate":	{
+				"x":	-6.5,
+				"y":	30.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	18,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	18,
+				"angle":	93.034172058105469,
+				"prefab":	"weapons/axe"
+			}
+		}, {
+			"id":	19,
+			"Coordinate":	{
+				"x":	-9.5,
+				"y":	14.5,
+				"angle":	66.1630172729492,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	20,
+			"Coordinate":	{
+				"x":	-6.5,
+				"y":	14.5,
+				"angle":	67.7338104248047,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	21,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	40,
+				"angle":	6.2831854820251465,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	22,
+			"Coordinate":	{
+				"x":	-7.5,
+				"y":	47.5,
+				"prefab":	"tiles/wood",
+				"scale_x":	15
+			}
+		}, {
+			"id":	23,
+			"Coordinate":	{
+				"x":	-15.5,
+				"y":	40,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/wood",
+				"scale_x":	16
+			}
+		}, {
+			"id":	24,
+			"Coordinate":	{
+				"x":	-14,
+				"y":	45.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/hay bale"
+			}
+		}, {
+			"id":	25,
+			"Coordinate":	{
+				"x":	-12,
+				"y":	45.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/hay bale"
+			}
+		}, {
+			"id":	26,
+			"Coordinate":	{
+				"x":	-13.5,
+				"y":	43,
+				"prefab":	"objects/hay bale"
+			}
+		}, {
+			"id":	27,
+			"Coordinate":	{
+				"x":	-6,
+				"y":	42,
+				"angle":	73.8260498046875,
+				"prefab":	"creatures/zombie"
+			}
+		}, {
+			"id":	28,
+			"Coordinate":	{
+				"x":	-11,
+				"y":	39,
+				"angle":	73.8260498046875,
+				"prefab":	"creatures/zombie"
+			}
+		}, {
+			"id":	29,
+			"Coordinate":	{
+				"x":	-6,
+				"y":	37,
+				"angle":	73.8260498046875,
+				"prefab":	"creatures/zombie"
+			}
+		}, {
+			"id":	30,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	6
 			},
 			"Collider":	{
 				"type":	0,
@@ -199,951 +262,821 @@
 				"size":	30
 			}
 		}, {
-			"id":	8,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	-24
-			},
-			"Image":	{
-				"filename":	"board_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	16,
-				"group":	12
-			}
-		}, {
-			"id":	9,
-			"Coordinate":	{
-				"x":	-15.5,
-				"y":	-24
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	1,
-				"height":	16,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	16,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	10,
-			"Coordinate":	{
-				"x":	-7.5,
-				"y":	-31.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	15,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	15,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	11,
-			"Coordinate":	{
-				"x":	-0.5,
-				"y":	-23
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	1,
-				"height":	16,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	16,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	12,
-			"Coordinate":	{
-				"x":	-12,
-				"y":	-16.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	6,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	6,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	13,
-			"Coordinate":	{
-				"x":	-4,
-				"y":	-16.5
-			},
-			"Image":	{
-				"filename":	"brick_tile",
-				"width":	6,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	6,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	14,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	-12,
-				"angle":	1.5707964897155762
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2,
-				"height":	2,
-				"group":	11
-			},
-			"Text":	{
-				"source_string":	"[PICK_UP] to pick up item.",
-				"size":	30
-			}
-		}, {
-			"id":	15,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	-3
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2,
-				"height":	2,
-				"group":	11
-			},
-			"Text":	{
-				"source_string":	"[ATTACK] to attack.",
-				"size":	30
-			}
-		}, {
-			"id":	16,
-			"Coordinate":	{
-				"x":	-13,
-				"y":	-30,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"wood_tile",
-				"width":	2,
-				"height":	4,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	2,
-				"height":	4,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	17,
-			"Coordinate":	{
-				"x":	-13,
-				"y":	-30,
-				"angle":	1.1106362342834473
-			},
-			"Image":	{
-				"filename":	"lamp",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	10,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	0.5,
-				"speed":	5,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	18,
-			"Coordinate":	{
-				"x":	-7,
-				"y":	-30,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"bed",
-				"width":	4,
-				"height":	2,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3.7999999523162842,
-				"height":	1.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	19,
-			"Coordinate":	{
-				"x":	-9.5,
-				"y":	-17.5,
-				"angle":	4.78923463821411
-			},
-			"Image":	{
-				"filename":	"candle",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	7.5,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.25,
-				"loop":	1
-			}
-		}, {
-			"id":	20,
-			"Coordinate":	{
-				"x":	-6.5,
-				"y":	-17.5,
-				"angle":	4.8318037986755371
-			},
-			"Image":	{
-				"filename":	"candle",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	7.5,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.25,
-				"loop":	1
-			}
-		}, {
-			"id":	21,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	-16.5,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"door",
-				"width":	2,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	2,
-				"height":	0.300000011920929,
-				"group":	16
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			},
-			"Joint":	{
-				"parent":	22,
-				"min_length":	1,
-				"max_length":	1,
-				"strength":	1,
-				"max_angle":	1.5707963705062866
-			}
-		}, {
-			"id":	22,
-			"Coordinate":	{
-				"x":	-9,
-				"y":	-16.5,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"hinge",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			}
-		}, {
-			"id":	23,
-			"Coordinate":	{
-				"x":	-10,
-				"y":	-1.5,
-				"angle":	4.7123894691467285
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	24,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	23
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	25,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	23
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	26,
-			"Coordinate":	{
-				"x":	-7,
-				"y":	-1.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	27,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	26
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	28,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	26
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	29,
-			"Coordinate":	{
-				"x":	-8.5,
-				"y":	-0.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	30,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	29
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
 			"id":	31,
 			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	29
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
+				"x":	-0.5,
+				"y":	38,
+				"angle":	4.71238899230957,
+				"prefab":	"tiles/wood",
+				"scale_x":	12
 			}
 		}, {
 			"id":	32,
 			"Coordinate":	{
-				"x":	-2.5,
-				"y":	-29.5,
-				"angle":	2.2007546424865723
-			},
-			"Image":	{
-				"filename":	"table",
-				"width":	3,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.7999999523162842,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
+				"x":	-2,
+				"y":	46,
+				"angle":	9.42477798461914,
+				"prefab":	"objects/desk"
 			}
 		}, {
 			"id":	33,
 			"Coordinate":	{
-				"x":	-0.600000023841858,
-				"y":	0,
-				"parent":	32
-			},
-			"Image":	{
-				"filename":	"table_destroyed",
-				"width":	2,
-				"height":	3,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2000000476837158,
-				"height":	1.7999999523162842,
-				"group":	15,
-				"enabled":	0
+				"x":	0,
+				"y":	45,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/desk"
 			}
 		}, {
 			"id":	34,
 			"Coordinate":	{
-				"x":	0.600000023841858,
-				"y":	0,
-				"angle":	3.1415925025939941,
-				"parent":	32
-			},
-			"Image":	{
-				"filename":	"table_destroyed",
-				"width":	2,
-				"height":	3,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2000000476837158,
-				"height":	1.7999999523162842,
-				"group":	15,
-				"enabled":	0
+				"x":	8,
+				"y":	40,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
 			}
 		}, {
 			"id":	35,
 			"Coordinate":	{
-				"x":	-8,
-				"y":	8
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	0
+				"x":	24,
+				"y":	40,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
 			}
 		}, {
 			"id":	36,
 			"Coordinate":	{
-				"x":	-15.5,
-				"y":	7.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"wood_tile",
-				"width":	15,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	15,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
+				"x":	16,
+				"y":	38.5,
+				"prefab":	"tiles/fence",
+				"scale_x":	16
 			}
 		}, {
 			"id":	37,
 			"Coordinate":	{
-				"x":	-13,
-				"y":	5,
-				"angle":	3.8785967826843262
-			},
-			"Image":	{
-				"filename":	"zombie",
-				"width":	1,
-				"height":	1,
-				"layer":	9
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	4
-			},
-			"Enemy":	{
-				"weapon":	38
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"zombie_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
+				"x":	14,
+				"y":	47.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	28
 			}
 		}, {
 			"id":	38,
 			"Coordinate":	{
-				"x":	0.5,
-				"y":	0,
-				"parent":	37
-			},
-			"Weapon":	{
-				"fire_rate":	0.5,
-				"recoil":	0,
-				"damage":	25,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0,
-				"reload_time":	0,
-				"range":	1,
-				"sound_range":	1,
-				"spread":	1.0995573997497559,
-				"shots":	7,
-				"ammo_type":	0,
-				"sound":	"axe",
-				"automatic":	false
+				"x":	8,
+				"y":	56,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
 			}
 		}, {
 			"id":	39,
 			"Coordinate":	{
-				"x":	-9,
-				"y":	11,
-				"angle":	4.9616208076477051
-			},
-			"Image":	{
-				"filename":	"zombie",
-				"width":	1,
-				"height":	1,
-				"layer":	9
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	4
-			},
-			"Enemy":	{
-				"weapon":	40
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"zombie_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
+				"x":	24,
+				"y":	56,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
 			}
 		}, {
 			"id":	40,
 			"Coordinate":	{
 				"x":	0.5,
-				"y":	0,
-				"parent":	39
-			},
-			"Weapon":	{
-				"fire_rate":	0.5,
-				"recoil":	0,
-				"damage":	25,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0,
-				"reload_time":	0,
-				"range":	1,
-				"sound_range":	1,
-				"spread":	1.0995573997497559,
-				"shots":	7,
-				"ammo_type":	0,
-				"sound":	"axe",
-				"automatic":	false
+				"y":	56,
+				"prefab":	"tiles/stone",
+				"scale_y":	16
 			}
 		}, {
 			"id":	41,
 			"Coordinate":	{
-				"x":	-4,
-				"y":	5,
-				"angle":	2.2183957099914551
-			},
-			"Image":	{
-				"filename":	"zombie",
-				"width":	1,
-				"height":	1,
-				"layer":	9
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	4
-			},
-			"Enemy":	{
-				"weapon":	42
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"zombie_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
+				"x":	19.5,
+				"y":	63.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	25
 			}
 		}, {
 			"id":	42,
 			"Coordinate":	{
-				"x":	0.5,
-				"y":	0,
-				"parent":	41
-			},
-			"Weapon":	{
-				"fire_rate":	0.5,
-				"recoil":	0,
-				"damage":	25,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0,
-				"reload_time":	0,
-				"range":	1,
-				"sound_range":	1,
-				"spread":	1.0995573997497559,
-				"shots":	7,
-				"ammo_type":	0,
-				"sound":	"axe",
-				"automatic":	false
+				"x":	32,
+				"y":	56,
+				"prefab":	"tiles/beach",
+				"scale_y":	2
 			}
 		}, {
 			"id":	43,
 			"Coordinate":	{
+				"x":	32,
+				"y":	40,
+				"prefab":	"tiles/beach",
+				"scale_y":	2
+			}
+		}, {
+			"id":	44,
+			"Coordinate":	{
+				"x":	40,
+				"y":	48,
+				"prefab":	"tiles/water",
+				"scale_x":	2,
+				"scale_y":	4
+			}
+		}, {
+			"id":	45,
+			"Coordinate":	{
+				"x":	9,
+				"y":	43,
+				"prefab":	"objects/fire"
+			}
+		}, {
+			"id":	46,
+			"Coordinate":	{
+				"x":	8,
+				"y":	44,
+				"prefab":	"weapons/pistol"
+			}
+		}, {
+			"id":	47,
+			"Coordinate":	{
+				"x":	10,
+				"y":	44,
+				"angle":	35.931720733642578,
+				"prefab":	"weapons/ammo pistol"
+			}
+		}, {
+			"id":	48,
+			"Coordinate":	{
+				"x":	10,
+				"y":	42,
+				"angle":	35.931720733642578,
+				"prefab":	"weapons/ammo pistol"
+			}
+		}, {
+			"id":	49,
+			"Coordinate":	{
+				"x":	7,
+				"y":	52,
+				"angle":	38.14935302734375,
+				"prefab":	"creatures/farmer"
+			}
+		}, {
+			"id":	50,
+			"Coordinate":	{
+				"x":	16,
+				"y":	61,
+				"angle":	38.14935302734375,
+				"prefab":	"creatures/farmer"
+			}
+		}, {
+			"id":	51,
+			"Coordinate":	{
+				"x":	24,
+				"y":	72,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	52,
+			"Coordinate":	{
+				"x":	8,
+				"y":	72,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	53,
+			"Coordinate":	{
+				"x":	15.5,
+				"y":	72,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/fence",
+				"scale_x":	8
+			}
+		}, {
+			"id":	54,
+			"Coordinate":	{
 				"x":	-8,
-				"y":	-21
+				"y":	72,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	55,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	88,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	56,
+			"Coordinate":	{
+				"x":	8,
+				"y":	88,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	57,
+			"Coordinate":	{
+				"x":	2,
+				"y":	62,
+				"angle":	8.33897399902344,
+				"prefab":	"objects/tree",
+				"scale_x":	1.2999999523162842,
+				"scale_y":	1.2999999523162842
+			}
+		}, {
+			"id":	58,
+			"Coordinate":	{
+				"x":	6,
+				"y":	58,
+				"angle":	8.33897399902344,
+				"prefab":	"objects/tree",
+				"scale_x":	1.2999999523162842,
+				"scale_y":	1.2999999523162842
+			}
+		}, {
+			"id":	59,
+			"Coordinate":	{
+				"x":	4,
+				"y":	51,
+				"angle":	8.33897399902344,
+				"prefab":	"objects/tree",
+				"scale_x":	1.2999999523162842,
+				"scale_y":	1.2999999523162842
+			}
+		}, {
+			"id":	60,
+			"Coordinate":	{
+				"x":	14,
+				"y":	51,
+				"angle":	8.33897399902344,
+				"prefab":	"objects/tree",
+				"scale_x":	1.2999999523162842,
+				"scale_y":	1.2999999523162842
+			}
+		}, {
+			"id":	61,
+			"Coordinate":	{
+				"x":	13,
+				"y":	60,
+				"angle":	8.33897399902344,
+				"prefab":	"objects/tree",
+				"scale_x":	1.2999999523162842,
+				"scale_y":	1.2999999523162842
+			}
+		}, {
+			"id":	62,
+			"Coordinate":	{
+				"x":	20,
+				"y":	56,
+				"angle":	8.33897399902344,
+				"prefab":	"objects/tree",
+				"scale_x":	1.2999999523162842,
+				"scale_y":	1.2999999523162842
+			}
+		}, {
+			"id":	63,
+			"Coordinate":	{
+				"x":	5,
+				"y":	67,
+				"angle":	62.110866546630859,
+				"prefab":	"objects/uranium"
+			}
+		}, {
+			"id":	64,
+			"Coordinate":	{
+				"x":	-0.5,
+				"y":	91,
+				"prefab":	"tiles/stone",
+				"scale_y":	10
+			}
+		}, {
+			"id":	65,
+			"Coordinate":	{
+				"x":	-3.5,
+				"y":	86.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	5
+			}
+		}, {
+			"id":	66,
+			"Coordinate":	{
+				"x":	-12.5,
+				"y":	86.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	5
+			}
+		}, {
+			"id":	67,
+			"Coordinate":	{
+				"x":	-15.5,
+				"y":	91,
+				"prefab":	"tiles/stone",
+				"scale_y":	10
+			}
+		}, {
+			"id":	68,
+			"Coordinate":	{
+				"x":	-0.5,
+				"y":	104,
+				"prefab":	"tiles/stone",
+				"scale_y":	16
+			}
+		}, {
+			"id":	69,
+			"Coordinate":	{
+				"x":	-15.5,
+				"y":	104,
+				"prefab":	"tiles/stone",
+				"scale_y":	16
+			}
+		}, {
+			"id":	70,
+			"Coordinate":	{
+				"x":	-12.5,
+				"y":	111.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	5
+			}
+		}, {
+			"id":	71,
+			"Coordinate":	{
+				"x":	-4,
+				"y":	111.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	6
+			}
+		}, {
+			"id":	72,
+			"Coordinate":	{
+				"x":	-10.5,
+				"y":	114.5,
+				"prefab":	"tiles/stone",
+				"scale_y":	5
+			}
+		}, {
+			"id":	73,
+			"Coordinate":	{
+				"x":	-6.5,
+				"y":	114.5,
+				"prefab":	"tiles/stone",
+				"scale_y":	5
+			}
+		}, {
+			"id":	74,
+			"Coordinate":	{
+				"x":	-8.5,
+				"y":	117.5,
+				"prefab":	"tiles/stone",
+				"scale_x":	5
+			}
+		}, {
+			"id":	75,
+			"Coordinate":	{
+				"x":	-8.5,
+				"y":	115.5,
+				"prefab":	"tiles/level_end",
+				"scale_x":	3,
+				"scale_y":	3
+			}
+		}, {
+			"id":	76,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	99,
+				"prefab":	"tiles/tiles",
+				"scale_x":	14,
+				"scale_y":	24
+			}
+		}, {
+			"id":	77,
+			"Coordinate":	{
+				"x":	-8.5,
+				"y":	114,
+				"prefab":	"tiles/tiles",
+				"scale_x":	3,
+				"scale_y":	6
+			}
+		}, {
+			"id":	78,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	89,
+				"angle":	1.5707962512969971,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	79,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	90.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	80,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	92,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	81,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	93.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	82,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	95,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	83,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	96.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	84,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	98,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	85,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	99.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	86,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	101,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	87,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	102.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	88,
+			"Coordinate":	{
+				"x":	-11.5,
+				"y":	104,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	89,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	89,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	90,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	90.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	91,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	92,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	92,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	93.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	93,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	95,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	94,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	96.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	95,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	98,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	96,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	99.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	97,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	101,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	98,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	102.5,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	99,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	104,
+				"angle":	-4.71238899230957,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	100,
+			"Coordinate":	{
+				"x":	-14.5,
+				"y":	103,
+				"angle":	24.693389892578125,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	101,
+			"Coordinate":	{
+				"x":	-14.5,
+				"y":	90.5,
+				"angle":	24.693389892578125,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	102,
+			"Coordinate":	{
+				"x":	-1.5,
+				"y":	87.5,
+				"angle":	24.693389892578125,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	103,
+			"Coordinate":	{
+				"x":	-1.5,
+				"y":	98.5,
+				"angle":	24.693389892578125,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	104,
+			"Coordinate":	{
+				"x":	-1,
+				"y":	75,
+				"angle":	48.1178970336914,
+				"prefab":	"objects/uranium"
+			}
+		}, {
+			"id":	105,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	82,
+				"angle":	44.976303100585938,
+				"prefab":	"objects/uranium"
+			}
+		}, {
+			"id":	106,
+			"Coordinate":	{
+				"x":	-9,
+				"y":	86.5,
+				"angle":	-4.3711388286737929e-08,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	107,
+			"Coordinate":	{
+				"x":	-7,
+				"y":	86.5,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	108,
+			"Coordinate":	{
+				"x":	-1,
+				"y":	74,
+				"angle":	-4.3711388286737929e-08,
+				"prefab":	"weapons/shotgun"
+			}
+		}, {
+			"id":	109,
+			"Coordinate":	{
+				"x":	-9,
+				"y":	85,
+				"angle":	10.465280532836914,
+				"prefab":	"weapons/ammo shotgun"
+			}
+		}, {
+			"id":	110,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	84,
+				"angle":	10.465280532836914,
+				"prefab":	"weapons/ammo shotgun"
+			}
+		}, {
+			"id":	111,
+			"Coordinate":	{
+				"x":	-7,
+				"y":	85,
+				"angle":	10.465280532836914,
+				"prefab":	"weapons/ammo shotgun"
+			}
+		}, {
+			"id":	112,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	109.5,
+				"angle":	19.270410537719727,
+				"prefab":	"creatures/priest"
+			}
+		}, {
+			"id":	113,
+			"Coordinate":	{
+				"x":	13.5,
+				"y":	77.5,
+				"angle":	9.72899532318115,
+				"prefab":	"objects/rock",
+				"scale_x":	1.3655960559844971,
+				"scale_y":	1.3655960559844971
+			}
+		}, {
+			"id":	114,
+			"Coordinate":	{
+				"x":	11.5,
+				"y":	80.5,
+				"angle":	5.01660680770874,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4866083860397339,
+				"scale_y":	1.4866083860397339
+			}
+		}, {
+			"id":	115,
+			"Coordinate":	{
+				"x":	6,
+				"y":	82.5,
+				"angle":	6.5874032974243164,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4866083860397339,
+				"scale_y":	1.4866083860397339
+			}
+		}, {
+			"id":	116,
+			"Coordinate":	{
+				"x":	2.5,
+				"y":	83,
+				"angle":	3.4458103179931641,
+				"prefab":	"objects/rock",
+				"scale_x":	1.3655960559844971,
+				"scale_y":	1.3655960559844971
+			}
+		}, {
+			"id":	117,
+			"Coordinate":	{
+				"x":	1,
+				"y":	85.5,
+				"angle":	9.72899532318115,
+				"prefab":	"objects/rock",
+				"scale_x":	1.3323600292205811,
+				"scale_y":	1.3323600292205811
+			}
+		}, {
+			"id":	118,
+			"Coordinate":	{
+				"x":	8,
+				"y":	81,
+				"angle":	3.4458103179931641,
+				"prefab":	"objects/rock",
+				"scale_x":	1.2063694000244141,
+				"scale_y":	1.2063694000244141
+			}
+		}, {
+			"id":	119,
+			"Coordinate":	{
+				"x":	-1.5,
+				"y":	65,
+				"angle":	6.5874032974243164,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4021556377410889,
+				"scale_y":	1.4021556377410889
+			}
+		}, {
+			"id":	120,
+			"Coordinate":	{
+				"x":	-5,
+				"y":	67,
+				"angle":	6.5874032974243164,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4866082668304443,
+				"scale_y":	1.4866082668304443
+			}
+		}, {
+			"id":	121,
+			"Coordinate":	{
+				"x":	-7,
+				"y":	70,
+				"angle":	3.4458103179931641,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4866082668304443,
+				"scale_y":	1.4866082668304443
+			}
+		}, {
+			"id":	122,
+			"Coordinate":	{
+				"x":	-11,
+				"y":	71,
+				"angle":	6.5874032974243164,
+				"prefab":	"objects/rock",
+				"scale_x":	1.5887961387634277,
+				"scale_y":	1.5887961387634277
+			}
+		}, {
+			"id":	123,
+			"Coordinate":	{
+				"x":	-15,
+				"y":	77,
+				"angle":	3.4458103179931641,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4866082668304443,
+				"scale_y":	1.4866082668304443
+			}
+		}, {
+			"id":	124,
+			"Coordinate":	{
+				"x":	-16,
+				"y":	80.5,
+				"angle":	3.4458103179931641,
+				"prefab":	"objects/rock",
+				"scale_x":	1.7124433517456055,
+				"scale_y":	1.7124433517456055
+			}
+		}, {
+			"id":	125,
+			"Coordinate":	{
+				"x":	-15.5,
+				"y":	84.5,
+				"angle":	3.4458103179931641,
+				"prefab":	"objects/rock",
+				"scale_x":	1.3655960559844971,
+				"scale_y":	1.3655960559844971
+			}
+		}, {
+			"id":	126,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	11
 			},
 			"Collider":	{
 				"type":	0,
@@ -1156,130 +1089,42 @@
 				"size":	30
 			}
 		}, {
-			"id":	44,
+			"id":	127,
 			"Coordinate":	{
 				"x":	-8,
-				"y":	15.5
-			},
-			"Image":	{
-				"filename":	"wood_tile",
-				"width":	16,
-				"height":	1,
-				"layer":	5
+				"y":	20
 			},
 			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	45,
-			"Coordinate":	{
-				"x":	-14,
-				"y":	13.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"hay_bale",
-				"width":	3,
+				"type":	0,
+				"width":	2,
 				"height":	2,
-				"layer":	7
+				"group":	11
 			},
-			"Collider":	{
-				"type":	1,
-				"width":	2.7999999523162842,
-				"height":	1.5,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
+			"Text":	{
+				"source_string":	"[PICK_UP] to pick up item.",
+				"size":	30
 			}
 		}, {
-			"id":	46,
+			"id":	128,
 			"Coordinate":	{
-				"x":	-12,
-				"y":	13.5,
-				"angle":	1.5707964897155762
+				"x":	-8,
+				"y":	29
 			},
-			"Image":	{
-				"filename":	"hay_bale",
-				"width":	3,
+			"Collider":	{
+				"type":	0,
+				"width":	2,
 				"height":	2,
-				"layer":	7
+				"group":	11
 			},
-			"Collider":	{
-				"type":	1,
-				"width":	2.7999999523162842,
-				"height":	1.5,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
+			"Text":	{
+				"source_string":	"[ATTACK] to attack.",
+				"size":	30
 			}
 		}, {
-			"id":	47,
-			"Coordinate":	{
-				"x":	-13.5,
-				"y":	11,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"hay_bale",
-				"width":	3,
-				"height":	2,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	2.7999999523162842,
-				"height":	1.5,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			}
-		}, {
-			"id":	48,
-			"Coordinate":	{
-				"x":	-0.5,
-				"y":	6,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"wood_tile",
-				"width":	12,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	12,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	49,
+			"id":	129,
 			"Coordinate":	{
 				"x":	7,
-				"y":	12
+				"y":	45
 			},
 			"Collider":	{
 				"type":	0,
@@ -1292,10 +1137,10 @@
 				"size":	30
 			}
 		}, {
-			"id":	50,
+			"id":	130,
 			"Coordinate":	{
 				"x":	7,
-				"y":	10
+				"y":	41
 			},
 			"Collider":	{
 				"type":	0,
@@ -1308,1014 +1153,10 @@
 				"size":	30
 			}
 		}, {
-			"id":	51,
-			"Coordinate":	{
-				"x":	-3,
-				"y":	2,
-				"angle":	0.27018070220947266
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.2763147354125977,
-				"height":	3.2763147354125977,
-				"group":	6
-			}
-		}, {
-			"id":	52,
-			"Coordinate":	{
-				"x":	8,
-				"y":	8
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	53,
-			"Coordinate":	{
-				"x":	9,
-				"y":	11
-			},
-			"Image":	{
-				"filename":	"fire",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.699999988079071,
-				"height":	0.699999988079071,
-				"group":	8
-			},
-			"Light":	{
-				"range":	18,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.600000023841858,
-				"loop":	1
-			},
-			"Sound":	{
-				"loop_sound":	"fire"
-			}
-		}, {
-			"id":	54,
-			"Coordinate":	{
-				"x":	8,
-				"y":	15.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	16,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	55,
-			"Coordinate":	{
-				"x":	8,
-				"y":	6.5,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"fence_tile",
-				"width":	16,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	1,
-				"group":	8
-			}
-		}, {
-			"id":	56,
-			"Coordinate":	{
-				"x":	10,
-				"y":	12,
-				"angle":	0.36298942565917969
-			},
-			"Image":	{
-				"filename":	"ammo_pistol",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	1,
-				"size":	24
-			}
-		}, {
-			"id":	57,
-			"Coordinate":	{
-				"x":	10,
-				"y":	10,
-				"angle":	3.5319066047668457
-			},
-			"Image":	{
-				"filename":	"ammo_pistol",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	1,
-				"size":	24
-			}
-		}, {
-			"id":	58,
-			"Coordinate":	{
-				"x":	8,
-				"y":	12
-			},
-			"Image":	{
-				"filename":	"pistol",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	2
-			},
-			"Light":	{
-				"enabled":	0,
-				"range":	2,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	1,
-				"speed":	10
-			},
-			"Particle":	{
-				"type":	1,
-				"start_size":	0.15000000596046448
-			},
-			"Weapon":	{
-				"fire_rate":	10,
-				"recoil":	0.10000000149011612,
-				"damage":	20,
-				"max_magazine":	12,
-				"magazine":	12,
-				"max_recoil":	0.31415927410125732,
-				"reload_time":	2,
-				"range":	25,
-				"sound_range":	25,
-				"spread":	0,
-				"shots":	1,
-				"ammo_type":	1,
-				"sound":	"pistol",
-				"automatic":	false
-			},
-			"Item":	{
-				"size":	1,
-				"attachments":	[-1],
-				"price":	100,
-				"name":	"Glock",
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			}
-		}, {
-			"id":	59,
-			"Coordinate":	{
-				"x":	-2,
-				"y":	14,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"desk",
-				"width":	2,
-				"height":	2,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2999999523162842,
-				"height":	1.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	60,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-0.75,
-				"parent":	59
-			},
-			"Image":	{
-				"filename":	"desk_destroyed",
-				"width":	2,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2999999523162842,
-				"height":	1,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	61,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.25,
-				"parent":	59
-			},
-			"Image":	{
-				"filename":	"desk_debris",
-				"width":	2,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2999999523162842,
-				"height":	1,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	62,
-			"Coordinate":	{
-				"x":	24,
-				"y":	8
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	63,
-			"Coordinate":	{
-				"x":	32,
-				"y":	16
-			},
-			"Image":	{
-				"filename":	"beach_tile",
-				"width":	16,
-				"height":	32,
-				"layer":	1
-			}
-		}, {
-			"id":	64,
-			"Coordinate":	{
-				"x":	8,
-				"y":	24
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	65,
-			"Coordinate":	{
-				"x":	24,
-				"y":	24
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	66,
-			"Coordinate":	{
-				"x":	6,
-				"y":	27,
-				"angle":	4.2573103904724121
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.1666004657745361,
-				"height":	3.1666004657745361,
-				"group":	6
-			}
-		}, {
-			"id":	67,
-			"Coordinate":	{
-				"x":	12.5,
-				"y":	28,
-				"angle":	0.83796262741088867
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.5302286148071289,
-				"height":	3.5302286148071289,
-				"group":	6
-			}
-		}, {
-			"id":	68,
-			"Coordinate":	{
-				"x":	11.5,
-				"y":	20,
-				"angle":	3.5192513465881348
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.5100328922271729,
-				"height":	2.5100328922271729,
-				"group":	6
-			}
-		}, {
-			"id":	69,
-			"Coordinate":	{
-				"x":	4.5,
-				"y":	20.5,
-				"angle":	0.36241388320922852
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.078249454498291,
-				"height":	3.078249454498291,
-				"group":	6
-			}
-		}, {
-			"id":	70,
-			"Coordinate":	{
-				"x":	2.5,
-				"y":	30,
-				"angle":	1.2297148704528809
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.50531792640686,
-				"height":	3.50531792640686,
-				"group":	6
-			}
-		}, {
-			"id":	71,
-			"Coordinate":	{
-				"x":	24,
-				"y":	6.5
-			},
-			"Image":	{
-				"filename":	"fence_tile",
-				"width":	16,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	1,
-				"group":	8
-			}
-		}, {
-			"id":	72,
-			"Coordinate":	{
-				"x":	18,
-				"y":	30.5,
-				"angle":	3.6540541648864746
-			},
-			"Image":	{
-				"filename":	"farmer",
-				"width":	1,
-				"height":	1,
-				"layer":	9
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	4
-			},
-			"Light":	{
-				"range":	15,
-				"angle":	0.78539818525314331,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	0.5,
-				"speed":	10
-			},
-			"Enemy":	{
-				"fov":	0.78539818525314331,
-				"walk_speed":	3,
-				"run_speed":	3,
-				"weapon":	73
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"farmer_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
-			}
-		}, {
-			"id":	73,
-			"Coordinate":	{
-				"x":	0.75,
-				"y":	0,
-				"parent":	72
-			},
-			"Image":	{
-				"filename":	"assault_rifle",
-				"width":	3,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Light":	{
-				"enabled":	0,
-				"range":	4,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	1,
-				"speed":	10
-			},
-			"Particle":	{
-				"type":	1,
-				"start_size":	0.15000000596046448
-			},
-			"Weapon":	{
-				"fire_rate":	0.5,
-				"recoil":	0.05000000074505806,
-				"damage":	10,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0.15707963705062866,
-				"reload_time":	3,
-				"range":	30,
-				"sound_range":	30,
-				"spread":	0,
-				"shots":	1,
-				"ammo_type":	2,
-				"sound":	"assault_rifle",
-				"automatic":	true
-			},
-			"Item":	{
-				"size":	1,
-				"attachments":	[-1],
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			}
-		}, {
-			"id":	74,
-			"Coordinate":	{
-				"x":	0.5,
-				"y":	24
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	1,
-				"height":	16,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	16,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	75,
-			"Coordinate":	{
-				"x":	5,
-				"y":	23,
-				"angle":	3.8063063621521
-			},
-			"Image":	{
-				"filename":	"farmer",
-				"width":	1,
-				"height":	1,
-				"layer":	9
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	4
-			},
-			"Light":	{
-				"range":	15,
-				"angle":	0.78539818525314331,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	0.5,
-				"speed":	10
-			},
-			"Enemy":	{
-				"fov":	0.78539818525314331,
-				"walk_speed":	3,
-				"run_speed":	3,
-				"weapon":	76
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"farmer_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
-			}
-		}, {
-			"id":	76,
-			"Coordinate":	{
-				"x":	0.75,
-				"y":	0,
-				"parent":	75
-			},
-			"Image":	{
-				"filename":	"assault_rifle",
-				"width":	3,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Light":	{
-				"enabled":	0,
-				"range":	4,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	1,
-				"speed":	10
-			},
-			"Particle":	{
-				"type":	1,
-				"start_size":	0.15000000596046448
-			},
-			"Weapon":	{
-				"fire_rate":	0.5,
-				"recoil":	0.05000000074505806,
-				"damage":	10,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0.15707963705062866,
-				"reload_time":	3,
-				"range":	30,
-				"sound_range":	30,
-				"spread":	0,
-				"shots":	1,
-				"ammo_type":	2,
-				"sound":	"assault_rifle",
-				"automatic":	true
-			},
-			"Item":	{
-				"size":	1,
-				"attachments":	[-1],
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			}
-		}, {
-			"id":	77,
-			"Coordinate":	{
-				"x":	19.5,
-				"y":	31.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	25,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	25,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	78,
-			"Coordinate":	{
-				"x":	22,
-				"y":	15.5,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	12,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	12,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	79,
-			"Coordinate":	{
-				"x":	0,
-				"y":	13,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"desk",
-				"width":	2,
-				"height":	2,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2999999523162842,
-				"height":	1.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	80,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-0.75,
-				"parent":	79
-			},
-			"Image":	{
-				"filename":	"desk_destroyed",
-				"width":	2,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2999999523162842,
-				"height":	1,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	81,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.25,
-				"parent":	79
-			},
-			"Image":	{
-				"filename":	"desk_debris",
-				"width":	2,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1.2999999523162842,
-				"height":	1,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	82,
-			"Coordinate":	{
-				"x":	20,
-				"y":	24,
-				"angle":	1.4918417930603027
-			},
-			"Image":	{
-				"filename":	"tree",
-				"width":	3,
-				"height":	3,
-				"layer":	12
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.2706305980682373,
-				"height":	3.2706305980682373,
-				"group":	6
-			}
-		}, {
-			"id":	83,
-			"Coordinate":	{
-				"x":	16,
-				"y":	40
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	32,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	84,
-			"Coordinate":	{
-				"x":	5,
-				"y":	35,
-				"angle":	5.4059138298034668
-			},
-			"Image":	{
-				"filename":	"uranium",
-				"width":	1.0397168397903442,
-				"height":	1.0397168397903442,
-				"layer":	3
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1.0397168397903442,
-				"height":	1.0397168397903442,
-				"group":	6
-			},
-			"Light":	{
-				"range":	4.99169921875,
-				"angle":	6.2831854820251465,
-				"color_r":	127,
-				"color_g":	255,
-				"color_b":	0,
-				"brightness":	0.5,
-				"speed":	1,
-				"flicker":	0.25
-			},
-			"Particle":	{
-				"angle":	0,
-				"spread":	6.2831854820251465,
-				"start_size":	0.10000000149011612,
-				"end_size":	0.05000000074505806,
-				"speed":	2,
-				"rate":	5,
-				"outer_r":	127,
-				"outer_g":	255,
-				"outer_b":	0,
-				"inner_r":	127,
-				"inner_g":	255,
-				"inner_b":	0,
-				"loop":	1
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit",
-				"loop_sound":	"geiger"
-			}
-		}, {
-			"id":	85,
-			"Coordinate":	{
-				"x":	5,
-				"y":	37
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2,
-				"height":	2,
-				"group":	11
-			},
-			"Text":	{
-				"source_string":	"Select bandage and hold [ATTACK] to heal.",
-				"size":	30
-			}
-		}, {
-			"id":	86,
-			"Coordinate":	{
-				"x":	5,
-				"y":	36,
-				"angle":	1.9501328468322754
-			},
-			"Image":	{
-				"filename":	"bandage",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0,
-				"value":	100,
-				"use_time":	2
-			}
-		}, {
-			"id":	87,
-			"Coordinate":	{
-				"x":	6,
-				"y":	34,
-				"angle":	5.0036149024963379
-			},
-			"Image":	{
-				"filename":	"bandage",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0,
-				"value":	100,
-				"use_time":	2
-			}
-		}, {
-			"id":	88,
+			"id":	131,
 			"Coordinate":	{
 				"x":	30,
-				"y":	14
+				"y":	46
 			},
 			"Collider":	{
 				"type":	0,
@@ -2328,2869 +1169,26 @@
 				"size":	30
 			}
 		}, {
-			"id":	89,
-			"Coordinate":	{
-				"x":	40,
-				"y":	16
-			},
-			"Image":	{
-				"filename":	"water_tile",
-				"width":	16,
-				"height":	32,
-				"layer":	0
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	32,
-				"group":	1
-			}
-		}, {
-			"id":	90,
-			"Coordinate":	{
-				"x":	4,
-				"y":	34,
-				"angle":	2.0738139152526855
-			},
-			"Image":	{
-				"filename":	"bandage",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0,
-				"value":	100,
-				"use_time":	2
-			}
-		}, {
-			"id":	91,
-			"Coordinate":	{
-				"x":	15.5,
-				"y":	40,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"fence_tile",
-				"width":	16,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	16,
-				"height":	1,
-				"group":	8
-			}
-		}, {
-			"id":	92,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	40
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	16,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	93,
-			"Coordinate":	{
-				"x":	0,
-				"y":	56
-			},
-			"Image":	{
-				"filename":	"grass_tile",
-				"width":	32,
-				"height":	16,
-				"layer":	0
-			}
-		}, {
-			"id":	94,
-			"Coordinate":	{
-				"x":	-13,
-				"y":	54.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	6,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	6,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	95,
-			"Coordinate":	{
-				"x":	-3,
-				"y":	54.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	6,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	6,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	96,
-			"Coordinate":	{
-				"x":	-9,
-				"y":	54.5,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"door",
-				"width":	2,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	2,
-				"height":	0.300000011920929,
-				"group":	16
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			},
-			"Joint":	{
-				"parent":	97,
-				"min_length":	1,
-				"max_length":	1,
-				"strength":	1,
-				"max_angle":	1.5707963705062866
-			}
-		}, {
-			"id":	97,
-			"Coordinate":	{
-				"x":	-10,
-				"y":	54.5,
-				"angle":	3.1415925025939941
-			},
-			"Image":	{
-				"filename":	"hinge",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			}
-		}, {
-			"id":	98,
-			"Coordinate":	{
-				"x":	-7,
-				"y":	54.5
-			},
-			"Image":	{
-				"filename":	"door",
-				"width":	2,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	2,
-				"height":	0.300000011920929,
-				"group":	16
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			},
-			"Joint":	{
-				"parent":	99,
-				"min_length":	1,
-				"max_length":	1,
-				"strength":	1,
-				"max_angle":	1.5707963705062866
-			}
-		}, {
-			"id":	99,
-			"Coordinate":	{
-				"x":	-6,
-				"y":	54.5
-			},
-			"Image":	{
-				"filename":	"hinge",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			}
-		}, {
-			"id":	100,
-			"Coordinate":	{
-				"x":	-0.5,
-				"y":	67.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	1,
-				"height":	25,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	25,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	101,
-			"Coordinate":	{
-				"x":	-15.5,
-				"y":	67.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	1,
-				"height":	25,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	25,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	102,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	67.5
-			},
-			"Image":	{
-				"filename":	"tiles_tile",
-				"width":	14,
-				"height":	25,
-				"layer":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	14,
-				"height":	25,
-				"group":	12
-			}
-		}, {
-			"id":	103,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	57,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	104,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	103
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	105,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	103
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	106,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	58.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	107,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	106
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	108,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	106
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	109,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	60,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	110,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	109
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	111,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	109
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	112,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	61.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	113,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	112
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	114,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	112
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	115,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	63,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	116,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	115
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	117,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	115
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	118,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	64.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	119,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	118
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	120,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	118
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	121,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	66,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	122,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	121
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	123,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	121
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	124,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	67.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	125,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	124
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	126,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	124
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	127,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	69,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	128,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	127
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	129,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	127
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	130,
-			"Coordinate":	{
-				"x":	-4.5,
-				"y":	70.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	131,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	130
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
 			"id":	132,
 			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	130
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
+				"x":	5,
+				"y":	69
 			},
 			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
+				"type":	0,
+				"width":	2,
+				"height":	2,
+				"group":	11
+			},
+			"Text":	{
+				"source_string":	"Select bandage and hold [ATTACK] to heal.",
+				"size":	30
 			}
 		}, {
 			"id":	133,
 			"Coordinate":	{
-				"x":	-4.5,
-				"y":	72,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	134,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	133
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	135,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	133
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	136,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	57,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	137,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	136
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	138,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	136
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	139,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	58.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	140,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	139
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	141,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	139
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	142,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	60,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	143,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	142
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	144,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	142
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	145,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	61.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	146,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	145
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	147,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	145
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	148,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	63,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	149,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	148
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	150,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	148
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	151,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	64.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	152,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	151
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	153,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	151
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	154,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	66,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	155,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	154
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	156,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	154
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	157,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	67.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	158,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	157
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	159,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	157
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	160,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	69,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	161,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	160
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	162,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	160
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	163,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	70.5,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	164,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	163
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	165,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	163
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	166,
-			"Coordinate":	{
-				"x":	-11.5,
-				"y":	72,
-				"angle":	1.5707964897155762
-			},
-			"Image":	{
-				"filename":	"bench",
-				"width":	1,
-				"height":	3,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	2.7999999523162842,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	6,
-				"start_size":	0.15000000596046448
-			},
-			"Health":	{
-				"health":	100,
-				"dead_image":	"",
-				"decal":	"",
-				"die_sound":	"wood_destroy"
-			},
-			"Sound":	{
-				"hit_sound":	"wood_hit"
-			}
-		}, {
-			"id":	167,
-			"Coordinate":	{
-				"x":	0,
-				"y":	-1,
-				"parent":	166
-			},
-			"Image":	{
-				"filename":	"bench_debris",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.2000000476837158,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	168,
-			"Coordinate":	{
-				"x":	0,
-				"y":	0.5,
-				"parent":	166
-			},
-			"Image":	{
-				"filename":	"bench_destroyed",
-				"width":	1,
-				"height":	2,
-				"layer":	6,
-				"alpha":	0
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	0.800000011920929,
-				"height":	1.3999999761581421,
-				"group":	15,
-				"enabled":	0
-			}
-		}, {
-			"id":	169,
-			"Coordinate":	{
-				"x":	-14.5,
-				"y":	58.5,
-				"angle":	2.6722760200500488
-			},
-			"Image":	{
-				"filename":	"candle",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	7.5,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.25,
-				"loop":	1
-			}
-		}, {
-			"id":	170,
-			"Coordinate":	{
-				"x":	-1.5,
-				"y":	55.5,
-				"angle":	3.3725600242614746
-			},
-			"Image":	{
-				"filename":	"candle",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	7.5,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.25,
-				"loop":	1
-			}
-		}, {
-			"id":	171,
-			"Coordinate":	{
-				"x":	-14.5,
-				"y":	71,
-				"angle":	6.0634360313415527
-			},
-			"Image":	{
-				"filename":	"candle",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	7.5,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.25,
-				"loop":	1
-			}
-		}, {
-			"id":	172,
-			"Coordinate":	{
-				"x":	-1.5,
-				"y":	66.5,
-				"angle":	1.9930853843688965
-			},
-			"Image":	{
-				"filename":	"candle",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	5
-			},
-			"Light":	{
-				"range":	7.5,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	153,
-				"color_b":	0,
-				"brightness":	0.800000011920929,
-				"speed":	10,
-				"flicker":	0.10000000149011612
-			},
-			"Particle":	{
-				"type":	7,
-				"start_size":	0.25,
-				"loop":	1
-			}
-		}, {
-			"id":	173,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	77,
-				"angle":	4.1963324546813965
-			},
-			"Image":	{
-				"filename":	"priest",
-				"width":	1,
-				"height":	1,
-				"layer":	9
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	4
-			},
-			"Light":	{
-				"range":	2,
-				"angle":	6.2831854820251465,
-				"color_r":	127,
-				"color_g":	255,
-				"color_b":	0,
-				"brightness":	0.5,
-				"speed":	1,
-				"flicker":	0.25
-			},
-			"Enemy":	{
-				"fov":	6.2831854820251465,
-				"idle_speed":	0,
-				"run_speed":	2,
-				"weapon":	174
-			},
-			"Particle":	{
-				"type":	2,
-				"start_size":	0.300000011920929
-			},
-			"Waypoint":	{
-			},
-			"Health":	{
-				"health":	200,
-				"dead_image":	"priest_dead",
-				"decal":	"blood",
-				"die_sound":	""
-			},
-			"Sound":	{
-				"hit_sound":	"squish"
-			}
-		}, {
-			"id":	174,
-			"Coordinate":	{
-				"x":	0.5,
-				"y":	0,
-				"parent":	173
-			},
-			"Weapon":	{
-				"fire_rate":	0.25,
-				"recoil":	0,
-				"damage":	20,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0,
-				"reload_time":	0,
-				"range":	15,
-				"sound_range":	15,
-				"spread":	0.78539818525314331,
-				"shots":	5,
-				"ammo_type":	4,
-				"sound":	"energy",
-				"automatic":	false
-			},
-			"Sound":	{
-			}
-		}, {
-			"id":	175,
-			"Coordinate":	{
 				"x":	-1,
-				"y":	43,
-				"angle":	4.80591630935669
-			},
-			"Image":	{
-				"filename":	"uranium",
-				"width":	0.86175727844238281,
-				"height":	0.86175727844238281,
-				"layer":	3
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.86175727844238281,
-				"height":	0.86175727844238281,
-				"group":	6
-			},
-			"Light":	{
-				"range":	4.74571990966797,
-				"angle":	6.2831854820251465,
-				"color_r":	127,
-				"color_g":	255,
-				"color_b":	0,
-				"brightness":	0.5,
-				"speed":	1,
-				"flicker":	0.25
-			},
-			"Particle":	{
-				"angle":	0,
-				"spread":	6.2831854820251465,
-				"start_size":	0.10000000149011612,
-				"end_size":	0.05000000074505806,
-				"speed":	2,
-				"rate":	5,
-				"outer_r":	127,
-				"outer_g":	255,
-				"outer_b":	0,
-				"inner_r":	127,
-				"inner_g":	255,
-				"inner_b":	0,
-				"loop":	1
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit",
-				"loop_sound":	"geiger"
-			}
-		}, {
-			"id":	176,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	50,
-				"angle":	1.7792801856994629
-			},
-			"Image":	{
-				"filename":	"uranium",
-				"width":	0.88250988721847534,
-				"height":	0.88250988721847534,
-				"layer":	3
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.88250988721847534,
-				"height":	0.88250988721847534,
-				"group":	6
-			},
-			"Light":	{
-				"range":	4.238624095916748,
-				"angle":	6.2831854820251465,
-				"color_r":	127,
-				"color_g":	255,
-				"color_b":	0,
-				"brightness":	0.5,
-				"speed":	1,
-				"flicker":	0.25
-			},
-			"Particle":	{
-				"angle":	0,
-				"spread":	6.2831854820251465,
-				"start_size":	0.10000000149011612,
-				"end_size":	0.05000000074505806,
-				"speed":	2,
-				"rate":	5,
-				"outer_r":	127,
-				"outer_g":	255,
-				"outer_b":	0,
-				"inner_r":	127,
-				"inner_g":	255,
-				"inner_b":	0,
-				"loop":	1
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit",
-				"loop_sound":	"geiger"
-			}
-		}, {
-			"id":	177,
-			"Coordinate":	{
-				"x":	1,
-				"y":	53,
-				"angle":	4.8133950233459473
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.9481567144393921,
-				"scale_y":	1.9481567144393921
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	5.454838752746582,
-				"height":	5.454838752746582,
-				"group":	1
-			}
-		}, {
-			"id":	178,
-			"Coordinate":	{
-				"x":	5,
-				"y":	51,
-				"angle":	2.3965344429016113
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.5633563995361328,
-				"scale_y":	1.5633563995361328
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.3773980140686035,
-				"height":	4.3773980140686035,
-				"group":	1
-			}
-		}, {
-			"id":	179,
-			"Coordinate":	{
-				"x":	8,
-				"y":	49,
-				"angle":	2.4335427284240723
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.0774636268615723,
-				"scale_y":	1.0774636268615723
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.0168981552124023,
-				"height":	3.0168981552124023,
-				"group":	1
-			}
-		}, {
-			"id":	180,
-			"Coordinate":	{
-				"x":	11,
-				"y":	48,
-				"angle":	5.73918104171753
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.3764687776565552,
-				"scale_y":	1.3764687776565552
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.85411262512207,
-				"height":	3.85411262512207,
-				"group":	1
-			}
-		}, {
-			"id":	181,
-			"Coordinate":	{
-				"x":	14,
-				"y":	46,
-				"angle":	2.0740056037902832
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	0.779793679714203,
-				"scale_y":	0.779793679714203
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.183422327041626,
-				"height":	2.183422327041626,
-				"group":	1
-			}
-		}, {
-			"id":	182,
-			"Coordinate":	{
-				"x":	12,
-				"y":	46,
-				"angle":	5.6053376197814941
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	0.816644787788391,
-				"scale_y":	0.816644787788391
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.2866053581237793,
-				"height":	2.2866053581237793,
-				"group":	1
-			}
-		}, {
-			"id":	183,
-			"Coordinate":	{
-				"x":	3,
-				"y":	51,
-				"angle":	0.74477052688598633
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	0.87157809734344482,
-				"scale_y":	0.87157809734344482
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.4404187202453613,
-				"height":	2.4404187202453613,
-				"group":	1
-			}
-		}, {
-			"id":	184,
-			"Coordinate":	{
-				"x":	-14,
-				"y":	53,
-				"angle":	6.0979523658752441
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.3949705362319946,
-				"scale_y":	1.3949705362319946
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.9059174060821533,
-				"height":	3.9059174060821533,
-				"group":	1
-			}
-		}, {
-			"id":	185,
-			"Coordinate":	{
-				"x":	-13,
-				"y":	50,
-				"angle":	6.1800217628479
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.7275459766387939,
-				"scale_y":	1.7275459766387939
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.8371286392211914,
-				"height":	4.8371286392211914,
-				"group":	1
-			}
-		}, {
-			"id":	186,
-			"Coordinate":	{
-				"x":	-12,
-				"y":	46,
-				"angle":	0.64755153656005859
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.270912766456604,
-				"scale_y":	1.270912766456604
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.5585558414459229,
-				"height":	3.5585558414459229,
-				"group":	1
-			}
-		}, {
-			"id":	187,
-			"Coordinate":	{
-				"x":	-9,
-				"y":	44,
-				"angle":	5.8958439826965332
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.8475600481033325,
-				"scale_y":	1.8475600481033325
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	5.1731681823730469,
-				"height":	5.1731681823730469,
-				"group":	1
-			}
-		}, {
-			"id":	188,
-			"Coordinate":	{
-				"x":	-6,
-				"y":	41,
-				"angle":	4.2703499794006348
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	0.90255439281463623,
-				"scale_y":	0.90255439281463623
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.5271522998809814,
-				"height":	2.5271522998809814,
-				"group":	1
-			}
-		}, {
-			"id":	189,
-			"Coordinate":	{
-				"x":	-4,
-				"y":	39,
-				"angle":	4.44561243057251
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.386349081993103,
-				"scale_y":	1.386349081993103
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.88177752494812,
-				"height":	3.88177752494812,
-				"group":	1
-			}
-		}, {
-			"id":	190,
-			"Coordinate":	{
-				"x":	-2,
-				"y":	37,
-				"angle":	3.371025562286377
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	0.774224042892456,
-				"scale_y":	0.774224042892456
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	2.1678273677825928,
-				"height":	2.1678273677825928,
-				"group":	1
-			}
-		}, {
-			"id":	191,
-			"Coordinate":	{
-				"x":	-1,
-				"y":	35,
-				"angle":	0.891653537750244
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.59803307056427,
-				"scale_y":	1.59803307056427
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.47449254989624,
-				"height":	4.47449254989624,
-				"group":	1
-			}
-		}, {
-			"id":	192,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	41,
-				"angle":	2.0621170997619629
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.7566530704498291,
-				"scale_y":	1.7566530704498291
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.9186286926269531,
-				"height":	4.9186286926269531,
-				"group":	1
-			}
-		}, {
-			"id":	193,
-			"Coordinate":	{
-				"x":	-4,
-				"y":	37,
-				"angle":	3.8128256797790527
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.130565881729126,
-				"scale_y":	1.130565881729126
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	3.1655845642089844,
-				"height":	3.1655845642089844,
-				"group":	1
-			}
-		}, {
-			"id":	194,
-			"Coordinate":	{
-				"x":	-12,
-				"y":	47,
-				"angle":	3.2922148704528809
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.5274208784103394,
-				"scale_y":	1.5274208784103394
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.27677822113037,
-				"height":	4.27677822113037,
-				"group":	1
-			}
-		}, {
-			"id":	195,
-			"Coordinate":	{
-				"x":	13,
-				"y":	45,
-				"angle":	0.23508977890014648
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.7848063707351685,
-				"scale_y":	1.7848063707351685
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.99745798110962,
-				"height":	4.99745798110962,
-				"group":	1
-			}
-		}, {
-			"id":	196,
-			"Coordinate":	{
-				"x":	-1,
-				"y":	33,
-				"angle":	5.27168607711792
-			},
-			"Image":	{
-				"filename":	"rock",
-				"width":	3,
-				"height":	3,
-				"layer":	3,
-				"scale_x":	1.7177038192749023,
-				"scale_y":	1.7177038192749023
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	4.8095707893371582,
-				"height":	4.8095707893371582,
-				"group":	1
-			}
-		}, {
-			"id":	197,
-			"Coordinate":	{
-				"x":	-1,
-				"y":	44
+				"y":	76
 			},
 			"Collider":	{
 				"type":	0,
@@ -5203,10 +1201,10 @@
 				"size":	30
 			}
 		}, {
-			"id":	198,
+			"id":	134,
 			"Coordinate":	{
 				"x":	-8,
-				"y":	53
+				"y":	85
 			},
 			"Collider":	{
 				"type":	0,
@@ -5219,364 +1217,47 @@
 				"size":	30
 			}
 		}, {
-			"id":	199,
+			"id":	135,
 			"Coordinate":	{
-				"x":	-12.5,
-				"y":	79.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	5,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	5,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	4,
+				"y":	66,
+				"angle":	5.2144947052001953,
+				"prefab":	"objects/bandage"
 			}
 		}, {
-			"id":	200,
+			"id":	136,
 			"Coordinate":	{
-				"x":	-4,
-				"y":	79.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	6,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	6,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	6,
+				"y":	66,
+				"angle":	8.35608768463135,
+				"prefab":	"objects/bandage"
 			}
 		}, {
-			"id":	201,
+			"id":	137,
 			"Coordinate":	{
-				"x":	-10.5,
-				"y":	83
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	1,
-				"height":	6,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	6,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	5,
+				"y":	68,
+				"angle":	5.2144947052001953,
+				"prefab":	"objects/bandage"
 			}
 		}, {
-			"id":	202,
+			"id":	138,
 			"Coordinate":	{
-				"x":	-6.5,
-				"y":	83
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	1,
-				"height":	6,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	6,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
+				"x":	-3,
+				"y":	34,
+				"prefab":	"objects/tree",
+				"scale_x":	1.3310000896453857,
+				"scale_y":	1.3310000896453857
 			}
 		}, {
-			"id":	203,
+			"id":	139,
 			"Coordinate":	{
-				"x":	-8.5,
-				"y":	85.5
-			},
-			"Image":	{
-				"filename":	"stone_tile",
-				"width":	3,
-				"height":	1,
-				"layer":	5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	1,
-				"group":	1
-			},
-			"Particle":	{
-				"type":	5,
-				"start_size":	0.300000011920929
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			}
-		}, {
-			"id":	204,
-			"Coordinate":	{
-				"x":	-8.5,
-				"y":	82.5
-			},
-			"Image":	{
-				"filename":	"tiles_tile",
-				"width":	3,
-				"height":	5,
-				"layer":	2
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	5,
-				"group":	12
-			}
-		}, {
-			"id":	205,
-			"Coordinate":	{
-				"x":	-8.5,
-				"y":	83.5
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	3,
-				"group":	1,
-				"trigger_type":	1
-			}
-		}, {
-			"id":	206,
-			"Coordinate":	{
-				"x":	-1,
-				"y":	42
-			},
-			"Image":	{
-				"filename":	"combat_shotgun",
-				"width":	3,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	2
-			},
-			"Light":	{
-				"enabled":	0,
-				"range":	3,
-				"angle":	6.2831854820251465,
-				"color_r":	255,
-				"color_g":	255,
-				"color_b":	255,
-				"brightness":	1,
-				"speed":	5
-			},
-			"Particle":	{
-				"type":	1,
-				"start_size":	0.10000000149011612
-			},
-			"Weapon":	{
-				"fire_rate":	0.800000011920929,
-				"recoil":	0.25,
-				"damage":	10,
-				"max_magazine":	6,
-				"magazine":	6,
-				"max_recoil":	0.78539818525314331,
-				"reload_time":	3,
-				"range":	25,
-				"sound_range":	25,
-				"spread":	0.15707963705062866,
-				"shots":	8,
-				"ammo_type":	3,
-				"sound":	"shotgun",
-				"automatic":	false
-			},
-			"Item":	{
-				"size":	0,
-				"name":	"M870",
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			}
-		}, {
-			"id":	207,
-			"Coordinate":	{
-				"x":	-9,
-				"y":	53,
-				"angle":	4.1704459190368652
-			},
-			"Image":	{
-				"filename":	"ammo_shotgun",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	3,
-				"size":	16
-			}
-		}, {
-			"id":	208,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	52,
-				"angle":	0.2270359992980957
-			},
-			"Image":	{
-				"filename":	"ammo_shotgun",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	3,
-				"size":	16
-			}
-		}, {
-			"id":	209,
-			"Coordinate":	{
-				"x":	-7,
-				"y":	53,
-				"angle":	4.9951767921447754
-			},
-			"Image":	{
-				"filename":	"ammo_shotgun",
-				"width":	1,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	0.5
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
-				"group":	2
-			},
-			"Item":	{
-				"size":	0,
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	3,
-				"size":	16
-			}
-		}, {
-			"id":	210,
-			"Coordinate":	{
-				"x":	-8,
-				"y":	-14,
-				"angle":	2.0977826118469238
-			},
-			"Image":	{
-				"filename":	"axe",
-				"width":	2,
-				"height":	1,
-				"layer":	7
-			},
-			"Physics":	{
-				"mass":	1
-			},
-			"Collider":	{
-				"type":	0,
-				"width":	1,
-				"height":	1,
-				"group":	2
-			},
-			"Weapon":	{
-				"fire_rate":	2,
-				"recoil":	0,
-				"damage":	50,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0,
-				"reload_time":	0,
-				"range":	2,
-				"sound_range":	2,
-				"spread":	1.0995573997497559,
-				"shots":	1,
-				"ammo_type":	0,
-				"sound":	"axe",
-				"automatic":	false
-			},
-			"Item":	{
-				"size":	0,
-				"name":	"Axe",
-				"type":	0
-			},
-			"Sound":	{
-				"hit_sound":	"metal"
+				"x":	-14,
+				"y":	74,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/rock",
+				"scale_x":	1.4641001224517822,
+				"scale_y":	1.4641001224517822
 			}
 		}]
 }

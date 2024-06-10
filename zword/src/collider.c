@@ -36,7 +36,7 @@ float collider_height(int i) {
 float collider_radius(int i) {
     Vector2f scale = get_scale(i);
     ColliderComponent* col = ColliderComponent_get(i);
-    return col->radius * norm(scale);
+    return col->radius * fmaxf(scale.x, scale.y);
 }
 
 
@@ -118,7 +118,7 @@ Vector2f overlap_circle_circle(int i, int j) {
     Vector2f b = get_position(j);
 
     float d = dist(a, b);
-    float r = ColliderComponent_get(i)->radius + ColliderComponent_get(j)->radius;
+    float r = collider_radius(i) + collider_radius(j);
 
     if (d > r) {
         return (Vector2f) { 0.0, 0.0 };
@@ -431,7 +431,7 @@ void draw_colliders(int camera) {
 
         Vector2f pos = get_position(i);
         if (col->type == COLLIDER_CIRCLE) {
-            draw_circle(camera, pos, col->radius, get_color(1.0, 0.0, 1.0, 0.25));
+            draw_circle(camera, pos, collider_radius(i), get_color(1.0, 0.0, 1.0, 0.25));
             draw_line(camera, pos, sum(pos, half_width(i)), 0.05f, COLOR_WHITE);
         } else {
             Color color = get_color(0.0, 1.0, 1.0, 0.25);

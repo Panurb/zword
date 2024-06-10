@@ -524,7 +524,7 @@ void draw_tutorials() {
             Vector2f pos = get_position(i);
             Color color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
             float angle = get_angle(i);
-            draw_rectangle(game_data->camera, pos, collider->width, collider->height, angle, 
+            draw_rectangle(game_data->camera, pos, collider_width(i), collider_height(i), angle, 
                 color);
             draw_text(game_data->camera, pos, "level_end", 20, COLOR_GREEN);
         }

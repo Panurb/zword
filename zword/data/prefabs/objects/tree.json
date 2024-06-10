@@ -4,9 +4,9 @@
 			"Coordinate":	{
 				"x":	0,
 				"y":	0,
-				"angle":	1.04237174987793,
-				"scale_x":	1.073656439781189,
-				"scale_y":	1.073656439781189
+				"angle":	0,
+				"scale_x":	1,
+				"scale_y":	1
 			},
 			"Image":	{
 				"filename":	"tree",
