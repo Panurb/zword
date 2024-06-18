@@ -3,6 +3,11 @@
 #include <stdbool.h>
 
 
+#define LOG_DEBUG(...) printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");
+#define LOG_INFO(...) printf("INFO: "); printf(__VA_ARGS__); printf("\n");
+#define LOG_WARNING(...) printf("WARNING: "); printf(__VA_ARGS__); printf("\n");
+#define LOG_ERROR(...) printf("ERROR: "); printf(__VA_ARGS__); printf("\n");
+
 #define PRINT(x) printf("%d\n", x);
 
 #define COLOR_ENERGY get_color(0.5f, 1.0f, 0.0f, 1.0f)

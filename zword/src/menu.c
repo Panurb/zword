@@ -10,6 +10,7 @@
 #include "widget.h"
 #include "light.h"
 #include "input.h"
+#include "app.h"
 
 
 static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
@@ -277,6 +278,29 @@ void toggle_xbox_controls(int entity) {
 }
 
 
+void set_controller(int entity, int value) {
+    int parent = get_parent(entity);
+
+    int player = 0;
+    int i = 0;
+    ListNode* node;
+    FOREACH(node, get_children(parent)) {
+        if (entity == node->value) {
+            player = i / 2;
+        } else {
+            WidgetComponent* widget = WidgetComponent_get(node->value);
+            // Don't allow multiple players to use the same controller
+            if (widget->value == value) {
+                widget->value = 0;
+            }
+        }
+        i++;
+    }
+    app.player_controllers[player] = value - 2;
+    LOG_DEBUG("Player %d controller: %d", player, app.player_controllers[player]);
+}
+
+
 void toggle_controls(int entity) {
     UNUSED(entity);
     if (window_controls != -1) {
@@ -286,13 +310,34 @@ void toggle_controls(int entity) {
     }
 
     Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_controls = create_window(pos, "CONTROLS", 1, toggle_controls);
+    window_controls = create_window(pos, "CONTROLS", 2, toggle_controls);
 
-    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
+    int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 2, 5);
     add_child(window_controls, container);
 
-    add_button_to_container(container, "KEYBOARD", toggle_keyboard_controls);
-    add_button_to_container(container, "XBOX", toggle_xbox_controls);
+    static ButtonText CONTROLLERS[9] = {"None", "Keyboard", "", "", "", "", "", "", ""};
+    
+    for (int i = 0; i < 8; i++) {
+        if (app.controllers[i] == NULL) {
+            continue;
+        }
+        strcpy(CONTROLLERS[i + 2], SDL_GameControllerName(app.controllers[i]));
+    }
+
+    for (int i = 0; i < 4; i++) {
+        char buffer[128];
+        snprintf(buffer, 128, "Player %d", i + 1);
+        int left = create_label(buffer, zeros());
+        int right = create_dropdown(zeros(), CONTROLLERS, SDL_NumJoysticks() + 2);
+        WidgetComponent* widget = WidgetComponent_get(right);
+        widget->on_change = set_controller;
+        widget->value = app.player_controllers[i] + 2;
+        add_row_to_container(container, left, right);
+    }
+
+    int left = create_button("KEYBOARD", zeros(), toggle_keyboard_controls);
+    int right = create_button("XBOX", zeros(), toggle_xbox_controls);
+    add_row_to_container(container, left, right);
 }
 
 

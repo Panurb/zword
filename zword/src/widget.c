@@ -226,7 +226,7 @@ void set_dropdown(int entity) {
     widget_dropdown->value = widget->value;
 
     if (widget_dropdown->on_change) {
-        widget_dropdown->on_change(dropdown, 0);
+        widget_dropdown->on_change(dropdown, widget->value);
     }
 
     close_dropdown(dropdown);
@@ -279,7 +279,7 @@ void toggle_dropdown(int entity) {
     } else {
         int height = mini(3, widget->max_value + 1);
 
-        int container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 1, height);
+        int container = create_container(vec(0.0f, -0.5f * (height + 1) * BUTTON_HEIGHT), 1, height);
         add_child(entity, container);
         for (int i = widget->min_value; i <= widget->max_value; i++) {
             int j = add_button_to_container(container, "", set_dropdown);

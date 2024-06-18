@@ -465,7 +465,7 @@ ColliderComponent* ColliderComponent_add_rectangle(int entity, float width, floa
 ColliderComponent* ColliderComponent_get(int entity);
 void ColliderComponent_remove(int entity);
 
-PlayerComponent* PlayerComponent_add(int entity, int joystick);
+PlayerComponent* PlayerComponent_add(int entity);
 PlayerComponent* PlayerComponent_get(int entity);
 void PlayerComponent_remove(int entity);
 

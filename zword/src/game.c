@@ -160,6 +160,20 @@ void start_game(Filename map_name) {
     // test(data->components);
     load_game(map_name);
 
+    int i = 0;
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        if (app.player_controllers[i] == CONTROLLER_NONE) {
+            destroy_entity_recursive(node->value);
+            continue;
+        }
+
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        player->controller.joystick = app.player_controllers[i];
+        LOG_DEBUG("Player %d: %d\n", i, player->controller.joystick);
+        i++;
+    }
+
     init_grid();
 
     switch (game_data->game_mode) {

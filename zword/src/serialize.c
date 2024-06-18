@@ -425,7 +425,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Player");
     if (!json) return;
 
-    PlayerComponent* player = PlayerComponent_add(entity, -1);
+    PlayerComponent* player = PlayerComponent_add(entity);
     player->vehicle = deserialize_int(json, "vehicle", player->vehicle);
     player->item = deserialize_int(json, "item", player->item);
     deserialize_id_array(json, "inventory", player->inventory);

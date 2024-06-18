@@ -116,9 +116,20 @@ void init() {
     TTF_Init();
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024);
 
-    for (int i = 0; i < 4; i++) {
-        app.controllers[i] = NULL;
+    memset(app.controllers, 0, sizeof(app.controllers));
+
+    int controllers = SDL_NumJoysticks();
+    for (int i = 0; i < controllers; i++) {
+        if (SDL_IsGameController(i)) {
+            if (app.controllers[i] == NULL) {
+                app.controllers[i] = SDL_GameControllerOpen(i);
+            }
+        }
     }
+    for (int i = 0; i < 4; i++) {
+        app.player_controllers[i] = CONTROLLER_NONE;
+    }
+    app.player_controllers[0] = CONTROLLER_MKB;
 
     create_game_window();
 
@@ -155,6 +166,23 @@ void input() {
             case SDL_QUIT:
                 app.quit = true;
                 return;
+            case SDL_JOYDEVICEADDED:
+                if (app.controllers[sdl_event.jdevice.which] == NULL) {
+                    app.controllers[sdl_event.jdevice.which] = SDL_GameControllerOpen(sdl_event.jdevice.which);
+                    LOG_INFO("Joystick added: %d", sdl_event.jdevice.which)
+                }
+                break;
+            case SDL_JOYDEVICEREMOVED:
+                for (int i = 0; i < 8; i++) {
+                    if (app.controllers[i] == NULL) continue;
+
+                    if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(app.controllers[i])) == sdl_event.jdevice.which) {
+                        SDL_GameControllerClose(app.controllers[i]);
+                        app.controllers[i] = NULL;
+                        LOG_INFO("Joystick removed: %d", sdl_event.jdevice.which)
+                    }
+                }
+                break;
             default:
                 if (game_state == STATE_GAME) {
                     if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {

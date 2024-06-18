@@ -223,7 +223,7 @@ void ColliderComponent_remove(int entity) {
 }
 
 
-PlayerComponent* PlayerComponent_add(int entity, int joystick) {
+PlayerComponent* PlayerComponent_add(int entity) {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->target = -1;
     player->acceleration = 20.0;
@@ -246,18 +246,13 @@ PlayerComponent* PlayerComponent_add(int entity, int joystick) {
     player->money_timer = 0.0f;
     player->won = false;
 
-    player->controller.joystick = joystick;
-
-    if (joystick == -1) {
-        
-    } else {
-        int buttons[12] = { SDL_CONTROLLER_BUTTON_A, SDL_CONTROLLER_BUTTON_B, SDL_CONTROLLER_BUTTON_X, SDL_CONTROLLER_BUTTON_Y,
-                            SDL_CONTROLLER_BUTTON_LEFTSHOULDER, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, SDL_CONTROLLER_BUTTON_START,
-                            SDL_CONTROLLER_BUTTON_BACK, SDL_CONTROLLER_BUTTON_LEFTSTICK, SDL_CONTROLLER_BUTTON_RIGHTSTICK,
-                            SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN};
-        memcpy(player->controller.buttons, buttons, sizeof(buttons));
-        app.controllers[joystick] = SDL_GameControllerOpen(joystick);
-    }
+    player->controller.joystick = -1;
+    
+    int buttons[12] = { SDL_CONTROLLER_BUTTON_A, SDL_CONTROLLER_BUTTON_B, SDL_CONTROLLER_BUTTON_X, SDL_CONTROLLER_BUTTON_Y,
+                        SDL_CONTROLLER_BUTTON_LEFTSHOULDER, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, SDL_CONTROLLER_BUTTON_START,
+                        SDL_CONTROLLER_BUTTON_BACK, SDL_CONTROLLER_BUTTON_LEFTSTICK, SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+                        SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN};
+    memcpy(player->controller.buttons, buttons, sizeof(buttons));
 
     player->controller.left_stick = zeros();
     player->controller.right_stick = zeros();
