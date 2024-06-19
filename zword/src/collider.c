@@ -36,7 +36,14 @@ float collider_height(int i) {
 float collider_radius(int i) {
     Vector2f scale = get_scale(i);
     ColliderComponent* col = ColliderComponent_get(i);
-    return col->radius * fmaxf(scale.x, scale.y);
+    if (col->type == COLLIDER_RECTANGLE) {
+        return 0.5f * norm(vec(col->width * scale.x, col->height * scale.y));
+    }
+
+    if (!close_enough(scale.x, scale.y, 0.01f)) {
+        LOG_WARNING("Circle collider %i has non-uniform scale\n", i);
+    }
+    return col->radius * scale.x;
 }
 
 
@@ -92,7 +99,7 @@ float axis_half_width(int i, Vector2f axis) {
         Vector2f hh = half_height(i);
         return fabs(dot(hw, axis)) + fabs(dot(hh, axis));
     } else {
-        return col->radius;
+        return collider_radius(i);
     }
     return 0.0;
 }

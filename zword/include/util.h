@@ -73,6 +73,8 @@ typedef char Filename[128];
 #define BUTTON_TEXT_SIZE 128
 typedef char ButtonText[BUTTON_TEXT_SIZE];
 
+bool close_enough(float a, float b, float epsilon);
+
 Vector2f zeros();
 
 Vector2f ones();
