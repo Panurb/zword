@@ -176,7 +176,7 @@ int toggle_prefabs(int window_id, Filename category, OnClick close, OnClick on_c
 
     int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 1, 5);
     add_child(window_id, container);
-    Filename path;
+    String path;
     snprintf(path, STRING_SIZE, "prefabs/%s", category);
     add_files_to_container(container, path, on_click);
     add_scrollbar_to_container(container);
@@ -552,7 +552,7 @@ void input_tool_select(SDL_Event event) {
             }
         } else if (event.button.button == SDL_BUTTON_RIGHT) {
             if (selections) {
-                rotate_selections(game_data);
+                rotate_selections();
             }
         }
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
@@ -571,7 +571,7 @@ void input_tool_select(SDL_Event event) {
         if (selections) {
             switch (event.key.keysym.sym) {
             case SDLK_DELETE:
-                destroy_selections(game_data);
+                destroy_selections();
                 break;
             case SDLK_s:
                 // save_prefab("prefab.json");

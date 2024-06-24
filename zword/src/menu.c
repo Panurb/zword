@@ -369,7 +369,15 @@ void toggle_credits(int entity) {
 
 
 void create_menu() {
-    int height = game_settings.debug ? 6 : 5;
+    #ifdef __EMSCRIPTEN__
+        int height = 4;
+    #else
+        int height = 5;
+    #endif
+
+    if (game_settings.debug) {
+        height++;
+    }
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     add_button_to_container(container, "PLAY", toggle_play);
     if (game_settings.debug) {

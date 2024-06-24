@@ -35,11 +35,11 @@
 			"Weapon":	{
 				"fire_rate":	0.800000011920929,
 				"recoil":	0.25,
-				"damage":	10,
+				"damage":	12,
 				"max_magazine":	6,
 				"magazine":	6,
 				"max_recoil":	0.78539818525314331,
-				"reload_time":	3,
+				"reload_time":	2,
 				"range":	25,
 				"sound_range":	25,
 				"spread":	0.15707963705062866,

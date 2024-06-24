@@ -142,7 +142,7 @@ int create_candle(Vector2f pos) {
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, rand_angle());
-    ColliderComponent_add_circle(i, 0.5f, LAYER_WALLS);
+    ColliderComponent_add_circle(i, 0.5f, GROUP_WALLS);
     Color orange = get_color(1.0, 0.6, 0.0, 1.0);
     LightComponent_add(i, 7.5f, 2.0 * M_PI, orange, 0.8f, 10.0)->flicker = 0.1f;
     ParticleComponent_add_type(i, PARTICLE_FIRE, 0.25f);

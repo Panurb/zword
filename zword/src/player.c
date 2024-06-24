@@ -23,7 +23,6 @@
 
 
 int create_player(Vector2f pos, float angle) {
-    int joystick = -1;
     int i = create_entity();
 
     CoordinateComponent_add(i, pos, angle);
@@ -32,7 +31,7 @@ int create_player(Vector2f pos, float angle) {
     phys->bounce = 0.0f;
     phys->max_speed = 5.0;
     ColliderComponent_add_circle(i, 0.5, GROUP_PLAYERS);
-    PlayerComponent* player = PlayerComponent_add(i, joystick);
+    PlayerComponent* player = PlayerComponent_add(i);
     ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
     WaypointComponent_add(i);
     HealthComponent_add(i, 100, "player_dead", "blood", "");

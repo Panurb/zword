@@ -10,6 +10,9 @@
 #include "player.h"
 #include "menu.h"
 #include "editor.h"
+#include "hud.h"
+#include "input.h"
+#include "serialize.h"
 
 
 App app;

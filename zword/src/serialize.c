@@ -778,7 +778,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     cJSON* coord_json = cJSON_GetObjectItem(entity_json, "Coordinate");
     Filename prefab;
     prefab[0] = '\0';
-    deserialize_string(coord_json, "prefab", prefab, "");
+    deserialize_string(coord_json, "prefab", prefab);
     Vector2f pos;
     pos.x = deserialize_float(coord_json, "x", 0.0f);
     pos.y = deserialize_float(coord_json, "y", 0.0f);
@@ -788,8 +788,9 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     scale.y = deserialize_float(coord_json, "scale_y", 1.0f);
 
     if (prefab[0] != '\0') {
+        LOG_DEBUG("Prefab detected: %s", prefab);
         if (preserve_id) {
-            printf("Cannot preserve id for prefabs\n");
+            LOG_ERROR("Cannot preserve id for prefabs\n");
             return -1;
         } else {
             return load_prefab(prefab, pos, angle, scale);
@@ -797,7 +798,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     }
 
     int entity;
-    if (preserve_id && !is_prefab) {
+    if (preserve_id && !is_prefab(entity)) {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
         if (CoordinateComponent_get(entity)) {
             destroy_entity(entity);
@@ -957,7 +958,10 @@ int deserialize_prefab(cJSON* json, Vector2f position, float angle, Vector2f sca
     // Prefab ids can only refer to entities inside the prefab so they can be updated here and then continue
     // deserializing the map/parent prefab
 
+    LOG_DEBUG("Deserializing prefab");
+
     // Backup deserialized ids
+    // TODO: Reduce memory usage
     int* old_deserialized_ids[MAX_ENTITIES];
     memcpy(old_deserialized_ids, deserialized_ids, sizeof(old_deserialized_ids));
 
@@ -993,15 +997,18 @@ int deserialize_prefab(cJSON* json, Vector2f position, float angle, Vector2f sca
     coord->scale.x *= scale.x;
     coord->scale.y *= scale.y;
 
+    LOG_DEBUG("Deserialized prefab\n");
+
     return root;
 }
 
 
 void deserialize_game(cJSON* json, bool preserve_id) {
+    LOG_DEBUG("Deserializing game");
     game_data->game_mode = deserialize_int(json, "game_mode", game_data->game_mode);
-    printf("Game mode: %d\n", game_data->game_mode);
+    LOG_DEBUG("Game mode: %d", game_data->game_mode);
     game_data->ambient_light = deserialize_float(json, "ambient_light", game_data->ambient_light);
-    printf("Ambient light: %f\n", game_data->ambient_light);
+    LOG_DEBUG("Ambient light: %f", game_data->ambient_light);
     deserialize_map(json, preserve_id);
 }
 
@@ -1024,11 +1031,13 @@ void save_json(cJSON* json, Filename directory, Filename filename) {
 
 
 cJSON* load_json(Filename directory, Filename filename) {
+    LOG_DEBUG("Loading json %s", filename);
+
     Filename path;
     snprintf(path, 128, "%s/%s/%s%s", "data", directory, filename, ".json");
     FILE* file = fopen(path, "r");
     if (!file) {
-        printf("Could not open file: %s\n", path);
+        LOG_WARNING("Could not open file: %s\n", path);
         return NULL;
     }
 
@@ -1044,6 +1053,9 @@ cJSON* load_json(Filename directory, Filename filename) {
 
     cJSON* json = cJSON_Parse(string);
     free(string);
+
+    LOG_DEBUG("Loaded json %s", filename);
+
     return json;
 }
 
@@ -1056,6 +1068,8 @@ void save_game(ButtonText map_name) {
 
 
 void load_game(ButtonText map_name) {
+    LOG_DEBUG("Loading map %s", map_name);
+
     cJSON* json = load_json("maps", map_name);
     if (json) {
         strcpy(game_data->map_name, map_name);
@@ -1079,6 +1093,8 @@ void save_prefab(Filename filename, List* entities) {
 
 
 int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scale) {
+    LOG_DEBUG("Loading prefab %s", filename);
+
     cJSON* json = load_json("prefabs", filename);
 
     int root = deserialize_prefab(json, position, angle, scale);
@@ -1088,6 +1104,8 @@ int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scal
     }
 
     cJSON_Delete(json);
+
+    LOG_DEBUG("Loaded prefab %s\n", filename);
 
     return root;
 }

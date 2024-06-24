@@ -35,7 +35,7 @@
 			"Weapon":	{
 				"fire_rate":	10,
 				"recoil":	0.05000000074505806,
-				"damage":	40,
+				"damage":	30,
 				"max_magazine":	30,
 				"magazine":	30,
 				"max_recoil":	0.15707963705062866,
