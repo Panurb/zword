@@ -425,7 +425,7 @@ void update_selections() {
         ColliderComponent* collider = ColliderComponent_get(i);
         ImageComponent* image = ImageComponent_get(i);
         Vector2f overlap = zeros();
-        if (collider) {
+        if (collider && collider->enabled) {
             overlap = overlap_collider_collider(selection_box, i);
         } else if (image) {
             overlap = overlap_rectangle_image(selection_box, i);

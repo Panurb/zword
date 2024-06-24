@@ -160,12 +160,12 @@ void draw_grid(int camera, float tile_width, float tile_height) {
     Color color = get_color(1.0f, 1.0f, 1.0f, 0.1f);
     
     for (float x = left - mod(left, tile_width); x < right; x += tile_width) {
-        float linewidth = mod(x, major_lines) == 0.0f ? 0.1f : 0.01f;
+        float linewidth = mod(x, major_lines) == 0.0f ? 0.2f : 0.01f;
         draw_line(camera, vec(x, bottom), vec(x, top), linewidth, color);
     }
 
     for (float y = bottom - mod(bottom, tile_height); y < top; y += tile_height) {
-        float linewidth = mod(y, major_lines) == 0.0f ? 0.1f : 0.01f;
+        float linewidth = mod(y, major_lines) == 0.0f ? 0.2f : 0.01f;
         draw_line(camera, vec(left, y), vec(right, y), linewidth, color);
     }
 }
