@@ -117,7 +117,8 @@ void init() {
     
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
-    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024);
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 2048);
+    Mix_AllocateChannels(32);
 
     memset(app.controllers, 0, sizeof(app.controllers));
 

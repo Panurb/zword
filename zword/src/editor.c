@@ -364,7 +364,7 @@ void move_selections(Vector2f delta_pos) {
 }
 
 
-void rotate_selections() {
+void rotate_selections(float angle) {
     // TODO: snap to grid after rotation
     Vector2f center = get_entities_center(selections);
 
@@ -375,15 +375,39 @@ void rotate_selections() {
         if (coord->parent != -1) continue;
 
         Vector2f r = diff(coord->position, center);
-        r = perp(r);
+        r = rotate(r, angle);
         if (ColliderComponent_get(i)) {
             clear_grid(i);
             coord->position = sum(center, r);
-            coord->angle += 0.5f * M_PI;
+            coord->angle += angle;
             update_grid(i);
         } else {
             coord->position = sum(center, r);
-            coord->angle += 0.5f * M_PI;
+            coord->angle += angle;
+        }
+    }
+}
+
+
+void scale_selections(float scale) {
+    Vector2f center = get_entities_center(selections);
+
+    ListNode* node;
+    FOREACH (node, selections) {
+        int i = node->value;
+        CoordinateComponent* coord = CoordinateComponent_get(node->value);
+        if (coord->parent != -1) continue;
+
+        Vector2f r = diff(coord->position, center);
+        r = mult(scale, r);
+        if (ColliderComponent_get(i)) {
+            clear_grid(i);
+            coord->position = sum(center, r);
+            coord->scale = mult(scale, coord->scale);
+            update_grid(i);
+        } else {
+            coord->position = sum(center, r);
+            coord->scale = mult(scale, coord->scale);
         }
     }
 }
@@ -410,6 +434,10 @@ void update_selections() {
     }
     List_clear(selections);
 
+    float area = collider_width(selection_box) * collider_height(selection_box);
+
+    int top_entity = -1;
+    int top_layer = -1;
     for (int i = 0; i < game_data->components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         if (!coord) continue;
@@ -425,7 +453,7 @@ void update_selections() {
         ColliderComponent* collider = ColliderComponent_get(i);
         ImageComponent* image = ImageComponent_get(i);
         Vector2f overlap = zeros();
-        if (collider && collider->enabled) {
+        if (collider) {
             overlap = overlap_collider_collider(selection_box, i);
         } else if (image) {
             overlap = overlap_rectangle_image(selection_box, i);
@@ -434,10 +462,19 @@ void update_selections() {
                 overlap = ones();
             }
         }
-        
-        if (non_zero(overlap)) {
+
+        if (image && image->layer > top_layer && non_zero(overlap)) {
+            top_entity = i;
+            top_layer = image->layer;
+        }
+    
+        if (area > 0.0f && non_zero(overlap)) {
             List_add(selections, i);
         }
+    }
+
+    if (area == 0.0f && top_entity != -1) {
+        List_add(selections, top_entity);
     }
 }
 
@@ -542,8 +579,6 @@ void input_tool_select(SDL_Event event) {
                         }
                     }
                 }
-            } else {
-                // TODO: grab top entity
             }
             if (!grabbed) {
                 selection_box = create_entity();
@@ -552,7 +587,7 @@ void input_tool_select(SDL_Event event) {
             }
         } else if (event.button.button == SDL_BUTTON_RIGHT) {
             if (selections) {
-                rotate_selections();
+                List_clear(selections);
             }
         }
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
@@ -591,6 +626,12 @@ void input_tool_select(SDL_Event event) {
             default:
                 break;
             }
+        }
+    } else if (event.type == SDL_MOUSEWHEEL) {
+        if (shift_down) {
+            rotate_selections(M_PI_4 * event.wheel.y);
+        } else if (ctrl_down) {
+            scale_selections(powf(1.1f, event.wheel.y));
         }
     }
 }
