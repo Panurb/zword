@@ -891,13 +891,15 @@ int create_entity() {
 
 
 int get_root(int entity) {
-    int root = entity;
     CoordinateComponent* coord = CoordinateComponent_get(entity);
-    while (coord->parent != -1) {
-        root = coord->parent;
-        coord = CoordinateComponent_get(coord->parent);
+    if (coord->parent != -1) {
+        return get_root(coord->parent);
     }
-    return root;
+    JointComponent* joint = JointComponent_get(entity);
+    if (joint && joint->parent != -1) {
+        return get_root(joint->parent);
+    }
+    return entity;
 }
 
 

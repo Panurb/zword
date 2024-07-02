@@ -12,6 +12,12 @@ typedef struct {
     int key;
 } Keybind;
 
+typedef enum {
+    QUALITY_LOW,
+    QUALITY_MEDIUM,
+    QUALITY_HIGH
+} Quality;
+
 typedef struct {
     int width;
     int height;
@@ -21,6 +27,7 @@ typedef struct {
     int max_fps;
     int volume;
     int music;
+    Quality particles;
     bool debug;
     Keybind keybinds[16];
 } Settings;

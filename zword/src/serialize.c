@@ -976,6 +976,16 @@ int deserialize_prefab(cJSON* json, Vector2f position, float angle, Vector2f sca
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
         ids[n] = deserialize_entity(entity, false);
+
+        CoordinateComponent* coord = CoordinateComponent_get(ids[n]);
+        if (coord && coord->parent == -1) {
+            LOG_DEBUG("Updating prefab entity %d", ids[n]);
+            coord->position = sum(coord->position, position);
+            coord->angle += angle;
+            coord->scale.x *= scale.x;
+            coord->scale.y *= scale.y;
+        }
+
         if (root == -1) {
             root = ids[n];
         }
@@ -991,13 +1001,7 @@ int deserialize_prefab(cJSON* json, Vector2f position, float angle, Vector2f sca
         root = get_root(root);
     }
 
-    CoordinateComponent* coord = CoordinateComponent_get(root);
-    coord->position = sum(coord->position, position);
-    coord->angle += angle;
-    coord->scale.x *= scale.x;
-    coord->scale.y *= scale.y;
-
-    LOG_DEBUG("Deserialized prefab\n");
+    LOG_DEBUG("Deserialized prefab");
 
     return root;
 }
@@ -1105,7 +1109,7 @@ int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scal
 
     cJSON_Delete(json);
 
-    LOG_DEBUG("Loaded prefab %s\n", filename);
+    LOG_DEBUG("Loaded prefab %s", filename);
 
     return root;
 }

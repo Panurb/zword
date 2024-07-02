@@ -28,9 +28,9 @@ void ParticleComponent_add_bullet(int entity, float size) {
 
 
 void ParticleComponent_add_blood(int entity) {
-    Color color = COLOR_BLOOD;
-    Color inner_color = COLOR_BLOOD;
-    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.5f, 0.0f, 2.0, 10.0, color, inner_color);
+    Color color = get_color(0.78, 0.0, 0.0, 1.0);
+    Color inner_color = color_lerp(color, COLOR_WHITE, 0.25f);
+    ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.3f, 0.0f, 3.0f, 10.0f, color, inner_color);
 }
 
 
@@ -162,10 +162,12 @@ void update_particles(int camera, float delta_time) {
 
 
 void draw_particles(int camera) {
-    SDL_SetRenderTarget(app.renderer, app.blood_texture);
-    SDL_SetRenderDrawColor(app.renderer, COLOR_BLOOD.r, COLOR_BLOOD.g, COLOR_BLOOD.b, 0);
-    SDL_RenderClear(app.renderer);
-    SDL_SetRenderTarget(app.renderer, NULL);
+    if (game_settings.particles == QUALITY_HIGH) {
+        SDL_SetRenderTarget(app.renderer, app.blood_texture);
+        SDL_SetRenderDrawColor(app.renderer, COLOR_BLOOD.r, COLOR_BLOOD.g, COLOR_BLOOD.b, 0);
+        SDL_RenderClear(app.renderer);
+        SDL_SetRenderTarget(app.renderer, NULL);
+    }
 
     ListNode* node;
     FOREACH(node, game_data->components->image.order) {
@@ -174,7 +176,7 @@ void draw_particles(int camera) {
         ParticleComponent* part = ParticleComponent_get(entity);
         if (!part) continue;
 
-        if (part->type == PARTICLE_BLOOD) {
+        if (game_settings.particles == QUALITY_HIGH && part->type == PARTICLE_BLOOD) {
             SDL_SetRenderTarget(app.renderer, app.blood_texture);
 
             for (int i = part->particles - 1; i >= 0; i--) {
@@ -218,13 +220,15 @@ void draw_particles(int camera) {
         }   
     }
 
-    SDL_SetRenderTarget(app.renderer, app.blood_texture);
-    SDL_RenderCopy(app.renderer, app.blood_threshold_texture, NULL, NULL);
+    if (game_settings.particles == QUALITY_HIGH) {
+        SDL_SetRenderTarget(app.renderer, app.blood_texture);
+        SDL_RenderCopy(app.renderer, app.blood_threshold_texture, NULL, NULL);
 
-    for (int i = 0; i < 10; i++) {
-        SDL_RenderCopy(app.renderer, app.blood_multiply_texture, NULL, NULL);
+        for (int i = 0; i < 10; i++) {
+            SDL_RenderCopy(app.renderer, app.blood_multiply_texture, NULL, NULL);
+        }
+
+        SDL_SetRenderTarget(app.renderer, NULL);
+        SDL_RenderCopy(app.renderer, app.blood_texture, NULL, NULL);
     }
-
-    SDL_SetRenderTarget(app.renderer, NULL);
-    SDL_RenderCopy(app.renderer, app.blood_texture, NULL, NULL);
 }

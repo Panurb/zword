@@ -41,6 +41,8 @@ void update_physics(float time_step) {
             }
         }
 
+        if (get_parent(i) != -1) continue;
+
         if (physics->collision.entities->size > 0) {
             physics->velocity = physics->collision.velocity;
 

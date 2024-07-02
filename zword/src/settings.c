@@ -9,8 +9,18 @@
 #include "input.h"
 
 
-Settings game_settings = { 1920, 1080, 8, false, false, 0, 100, 100, false,
-    {
+Settings game_settings = {
+    .width = 1920,
+    .height = 1080,
+    .antialiasing = 8,
+    .fullscreen = false,
+    .vsync = false,
+    .max_fps = 0,
+    .volume = 100,
+    .music = 100,
+    .particles = QUALITY_LOW,
+    .debug = false,
+    .keybinds = {
         { DEVICE_KEYBOARD, SDL_SCANCODE_W },
         { DEVICE_KEYBOARD, SDL_SCANCODE_A },
         { DEVICE_KEYBOARD, SDL_SCANCODE_S },
