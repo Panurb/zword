@@ -2,9 +2,9 @@
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
-				"x":	-1,
+				"x":	0,
 				"y":	0,
-				"angle":	3.1415925025939941
+				"angle":	0
 			},
 			"Image":	{
 				"filename":	"hinge",
@@ -13,9 +13,9 @@
 		}, {
 			"id":	1,
 			"Coordinate":	{
-				"x":	0,
+				"x":	-1,
 				"y":	0,
-				"angle":	3.1415925025939941
+				"angle":	0
 			},
 			"Image":	{
 				"filename":	"door",

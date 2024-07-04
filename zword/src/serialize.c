@@ -719,6 +719,14 @@ bool is_prefab(int entity) {
 
 
 bool is_prefab_child(int entity) {
+    JointComponent* joint = JointComponent_get(entity);
+    if (joint && joint->parent != -1) {
+        if (is_prefab(joint->parent)) {
+            return true;
+        }
+        return is_prefab_child(joint->parent);
+    }
+
     int parent = get_parent(entity);
     if (parent == -1) {
         return false;
@@ -847,7 +855,7 @@ void update_deserialized_ids(int ids[MAX_ENTITIES]) {
     for (int i = 0; i < LENGTH(deserialized_ids); i++) {
         int* id_ptr = deserialized_ids[i];
         if (!id_ptr) break;
-        printf("%d -> %d\n", *id_ptr, updated_id(*id_ptr, ids));
+        LOG_DEBUG("%d -> %d", *id_ptr, updated_id(*id_ptr, ids));
         *id_ptr = updated_id(*id_ptr, ids);
     }
     memset(deserialized_ids, 0, sizeof(deserialized_ids));
@@ -969,21 +977,25 @@ int deserialize_prefab(cJSON* json, Vector2f position, float angle, Vector2f sca
         deserialized_ids[i] = NULL;
     }
 
+    Matrix3 transform = transform_matrix(position, angle, scale);
+
     cJSON* entities = cJSON_GetObjectItem(json, "entities");
     cJSON* entity;
     int root = -1;
     int ids[MAX_ENTITIES];
     int n = 0;
     cJSON_ArrayForEach(entity, entities) {
+        // TODO: apply transform recursively
         ids[n] = deserialize_entity(entity, false);
 
         CoordinateComponent* coord = CoordinateComponent_get(ids[n]);
         if (coord && coord->parent == -1) {
             LOG_DEBUG("Updating prefab entity %d", ids[n]);
-            coord->position = sum(coord->position, position);
-            coord->angle += angle;
-            coord->scale.x *= scale.x;
-            coord->scale.y *= scale.y;
+            Matrix3 entity_transform = transform_matrix(coord->position, coord->angle, coord->scale);
+            entity_transform = matrix3_mult(transform, entity_transform);
+            coord->position = position_from_transform(entity_transform);
+            coord->angle = angle_from_transform(entity_transform);
+            coord->scale = scale_from_transform(entity_transform);
         }
 
         if (root == -1) {

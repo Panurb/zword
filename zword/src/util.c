@@ -244,6 +244,22 @@ Matrix3 transform_matrix(Vector2f position, float angle, Vector2f scale) {
     return (Matrix3) { scale.x * c, -scale.y * s, position.x, scale.x * s, scale.y * c, position.y, 0.0f, 0.0f, 1.0f };
 }
 
+
+Vector2f position_from_transform(Matrix3 m) {
+    return (Vector2f) { m.c, m.f };
+}
+
+
+Vector2f scale_from_transform(Matrix3 m) {
+    return (Vector2f) { norm((Vector2f) { m.a, m.d }), norm((Vector2f) { m.b, m.e }) };
+}
+
+
+float angle_from_transform(Matrix3 m) {
+    return atan2f(m.d, m.a);
+}
+
+
 Color get_color(float r, float g, float b, float a) {
     Color color;
     color.r = (int) (r * 255);

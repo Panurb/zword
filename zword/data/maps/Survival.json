@@ -23,7 +23,7 @@
 			"Coordinate":	{
 				"x":	-40,
 				"y":	8,
-				"angle":	3.1415927410125732,
+				"angle":	-3.1415925025939941,
 				"prefab":	"tiles/beach",
 				"scale_y":	6
 			}
@@ -40,7 +40,7 @@
 			"Coordinate":	{
 				"x":	-40,
 				"y":	40,
-				"angle":	3.1415927410125732,
+				"angle":	-3.1415925025939941,
 				"prefab":	"tiles/beach corner"
 			}
 		}, {
@@ -55,7 +55,7 @@
 			"Coordinate":	{
 				"x":	-40,
 				"y":	-24,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"tiles/beach corner"
 			}
 		}, {
@@ -63,7 +63,7 @@
 			"Coordinate":	{
 				"x":	-8,
 				"y":	-24,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"tiles/beach",
 				"scale_y":	6
 			}
@@ -488,47 +488,57 @@
 			"Coordinate":	{
 				"x":	-15.5,
 				"y":	-2.5,
-				"angle":	49.688694000244141,
-				"prefab":	"objects/uranium"
+				"angle":	-0.7209855318069458,
+				"prefab":	"objects/uranium",
+				"scale_x":	0.99999988079071045,
+				"scale_y":	0.99999988079071045
 			}
 		}, {
 			"id":	59,
 			"Coordinate":	{
 				"x":	-22.5,
 				"y":	4.5,
-				"angle":	29.4057788848877,
-				"prefab":	"objects/candle"
+				"angle":	-2.0101475715637207,
+				"prefab":	"objects/candle",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
 			}
 		}, {
 			"id":	60,
 			"Coordinate":	{
 				"x":	-8.5,
 				"y":	4.5,
-				"angle":	29.4057788848877,
-				"prefab":	"objects/candle"
+				"angle":	-2.0101475715637207,
+				"prefab":	"objects/candle",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
 			}
 		}, {
 			"id":	61,
 			"Coordinate":	{
 				"x":	-8.5,
 				"y":	-8.5,
-				"angle":	29.4057788848877,
-				"prefab":	"objects/candle"
+				"angle":	-2.0101475715637207,
+				"prefab":	"objects/candle",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
 			}
 		}, {
 			"id":	62,
 			"Coordinate":	{
 				"x":	-22.5,
 				"y":	-8.5,
-				"angle":	29.4057788848877,
-				"prefab":	"objects/candle"
+				"angle":	-2.0101475715637207,
+				"prefab":	"objects/candle",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
 			}
 		}, {
 			"id":	63,
 			"Coordinate":	{
 				"x":	-28.5,
 				"y":	17.5,
-				"angle":	6.2831850051879883,
+				"angle":	-3.0199160505617328e-07,
 				"prefab":	"weapons/smg"
 			}
 		}, {
@@ -536,7 +546,7 @@
 			"Coordinate":	{
 				"x":	-2.5,
 				"y":	18,
-				"angle":	6.2831850051879883,
+				"angle":	-3.0199160505617328e-07,
 				"prefab":	"weapons/pistol"
 			}
 		}, {
@@ -544,7 +554,7 @@
 			"Coordinate":	{
 				"x":	9,
 				"y":	30.5,
-				"angle":	12.566370010375977,
+				"angle":	-6.0398321011234657e-07,
 				"prefab":	"weapons/sawed-off"
 			}
 		}, {
@@ -552,7 +562,7 @@
 			"Coordinate":	{
 				"x":	-15.5,
 				"y":	4.5,
-				"angle":	12.566370010375977,
+				"angle":	-6.0398321011234657e-07,
 				"prefab":	"weapons/assault rifle"
 			}
 		}, {
@@ -560,7 +570,7 @@
 			"Coordinate":	{
 				"x":	-25.5,
 				"y":	-23,
-				"angle":	12.566370010375977,
+				"angle":	-6.0398321011234657e-07,
 				"prefab":	"weapons/shotgun"
 			}
 		}, {
@@ -631,7 +641,7 @@
 			"Coordinate":	{
 				"x":	-23.5,
 				"y":	24,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"objects/desk"
 			}
 		}, {
@@ -639,7 +649,7 @@
 			"Coordinate":	{
 				"x":	-26,
 				"y":	24,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"objects/desk"
 			}
 		}, {
@@ -647,7 +657,7 @@
 			"Coordinate":	{
 				"x":	-28.5,
 				"y":	24,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"objects/desk"
 			}
 		}, {
@@ -655,7 +665,7 @@
 			"Coordinate":	{
 				"x":	-28.5,
 				"y":	26.5,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"objects/desk"
 			}
 		}, {
@@ -663,7 +673,7 @@
 			"Coordinate":	{
 				"x":	-26,
 				"y":	26.5,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"objects/desk"
 			}
 		}, {
@@ -671,7 +681,7 @@
 			"Coordinate":	{
 				"x":	-23.5,
 				"y":	26.5,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"objects/desk"
 			}
 		}, {
@@ -679,7 +689,7 @@
 			"Coordinate":	{
 				"x":	-22.5,
 				"y":	17.5,
-				"angle":	28.869630813598633,
+				"angle":	-2.37621021270752,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -705,7 +715,7 @@
 			"Coordinate":	{
 				"x":	-8,
 				"y":	17.5,
-				"angle":	6.2831850051879883,
+				"angle":	-3.0199160505617328e-07,
 				"prefab":	"objects/stove"
 			}
 		}, {
@@ -713,7 +723,7 @@
 			"Coordinate":	{
 				"x":	-8,
 				"y":	15,
-				"angle":	6.2831850051879883,
+				"angle":	-3.0199160505617328e-07,
 				"prefab":	"objects/sink"
 			}
 		}, {
@@ -739,7 +749,7 @@
 			"Coordinate":	{
 				"x":	3,
 				"y":	17,
-				"angle":	22.312618255615234,
+				"angle":	1.7597157955169678,
 				"prefab":	"objects/table"
 			}
 		}, {
@@ -747,7 +757,7 @@
 			"Coordinate":	{
 				"x":	6,
 				"y":	26.5,
-				"angle":	28.869630813598633,
+				"angle":	-2.37621021270752,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -755,7 +765,7 @@
 			"Coordinate":	{
 				"x":	13.5,
 				"y":	30,
-				"angle":	10.995573997497559,
+				"angle":	-1.5707966089248657,
 				"prefab":	"objects/sink"
 			}
 		}, {
@@ -763,7 +773,7 @@
 			"Coordinate":	{
 				"x":	13.5,
 				"y":	26.5,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/toilet"
 			}
 		}, {
@@ -771,7 +781,7 @@
 			"Coordinate":	{
 				"x":	21,
 				"y":	-5,
-				"angle":	12.566370010375977,
+				"angle":	-6.0398321011234657e-07,
 				"prefab":	"creatures/player"
 			}
 		}, {
@@ -779,7 +789,7 @@
 			"Coordinate":	{
 				"x":	21,
 				"y":	-3,
-				"angle":	36.819828033447266,
+				"angle":	1.9692152738571167,
 				"prefab":	"weapons/axe"
 			}
 		}, {
@@ -795,7 +805,7 @@
 			"Coordinate":	{
 				"x":	16.5,
 				"y":	-4,
-				"angle":	6.2831854820251465,
+				"angle":	1.7484555314695172e-07,
 				"prefab":	"objects/bench"
 			}
 		}, {
@@ -803,7 +813,7 @@
 			"Coordinate":	{
 				"x":	19,
 				"y":	-1.5,
-				"angle":	4.7123894691467285,
+				"angle":	-1.5707958936691284,
 				"prefab":	"objects/bench"
 			}
 		}, {
@@ -811,7 +821,7 @@
 			"Coordinate":	{
 				"x":	19,
 				"y":	-6.5,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/bench"
 			}
 		}, {
@@ -819,7 +829,7 @@
 			"Coordinate":	{
 				"x":	19,
 				"y":	-4,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/fire"
 			}
 		}, {
@@ -827,7 +837,7 @@
 			"Coordinate":	{
 				"x":	10,
 				"y":	0,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -835,7 +845,7 @@
 			"Coordinate":	{
 				"x":	12,
 				"y":	-6,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -843,7 +853,7 @@
 			"Coordinate":	{
 				"x":	6,
 				"y":	-1,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -851,7 +861,7 @@
 			"Coordinate":	{
 				"x":	5,
 				"y":	-6,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -859,7 +869,7 @@
 			"Coordinate":	{
 				"x":	7,
 				"y":	-10,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -867,7 +877,7 @@
 			"Coordinate":	{
 				"x":	5,
 				"y":	-14,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -875,7 +885,7 @@
 			"Coordinate":	{
 				"x":	0,
 				"y":	-11,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -883,7 +893,7 @@
 			"Coordinate":	{
 				"x":	0,
 				"y":	-4,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -891,7 +901,7 @@
 			"Coordinate":	{
 				"x":	1,
 				"y":	1,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -899,7 +909,7 @@
 			"Coordinate":	{
 				"x":	3,
 				"y":	5,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -907,7 +917,7 @@
 			"Coordinate":	{
 				"x":	7,
 				"y":	5,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -915,7 +925,7 @@
 			"Coordinate":	{
 				"x":	-17,
 				"y":	11,
-				"angle":	7.8539814949035645,
+				"angle":	1.5707961320877075,
 				"prefab":	"objects/tree"
 			}
 		}, {
@@ -1373,6 +1383,77 @@
 				"x":	22,
 				"y":	-1,
 				"prefab":	"objects/waypoint"
+			}
+		}, {
+			"id":	176,
+			"Coordinate":	{
+				"x":	0,
+				"y":	9.5,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	177,
+			"Coordinate":	{
+				"x":	13,
+				"y":	9.5,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	178,
+			"Coordinate":	{
+				"x":	-20,
+				"y":	24,
+				"prefab":	"tiles/wood",
+				"scale_x":	2,
+				"scale_y":	2
+			}
+		}, {
+			"id":	179,
+			"Coordinate":	{
+				"x":	-11,
+				"y":	20,
+				"prefab":	"tiles/wood",
+				"scale_x":	2,
+				"scale_y":	2
+			}
+		}, {
+			"id":	180,
+			"Coordinate":	{
+				"x":	-25,
+				"y":	16.5,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	181,
+			"Coordinate":	{
+				"x":	4.7500004768371582,
+				"y":	27.5,
+				"angle":	4.71238899230957,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	182,
+			"Coordinate":	{
+				"x":	-8,
+				"y":	11,
+				"angle":	-1.4857535362243652,
+				"prefab":	"objects/lamp"
+			}
+		}, {
+			"id":	183,
+			"Coordinate":	{
+				"x":	-11,
+				"y":	20,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	184,
+			"Coordinate":	{
+				"x":	-20,
+				"y":	24,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/candle"
 			}
 		}]
 }

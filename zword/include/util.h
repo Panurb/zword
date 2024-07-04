@@ -157,6 +157,12 @@ Matrix3 matrix3_mult(Matrix3 m, Matrix3 n);
 
 Matrix3 transform_matrix(Vector2f position, float angle, Vector2f scale);
 
+Vector2f position_from_transform(Matrix3 m);
+
+Vector2f scale_from_transform(Matrix3 m);
+
+float angle_from_transform(Matrix3 m);
+
 Color get_color(float r, float g, float b, float a);
 
 void permute(int* array, int size);

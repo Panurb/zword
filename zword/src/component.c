@@ -987,35 +987,19 @@ Matrix3 get_transform(int entity) {
 
 
 Vector2f get_position(int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(entity);
-    Vector2f position = coord->position;
-
-    int parent = coord->parent;
-    if (parent != -1) {
-        position = sum(get_position(parent), rotate(position, get_angle(parent)));
-    }
-    return position;
+    Matrix3 transform = get_transform(entity);
+    return position_from_transform(transform);
 }
 
 float get_angle(int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(entity);
-    float angle = coord->angle;
-
-    int parent = coord->parent;
-    if (parent != -1) {
-        angle += get_angle(parent);
-    }
-
-    return mod(angle, 2.0f * M_PI);
+    Matrix3 transform = get_transform(entity);
+    return angle_from_transform(transform);
 }
 
 
 Vector2f get_scale(int entity) {
     Matrix3 transform = get_transform(entity);
-    Vector2f scale;
-    scale.x = norm(vec(transform.a, transform.d));
-    scale.y = norm(vec(transform.b, transform.e));
-    return scale;
+    return scale_from_transform(transform);
 }
 
 

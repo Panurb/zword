@@ -463,13 +463,16 @@ void update_selections() {
             }
         }
 
-        if (image && image->layer > top_layer && non_zero(overlap)) {
-            top_entity = i;
-            top_layer = image->layer;
-        }
-    
-        if (area > 0.0f && non_zero(overlap)) {
-            List_add(selections, i);
+        if (non_zero(overlap)) {
+            if (image && image->layer > top_layer) {
+                top_entity = i;
+                top_layer = image->layer;
+            }
+        
+            if (area > 0.0f) {
+                List_add(selections, i);
+                // TODO: select joint chain
+            }
         }
     }
 
