@@ -145,6 +145,13 @@ void init_survival() {
 void init_tutorial() {
     game_over_timer = 0.0f;
     level_won = false;
+
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ItemComponent* item = ItemComponent_get(i);
+        if (item) {
+            item->price = 0;
+        }
+    }
 }
 
 
