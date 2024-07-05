@@ -392,6 +392,15 @@ void collide() {
                             break;
                         case 2:
                             apply_force(i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
+
+                            ImageComponent* image = ImageComponent_get(n);
+                            if (image) {
+                                float x = norm(proj(ol, half_width(n)));
+                                float y = norm(proj(ol, half_height(n)));
+                                image->stretch = x / collider_width(n) - y / collider_height(n);
+                                image->stretch *= 0.5f;
+                                image->stretch_speed = 0.0f;
+                            }
                             break;
                         case 3:
                             if (VehicleComponent_get(i)) {
