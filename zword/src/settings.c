@@ -10,8 +10,8 @@
 
 
 Settings game_settings = {
-    .width = 1920,
-    .height = 1080,
+    .width = 1280,
+    .height = 720,
     .antialiasing = 8,
     .fullscreen = false,
     .vsync = false,

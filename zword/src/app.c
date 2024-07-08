@@ -17,7 +17,7 @@
 
 App app;
 
-static String version = "0.1";
+static String version = "0.2";
 
 static float title_scale = 2.0f;
 

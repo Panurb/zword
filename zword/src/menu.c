@@ -15,8 +15,6 @@
 
 static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
 int RESOLUTION_ID = -1;
-int SOUND_ID = -1;
-int MUSIC_ID = -1;
 int fullscreen_id = -1;
 static int map_name_textbox = -1;
 static int window_play = -1;
@@ -31,8 +29,6 @@ static int window_xbox_controls = -1;
 
 void reset_ids() {
     RESOLUTION_ID = -1;
-    SOUND_ID = -1;
-    MUSIC_ID = -1;
     fullscreen_id = -1;
     window_play = -1;
     window_new_map = -1;
@@ -109,12 +105,6 @@ void apply(int entity) {
 
     widget = WidgetComponent_get(fullscreen_id);
     game_settings.fullscreen = widget->value;
-
-    widget = WidgetComponent_get(SOUND_ID);
-    game_settings.volume = widget->value;
-
-    widget = WidgetComponent_get(MUSIC_ID);
-    game_settings.music = widget->value;
 
     game_state = STATE_APPLY;
 }
@@ -197,6 +187,18 @@ int get_resolution_index() {
 }
 
 
+void set_volume(int entity, int value) {
+    UNUSED(entity);
+    game_settings.volume = value;
+}
+
+
+void set_music(int entity, int value) {
+    UNUSED(entity);
+    game_settings.music = value;
+}
+
+
 void toggle_settings(int entity) {
     UNUSED(entity);
     if (window_settings != -1) {
@@ -211,24 +213,29 @@ void toggle_settings(int entity) {
     int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 2, 5);
     add_child(window_settings, container);
 
-    int label = create_label("Resolution", zeros());
-    RESOLUTION_ID = create_dropdown(zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
-    WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
-    add_row_to_container(container, label, RESOLUTION_ID);
+    int label = -1;
+    #ifndef __EMSCRIPTEN__
+        label = create_label("Resolution", zeros());
+        RESOLUTION_ID = create_dropdown(zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
+        WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
+        add_row_to_container(container, label, RESOLUTION_ID);
 
-    label = create_label("Fullscreen", zeros());
-    fullscreen_id = create_checkbox(zeros(), game_settings.fullscreen, NULL);
-    add_row_to_container(container, label, fullscreen_id);
+        label = create_label("Fullscreen", zeros());
+        fullscreen_id = create_checkbox(zeros(), game_settings.fullscreen, NULL);
+        add_row_to_container(container, label, fullscreen_id);
+    #endif
 
     label = create_label("Sound", zeros());
-    SOUND_ID = create_slider(zeros(), 0, 100, game_settings.volume, NULL);
-    add_row_to_container(container, label, SOUND_ID);
+    int slider = create_slider(zeros(), 0, 100, game_settings.volume, set_volume);
+    add_row_to_container(container, label, slider);
 
     label = create_label("Music", zeros());
-    MUSIC_ID = create_slider(zeros(), 0, 100, game_settings.music, NULL);
-    add_row_to_container(container, label, MUSIC_ID);
+    slider = create_slider(zeros(), 0, 100, game_settings.music, set_music);
+    add_row_to_container(container, label, slider);
 
-    add_button_to_container(container, "Apply", apply);
+    #ifndef __EMSCRIPTEN__
+        add_button_to_container(container, "Apply", apply);
+    #endif
 }
 
 

@@ -63,7 +63,7 @@ set(SOURCES
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")  
     add_executable(notk ${SOURCES})
-    set_target_properties(notk PROPERTIES LINK_FLAGS "--preload-file=data -s ALLOW_MEMORY_GROWTH=1")
+    set_target_properties(notk PROPERTIES LINK_FLAGS "--preload-file=data -s ALLOW_MEMORY_GROWTH=1 --shell-file ../shell.html")
 
     file(COPY zword/data
         DESTINATION ${CMAKE_BINARY_DIR}
@@ -92,45 +92,37 @@ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     )
 
     target_link_libraries(notk ${LIBS})
+
+    set(DLLS
+        ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.dll
+        ${CMAKE_SOURCE_DIR}/SDL_image/lib/x64/SDL2_image.dll
+        ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x64/SDL2_ttf.dll
+        ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x64/SDL2_mixer.dll
+    )
+
+    install(FILES ${DLLS}
+        DESTINATION ${CMAKE_BINARY_DIR}
+    )
+
+    install(DIRECTORY zword/data
+        DESTINATION ${CMAKE_BINARY_DIR}
+        FILES_MATCHING 
+            PATTERN "*.png"
+            PATTERN "*.ttf"
+            PATTERN "*.wav"
+            PATTERN "*.json"
+            PATTERN "*.ogg"
+    )
+
+    install(FILES ${EXTERNAL_DLLS}
+        DESTINATION ${CMAKE_BINARY_DIR}
+    )
+
+    set(CONFIG 
+        ${CMAKE_SOURCE_DIR}/zword/config.cfg
+    )
+
+    install(FILES ${CONFIG}
+        DESTINATION ${CMAKE_BINARY_DIR}
+    )
 endif()
-
-set(DLLS
-    ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.dll
-    ${CMAKE_SOURCE_DIR}/SDL_image/lib/x64/SDL2_image.dll
-    ${CMAKE_SOURCE_DIR}/SDL_ttf/lib/x64/SDL2_ttf.dll
-    ${CMAKE_SOURCE_DIR}/SDL_mixer/lib/x64/SDL2_mixer.dll
-)
-
-install(FILES ${DLLS}
-    DESTINATION ${CMAKE_BINARY_DIR}
-)
-
-install(DIRECTORY zword/data
-    DESTINATION ${CMAKE_BINARY_DIR}
-    FILES_MATCHING 
-        PATTERN "*.png"
-        PATTERN "*.ttf"
-        PATTERN "*.wav"
-		PATTERN "*.json"
-		PATTERN "*.ogg"
-)
-
-set(SHADERS
-    ${CMAKE_SOURCE_DIR}/zword/src/outline.frag
-)
-
-install(FILES ${SHADERS}
-    DESTINATION ${CMAKE_BINARY_DIR}
-)
-
-install(FILES ${EXTERNAL_DLLS}
-    DESTINATION ${CMAKE_BINARY_DIR}
-)
-
-set(CONFIG 
-    ${CMAKE_SOURCE_DIR}/zword/config.cfg
-)
-
-install(FILES ${CONFIG}
-    DESTINATION ${CMAKE_BINARY_DIR}
-)
