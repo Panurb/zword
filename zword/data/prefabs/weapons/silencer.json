@@ -7,28 +7,24 @@
 				"angle":	0
 			},
 			"Image":	{
-				"filename":	"ammo_rifle",
+				"filename":	"silencer",
 				"layer":	7
 			},
 			"Physics":	{
 				"mass":	0.5
 			},
 			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
+				"type":	1,
+				"width":	1,
+				"height":	0.3,
 				"group":	2
 			},
 			"Item":	{
 				"size":	0,
-				"type":	0
+				"type":	3
 			},
 			"Sound":	{
 				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	2,
-				"size":	24
 			}
 		}]
 }

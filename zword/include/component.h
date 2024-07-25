@@ -284,7 +284,14 @@ typedef struct {
 
 typedef enum ItemType {
     ITEM_HEAL,
-    ITEM_LIGHT
+    ITEM_LIGHT,
+    ITEM_LASER,
+    ITEM_SILENCER,
+    ITEM_SCOPE,
+    ITEM_MAGAZINE,
+    ITEM_STOCK,
+    ITEM_BARREL,
+    ITEM_GRIP
 } ItemType;
 
 typedef struct {

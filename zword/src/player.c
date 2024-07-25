@@ -295,14 +295,16 @@ void update_players(float time_step) {
                     } else if (atch != -1) {
                         ItemComponent* item_slot = ItemComponent_get(player->inventory[slot]);
                         if (player->inventory[slot] != player->grabbed_item && item_slot->attachments[atch] == -1) {
-                            replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
-                            for (int j = 0; j < player->inventory_size; j++) {
-                                if (player->inventory[j] == -1) continue;
-                                ItemComponent* it = ItemComponent_get(player->inventory[j]);
-                                replace(player->grabbed_item, -1, it->attachments, it->size);
+                            if (is_attachment(player->grabbed_item)) {
+                                replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
+                                for (int j = 0; j < player->inventory_size; j++) {
+                                    if (player->inventory[j] == -1) continue;
+                                    ItemComponent* it = ItemComponent_get(player->inventory[j]);
+                                    replace(player->grabbed_item, -1, it->attachments, it->size);
+                                }
+                                item_slot->attachments[atch] = player->grabbed_item;
+                                CoordinateComponent_get(player->grabbed_item)->parent = player->inventory[slot];
                             }
-                            item_slot->attachments[atch] = player->grabbed_item;
-                            CoordinateComponent_get(player->grabbed_item)->parent = player->inventory[slot];
                         }
                     }
                     player->grabbed_item = -1;

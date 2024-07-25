@@ -26,6 +26,7 @@ static const char* SOUNDS[] = {
     "metal_hit",
     "pistol",
     "shotgun",
+    "silencer",
     "squish",
     "stone_hit",
     "wood_destroy",

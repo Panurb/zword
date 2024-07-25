@@ -344,6 +344,7 @@ void input_players(int camera) {
                             int k = item->attachments[j];
                             LightComponent* light = LightComponent_get(k);
                             if (light) {
+                                // FIXME
                                 light->enabled = !light->enabled;
                             }
                         }

@@ -9,6 +9,21 @@
 #include "player.h"
 
 
+bool is_attachment(int entity) {
+    ItemComponent* item = ItemComponent_get(entity);
+    if (!item) return false;
+    
+    switch (item->type) {
+        case ITEM_LIGHT:
+        case ITEM_LASER:
+        case ITEM_SILENCER:
+            return true;
+        default:
+            return false;
+    }
+}
+
+
 int create_flashlight(Vector2f position) {
     int i = create_entity();
 

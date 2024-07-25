@@ -5,6 +5,8 @@
 #include "game.h"
 
 
+bool is_attachment(int entity);
+
 int create_flashlight(Vector2f position);
 
 int create_gas(Vector2f position);

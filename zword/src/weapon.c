@@ -28,6 +28,68 @@ int get_akimbo(int entity) {
     return 0;
 }
 
+
+float get_recoil(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    float recoil = weapon->recoil;
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (atch && atch->type == ITEM_LASER) {
+            recoil *= 0.75;
+        }
+    }
+
+    return recoil;
+}
+
+
+int get_damage(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    int damage = weapon->damage;
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (atch && atch->type == ITEM_SILENCER) {
+            damage *= 0.75;
+        }
+    }
+
+    return damage;
+}
+
+
+float get_reload_time(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    float reload_time = weapon->reload_time;
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (atch && atch->type == ITEM_MAGAZINE) {
+            reload_time *= 0.75;
+        }
+    }
+
+    return reload_time;
+}
+
+
+float has_silencer(int entity) {
+    ItemComponent* item = ItemComponent_get(entity);
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (atch && atch->type == ITEM_SILENCER) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 void reload(int i) {
     WeaponComponent* weapon = WeaponComponent_get(i);
     if (weapon->max_magazine == -1) {
@@ -263,7 +325,7 @@ void attack(int entity) {
             }
 
             weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);
-            if (PlayerComponent_get(parent)) {
+            if (PlayerComponent_get(parent) && !has_silencer(entity)) {
                 alert_enemies(parent, weapon->sound_range);
             }
 
@@ -278,7 +340,12 @@ void attack(int entity) {
 
     SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
-        add_sound(entity, weapon->sound, 1.0f, 1.0f);
+        if (has_silencer(entity)) {
+            add_sound(entity, weapon->sound, 0.5f, 1.0f);
+            add_sound(entity, "silencer", 0.5f, 1.0f);
+        } else {
+            add_sound(entity, weapon->sound, 1.0f, 1.0f);
+        }
     }
 
     if (weapon->magazine == 0) {

@@ -4,7 +4,7 @@
 			"Coordinate":	{
 				"x":	0,
 				"y":	0,
-				"angle":	4.69105577468872
+				"angle":	0
 			},
 			"Image":	{
 				"filename":	"flashlight",
@@ -33,7 +33,7 @@
 				"size":	0,
 				"price":	100,
 				"name":	"Flashlight",
-				"type":	0
+				"type":	1
 			}
 		}]
 }

@@ -7,28 +7,34 @@
 				"angle":	0
 			},
 			"Image":	{
-				"filename":	"ammo_rifle",
+				"filename":	"laser",
 				"layer":	7
 			},
 			"Physics":	{
 				"mass":	0.5
 			},
 			"Collider":	{
-				"type":	0,
-				"width":	0.5,
-				"height":	0.5,
+				"type":	1,
+				"width":	1,
+				"height":	0.3,
 				"group":	2
+			},
+            "Light":	{
+				"enabled":	0,
+				"range":	30,
+				"angle":	0.05,
+				"color_r":	255,
+				"color_g":	0,
+				"color_b":	0,
+				"brightness":	0.75,
+				"speed":	10
 			},
 			"Item":	{
 				"size":	0,
-				"type":	0
+				"type":	2
 			},
 			"Sound":	{
 				"hit_sound":	"metal"
-			},
-			"Ammo":	{
-				"type":	2,
-				"size":	24
 			}
 		}]
 }
