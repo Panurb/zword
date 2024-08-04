@@ -287,6 +287,7 @@ typedef enum ItemType {
     ITEM_LIGHT,
     ITEM_LASER,
     ITEM_SILENCER,
+    ITEM_HOLLOW_POINT,
     ITEM_SCOPE,
     ITEM_MAGAZINE,
     ITEM_STOCK,

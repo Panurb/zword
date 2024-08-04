@@ -29,15 +29,37 @@ int get_akimbo(int entity) {
 }
 
 
+float get_spread(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    float spread = weapon->spread;
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (!atch) continue;
+        if (atch->type == ITEM_LASER) {
+            spread *= 0.75f;
+        } else if (atch->type == ITEM_SCOPE) {
+            spread *= 0.5f;
+        }
+    }
+
+    return spread;
+}
+
+
 float get_recoil(int entity) {
     WeaponComponent* weapon = WeaponComponent_get(entity);
     ItemComponent* item = ItemComponent_get(entity);
 
-    float recoil = weapon->recoil;
+    float recoil = weapon->recoil_up;
     for (int i = 0; i < item->size; i++) {
         ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (atch && atch->type == ITEM_LASER) {
-            recoil *= 0.75;
+        if (!atch) continue;
+        if (atch->type == ITEM_LASER) {
+            recoil *= 0.75f;
+        } else if (atch->type == ITEM_SCOPE) {
+            recoil *= 0.5f;
         }
     }
 
@@ -52,8 +74,11 @@ int get_damage(int entity) {
     int damage = weapon->damage;
     for (int i = 0; i < item->size; i++) {
         ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (atch && atch->type == ITEM_SILENCER) {
-            damage *= 0.75;
+        if (!atch) continue;
+        if (atch->type == ITEM_SILENCER) {
+            damage *= 0.75f;
+        } else if (atch->type == ITEM_HOLLOW_POINT) {
+            damage *= 1.25f;
         }
     }
 
@@ -69,11 +94,45 @@ float get_reload_time(int entity) {
     for (int i = 0; i < item->size; i++) {
         ItemComponent* atch = ItemComponent_get(item->attachments[i]);
         if (atch && atch->type == ITEM_MAGAZINE) {
-            reload_time *= 0.75;
+            reload_time *= 0.75f;
         }
     }
 
     return reload_time;
+}
+
+
+float get_fire_rate(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    float fire_rate = weapon->fire_rate;
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (!atch) continue;
+        if (atch->type == ITEM_SCOPE) {
+            fire_rate *= 0.75f;
+        }
+    }
+
+    return fire_rate;
+}
+
+
+int get_magazine(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    int magazine = weapon->max_magazine;
+    for (int i = 0; i < item->size; i++) {
+        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+        if (!atch) continue;
+        if (atch->type == ITEM_MAGAZINE) {
+            magazine = floorf(magazine * 1.5f);
+        }
+    }
+
+    return magazine;
 }
 
 
@@ -212,7 +271,7 @@ void attack(int entity) {
     }
 
     int akimbo = get_akimbo(entity);
-    weapon->cooldown = 1.0f / ((1 + akimbo) * weapon->fire_rate);
+    weapon->cooldown = 1.0f / ((1 + akimbo) * get_fire_rate(entity));
     if (weapon->max_magazine != -1) {
         weapon->magazine--;
     }
@@ -303,13 +362,14 @@ void attack(int entity) {
             ParticleComponent* particle = ParticleComponent_get(entity);
             for (int i = 0; i < weapon->shots; i++) {
                 float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-                if (weapon->spread > 0.0f) {
-                    angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+                float spread = get_spread(entity);
+                if (spread > 0.0f) {
+                    angle = i * spread / (weapon->shots - 1) - 0.5f * spread + randf(-0.1f, 0.1f);
                 }
                 Vector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
                 HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
-                int dmg = weapon->damage;
+                int dmg = get_damage(entity);
                 if (dot(info.normal, dir) < -0.99f) {
                     dmg *= 2;
                 }
@@ -369,7 +429,7 @@ void update_weapons(float time_step) {
             weapon->recoil = fmaxf(weapon->recoil_up * phys->speed / phys->max_speed, weapon->recoil);
 
             if (weapon->ammo_type == AMMO_MELEE) {
-                float x_max = 1.0f / weapon->fire_rate;
+                float x_max = 1.0f / get_fire_rate(i);
                 float x = 2.0f * (x_max - weapon->cooldown) / x_max;
                 coord->angle = M_PI * powf(x - 1.0f, 2.0f) - 0.45f * M_PI;
             }

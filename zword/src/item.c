@@ -17,6 +17,9 @@ bool is_attachment(int entity) {
         case ITEM_LIGHT:
         case ITEM_LASER:
         case ITEM_SILENCER:
+        case ITEM_SCOPE:
+        case ITEM_MAGAZINE:
+        case ITEM_HOLLOW_POINT:
             return true;
         default:
             return false;
@@ -214,7 +217,7 @@ void heal(int entity) {
 void switch_light(int entity) {
     LightComponent* light = LightComponent_get(entity);
     if (light) {
-        light->enabled = true;
+        light->enabled = !light->enabled;
     }
 }
 
@@ -231,6 +234,7 @@ void use_item(int entity, float time_step) {
                 heal(entity);
                 break;
             case ITEM_LIGHT:
+            case ITEM_LASER:
                 switch_light(entity);
                 break;
             default:

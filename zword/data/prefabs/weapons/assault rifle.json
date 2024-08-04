@@ -49,8 +49,8 @@
 				"automatic":	true
 			},
 			"Item":	{
-				"size":	1,
-				"attachments":	[-1],
+				"size":	2,
+				"attachments":	[-1, -1],
 				"price":	5000,
 				"name":	"RK-62",
 				"type":	0

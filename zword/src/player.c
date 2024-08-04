@@ -152,10 +152,6 @@ void update_players(float time_step) {
                 }
                 List_delete(list);
 
-                if (!weapon && light) {
-                    light->enabled = true;
-                }
-
                 if (itco) {
                     for (int j = 0; j < itco->size; j++) {
                         LightComponent* a = LightComponent_get(itco->attachments[j]);
@@ -182,6 +178,7 @@ void update_players(float time_step) {
                     }
                 } else if (itco) {
                     use_item(item, time_step);
+                    player->state = PLAYER_ON_FOOT;
                 }
 
                 break;

@@ -4,6 +4,15 @@
 #include "grid.h"
 
 
+typedef struct {
+    float magazine;
+    float spread;
+    float recoil;
+    float damage;
+    float fire_rate;
+} WeaponStats;
+
+
 int get_akimbo(int entity);
 
 void reload(int i);

@@ -211,6 +211,14 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 }
 
 
+void draw_laser(int camera, Vector2f start, float angle, float range, Color color, float brightness) {
+    HitInfo info = raycast(start, polar_to_cartesian(1.0, angle), range, GROUP_LIGHTS);
+    Vector2f end = info.position;
+
+    draw_line(camera, start, end, 0.1f, color);
+}
+
+
 void draw_lights(int camera, float ambient_light) {
     Color color = get_color(ambient_light, ambient_light, ambient_light, 1.0f);
 
@@ -225,6 +233,10 @@ void draw_lights(int camera, float ambient_light) {
         LightComponent* light = LightComponent_get(i);
         if (!light) continue;
 
+        if (!light->enabled || light->brightness == 0.0f) {
+            continue;
+        }
+
         Vector2f start = get_position(i);
 
         if (!on_screen(camera, start, 2.0f * light->range, 2.0f * light->range)) {
@@ -234,14 +246,16 @@ void draw_lights(int camera, float ambient_light) {
         float brightness = light->brightness;
         float range = light->range;
 
-        if (light->enabled) {
-            float f = 1.0 - light->flicker * 0.25 * (sinf(8.0 * light->time) + sinf(12.345 * light->time) + 2.0);
-            brightness *= f;
-            range *= f;
-        }
+        float f = 1.0 - light->flicker * 0.25 * (sinf(8.0 * light->time) + sinf(12.345 * light->time) + 2.0);
+        brightness *= f;
+        range *= f;
 
         Color color = light->color;
-        draw_light(camera, start, get_angle(i), light->angle, range, light->rays, color, brightness, light->bounces);
+        if (light->angle == 0.0f) {
+            draw_laser(camera, start, get_angle(i), range, color, brightness);
+        } else {
+            draw_light(camera, start, get_angle(i), light->angle, range, light->rays, color, brightness, light->bounces);
+        }
     }
 
     SDL_SetRenderTarget(app.renderer, NULL);

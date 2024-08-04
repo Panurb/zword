@@ -7,7 +7,7 @@
 				"angle":	0
 			},
 			"Image":	{
-				"filename":	"silencer",
+				"filename":	"scope",
 				"layer":	7
 			},
 			"Physics":	{
@@ -20,9 +20,10 @@
 				"group":	2
 			},
 			"Item":	{
-				"name":	"Silencer",
+				"name":	"Scope",
 				"size":	0,
-				"type":	3
+				"type":	5, 
+                "price": 5000
 			},
 			"Sound":	{
 				"hit_sound":	"metal"
