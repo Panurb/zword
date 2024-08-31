@@ -34,13 +34,16 @@ float get_spread(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     float spread = weapon->spread;
-    for (int i = 0; i < item->size; i++) {
-        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (!atch) continue;
-        if (atch->type == ITEM_LASER) {
-            spread *= 0.75f;
-        } else if (atch->type == ITEM_SCOPE) {
-            spread *= 0.5f;
+
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (!atch) continue;
+            if (atch->type == ITEM_LASER) {
+                spread *= 0.75f;
+            } else if (atch->type == ITEM_SCOPE) {
+                spread *= 0.5f;
+            }
         }
     }
 
@@ -53,13 +56,16 @@ float get_recoil(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     float recoil = weapon->recoil_up;
-    for (int i = 0; i < item->size; i++) {
-        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (!atch) continue;
-        if (atch->type == ITEM_LASER) {
-            recoil *= 0.75f;
-        } else if (atch->type == ITEM_SCOPE) {
-            recoil *= 0.5f;
+
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (!atch) continue;
+            if (atch->type == ITEM_LASER) {
+                recoil *= 0.75f;
+            } else if (atch->type == ITEM_SCOPE) {
+                recoil *= 0.5f;
+            }
         }
     }
 
@@ -72,13 +78,16 @@ int get_damage(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     int damage = weapon->damage;
-    for (int i = 0; i < item->size; i++) {
-        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (!atch) continue;
-        if (atch->type == ITEM_SILENCER) {
-            damage *= 0.75f;
-        } else if (atch->type == ITEM_HOLLOW_POINT) {
-            damage *= 1.25f;
+
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (!atch) continue;
+            if (atch->type == ITEM_SILENCER) {
+                damage *= 0.75f;
+            } else if (atch->type == ITEM_HOLLOW_POINT) {
+                damage *= 1.25f;
+            }
         }
     }
 
@@ -91,10 +100,13 @@ float get_reload_time(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     float reload_time = weapon->reload_time;
-    for (int i = 0; i < item->size; i++) {
-        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (atch && atch->type == ITEM_MAGAZINE) {
-            reload_time *= 0.75f;
+
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (atch && atch->type == ITEM_MAGAZINE) {
+                reload_time *= 0.75f;
+            }
         }
     }
 
@@ -107,11 +119,14 @@ float get_fire_rate(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     float fire_rate = weapon->fire_rate;
-    for (int i = 0; i < item->size; i++) {
-        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (!atch) continue;
-        if (atch->type == ITEM_SCOPE) {
-            fire_rate *= 0.75f;
+
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (!atch) continue;
+            if (atch->type == ITEM_SCOPE) {
+                fire_rate *= 0.75f;
+            }
         }
     }
 
