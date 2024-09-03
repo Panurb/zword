@@ -42,6 +42,7 @@ static const char* IMAGES[] = {
     "bench_destroyed",
     "big_boy",
     "big_boy_dead",
+    "birch",
     "blood",
     "blood_large",
     "blood_particle",

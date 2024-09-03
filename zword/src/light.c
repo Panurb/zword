@@ -233,7 +233,7 @@ void draw_lights(int camera, float ambient_light) {
         LightComponent* light = LightComponent_get(i);
         if (!light) continue;
 
-        if (!light->enabled || light->brightness == 0.0f) {
+        if (light->brightness == 0.0f) {
             continue;
         }
 

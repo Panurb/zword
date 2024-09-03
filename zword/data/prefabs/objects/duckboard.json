@@ -7,7 +7,7 @@
 			},
 			"Image":	{
 				"filename":	"duckboard",
-				"layer":	7
+				"layer":	1
 			},
 			"Collider":	{
 				"type":	1,
