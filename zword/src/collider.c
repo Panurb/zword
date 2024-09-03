@@ -313,6 +313,8 @@ bool collides_with(int i, List* entities) {
 void apply_trigger(int trigger, int target) {
     ColliderComponent* collider = ColliderComponent_get(trigger);
     PlayerComponent* player = PlayerComponent_get(target);
+    PhysicsComponent* physics = PhysicsComponent_get(target);
+
     switch (collider->trigger_type) {
         case TRIGGER_NONE:
             break;
@@ -320,6 +322,19 @@ void apply_trigger(int trigger, int target) {
             if (player) {
                 player->won = true;
             }
+            break;
+        case TRIGGER_SLOW:
+            if (physics) {
+                physics->slowed = true;
+            }
+            break;
+        case TRIGGER_GROUND:
+            if (physics) {
+                physics->on_ground = true;
+            }
+            break;
+        case TRIGGER_DAMAGE:
+            damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 1, trigger);
             break;
     }
 }
@@ -339,7 +354,7 @@ void collide() {
         ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
 
-        PhysicsComponent* physics = game_data->components->physics[i];
+        PhysicsComponent* physics = PhysicsComponent_get(i);
         if (!physics) continue;
 
         Bounds bounds = get_bounds(i);
@@ -358,16 +373,14 @@ void collide() {
 
                     if (collision_type == 0) continue;
 
-                    if (collider_other->trigger_type != TRIGGER_NONE) {
-                        // print trigger type
-                        // printf("trigger type: %i\n", collider_other->trigger_type);
-                        apply_trigger(n, i);
-                        continue;
-                    }
-
                     Vector2f ol = overlap_collider_collider(i, n);
 
                     if (!non_zero(ol)) continue;
+
+                    if (collider_other->trigger_type != TRIGGER_NONE) {
+                        apply_trigger(n, i);
+                        continue;
+                    }
 
                     Vector2f dv = physics->velocity;
                     Vector2f no = normalized(ol);

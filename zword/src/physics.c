@@ -100,12 +100,16 @@ void update_physics(float time_step) {
         physics->acceleration = zeros();
         
         physics->speed = norm(physics->velocity);
+        float max_speed = physics->max_speed;
+        if (physics->slowed && !physics->on_ground) {
+            max_speed *= 0.6f;
+        }
         if (physics->speed < 0.1f) {
             physics->velocity = zeros();
             physics->speed = 0.0f;
-        } else if (physics->speed > physics->max_speed) {
-            physics->velocity = mult(physics->max_speed / physics->speed, physics->velocity);
-            physics->speed = physics->max_speed;
+        } else if (physics->speed > max_speed) {
+            physics->velocity = mult(max_speed / physics->speed, physics->velocity);
+            physics->speed = max_speed;
         }
 
         physics->angular_acceleration -= sign(physics->angular_velocity) * physics->angular_drag;
@@ -127,5 +131,8 @@ void update_physics(float time_step) {
         List_clear(physics->collision.entities);
         physics->collision.overlap = zeros();
         physics->collision.velocity = zeros();
+
+        physics->slowed = false;
+        physics->on_ground = false;
     }
 }

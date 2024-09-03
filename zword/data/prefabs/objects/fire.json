@@ -11,9 +11,10 @@
 			},
 			"Collider":	{
 				"type":	0,
-				"width":	0.699999988079071,
-				"height":	0.699999988079071,
-				"group":	8
+				"width":	0.7,
+				"height":	0.7,
+				"group":	8,
+				"trigger_type":	4
 			},
 			"Light":	{
 				"range":	18,

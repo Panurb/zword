@@ -1,0 +1,20 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"swamp_tile",
+				"layer":	0
+			},
+            "Collider":	{
+				"type":	1,
+				"width":	8.0,
+				"height":	8.0,
+				"group":	0,
+                "trigger_type": 2
+			}
+		}]
+}

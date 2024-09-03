@@ -150,6 +150,8 @@ PhysicsComponent* PhysicsComponent_add(int entity, float mass) {
     phys->angular_drag = 10.0f;
     phys->max_angular_speed = 20.0 * M_PI;
     phys->lifetime = INFINITY;
+    phys->slowed = false;
+    phys->on_ground = false;
 
     game_data->components->physics[entity] = phys;
 

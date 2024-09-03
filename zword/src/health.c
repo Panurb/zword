@@ -150,7 +150,7 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
     
     PhysicsComponent* physics = PhysicsComponent_get(entity);
     if (physics) {
-        apply_force(entity, mult(fminf(10.0f * dmg, 500.0f), normalized(dir)));
+        apply_force(entity, mult(clamp(10.0f * dmg, 100.0f, 500.0f), normalized(dir)));
     }
 
     ParticleComponent* particle = ParticleComponent_get(entity);

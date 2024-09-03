@@ -70,6 +70,8 @@ typedef struct {
     float angular_drag;
     float max_angular_speed;
     float lifetime;
+    bool slowed;
+    bool on_ground;
 } PhysicsComponent;
 
 typedef enum {
@@ -100,7 +102,10 @@ typedef enum {
 
 typedef enum {
     TRIGGER_NONE,
-    TRIGGER_WIN
+    TRIGGER_WIN,
+    TRIGGER_SLOW,
+    TRIGGER_GROUND,
+    TRIGGER_DAMAGE,
 } TriggerType;
 
 typedef struct {
