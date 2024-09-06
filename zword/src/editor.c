@@ -20,6 +20,7 @@
 #include "enemy.h"
 #include "input.h"
 #include "game.h"
+#include "door.h"
 
 
 typedef enum {
@@ -137,9 +138,13 @@ void select_object(int entity) {
 
     int i = load_prefab(selected_object_name, zeros(), 0.0f, ones());
     ColliderComponent* collider = ColliderComponent_get(i);
+    ImageComponent* image = ImageComponent_get(i);
     if (collider) {
         selected_object_width = collider->width;
         selected_object_height = collider->height;
+    } else if (image) {
+        selected_object_width = image->width;
+        selected_object_height = image->height;
     } else {
         selected_object_width = 1.0f;
         selected_object_height = 1.0f;

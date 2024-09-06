@@ -6,3 +6,5 @@
 int create_door(Vector2f pos, float angle);
 
 void update_doors();
+
+void unlock_door(int entity);

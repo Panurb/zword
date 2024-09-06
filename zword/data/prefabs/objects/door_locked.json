@@ -45,8 +45,8 @@
 				"max_angle":	1.5707963705062866
 			},
 			"Door":	{
-				"locked":	false,
-				"price": 0
+				"locked":	true,
+				"price": 1000
 			}
 		}]
 }

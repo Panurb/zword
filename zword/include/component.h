@@ -131,7 +131,7 @@ typedef enum {
     PLAYER_MENU_DROP,
     PLAYER_AMMO_MENU,
     PLAYER_DEAD,
-    PLAYER_PICK_UP
+    PLAYER_INTERACT
 } PlayerState;
 
 typedef struct {

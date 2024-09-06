@@ -440,7 +440,7 @@ void draw_game() {
     draw_particles(game_data->camera);
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
     draw_roofs(game_data->camera);
-    draw_items();
+    draw_player_targets();
 }
 
 
@@ -478,6 +478,12 @@ void draw_debug(int debug_level) {
     }
     if (debug_level > 2) {
         draw_occupied_tiles(game_data->camera);
+    }
+    for (int i = 0; i < game_data->components->entities; i++) {
+        DoorComponent* door = DoorComponent_get(i);
+        if (door) {
+            draw_text(game_data->camera, get_position(i), door->locked ? "locked" : "unlocked", 20, COLOR_WHITE);
+        }
     }
 }
 

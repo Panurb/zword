@@ -21,4 +21,4 @@ void drop_item(int entity);
 
 void use_item(int entity, float time_step);
 
-void draw_items();
+void draw_player_targets();

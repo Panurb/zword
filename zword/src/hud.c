@@ -213,7 +213,7 @@ void draw_hud(int camera) {
         switch (player->state) {
             case PLAYER_ON_FOOT:
                 break;
-            case PLAYER_PICK_UP:
+            case PLAYER_INTERACT:
                 break;
             case PLAYER_SHOOT:
                 draw_item_use(camera, i);

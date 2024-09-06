@@ -8,6 +8,7 @@
 #include "particle.h"
 #include "navigation.h"
 #include "game.h"
+#include "player.h"
 
 
 int create_door(Vector2f pos, float angle) {
@@ -50,5 +51,19 @@ void update_doors() {
                 stop_loop(i);
             }
         }
+    }
+}
+
+
+void unlock_door(int entity) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    if (player->target == -1) return;
+
+    DoorComponent* door = DoorComponent_get(player->target);
+    if (!door) return;
+
+    if (door->price > 0 && player->money >= door->price) {
+        add_money(entity, -door->price);
+        door->locked = false;
     }
 }

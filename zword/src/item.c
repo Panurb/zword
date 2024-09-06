@@ -246,15 +246,19 @@ void use_item(int entity, float time_step) {
 }
 
 
-void draw_items() {
+void draw_player_targets() {
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
         if (player->target == -1) continue;
         ItemComponent* item = ItemComponent_get(player->target);
         ImageComponent* image = ImageComponent_get(player->target);
+        DoorComponent* door = DoorComponent_get(player->target);
 
-        // sfShader_setFloatUniform(CameraComponent_get(game_data->camera)->shaders[1], "offset", 0.05f);
+        if (door && door->price == 0) {
+            continue;
+        }
+
         Vector2f pos = get_position(player->target);
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
@@ -272,6 +276,13 @@ void draw_items() {
             }
 
             draw_text(game_data->camera, pos, item->name, 20, COLOR_YELLOW);
+        }
+
+        if (door) {
+            pos = sum(pos, vec(0.0f, 1.0f));
+            char buffer[256];
+            snprintf(buffer, 256, "%d", door->price);
+            draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
         }
     }
 }

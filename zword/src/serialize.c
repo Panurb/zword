@@ -669,16 +669,16 @@ void DoorComponent_serialize(cJSON* entity_json, int entity) {
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Door", json);
-    cJSON_AddNumberToObject(json, "price", door->price);
+    serialize_int(json, "price", door->price, 0);
     serialize_int(json, "locked", door->locked, false);
 }
 
 
 void DoorComponent_deserialize(cJSON* entity_json, int entity) {
-    cJSON* json = cJSON_GetObjectItem(entity_json, "Ammo");
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Door");
     if (!json) return;
 
-    int price = cJSON_GetObjectItem(json, "price")->valueint;
+    int price = deserialize_int(json, "price", 0);
     DoorComponent* door = DoorComponent_add(entity, price);
     door->locked = deserialize_int(json, "locked", door->locked);
 }
@@ -775,6 +775,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
     SoundComponent_serialize(json, entity);
     AmmoComponent_serialize(json, entity);
     AnimationComponent_serialize(json, entity);
+    DoorComponent_serialize(json, entity);
     JointComponent_serialize(json, entity);
     TextComponent_serialize(json, entity);
 
@@ -831,6 +832,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     SoundComponent_deserialize(entity_json, entity);
     AmmoComponent_deserialize(entity_json, entity);
     AnimationComponent_deserialize(entity_json, entity);
+    DoorComponent_deserialize(entity_json, entity);
     JointComponent_deserialize(entity_json, entity);
     TextComponent_deserialize(entity_json, entity);
 

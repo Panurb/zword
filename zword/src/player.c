@@ -20,6 +20,7 @@
 #include "particle.h"
 #include "enemy.h"
 #include "health.h"
+#include "door.h"
 
 
 int create_player(Vector2f pos, float angle) {
@@ -141,7 +142,7 @@ void update_players(float time_step) {
                 for (ListNode* current = list->head; current; current = current->next) {
                     int k = current->value;
                     if (k == -1) break;
-                    if (!ItemComponent_get(k)) continue;
+                    if (!ItemComponent_get(k) && !DoorComponent_get(k)) continue;
                     if (CoordinateComponent_get(k)->parent != -1) continue;
 
                     float d = dist(pos, get_position(k));
@@ -163,8 +164,12 @@ void update_players(float time_step) {
 
                 player->use_timer = 0.0f;
                 break;
-            case PLAYER_PICK_UP:
-                pick_up_item(i);
+            case PLAYER_INTERACT:
+                if (ItemComponent_get(player->target)) {
+                    pick_up_item(i);
+                } else if (DoorComponent_get(player->target)) {
+                    unlock_door(i);
+                }
                 player->state = PLAYER_ON_FOOT;
                 break;
             case PLAYER_SHOOT:

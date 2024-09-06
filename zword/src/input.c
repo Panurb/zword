@@ -326,7 +326,7 @@ void input_players(int camera) {
                 }
 
                 if (controller.buttons_pressed[BUTTON_RB]) {
-                    player->state = PLAYER_PICK_UP;
+                    player->state = PLAYER_INTERACT;
                 }
 
                 if (controller.buttons_pressed[BUTTON_RT]) {
@@ -360,7 +360,7 @@ void input_players(int camera) {
                 }
 
                 break;
-            case PLAYER_PICK_UP:
+            case PLAYER_INTERACT:
                 break;
             case PLAYER_SHOOT:
                 if (!controller.buttons_down[BUTTON_RT]) {

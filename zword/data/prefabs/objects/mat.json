@@ -4,10 +4,10 @@
 			"Coordinate":	{
 				"x":	0,
 				"y":	0,
-				"angle":	5.0814671516418457
+				"angle":	0
 			},
 			"Image":	{
-				"filename":	"blood",
+				"filename":	"mat",
 				"layer":	3
 			}
 		}]

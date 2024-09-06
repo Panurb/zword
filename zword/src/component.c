@@ -757,7 +757,7 @@ void AnimationComponent_remove(int entity) {
 
 DoorComponent* DoorComponent_add(int entity, int price) {
     DoorComponent* door = malloc(sizeof(DoorComponent));
-    door->locked = true;
+    door->locked = price > 0;
     door->price = price;
 
     game_data->components->door[entity] = door;
