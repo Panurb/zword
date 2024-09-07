@@ -91,6 +91,7 @@ static const char* IMAGES[] = {
     "roof_tile",
     "rope",
     "scope",
+    "shard",
     "shotgun",
     "silencer",
     "sink",
@@ -107,6 +108,8 @@ static const char* IMAGES[] = {
     "tree",
     "uranium",
     "water_tile",
+    "window",
+    "window_destroyed",
     "wood_tile",
     "zombie",
     "zombie_dead"

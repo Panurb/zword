@@ -23,6 +23,7 @@ static const char* SOUNDS[] = {
     "energy",
     "fire",
     "geiger",
+    "glass_hit",
     "metal_hit",
     "pistol",
     "shotgun",

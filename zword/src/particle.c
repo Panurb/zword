@@ -75,6 +75,13 @@ void ParticleComponent_add_energy(int entity) {
 }
 
 
+void ParticleComponent_add_glass(int entity) {
+    Color color = get_color(0.8f, 0.8f, 0.8f, 0.5f);
+    Color inner_color = color_lerp(color, COLOR_WHITE, 0.5f);
+    ParticleComponent_add(entity, 0.0, 2.0 * M_PI, 0.15, 0.0, 5.0, 10.0, color, inner_color);
+}
+
+
 ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, float size) {
     switch (type) {
         case PARTICLE_NONE:
@@ -102,6 +109,9 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
             break;
         case PARTICLE_ENERGY:
             ParticleComponent_add_energy(entity);
+            break;
+        case PARTICLE_GLASS:
+            ParticleComponent_add_glass(entity);
             break;
     }
     ParticleComponent* particle = ParticleComponent_get(entity);

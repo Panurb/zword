@@ -218,7 +218,8 @@ typedef enum ParticleType {
     PARTICLE_ROCK,
     PARTICLE_SPLINTER,
     PARTICLE_FIRE,
-    PARTICLE_ENERGY
+    PARTICLE_ENERGY,
+    PARTICLE_GLASS
 } ParticleType;
 
 typedef struct {

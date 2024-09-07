@@ -1,0 +1,93 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0
+			},
+			"Image":	{
+				"filename":	"window",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	2,
+				"height":	0.25,
+				"group":	1
+			},
+			"Particle":	{
+				"type":	9,
+				"start_size":	0.5
+			},
+			"Sound":	{
+				"hit_sound":	"glass_hit"
+			}, 
+            "Health": {
+                "health": 1,
+                "dead_image": "window_destroyed",
+                "decal": "",
+                "die_sound": "glass_hit"
+            }
+		}, {
+            "id":	1,
+            "Coordinate":	{
+                "x":	0,
+                "y":	0,
+                "angle":	0,
+                "parent": 0
+            },
+            "Collider":	{
+                "type":	1,
+                "width":	2,
+                "height":	0.25,
+                "group":	8
+            }
+        }, {
+            "id":	2,
+            "Coordinate":	{
+                "x":	0,
+                "y":	0.5,
+                "angle":	0,
+                "parent": 0
+            },
+            "Image":	{
+                "filename":	"shard",
+                "layer":	8,
+                "alpha":	0
+            }, 
+            "Physics": {
+                "mass": 0.5
+            },
+            "Collider": {
+                "type": 0,
+                "width": 0.5,
+                "height": 0.5,
+                "group": 15, 
+                "enabled": 0
+            }
+        }, {
+            "id":	3,
+            "Coordinate":	{
+                "x":	0,
+                "y":	-0.5,
+                "angle":	3,
+                "parent": 0
+            },
+            "Image":	{
+                "filename":	"shard",
+                "layer":	8,
+                "alpha":	0
+            }, 
+            "Physics": {
+                "mass": 0.5
+            },
+            "Collider": {
+                "type": 0,
+                "width": 0.5,
+                "height": 0.5,
+                "group": 15, 
+                "enabled": 0
+            }
+        }]
+}

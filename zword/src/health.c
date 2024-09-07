@@ -90,18 +90,30 @@ void die(int entity) {
         for (ListNode* node = coord->children->head; node; node = node->next) {
             int i = node->value;
             CoordinateComponent* co = CoordinateComponent_get(i);
-            ImageComponent_get(i)->alpha = 1.0f;
+            ImageComponent* img = ImageComponent_get(i);
+            PhysicsComponent* phys = PhysicsComponent_get(i);
+            ColliderComponent* col = ColliderComponent_get(i);
+
+            if (img) {
+                img->stretch_speed = randf(-1.0f, 1.0f) * 0.05f;
+                img->alpha = 1.0f;
+            }
 
             co->position = get_position(i);
             co->angle = get_angle(i);
 
-            Vector2f r = normalized(diff(co->position, get_position(entity)));
-            if (!non_zero(r)) {
-                r = rand_vector();
+            if (phys) {
+                Vector2f r = normalized(diff(co->position, get_position(entity)));
+                if (!non_zero(r)) {
+                    r = rand_vector();
+                }
+                apply_force(i, mult(150.0f, r));
+                phys->angular_velocity = randf(-20.0f, 20.0f);
             }
-            apply_force(i, mult(150.0f, r));
-            PhysicsComponent_get(i)->angular_velocity = randf(-5.0f, 5.0f);
-            ColliderComponent_get(i)->enabled = true;
+
+            if (col) {
+                col->enabled = true;
+            }
         }
         remove_children(entity);
 
