@@ -26,8 +26,7 @@
 typedef enum {
     TOOL_SELECT,
     TOOL_TILE,
-    TOOL_OBJECT,
-    TOOL_PREFAB
+    TOOL_OBJECT
 } Tool;
 
 
@@ -51,7 +50,6 @@ static bool tile_started = false;
 static List* selections = NULL;
 static Tool tool = TOOL_TILE;
 static Vector2f mouse_world = { 0.0f, 0.0f };
-static Filename prefab_name = "";
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
 static float double_click_time = 0.0f;
@@ -63,15 +61,12 @@ static int objects_window_id = -1;
 static int creatures_window_id = -1;
 static int weapons_window_id = -1;
 static int editor_settings_window_id = -1;
-static int prefabs_window_id = -1;
 
 
 char* category_names[] = { "terrain", "floor", "decals", "walls", "objects", "waypoints" };
 bool selected_categories[] = { true, true, true, true, true, true };
 
-static int selected_tile = 0;
-
-static ButtonText selected_object_name = "";
+static Filename selected_object_name;
 static float selected_object_width = 1.0f;
 static float selected_object_height = 1.0f;
 static float selected_object_angle = 0.0f;
@@ -84,7 +79,6 @@ void reset_editor_ids() {
     creatures_window_id = -1;
     weapons_window_id = -1;
     editor_settings_window_id = -1;
-    prefabs_window_id = -1;
     entity_settings_id = -1;
     entity_settings_entity = -1;
 }
@@ -133,8 +127,6 @@ void select_object(int entity) {
     tool = TOOL_OBJECT;
 
     game_data->components->added_entities = List_create();
-
-    printf("selected object: %s\n", selected_object_name);
 
     int i = load_prefab(selected_object_name, zeros(), 0.0f, ones());
     ColliderComponent* collider = ColliderComponent_get(i);
@@ -713,44 +705,6 @@ void input_tool_object(SDL_Event event) {
 }
 
 
-void input_tool_prefab(SDL_Event event) {
-    if (event.type == SDL_MOUSEMOTION) {
-        tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-        if (event.button.button == SDL_BUTTON_LEFT) {
-            tile_start = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
-            tile_started = true;
-        }
-    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
-        float width = fabsf(tile_end.x - tile_start.x);
-        float height = fabsf(tile_end.y - tile_start.y);
-        Vector2f pos = mult(0.5f, sum(tile_end, tile_start));
-
-        game_data->components->added_entities = List_create();
-        int entity = load_prefab(prefab_name, pos, 0.0f, ones());
-
-        if (width > 0.0f && height > 0.0f) {
-            CoordinateComponent* coord = CoordinateComponent_get(entity);
-            ColliderComponent* collider = ColliderComponent_get(entity);
-            if (collider) {
-                coord->scale.x = width / collider->width;
-                coord->scale.y = height / collider->height;
-            }
-        }
-
-        ListNode* node;
-        FOREACH(node, game_data->components->added_entities) {
-            if (ColliderComponent_get(node->value)) {
-                update_grid(node->value);
-            }
-        }
-        List_delete(game_data->components->added_entities);
-        game_data->components->added_entities = NULL;
-        tile_started = false;
-    }
-}
-
-
 void input_editor(SDL_Event event) {
     if (input_widgets(game_data->menu_camera, event)) {
         return;
@@ -768,9 +722,6 @@ void input_editor(SDL_Event event) {
             break;
         case TOOL_OBJECT:
             input_tool_object(event);
-            break;
-        case TOOL_PREFAB:
-            input_tool_prefab(event);
             break;
     }
 
@@ -865,15 +816,8 @@ void draw_editor() {
                 draw_rectangle_outline(game_data->camera, pos, collider->width, 
                     collider->height, 0.0f, 0.05f, COLOR_WHITE);
             }
-            for (int i = 0; i < LENGTH(category_names); i++) {
-                Color color = selected_categories[i] ? COLOR_WHITE : get_color(0.6f, 0.6f, 0.6f, 1.0f);
-                char buffer[128];
-                snprintf(buffer, 128, "%d %s", i + 1, category_names[i]);
-                draw_text(game_data->menu_camera, vec(i * 5 - 15, 14), buffer, 20, color);
-            }
             break;
         case TOOL_TILE:
-        case TOOL_PREFAB:
             if (tile_started) {
                 Vector2f end = mouse_grid;
                 float width = fabsf(end.x - tile_start.x);
@@ -886,13 +830,24 @@ void draw_editor() {
                 draw_line(game_data->camera, vec(pos.x - 0.2f, pos.y), vec(pos.x + 0.2f, pos.y), 0.05f, COLOR_WHITE);
                 draw_line(game_data->camera, vec(pos.x, pos.y - 0.2f), vec(pos.x, pos.y + 0.2f), 0.05f, COLOR_WHITE);
             }
+
+            draw_text(game_data->menu_camera, vec(-23.0f, -14.0f), selected_object_name, 20, COLOR_WHITE);
             break;
         case TOOL_OBJECT:
             draw_rectangle_outline(game_data->camera, mouse_grid,
                 selected_object_width * selected_object_scale, 
                 selected_object_height * selected_object_scale, 
                 selected_object_angle, 0.05f, COLOR_WHITE);
+
+            draw_text(game_data->menu_camera, vec(-23.0f, -14.0f), selected_object_name, 20, COLOR_WHITE);
             break;
+    }
+
+    for (int i = 0; i < LENGTH(category_names); i++) {
+        Color color = selected_categories[i] ? COLOR_WHITE : get_color(0.6f, 0.6f, 0.6f, 1.0f);
+        char buffer[128];
+        snprintf(buffer, 128, "%d %s", i + 1, category_names[i]);
+        draw_text(game_data->menu_camera, vec(i * 5 - 15, 14), buffer, 20, color);
     }
 
     bool waypoint_selected = false;

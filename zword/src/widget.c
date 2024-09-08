@@ -412,10 +412,11 @@ void update_widgets(int camera) {
     FOREACH(node, game_data->components->widget.order) {
         int i = node->value;
         WidgetComponent* widget = WidgetComponent_get(i);
+        widget->selected = false;
+
         if (!widget->enabled) continue;
 
         Vector2f mouse = get_mouse_position(camera);
-        widget->selected = false;
         if (point_inside_collider(i, mouse)) {
             last_selected = i;
         }
@@ -554,14 +555,17 @@ bool input_widgets(int camera, SDL_Event event) {
             if (widget->type == WIDGET_WINDOW) {
                 if (i == grabbed_window) {
                     coord->position = sum(mouse_position, grab_offset);
+                    return true;
                 }
             } else if (widget->type == WIDGET_SLIDER) {
                 if (mouse_down) {
                     set_slider(i, mouse_position);
+                    return true;
                 }
-            } else if (widget->type == WIDGET_SCROLLBAR){
+            } else if (widget->type == WIDGET_SCROLLBAR) {
                 if (mouse_down) {
                     set_scrollbar(i, mouse_position);
+                    return true;
                 }
             }
         } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
@@ -573,9 +577,11 @@ bool input_widgets(int camera, SDL_Event event) {
             }
             int root = get_root(i);
             bring_to_top(root);
+            return true;
         } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
             if (widget->on_click) {
                 widget->on_click(i);
+                return true;
             }
         } else if (event.type == SDL_MOUSEWHEEL) {
             int delta = -event.wheel.y;
@@ -593,8 +599,6 @@ bool input_widgets(int camera, SDL_Event event) {
                 }
             }
         }
-
-        input_detected = true;
     }
 
     if (top_textbox != -1) {
