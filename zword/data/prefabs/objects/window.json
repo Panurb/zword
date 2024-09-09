@@ -13,8 +13,8 @@
 			"Collider":	{
 				"type":	1,
 				"width":	2,
-				"height":	0.25,
-				"group":	1
+				"height":	0.5,
+				"group":	11
 			},
 			"Particle":	{
 				"type":	9,
@@ -40,7 +40,7 @@
             "Collider":	{
                 "type":	1,
                 "width":	2,
-                "height":	0.5,
+                "height":	0.4,
                 "group":	8
             }
         }, {

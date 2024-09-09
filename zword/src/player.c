@@ -182,8 +182,9 @@ void update_players(float time_step) {
                         player->state = PLAYER_ON_FOOT;
                     }
                 } else if (itco) {
-                    use_item(item, time_step);
-                    player->state = PLAYER_ON_FOOT;
+                    if (use_item(item, time_step)) {
+                        player->state = PLAYER_ON_FOOT;
+                    }
                 }
 
                 break;

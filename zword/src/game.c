@@ -522,7 +522,7 @@ void draw_game_over() {
 int create_tutorial(Vector2f position) {
     int entity = create_entity();
     CoordinateComponent_add(entity, position, 0.0f);
-    ColliderComponent_add_circle(entity, 1.0f, GROUP_CORPSES);
+    ColliderComponent_add_circle(entity, 1.0f, GROUP_DEBRIS);
     TextComponent_add(entity, "", 30, COLOR_WHITE);
 
     return entity;

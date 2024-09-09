@@ -19,6 +19,6 @@ void pick_up_item(int entity);
 
 void drop_item(int entity);
 
-void use_item(int entity, float time_step);
+bool use_item(int entity, float time_step);
 
 void draw_player_targets();

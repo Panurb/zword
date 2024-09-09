@@ -325,7 +325,7 @@ void update_enemies(float time_step) {
             } case ENEMY_DEAD: {
                 ColliderComponent* col = ColliderComponent_get(i);
                 if (col) {
-                    col->group = GROUP_CORPSES;
+                    col->group = GROUP_DEBRIS;
                     if (phys->speed == 0.0f) {
                         clear_grid(i);
                         ColliderComponent_remove(i);

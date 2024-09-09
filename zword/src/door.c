@@ -65,5 +65,6 @@ void unlock_door(int entity) {
     if (door->price > 0 && player->money >= door->price) {
         add_money(entity, -door->price);
         door->locked = false;
+        door->price = 0;
     }
 }

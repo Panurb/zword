@@ -222,7 +222,7 @@ void switch_light(int entity) {
 }
 
 
-void use_item(int entity, float time_step) {
+bool use_item(int entity, float time_step) {
     int parent = CoordinateComponent_get(entity)->parent;
 
     PlayerComponent* player = PlayerComponent_get(parent);
@@ -232,17 +232,19 @@ void use_item(int entity, float time_step) {
         switch (item->type) {
             case ITEM_HEAL:
                 heal(entity);
-                break;
+                return true;
             case ITEM_LIGHT:
             case ITEM_LASER:
                 switch_light(entity);
-                break;
+                return true;
             default:
                 break;
         }
     } else {
         player->use_timer += time_step;
     }
+
+    return false;
 }
 
 
