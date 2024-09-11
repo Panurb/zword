@@ -107,16 +107,28 @@ float connection_distance(int i, int j) {
         return 0.0f;
     }
 
-    HitInfo info_a = raycast(a, v, 1.0f * d, GROUP_RAYS);
+    ColliderComponent* col = ColliderComponent_get(i);
 
-    if (info_a.entity != -1) {
-        return 0.0f;
-    }
+    if (col) {
+        float radius = 0.4f * collider_width(i);
 
-    HitInfo info_b = raycast(b, mult(-1.0f, v), 1.0f * d, GROUP_RAYS);
+        Vector2f left = polar_to_cartesian(radius, get_angle(i) + 0.5f * M_PI);
+        HitInfo info_l = raycast(sum(a, left), v, d, GROUP_RAYS);
+        if (info_l.entity != -1) {
+            return 0.0f;
+        }
 
-    if (info_b.entity != -1) {
-        return 0.0f;
+        Vector2f right = polar_to_cartesian(radius, get_angle(i) - 0.5f * M_PI);
+        HitInfo info_r = raycast(sum(a, right), v, d, GROUP_RAYS);
+        if (info_r.entity != -1) {
+            return 0.0f;
+        }
+    } else {
+        HitInfo info_a = raycast(a, v, d, GROUP_RAYS);
+
+        if (info_a.entity != -1) {
+            return 0.0f;
+        }
     }
 
     return d;
