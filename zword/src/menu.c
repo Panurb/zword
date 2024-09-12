@@ -11,6 +11,7 @@
 #include "light.h"
 #include "input.h"
 #include "app.h"
+#include "benchmark.h"
 
 
 static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
@@ -25,6 +26,7 @@ static int window_controls = -1;
 static int window_credits = -1;
 static int window_keyboard_controls = -1;
 static int window_xbox_controls = -1;
+static int button_benchmark = -1;
 
 
 void reset_ids() {
@@ -38,6 +40,7 @@ void reset_ids() {
     window_credits = -1;
     window_keyboard_controls = -1;
     window_xbox_controls = -1;
+    button_benchmark = -1;
 }
 
 
@@ -375,11 +378,24 @@ void toggle_credits(int entity) {
 }
 
 
+void update_benchmark(int entity) {
+    UNUSED(entity);
+    float fps = run_benchmark();
+
+    if (button_benchmark != -1) {
+        WidgetComponent* widget = WidgetComponent_get(button_benchmark);
+        char buffer[128];
+        snprintf(buffer, 128, "BENCHMARK: %.2f", fps);
+        strcpy(widget->string, buffer);
+    }
+}
+
+
 void create_menu() {
     #ifdef __EMSCRIPTEN__
-        int height = 4;
-    #else
         int height = 5;
+    #else
+        int height = 6;
     #endif
 
     if (game_settings.debug) {
@@ -393,6 +409,7 @@ void create_menu() {
     add_button_to_container(container, "SETTINGS", toggle_settings);
     add_button_to_container(container, "CONTROLS", toggle_controls);
     add_button_to_container(container, "CREDITS", toggle_credits);
+    button_benchmark = add_button_to_container(container, "BENCHMARK", update_benchmark);
     #ifndef __EMSCRIPTEN__
         add_button_to_container(container, "QUIT", change_state_quit);
     #endif

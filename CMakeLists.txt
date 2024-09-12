@@ -22,6 +22,7 @@ set(SOURCES
     cJSON/src/cJSON.c
     zword/src/animation.c
     zword/src/app.c
+    zword/src/benchmark.c
     zword/src/building.c
     zword/src/camera.c
     zword/src/collider.c
@@ -76,7 +77,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     )   
 else()
     # Enable console by removing WIN32 flag
-    add_executable(notk WIN32 ${SOURCES})
+    add_executable(notk ${SOURCES})
 endif()
 
 install(TARGETS notk
