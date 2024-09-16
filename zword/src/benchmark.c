@@ -8,7 +8,9 @@
 
 float run_benchmark() {
     float time_step = 1.0f / 60.0f;
-    int steps = 10000;
+    int steps = 5000;
+
+    srand(0);
 
     start_game("Survival");
 
@@ -20,7 +22,6 @@ float run_benchmark() {
 
     float start_time = SDL_GetTicks();
 
-    srand(0);
     for (int i = 0; i < steps; i++) {
         update_game(time_step);
         update_game_mode(time_step);

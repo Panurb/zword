@@ -293,7 +293,7 @@ void update_enemies(float time_step) {
                     for (int j = 0; j < weapon->shots; j++) {
                         float angle = j * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
                         Vector2f dir = polar_to_cartesian(1.0, get_angle(i) + angle);
-                        HitInfo info = raycast(pos, dir, 1.1f * ColliderComponent_get(i)->radius, GROUP_BULLETS);
+                        HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
                         if (HealthComponent_get(info.entity) && 
                                 !EnemyComponent_get(info.entity)) {

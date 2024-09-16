@@ -145,7 +145,6 @@ void update_particles(int camera, float delta_time) {
         float w = 3.0f * part->max_time * part->speed;
         bool visible = on_screen(camera, get_position(i), w, w);
         if (part->loop && !visible) {
-            
             continue;
         }
 

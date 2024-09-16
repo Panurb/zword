@@ -157,7 +157,6 @@ void init_tutorial() {
 
 void start_game(Filename map_name) {
     ColliderGrid_clear(game_data->grid);
-    CameraComponent* cam = CameraComponent_get(game_data->camera);
     ComponentData_clear();
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
@@ -246,9 +245,8 @@ int spawn_enemies(int camera, float time_step, int max_enemies) {
         return 0;
     }
 
-    static float delay = 0.0f;
-    if (delay > 0.0f) {
-        delay -= time_step;
+    if (spawn_delay > 0.0f) {
+        spawn_delay -= time_step;
     }
 
     int count = 0;
@@ -259,7 +257,7 @@ int spawn_enemies(int camera, float time_step, int max_enemies) {
         }
     }
 
-    if (count < max_enemies && delay <= 0.0f) {
+    if (count < max_enemies && spawn_delay <= 0.0f) {
         int i = randi(0, spawners->size - 1);
         int spawner = List_get(spawners, i)->value;
 
@@ -279,7 +277,7 @@ int spawn_enemies(int camera, float time_step, int max_enemies) {
         float probs[4] = {1.0f - f - b - p, f, b, p};
         
         spawn_enemy(pos, probs);
-        delay = 2.0f;
+        spawn_delay = 2.0f;
         return 1;
     }
 

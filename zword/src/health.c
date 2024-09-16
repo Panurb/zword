@@ -62,7 +62,9 @@ void die(int entity) {
             destroy_entity(enemy->weapon);
             List_remove(coord->children, enemy->weapon);
             enemy->weapon = -1;
-            WaypointComponent_remove(entity);
+
+            // FIXME: waypoing component is not removed
+            // WaypointComponent_remove(entity);
 
             float probs[5] = { 0.1f, 0.15f, 0.15f, 0.1f, 0.5f };
             int j = -1;

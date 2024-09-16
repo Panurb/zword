@@ -107,18 +107,21 @@ float connection_distance(int i, int j) {
         return 0.0f;
     }
 
-    ColliderComponent* col = ColliderComponent_get(i);
+    EnemyComponent* enemy = EnemyComponent_get(i);
 
-    if (col) {
+    if (enemy) {
+        ColliderComponent* col = ColliderComponent_get(i);
+
+        float angle = get_angle(i);
         float radius = 0.4f * collider_width(i);
 
-        Vector2f left = polar_to_cartesian(radius, get_angle(i) + 0.5f * M_PI);
+        Vector2f left = polar_to_cartesian(radius, angle + 0.5f * M_PI);
         HitInfo info_l = raycast(sum(a, left), v, d, GROUP_RAYS);
         if (info_l.entity != -1) {
             return 0.0f;
         }
 
-        Vector2f right = polar_to_cartesian(radius, get_angle(i) - 0.5f * M_PI);
+        Vector2f right = polar_to_cartesian(radius, angle - 0.5f * M_PI);
         HitInfo info_r = raycast(sum(a, right), v, d, GROUP_RAYS);
         if (info_r.entity != -1) {
             return 0.0f;
@@ -136,12 +139,6 @@ float connection_distance(int i, int j) {
 
 
 void update_waypoints(int camera) {
-    static int id = 0;
-    id = (id + 1) % 30;
-    if (id != 0) {
-        return;
-    }
-
     List* waypoints = List_create();
 
     List* list = get_entities(get_position(camera), 50.0f);
