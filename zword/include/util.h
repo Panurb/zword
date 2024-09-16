@@ -3,10 +3,19 @@
 #include <stdbool.h>
 
 
-#define LOG_DEBUG(...) printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");
-#define LOG_INFO(...) printf("INFO: "); printf(__VA_ARGS__); printf("\n");
-#define LOG_WARNING(...) printf("WARNING: "); printf(__VA_ARGS__); printf("\n");
-#define LOG_ERROR(...) printf("ERROR: "); printf(__VA_ARGS__); printf("\n");
+// #define LOGGING_ENABLED
+
+#ifdef LOGGING_ENABLED
+    #define LOG_DEBUG(...) printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");
+    #define LOG_INFO(...) printf("INFO: "); printf(__VA_ARGS__); printf("\n");
+    #define LOG_WARNING(...) printf("WARNING: "); printf(__VA_ARGS__); printf("\n");
+    #define LOG_ERROR(...) printf("ERROR: "); printf(__VA_ARGS__); printf("\n");
+#else
+    #define LOG_DEBUG(...)
+    #define LOG_INFO(...)
+    #define LOG_WARNING(...)
+    #define LOG_ERROR(...)
+#endif
 
 #define PRINT(x) printf("%d\n", x);
 
