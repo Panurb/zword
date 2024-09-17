@@ -110,7 +110,7 @@ void die(int entity) {
                     r = rand_vector();
                 }
                 apply_force(i, mult(150.0f, r));
-                phys->angular_velocity = randf(-20.0f, 20.0f);
+                phys->angular_velocity = randf(-10.0f, 10.0f);
             }
 
             if (col) {

@@ -48,6 +48,7 @@ void update_physics(float time_step) {
 
             Vector2f v_n = proj(physics->velocity, physics->collision.overlap);
             Vector2f v_t = diff(physics->velocity, v_n);
+
             physics->velocity = sum(mult(physics->bounce, v_n), mult(1.0f - physics->friction, v_t));
 
             blunt_damage(i, v_n);
@@ -81,6 +82,14 @@ void update_physics(float time_step) {
             }
         }
 
+        Vector2f v_hat = normalized(physics->velocity);
+        Vector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
+        Vector2f v_sideways = diff(v_hat, v_forward);
+        Vector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
+        physics->acceleration = sum(physics->acceleration, a);
+        physics->velocity = sum(physics->velocity, mult(time_step, physics->acceleration));
+        physics->acceleration = zeros();
+
         bool moved = col && col->enabled && (non_zero(delta_pos) || delta_angle != 0.0f);
         if (moved) {
             clear_grid(i);
@@ -90,14 +99,6 @@ void update_physics(float time_step) {
         if (moved) {
             update_grid(i);
         }
-
-        Vector2f v_hat = normalized(physics->velocity);
-        Vector2f v_forward = proj(v_hat, polar_to_cartesian(1.0, coord->angle));
-        Vector2f v_sideways = diff(v_hat, v_forward);
-        Vector2f a = lin_comb(-physics->drag, v_forward, -physics->drag_sideways, v_sideways);
-        physics->acceleration = sum(physics->acceleration, a);
-        physics->velocity = sum(physics->velocity, mult(time_step, physics->acceleration));
-        physics->acceleration = zeros();
         
         physics->speed = norm(physics->velocity);
         float max_speed = physics->max_speed;
@@ -134,5 +135,27 @@ void update_physics(float time_step) {
 
         physics->slowed = false;
         physics->on_ground = false;
+    }
+}
+
+
+void draw_vectors(int camera) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        PhysicsComponent* physics = PhysicsComponent_get(i);
+        if (!physics) continue;
+
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!coord) continue;
+
+        Vector2f pos = coord->position;
+        Vector2f v = physics->velocity;
+        Vector2f a = physics->acceleration;
+        float angle = coord->angle;
+        float angular_velocity = physics->angular_velocity;
+        float angular_acceleration = physics->angular_acceleration;
+
+        float line_width = 0.03f;
+        draw_line(camera, pos, sum(pos, mult(0.1f, v)), line_width, COLOR_RED);
+        draw_line(camera, pos, sum(pos, mult(0.1f, a)), line_width, COLOR_GREEN);
     }
 }

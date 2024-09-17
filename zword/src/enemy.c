@@ -289,7 +289,6 @@ void update_enemies(float time_step) {
                     enemy->attack_timer = enemy->attack_delay;
                     enemy->state = ENEMY_ATTACK;
                 } else {
-                    // TODO: dont hit other enemies
                     for (int j = 0; j < weapon->shots; j++) {
                         float angle = j * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
                         Vector2f dir = polar_to_cartesian(1.0, get_angle(i) + angle);

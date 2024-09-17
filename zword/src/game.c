@@ -471,6 +471,7 @@ void draw_debug(int debug_level) {
     draw_waypoints(game_data->camera, true);
     draw_enemies(game_data->camera);
     draw_parents();
+    draw_vectors(game_data->camera);
     if (debug_level > 1) {
         draw_entities();
     }

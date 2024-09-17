@@ -109,10 +109,6 @@ float connection_distance(int i, int j) {
 
     EnemyComponent* enemy = EnemyComponent_get(i);
 
-    if (enemy && enemy->state == ENEMY_DEAD) {
-        return 0.0f;
-    }
-
     if (enemy) {
         ColliderComponent* col = ColliderComponent_get(i);
 
@@ -162,10 +158,21 @@ void update_waypoints(int camera) {
             int n = nod->value;
             if (n == i) break;
 
+            EnemyComponent* enemy = EnemyComponent_get(i);
+            EnemyComponent* enemy_neighbor = EnemyComponent_get(n);
+
+            if (enemy && enemy_neighbor) {
+                continue;
+            }
+
             float d = connection_distance(i, n);
             if (d > 0.0f) {
-                List_add(WaypointComponent_get(i)->neighbors, n);
-                List_add(WaypointComponent_get(n)->neighbors, i);
+                if (!enemy_neighbor) {
+                    List_add(WaypointComponent_get(i)->neighbors, n);
+                }
+                if (!enemy) {
+                    List_add(WaypointComponent_get(n)->neighbors, i);
+                }
             }
         }
     }
