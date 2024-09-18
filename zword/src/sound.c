@@ -157,6 +157,19 @@ void play_sounds(int camera) {
 }
 
 
-void clear_sounds() {
+void clear_sounds(int entity) {
+    SoundComponent* scomp = SoundComponent_get(entity);
+    for (int i = 0; i < scomp->size; i++) {
+        SoundEvent* event = scomp->events[i];
+        if (event) {
+            Mix_HaltChannel(event->channel);
+            free(event);
+            scomp->events[i] = NULL;
+        }
+    }
+}
+
+
+void clear_all_sounds() {
     Mix_HaltChannel(-1);
 }

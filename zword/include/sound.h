@@ -32,4 +32,6 @@ void stop_loop(int entity);
 
 void play_sounds(int camera);
 
-void clear_sounds();
+void clear_sounds(int entity);
+
+void clear_all_sounds();

@@ -334,7 +334,7 @@ void apply_trigger(int trigger, int target) {
             }
             break;
         case TRIGGER_DAMAGE:
-            damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 1, trigger);
+            damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 10, trigger);
             break;
     }
 }

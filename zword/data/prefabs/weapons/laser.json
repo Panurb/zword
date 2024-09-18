@@ -26,7 +26,7 @@
 				"color_r":	255,
 				"color_g":	0,
 				"color_b":	0,
-				"brightness":	0.75,
+				"brightness":	1.0,
 				"speed":	10
 			},
 			"Item":	{

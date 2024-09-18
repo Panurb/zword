@@ -14,6 +14,7 @@
 #include "particle.h"
 #include "health.h"
 #include "image.h"
+#include "particle.h"
 
 
 int get_akimbo(int entity) {
@@ -272,6 +273,33 @@ int rope_root(int rope) {
 }
 
 
+int create_flame(Vector2f position, Vector2f velocity) {
+    int i = create_entity();
+
+    CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
+    coord->lifetime = 0.5f;
+    PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
+    phys->velocity = velocity;
+    phys->drag = 0.0f;
+    phys->max_speed = norm(velocity);
+    phys->bounce = 0.0f;
+    Color orange = get_color(1.0, 0.6, 0.0, 1.0);
+    LightComponent* light = LightComponent_add(i, 2.0f, 2.0 * M_PI, COLOR_ORANGE, 0.8f, 10.0f);
+    light->flicker = 0.1f;
+    light->rays = 10;
+    ParticleComponent* particle = ParticleComponent_add_type(i, PARTICLE_FIRE, 0.5f);
+    particle->rate = 40.0f;
+    particle->speed = 0.0f;
+    ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
+    collider->trigger_type = TRIGGER_DAMAGE;
+    SoundComponent* sound = SoundComponent_add(i, "");
+    strcpy(sound->loop_sound, "fire");
+    ImageComponent_add(i, "", 0.0f, 0.0f, LAYER_PARTICLES);
+
+    return i;
+}
+
+
 void attack(int entity) {
     WeaponComponent* weapon = WeaponComponent_get(entity);
     int parent = CoordinateComponent_get(entity)->parent;
@@ -373,8 +401,12 @@ void attack(int entity) {
             damage(info.entity, info.position, dir, weapon->damage, parent);
 
             break;
+        } case AMMO_FLAME: {
+            create_flame(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+            break;
         } default: {
             ParticleComponent* particle = ParticleComponent_get(entity);
+
             for (int i = 0; i < weapon->shots; i++) {
                 float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
                 float spread = get_spread(entity);
@@ -382,17 +414,30 @@ void attack(int entity) {
                     angle = i * spread / (weapon->shots - 1) - 0.5f * spread + randf(-0.1f, 0.1f);
                 }
                 Vector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
-                HitInfo info = raycast(pos, dir, weapon->range, GROUP_BULLETS);
 
-                int dmg = get_damage(entity);
-                if (dot(info.normal, dir) < -0.99f) {
-                    dmg *= 2;
+                HitInfo info;
+                Vector2f start = pos;
+                float range = weapon->range;
+                for (int p = 0; p <= weapon->penetration; p++) {
+                    info = raycast(start, dir, range, GROUP_BULLETS);
+
+                    int dmg = get_damage(entity);
+                    if (dot(info.normal, dir) < -0.99f) {
+                        dmg *= 2;
+                    }
+                    damage(info.entity, info.position, dir, dmg, parent);
+
+                    start = sum(info.position, mult(0.1f, dir));
+                    range -= dist(pos, info.position);
+
+                    if (!HealthComponent_get(info.entity)) {
+                        break;
+                    }
                 }
-                damage(info.entity, info.position, dir, dmg, parent);
 
                 particle->angle = angle;
-                if (info.entity) {
-                    particle->max_time = 0.9f * dist(pos, info.position) / particle->speed;
+                if (info.entity != -1) {
+                    particle->max_time = 0.5f * dist(pos, info.position) / particle->speed;
                 } else {
                     particle->max_time = weapon->range / particle->speed;
                 }

@@ -264,7 +264,8 @@ typedef enum {
     AMMO_RIFLE,
     AMMO_SHOTGUN,
     AMMO_ENERGY,
-    AMMO_ROPE
+    AMMO_ROPE,
+    AMMO_FLAME,
 } AmmoType;
 
 typedef struct {
@@ -284,6 +285,7 @@ typedef struct {
     float spread;
     int shots;
     bool automatic;
+    int penetration;
     AmmoType ammo_type;
     Filename sound;
 } WeaponComponent;

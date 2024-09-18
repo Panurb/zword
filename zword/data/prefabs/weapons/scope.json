@@ -14,9 +14,9 @@
 				"mass":	0.5
 			},
 			"Collider":	{
-				"type":	1,
-				"width":	1,
-				"height":	0.3,
+				"type":	0,
+				"width":	1.0,
+				"height":	1.0,
 				"group":	2
 			},
 			"Item":	{

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 
-// #define LOGGING_ENABLED
+#define LOGGING_ENABLED
 
 #ifdef LOGGING_ENABLED
     #define LOG_DEBUG(...) printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");
@@ -73,6 +73,7 @@ typedef struct {
 #define COLOR_GREEN get_color(0.0f, 1.0f, 0.0f, 1.0f)
 #define COLOR_MAGENTA get_color(1.0f, 0.0f, 1.0f, 1.0f)
 #define COLOR_BLOOD get_color(0.78f, 0.0f, 0.0f, 1.0f)
+#define COLOR_ORANGE get_color(1.0f, 0.6f, 0.0f, 1.0f)
 
 #define STRING_SIZE 1024
 typedef char String[STRING_SIZE];

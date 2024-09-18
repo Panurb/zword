@@ -396,13 +396,32 @@ void update_lifetimes(float time_step) {
             coord->lifetime = fmaxf(0.0f, coord->lifetime - time_step);
 
             ImageComponent* image = ImageComponent_get(i);
-            if (image && coord->lifetime < 1.0f) {
-                image->alpha = coord->lifetime;
+            if (coord->lifetime < 1.0f) {
+                if (image) {
+                    image->alpha = coord->lifetime;
+                }
+            }
+        } else if (coord->lifetime == 0.0f) {
+            LightComponent* light = LightComponent_get(i);
+            if (light) {
+                light->enabled = false;
             }
 
-            if (coord->lifetime == 0.0f) {
-                destroy_entity_recursive(i);
+            ParticleComponent* particle = ParticleComponent_get(i);
+            if (particle) {
+                particle->loop = false;
+                particle->enabled = false;
+                if (particle->particles > 0) {
+                    continue;
+                }
             }
+            if (ColliderComponent_get(i)) {
+                clear_grid(i);
+            }
+            if (SoundComponent_get(i)) {
+                clear_sounds(i);
+            }
+            destroy_entity_recursive(i);
         }
     }
 }

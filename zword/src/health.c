@@ -64,7 +64,7 @@ void die(int entity) {
             enemy->weapon = -1;
 
             // FIXME: waypoing component is not removed
-            // WaypointComponent_remove(entity);
+            WaypointComponent_remove(entity);
 
             float probs[5] = { 0.1f, 0.15f, 0.15f, 0.1f, 0.5f };
             int j = -1;
@@ -181,7 +181,7 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
     ImageComponent* image = ImageComponent_get(entity);
     if (image) {
         if (!strstr(image->filename, "tile")) {
-            image->stretch_speed = randf(-1.0f, 1.0f) * 0.05f * dmg;
+            image->stretch_speed = sign(randf(-1.0f, 1.0f)) * 0.05f * dmg;
         }
     }
 }

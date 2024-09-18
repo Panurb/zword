@@ -480,6 +480,7 @@ WeaponComponent* WeaponComponent_add(int entity, float fire_rate, int damage, in
     weapon->ammo_type = ammo_type;
     strcpy(weapon->sound, sound);
     weapon->automatic = false;
+    weapon->penetration = 2;
 
     game_data->components->weapon[entity] = weapon;
     return weapon;

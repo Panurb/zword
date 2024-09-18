@@ -1,0 +1,61 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"assault_rifle",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	0.5
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	2
+			},
+			"Light":	{
+				"enabled":	0,
+				"range":	4,
+				"angle":	6.2831854820251465,
+				"color_r":	255,
+				"color_g":	255,
+				"color_b":	255,
+				"brightness":	1,
+				"speed":	10
+			},
+			"Particle":	{
+				"type":	1,
+				"start_size":	0.15000000596046448
+			},
+			"Weapon":	{
+				"fire_rate":	10,
+				"recoil":	0.05000000074505806,
+				"damage":	30,
+				"max_magazine":	1000,
+				"magazine":	1000,
+				"max_recoil":	0.15707963705062866,
+				"reload_time":	3,
+				"range":	30,
+				"sound_range":	30,
+				"spread":	0,
+				"shots":	1,
+				"ammo_type":	6,
+				"sound":	"",
+				"automatic":	true
+			},
+			"Item":	{
+				"size": 0,
+				"price":	0,
+				"name":	"Flamethrower",
+				"type":	0
+			},
+			"Sound":	{
+				"hit_sound":	"metal"
+			}
+		}]
+}

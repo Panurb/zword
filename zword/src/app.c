@@ -226,12 +226,12 @@ void update(float time_step) {
             break;
         case STATE_END:
             end_game();
-            clear_sounds();
+            clear_all_sounds();
             game_state = STATE_MENU;
             break;
         case STATE_RESET:
             end_game();
-            clear_sounds();
+            clear_all_sounds();
             game_state = STATE_START;
             break;
         case STATE_GAME:

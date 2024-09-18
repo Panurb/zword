@@ -61,9 +61,8 @@ void ParticleComponent_add_splinter(int entity) {
 
 
 void ParticleComponent_add_fire(int entity, float size) {
-    Color orange = get_color(1.0, 0.6, 0.0, 1.0);
     float angle = 0.5f * M_PI - get_angle(entity);
-    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, orange, COLOR_YELLOW);
+    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, COLOR_ORANGE, COLOR_YELLOW);
     particle->loop = true;
     particle->enabled = true;
 }
@@ -164,7 +163,14 @@ void update_particles(int camera, float delta_time) {
 
         for (int j = 0; j < part->particles; j++) {
             part->position[j] = sum(part->position[j], mult(delta_time, part->velocity[j]));
-            part->time[j] = fmax(0.0, part->time[j] - delta_time);
+            part->time[j] = fmax(0.0f, part->time[j] - delta_time);
+        }
+
+        while (part->particles > 0 && part->time[part->particles - 1] == 0.0f) {
+            if (part->iterator == part->particles) {
+                part->iterator--;
+            }
+            part->particles--;
         }
     }
 }
