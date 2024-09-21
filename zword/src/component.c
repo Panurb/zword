@@ -395,6 +395,7 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
     particle->outer_color = outer_color;
     particle->inner_color = inner_color;
     particle->origin = zeros();
+    particle->stretch = 0.1f;
 
     game_data->components->particle[entity] = particle;
 
@@ -480,7 +481,7 @@ WeaponComponent* WeaponComponent_add(int entity, float fire_rate, int damage, in
     weapon->ammo_type = ammo_type;
     strcpy(weapon->sound, sound);
     weapon->automatic = false;
-    weapon->penetration = 2;
+    weapon->penetration = 0;
 
     game_data->components->weapon[entity] = weapon;
     return weapon;

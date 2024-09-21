@@ -219,7 +219,7 @@ void draw_particles(int camera) {
             float r = lerp(part->start_size, part->end_size, t);
             float angle = polar_angle(part->velocity[i]);
 
-            draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.06f * norm(part->velocity[i])) * r, r, angle, color);
+            draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[i])) * r, r, angle, color);
         }
 
         for (int i = part->particles - 1; i >= 0; i--) {
@@ -231,7 +231,7 @@ void draw_particles(int camera) {
             float r = 0.5f * lerp(part->start_size, part->end_size, t);
             float angle = polar_angle(part->velocity[i]);
 
-            draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.1f * norm(part->velocity[i])) * r, r, angle, color);
+            draw_ellipse(camera, part->position[i], fmaxf(1.0f, part->stretch * norm(part->velocity[i])) * r, r, angle, color);
         }   
     }
 

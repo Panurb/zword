@@ -18,30 +18,42 @@
 				"height":	1,
 				"group":	2
 			},
+			"Light":	{
+				"enabled":	0,
+				"range":	4,
+				"angle":	6.2831854820251465,
+				"color_r":	255,
+				"color_g":	255,
+				"color_b":	255,
+				"brightness":	1,
+				"speed":	10
+			},
 			"Particle":	{
 				"type":	1,
 				"start_size":	0.15000000596046448
 			},
 			"Weapon":	{
-				"fire_rate":	10,
+				"fire_rate":	1,
 				"recoil":	0.05000000074505806,
-				"damage":	30,
-				"max_magazine":	1000,
-				"magazine":	1000,
+				"damage":	100,
+				"max_magazine":	8,
+				"magazine":	8,
 				"max_recoil":	0.15707963705062866,
 				"reload_time":	3,
 				"range":	30,
 				"sound_range":	30,
 				"spread":	0,
 				"shots":	1,
-				"ammo_type":	6,
-				"sound":	"",
-				"automatic":	true
+				"ammo_type":	2,
+				"sound":	"assault_rifle",
+				"automatic":	false,
+                "penetration": 2
 			},
 			"Item":	{
-				"size": 0,
-				"price":	0,
-				"name":	"Flamethrower",
+				"size":	2,
+				"attachments":	[-1, -1],
+				"price":	5000,
+				"name":	"Sniper",
 				"type":	0
 			},
 			"Sound":	{

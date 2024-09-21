@@ -277,19 +277,20 @@ int create_flame(Vector2f position, Vector2f velocity) {
     int i = create_entity();
 
     CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
-    coord->lifetime = 0.5f;
+    coord->lifetime = 0.3f;
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
     phys->velocity = velocity;
     phys->drag = 0.0f;
     phys->max_speed = norm(velocity);
     phys->bounce = 0.0f;
-    Color orange = get_color(1.0, 0.6, 0.0, 1.0);
-    LightComponent* light = LightComponent_add(i, 2.0f, 2.0 * M_PI, COLOR_ORANGE, 0.8f, 10.0f);
+    LightComponent* light = LightComponent_add(i, 4.0f, 2.0 * M_PI, COLOR_ORANGE, 0.8f, 10.0f);
     light->flicker = 0.1f;
-    light->rays = 10;
+    light->rays = 20;
     ParticleComponent* particle = ParticleComponent_add_type(i, PARTICLE_FIRE, 0.5f);
-    particle->rate = 40.0f;
-    particle->speed = 0.0f;
+    particle->rate = 30.0f;
+    particle->speed = 1.0f;
+    particle->stretch = 1.0f;
+    particle->angle = polar_angle(velocity);
     ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
     collider->trigger_type = TRIGGER_DAMAGE;
     SoundComponent* sound = SoundComponent_add(i, "");
@@ -437,9 +438,12 @@ void attack(int entity) {
 
                 particle->angle = angle;
                 if (info.entity != -1) {
-                    particle->max_time = 0.5f * dist(pos, info.position) / particle->speed;
+                    particle->max_time = dist(info.position, pos) / particle->speed;
+                    // Prevent from going inside walls
+                    particle->max_time -= fmodf(particle->max_time, particle->start_size * particle->stretch);
                 } else {
                     particle->max_time = weapon->range / particle->speed;
+                    particle->stretch = 0.1f;
                 }
                 add_particles(entity, 1);
             }

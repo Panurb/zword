@@ -398,7 +398,7 @@ void update_lifetimes(float time_step) {
             ImageComponent* image = ImageComponent_get(i);
             if (coord->lifetime < 1.0f) {
                 if (image) {
-                    image->alpha = coord->lifetime;
+                    image->alpha = fminf(image->alpha, coord->lifetime);
                 }
             }
         } else if (coord->lifetime == 0.0f) {

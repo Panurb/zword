@@ -244,6 +244,7 @@ typedef struct {
     float rate;
     float timer;
     Vector2f origin;
+    float stretch;
 } ParticleComponent;
 
 typedef struct {

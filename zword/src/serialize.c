@@ -552,6 +552,7 @@ void WeaponComponent_serialize(cJSON* entity_json, int entity) {
     cJSON_AddNumberToObject(json, "ammo_type", weapon->ammo_type);
     cJSON_AddStringToObject(json, "sound", weapon->sound);
     cJSON_AddBoolToObject(json, "automatic", weapon->automatic);
+    serialize_int(json, "penetration", weapon->penetration, 0);
 }
 
 
@@ -573,6 +574,7 @@ void WeaponComponent_deserialize(cJSON* entity_json, int entity) {
     bool automatic = cJSON_GetObjectItem(json, "automatic")->valueint;
     WeaponComponent* weapon = WeaponComponent_add(entity, fire_rate, damage, shots, spread, max_magazine, 
         recoil, range, reload_time, ammo_type, sound);
+    weapon->penetration = deserialize_int(json, "penetration", weapon->penetration);
     weapon->magazine = magazine;
     weapon->automatic = automatic;
 }
