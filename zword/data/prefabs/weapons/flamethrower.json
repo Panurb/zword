@@ -6,7 +6,7 @@
 				"y":	0
 			},
 			"Image":	{
-				"filename":	"assault_rifle",
+				"filename":	"watergun",
 				"layer":	7
 			},
 			"Physics":	{
@@ -35,7 +35,7 @@
 				"spread":	0,
 				"shots":	1,
 				"ammo_type":	6,
-				"sound":	"",
+				"sound":	"flame",
 				"automatic":	true
 			},
 			"Item":	{

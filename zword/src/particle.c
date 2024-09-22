@@ -198,7 +198,7 @@ void draw_particles(int camera) {
             SDL_SetRenderTarget(app.renderer, app.blood_texture);
 
             for (int i = 0; i < part->particles; i++) {
-                int p = (part->first + part->particles - i) % part->max_particles;
+                int p = (part->first + part->particles - i - 1) % part->max_particles;
 
                 if (part->time[p] == 0.0) continue;
 
@@ -216,7 +216,7 @@ void draw_particles(int camera) {
         }
 
         for (int i = 0; i < part->particles; i++) {
-            int p = (part->first + part->particles - i) % part->max_particles;
+            int p = (part->first + part->particles - i - 1) % part->max_particles;
 
             if (part->time[p] == 0.0) continue;
 
@@ -230,7 +230,7 @@ void draw_particles(int camera) {
         }
 
         for (int i = 0; i < part->particles; i++) {
-            int p = (part->first + part->particles - i) % part->max_particles;
+            int p = (part->first + part->particles - i - 1) % part->max_particles;
 
             if (part->time[p] == 0.0) continue;
 

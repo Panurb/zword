@@ -20,6 +20,10 @@
 // https://freesound.org/people/pauliep83/sounds/34251/
 // Glass hit
 // https://freesound.org/people/C_Rogers/sounds/203373/
+// Sniper
+// https://freesound.org/people/EMSIarma/sounds/108852/
+// Flame
+// https://freesound.org/people/SilverIllusionist/sounds/472688/
 
 
 void load_sounds();

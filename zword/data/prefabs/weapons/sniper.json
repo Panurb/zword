@@ -6,7 +6,7 @@
 				"y":	0
 			},
 			"Image":	{
-				"filename":	"assault_rifle",
+				"filename":	"sniper",
 				"layer":	7
 			},
 			"Physics":	{
@@ -45,7 +45,7 @@
 				"spread":	0,
 				"shots":	1,
 				"ammo_type":	2,
-				"sound":	"assault_rifle",
+				"sound":	"sniper",
 				"automatic":	false,
                 "penetration": 2
 			},
@@ -53,7 +53,7 @@
 				"size":	2,
 				"attachments":	[-1, -1],
 				"price":	5000,
-				"name":	"Sniper",
+				"name":	"Mosin-Nagant",
 				"type":	0
 			},
 			"Sound":	{

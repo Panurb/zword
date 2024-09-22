@@ -293,8 +293,6 @@ int create_flame(Vector2f position, Vector2f velocity) {
     particle->angle = polar_angle(velocity);
     ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
     collider->trigger_type = TRIGGER_DAMAGE;
-    SoundComponent* sound = SoundComponent_add(i, "");
-    strcpy(sound->loop_sound, "fire");
     ImageComponent_add(i, "", 0.0f, 0.0f, LAYER_PARTICLES);
 
     return i;
@@ -443,7 +441,6 @@ void attack(int entity) {
                     particle->max_time -= fmodf(particle->max_time, particle->start_size * particle->stretch);
                 } else {
                     particle->max_time = weapon->range / particle->speed;
-                    particle->stretch = 0.1f;
                 }
                 add_particles(entity, 1);
             }
