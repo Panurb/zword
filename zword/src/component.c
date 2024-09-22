@@ -379,7 +379,7 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
     particle->spread = spread;
     particle->particles = 0;
     particle->max_particles = 100;
-    particle->iterator = 0;
+    particle->first = 0;
     particle->start_size = start_size;
     particle->end_size = end_size;
     particle->speed = speed;

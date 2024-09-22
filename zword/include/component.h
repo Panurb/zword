@@ -229,7 +229,7 @@ typedef struct {
     float angle;
     int particles;
     int max_particles;
-    int iterator;
+    int first;
     float spread;
     float speed_spread;
     float speed;

@@ -123,15 +123,19 @@ void add_particles(int entity, int n) {
     ParticleComponent* part = ParticleComponent_get(entity);
 
     for (int i = 0; i < n; i++) {
-        part->position[part->iterator] = sum(get_position(entity), part->origin);
+        int next = (part->first + part->particles) % part->max_particles;
+
+        part->position[next] = sum(get_position(entity), part->origin);
         float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
         float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
-        part->velocity[part->iterator] = polar_to_cartesian(r, get_angle(entity) + angle);
-        part->time[part->iterator] = part->max_time;
+        part->velocity[next] = polar_to_cartesian(r, get_angle(entity) + angle);
+        part->time[next] = part->max_time;
+        
         if (part->particles < part->max_particles) {
             part->particles++;
+        } else {
+            part->first = (part->first + 1) % part->max_particles;
         }
-        part->iterator = (part->iterator + 1) % part->max_particles;
     }
 }
 
@@ -162,14 +166,13 @@ void update_particles(int camera, float delta_time) {
         }
 
         for (int j = 0; j < part->particles; j++) {
-            part->position[j] = sum(part->position[j], mult(delta_time, part->velocity[j]));
-            part->time[j] = fmax(0.0f, part->time[j] - delta_time);
+            int p = (part->first + j) % part->max_particles;
+            part->position[p] = sum(part->position[p], mult(delta_time, part->velocity[p]));
+            part->time[p] = fmax(0.0f, part->time[p] - delta_time);
         }
 
-        while (part->particles > 0 && part->time[part->particles - 1] == 0.0f) {
-            if (part->iterator == part->particles) {
-                part->iterator--;
-            }
+        if (part->particles > 0 && part->time[part->first] == 0.0f) {
+            part->first = (part->first + 1) % part->max_particles;
             part->particles--;
         }
     }
@@ -194,15 +197,17 @@ void draw_particles(int camera) {
         if (game_settings.particles == QUALITY_HIGH && part->type == PARTICLE_BLOOD) {
             SDL_SetRenderTarget(app.renderer, app.blood_texture);
 
-            for (int i = part->particles - 1; i >= 0; i--) {
-                if (part->time[i] == 0.0) continue;
+            for (int i = 0; i < part->particles; i++) {
+                int p = (part->first + part->particles - i) % part->max_particles;
 
-                float t = 1.0f - part->time[i] / part->max_time;
+                if (part->time[p] == 0.0) continue;
+
+                float t = 1.0f - part->time[p] / part->max_time;
                 float r = lerp(part->start_size, part->end_size, t);
-                float angle = polar_angle(part->velocity[i]);
+                float angle = polar_angle(part->velocity[p]);
                 Vector2f scale = mult(2.0f * r, ones());
 
-                draw_sprite(camera, get_texture_index("blood_particle"), 1.0f, 1.0f, 0, part->position[i], 
+                draw_sprite(camera, get_texture_index("blood_particle"), 1.0f, 1.0f, 0, part->position[p], 
                     angle, scale, 1.0f);
             }
 
@@ -210,28 +215,32 @@ void draw_particles(int camera) {
             continue;
         }
 
-        for (int i = part->particles - 1; i >= 0; i--) {
-            if (part->time[i] == 0.0) continue;
+        for (int i = 0; i < part->particles; i++) {
+            int p = (part->first + part->particles - i) % part->max_particles;
+
+            if (part->time[p] == 0.0) continue;
 
             Color color = part->outer_color;
 
-            float t = 1.0f - part->time[i] / part->max_time;
+            float t = 1.0f - part->time[p] / part->max_time;
             float r = lerp(part->start_size, part->end_size, t);
-            float angle = polar_angle(part->velocity[i]);
+            float angle = polar_angle(part->velocity[p]);
 
-            draw_ellipse(camera, part->position[i], fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[i])) * r, r, angle, color);
+            draw_ellipse(camera, part->position[p], fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[p])) * r, r, angle, color);
         }
 
-        for (int i = part->particles - 1; i >= 0; i--) {
-            if (part->time[i] == 0.0) continue;
+        for (int i = 0; i < part->particles; i++) {
+            int p = (part->first + part->particles - i) % part->max_particles;
+
+            if (part->time[p] == 0.0) continue;
 
             Color color = part->inner_color;
 
-            float t = 1.0f - part->time[i] / part->max_time;
+            float t = 1.0f - part->time[p] / part->max_time;
             float r = 0.5f * lerp(part->start_size, part->end_size, t);
-            float angle = polar_angle(part->velocity[i]);
+            float angle = polar_angle(part->velocity[p]);
 
-            draw_ellipse(camera, part->position[i], fmaxf(1.0f, part->stretch * norm(part->velocity[i])) * r, r, angle, color);
+            draw_ellipse(camera, part->position[p], fmaxf(1.0f, part->stretch * norm(part->velocity[p])) * r, r, angle, color);
         }   
     }
 
