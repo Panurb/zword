@@ -80,8 +80,10 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
     HitInfo info;
     info.entity = -1;
     info.normal = perp(velocity);
+    info.position = zeros();
 
     if (v == 0.0f) {
+        LOG_WARNING("Raycast with zero velocity");
         return info;
     }
 

@@ -113,6 +113,8 @@ int abs_argmin(float* a, int n);
 
 int argmax(float* a, int n);
 
+int argmin(float* a, int n);
+
 float mean(float* array, int size);
 
 Vector2f perp(Vector2f v);

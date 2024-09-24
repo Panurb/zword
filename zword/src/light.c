@@ -164,47 +164,176 @@ void draw_shadows(int camera) {
 }
 
 
+typedef enum {
+    SIDE_LEFT = -1,
+    SIDE_NONE,
+    SIDE_RIGHT
+} Side;
+
+
+typedef struct {
+    Vector2f position;
+    Side side;
+} Edge;
+
+
+int compare_angle(const void* a, const void* b) {
+    Edge* va = (Edge*) a;
+    Edge* vb = (Edge*) b;
+
+    float angle_a = polar_angle(va->position);
+    float angle_b = polar_angle(vb->position);
+
+    return angle_a < angle_b ? -1 : angle_a > angle_b;
+}
+
+
 void draw_light(int camera, Vector2f start, float angle, float light_angle, float range, int rays, Color color, 
         float brightness, int bounces) {
-    SDL_Vertex* vertices = malloc((rays + 1) * sizeof(SDL_Vertex));
+    Edge points[1000];
+    int points_size = 0;
+    float delta = 0.01f;
+
+    List* entities = get_entities(start, range);
+
+    ListNode* node;
+    FOREACH(node, entities) {
+        int entity = node->value;
+
+        Vector2f pos = get_position(entity);
+        float distance = dist(pos, start);
+        if (distance == 0.0f) continue;
+
+        ColliderComponent* collider = ColliderComponent_get(entity);
+
+        if (collider->type == COLLIDER_CIRCLE) {
+            float radius = collider_radius(entity);
+            Vector2f dir = diff(pos, start);
+            float a = polar_angle(dir);
+
+            float angular_radius = asinf(radius / distance);
+            float x = sqrtf(distance * distance - radius * radius);
+
+            float left = a + angular_radius;
+            float right = a - angular_radius;
+
+            HitInfo info = raycast(start, polar_to_cartesian(1.0f, left - delta), range, GROUP_LIGHTS);
+            if (info.entity == entity) {
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_LEFT;
+                points_size++;
+
+                info = raycast(start, polar_to_cartesian(1.0f, left + delta), range, GROUP_LIGHTS);
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_NONE;
+                points_size++;
+            }
+
+            info = raycast(start, polar_to_cartesian(1.0f, right + delta), range, GROUP_LIGHTS);
+            if (info.entity == entity) {
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_RIGHT;
+                points_size++;
+
+                info = raycast(start, polar_to_cartesian(1.0f, right - delta), range, GROUP_LIGHTS);
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_NONE;
+                points_size++;
+            }
+        } else if (collider->type == COLLIDER_RECTANGLE) {
+            Vector2f corners[4];
+            get_rect_corners(pos, get_angle(entity), collider_width(entity), collider_height(entity), corners);
+
+            for (int j = 0; j < 4; j++) {
+                corners[j] = diff(corners[j], start);
+            }
+
+            qsort(corners, 4, sizeof(Vector2f), compare_angle);
+
+            float left = polar_angle(corners[0]);
+            float right = polar_angle(corners[3]);
+
+            HitInfo info = raycast(start, polar_to_cartesian(1.0f, left - delta), range, GROUP_LIGHTS);
+            if (info.entity == entity || info.entity == -1) {
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_LEFT;
+                points_size++;
+
+                info = raycast(start, polar_to_cartesian(1.0f, left + delta), range, GROUP_LIGHTS);
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_NONE;
+                points_size++;
+            }
+
+            info = raycast(start, polar_to_cartesian(1.0f, right + delta), range, GROUP_LIGHTS);
+            if (info.entity == entity || info.entity == -1) {
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_RIGHT;
+                points_size++;
+
+                info = raycast(start, polar_to_cartesian(1.0f, right - delta), range, GROUP_LIGHTS);
+                points[points_size].position = info.position;
+                points[points_size].side = SIDE_NONE;
+                points_size++;
+            }
+
+            float distances[4];
+            for (int j = 0; j < 4; j++) {
+                distances[j] = norm2(corners[j]);
+            }
+            int nearest = argmin(distances, 4);
+
+            if (nearest != 0 && nearest != 3) {
+                info = raycast(start, corners[nearest], range, GROUP_LIGHTS);
+                if (info.entity == entity || info.entity == -1) {
+                    points[points_size].position = info.position;
+                    points[points_size].side = SIDE_NONE;
+                    points_size++;
+                }
+            }
+        }
+    }
+
+    free(entities);
+
+    for (int i = 0; i < points_size; i++) {
+        points[i].position = diff(points[i].position, start);
+    }
+
+    qsort(points, points_size, sizeof(Edge), compare_angle);
+
+    for (int i = 0; i < points_size; i++) {
+        draw_circle(camera, sum(start, points[i].position), 0.1f, COLOR_RED);
+        String text;
+        sprintf(text, "%d", i);
+        draw_text(camera, sum(sum(start, points[i].position), vec(0, 0.5)), text, 20, COLOR_RED);
+    }
+
+    SDL_Vertex* vertices = malloc((points_size + 1) * sizeof(SDL_Vertex));
     Vector2f pos = world_to_screen(camera, start);
 
     color.a = 255 * brightness;
     vertices[0] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
 
-    Vector2f velocity = polar_to_cartesian(1.0, angle - 0.5 * light_angle);
+    for (int j = 0; j < points_size; j++) {
+        Vector2f end = sum(start, points[j].position);
 
-    float delta_angle = light_angle / (rays - 1);
-    Matrix2f rot = rotation_matrix(delta_angle);
-
-    for (int j = 1; j < rays + 1; j++) {
-        HitInfo info = raycast(start, velocity, range, GROUP_LIGHTS);
-        Vector2f end = info.position;
-
-        if (bounces > 0 && info.entity != -1) {
-            Vector2f normal = info.normal;
-            float a = polar_angle(normal);
-            draw_light(camera, end, a, M_PI, 0.5f * range, 10, color, 0.1f * brightness, bounces - 1);
-        }
-
-        end = sum(end, mult(0.25, velocity));
+        // end = sum(end, mult(0.25, diff(end, start)));
 
         color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
 
         pos = world_to_screen(camera, end);
-        vertices[j] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
-
-        velocity = matrix_mult(rot, velocity);
+        vertices[j + 1] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
     }
 
-    int* indices = malloc(3 * (rays + 1) * sizeof(int));
-    for (int j = 0; j < rays + 1; j++) {
+    int* indices = malloc(3 * (points_size + 1) * sizeof(int));
+    for (int j = 0; j < points_size + 1; j++) {
         indices[3 * j] = 0;
         indices[3 * j + 1] = j;
-        indices[3 * j + 2] = (j + 1)  % (rays + 1);
+        indices[3 * j + 2] = (j + 1)  % (points_size + 1);
     }
 
-    SDL_RenderGeometry(app.renderer, NULL, vertices, rays + 1, indices, 3 * (rays + 1));
+    SDL_RenderGeometry(app.renderer, NULL, vertices, points_size + 1, indices, 3 * (points_size + 1));
 
     free(vertices);
     free(indices);
