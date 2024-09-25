@@ -74,6 +74,7 @@ typedef struct {
 #define COLOR_MAGENTA get_color(1.0f, 0.0f, 1.0f, 1.0f)
 #define COLOR_BLOOD get_color(0.78f, 0.0f, 0.0f, 1.0f)
 #define COLOR_ORANGE get_color(1.0f, 0.6f, 0.0f, 1.0f)
+#define COLOR_BLUE get_color(0.0f, 0.0f, 1.0f, 1.0f)
 
 #define STRING_SIZE 1024
 typedef char String[STRING_SIZE];
