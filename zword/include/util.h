@@ -190,6 +190,8 @@ bool non_zero(Vector2f v);
 
 float clamp(float val, float min_val, float max_val);
 
+float angle_normalized(float angle);
+
 float angle_diff(float a, float b);
 
 bool collides_aabb(Vector2f pos1, float w1, float h1, Vector2f pos2, float w2, float h2);

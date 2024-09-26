@@ -327,8 +327,12 @@ float clamp(float val, float min_val, float max_val) {
     return fmaxf(fminf(val, max_val), min_val);
 }
 
+float angle_normalized(float angle) {
+    return mod(angle + M_PI, 2.0f * M_PI) - M_PI;
+}
+
 float angle_diff(float a, float b) {
-    return mod(a - b + M_PI, 2.0f * M_PI) - M_PI;
+    return angle_normalized(a - b);
 }
 
 bool collides_aabb(Vector2f pos1, float w1, float h1, Vector2f pos2, float w2, float h2) {

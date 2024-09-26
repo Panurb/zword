@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL_image.h>
+
 #include "component.h"
 
 
@@ -17,6 +19,8 @@ Vector2f camera_size(int camera);
 Vector2f world_to_screen(int camera, Vector2f a);
 
 Vector2f screen_to_world(int camera, Vector2f a);
+
+void draw_triangle_fan(int camera, SDL_Vertex* vertices, int verts_size);
 
 void draw_line(int camera, Vector2f start, Vector2f end, float width, Color color);
 
