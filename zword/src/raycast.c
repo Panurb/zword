@@ -81,6 +81,7 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
     info.entity = -1;
     info.normal = perp(velocity);
     info.position = zeros();
+    info.distance = range;
 
     if (v == 0.0f) {
         LOG_WARNING("Raycast with zero velocity");
@@ -120,6 +121,7 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
                 t_min = hit.time;
                 info.entity = j;
                 info.normal = hit.normal;
+                info.distance = t_min;
                 range = t_min;
             }
         }
