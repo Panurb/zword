@@ -36,7 +36,9 @@ Hit ray_intersection(int i, Vector2f start, Vector2f velocity, float range) {
             float t = cross(diff(corners[k], start), dir) / cross(velocity, dir);
             float u = cross(diff(start, corners[k]), velocity) / cross(dir, velocity);
 
-            if (t >= 0.0 && u >= 0.0 && u <= 1.0) {
+            // Aiming ray directly at corner can sometimes slip through so add some tolerance
+            float delta = 0.001f;
+            if (t >= 0.0 && u >= -delta && u <= 1.0f + delta) {
                 n++;
                 if (t < hit.time) {
                     hit.time = t;
@@ -126,6 +128,8 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
             }
         }
 
+        if (fminf(t_max_x, t_max_y) > range) break;
+
         if (t_max_x < t_max_y) {
             t_max_x += t_delta_x;
             x += step_x;
@@ -133,8 +137,6 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
             t_max_y += t_delta_y;
             y += step_y;
         }
-
-        if (mini(t_max_x, t_max_y) > range) break;
     }
 
     info.position = sum(start, mult(t_min, velocity));

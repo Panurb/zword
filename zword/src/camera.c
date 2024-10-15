@@ -78,7 +78,6 @@ void draw_triangle_fan(int camera, SDL_Vertex* vertices, int verts_size) {
         indices[3 * i + 1] = i;
         indices[3 * i + 2] = (i + 1) % verts_size;
     }
-    indices[verts_size * 3 - 1] = 1;
     SDL_RenderGeometry(app.renderer, NULL, vertices, verts_size, indices, 3 * verts_size);
     free(indices);
 }
@@ -126,14 +125,15 @@ void draw_circle(int camera, Vector2f position, float radius, Color color) {
     Vector2f points[100];
     get_circle_points(position, radius, points_size, points);
 
-    SDL_Vertex vertices[100];
+    SDL_Vertex vertices[101];
     for (int i = 0; i < points_size; i++) {
         Vector2f v = world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
+    vertices[points_size] = vertices[1];
 
-    draw_triangle_fan(camera, vertices, points_size);
+    draw_triangle_fan(camera, vertices, points_size + 1);
 }
 
 
@@ -171,14 +171,15 @@ void draw_ellipse(int camera, Vector2f position, float major, float minor, float
     Vector2f points[20];
     get_ellipse_points(position, major, minor, angle, 20, points);
 
-    SDL_Vertex vertices[20];
+    SDL_Vertex vertices[21];
     for (int i = 0; i < 20; i++) {
         Vector2f v = world_to_screen(camera, points[i]);
         vertices[i].position = (SDL_FPoint) { v.x, v.y };
         vertices[i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
     }
+    vertices[20] = vertices[1];
 
-    draw_triangle_fan(camera, vertices, 20);
+    draw_triangle_fan(camera, vertices, 21);
 }
 
 

@@ -328,6 +328,7 @@ float clamp(float val, float min_val, float max_val) {
 }
 
 float angle_normalized(float angle) {
+    // Normalize angle to [-pi, pi]
     return mod(angle + M_PI, 2.0f * M_PI) - M_PI;
 }
 

@@ -77,7 +77,7 @@ List* get_entities(Vector2f origin, float radius) {
                 ColliderComponent* col = ColliderComponent_get(n);
                 if (col->last_collision == id) continue;
 
-                if (dist(origin, get_position(n)) <= radius) {
+                if (dist(origin, get_position(n)) <= radius + collider_radius(n)) {
                     List_add(list, n);
                 }
 

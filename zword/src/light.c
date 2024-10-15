@@ -199,6 +199,51 @@ int compare_edge_angle(const void* a, const void* b) {
 }
 
 
+typedef struct {
+    float t1;
+    float t2;
+    Vector2f point1;
+    Vector2f point2;
+    bool intersected;
+} CircleIntersection;
+
+
+CircleIntersection circle_line_intersection(Vector2f center, float radius, Vector2f start, Vector2f end) {
+    Vector2f dir = diff(end, start);
+    Vector2f diff_start = diff(start, center);
+
+    float a = dot(dir, dir);
+    float b = 2.0f * dot(diff_start, dir);
+    float c = dot(diff_start, diff_start) - radius * radius;
+
+    float discriminant = b * b - 4.0f * a * c;
+    if (discriminant < 0.0f) {
+        return (CircleIntersection) { 0.0f, 0.0f, zeros(), zeros(), false };
+    }
+
+    float t1 = (-b - sqrtf(discriminant)) / (2.0f * a);
+    float t2 = (-b + sqrtf(discriminant)) / (2.0f * a);
+
+    Vector2f point1 = sum(start, mult(t1, dir));
+    Vector2f point2 = sum(start, mult(t2, dir));
+
+    return (CircleIntersection) { t1, t2, point1, point2, true };
+}
+
+
+bool probe(Vector2f start, float angle, float range, int target_entity, float min_distance, Edge* points, int* points_size) {
+    HitInfo info = raycast(start, polar_to_cartesian(1.0f, angle), range, GROUP_LIGHTS);
+    if ((info.entity == target_entity || target_entity == -1) && info.distance > min_distance) {
+        points[*points_size].angle = angle;
+        points[*points_size].position = info.position;
+        points[*points_size].entity = info.entity;
+        (*points_size)++;
+        return true;
+    }
+    return false;
+}
+
+
 void draw_light(int camera, Vector2f start, float angle, float light_angle, float range, int rays, Color color, 
         float brightness, int bounces) {
     Edge points[1000];
@@ -206,6 +251,11 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 
     // Minimum points per radian
     int min_points = 50;
+
+    float delta = 0.01f;
+
+    probe(start, angle - 0.5f * light_angle, range, -1, 0.0f, points, &points_size);
+    probe(start, angle + 0.5f * light_angle, range, -1, 0.0f, points, &points_size);
 
     List* entities = get_entities(start, range);
 
@@ -226,6 +276,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         float right;
         float left_distance;
         float right_distance;
+
         if (collider->type == COLLIDER_CIRCLE) {
             float radius = collider_radius(entity);
 
@@ -268,52 +319,69 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
                 }
             }
 
-            if (nearest != left_i && nearest != right_i) {
-                HitInfo info = raycast(start, corners[nearest], range, GROUP_LIGHTS);
-                if (info.entity == entity) {
-                    points[points_size].angle = polar_angle(corners[nearest]);
-                    points[points_size].position = info.position;
-                    points[points_size].entity = info.entity;
-                    points_size++;
+            if (nearest == left_i || nearest == right_i) {
+                CircleIntersection intersection = circle_line_intersection(zeros(), range, corners[left_i], corners[right_i]);
+                if (intersection.intersected) {
+                    float left_new = polar_angle(intersection.point1);
+                    float right_new = polar_angle(intersection.point2);
+
+                    if (intersection.t1 > 0.0f) {
+                        left = left_new;
+                        left_distance = norm(intersection.point1);
+                    }
+
+                    if (intersection.t2 < 1.0f) {
+                        right = right_new;
+                        right_distance = norm(intersection.point2);
+                    }
+                }
+            } else {
+                CircleIntersection intersection = circle_line_intersection(zeros(), range, corners[left_i], corners[nearest]);
+                if (intersection.intersected) {
+                    float left_new = polar_angle(intersection.point1);
+
+                    if (intersection.t1 > 0.0f) {
+                        left = left_new;
+                        left_distance = norm(intersection.point1);
+                    }
+                }
+
+                intersection = circle_line_intersection(zeros(), range, corners[nearest], corners[right_i]);
+                if (intersection.intersected) {
+                    float right_new = polar_angle(intersection.point2);
+
+                    if (intersection.t2 < 1.0f) {
+                        right = right_new;
+                        right_distance = norm(intersection.point2);
+                    }
+                }
+
+                float angle_nearest = polar_angle(corners[nearest]);
+                if (fabsf(angle_diff(angle_nearest, angle)) < 0.5f * light_angle) {
+                    probe(start, angle_nearest, range, entity, 0.0f, points, &points_size);
                 }
             }
         }
 
-        float delta = 0.01f;
-        HitInfo info = raycast(start, polar_to_cartesian(1.0f, left - delta), range, GROUP_LIGHTS);
-        if (info.entity == entity) {
-            points[points_size].angle = left - delta;
-            points[points_size].position = info.position;
-            points[points_size].entity = info.entity;
-            points_size++;
-
-            info = raycast(start, polar_to_cartesian(1.0f, left + delta), range, GROUP_LIGHTS);
-            if (info.distance > left_distance) {
-                points[points_size].angle = left + delta;
-                points[points_size].position = info.position;
-                points[points_size].entity = info.entity;
-                points_size++;
+        if (fabsf(angle_diff(left, angle)) < 0.5f * light_angle) {
+            if (probe(start, left - delta, range, entity, 0.0f, points, &points_size)) {
+                probe(start, left + delta, range, -1, 0.0f, points, &points_size);
             }
         }
 
-        info = raycast(start, polar_to_cartesian(1.0f, right + delta), range, GROUP_LIGHTS);
-        if (info.entity == entity) {
-            points[points_size].angle = right + delta;
-            points[points_size].position = info.position;
-            points[points_size].entity = info.entity;
-            points_size++;
-
-            info = raycast(start, polar_to_cartesian(1.0f, right - delta), range, GROUP_LIGHTS);
-            if (info.distance > right_distance) {
-                points[points_size].angle = right - delta;
-                points[points_size].position = info.position;
-                points[points_size].entity = info.entity;
-                points_size++;
+        if (fabsf(angle_diff(right, angle)) < 0.5f * light_angle) {
+            if (probe(start, right + delta, range, entity, 0.0f, points, &points_size)) {
+                probe(start, right - delta, range, -1, 0.0f, points, &points_size);
             }
         }
     }
 
     free(entities);
+
+    // Transform angles to local coordinates
+    for (int i = 0; i < points_size; i++) {
+        points[i].angle -= angle;
+    }
 
     qsort(points, points_size, sizeof(Edge), compare_edge_angle);
 
@@ -328,7 +396,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         Vector2f end = points[i].position;
 
         float d = dist(start, end);
-        end = sum(end, mult(0.25, mult(1.0 / d, diff(end, start))));
+        // end = sum(end, mult(0.25, mult(1.0 / d, diff(end, start))));
 
         color.a = 255 * brightness * (1.0 - d / (range + 0.25));
 
@@ -336,49 +404,55 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
         vertices_size++;
 
-        int next_i = (i + 1) % points_size;
-        if (points[i].entity == -1 && points[next_i].entity == -1) {        
-            float delta_angle = angle_diff(points[next_i].angle, points[i].angle);
+        // char string[100];
+        // sprintf(string, "%d", points[i].entity);
+        // draw_text(camera, end, string, 10, COLOR_WHITE);
+
+        int next_i = i + 1;
+        if (next_i < points_size && points[i].entity == -1 && points[next_i].entity == -1) {
+            float delta_angle = fabsf(angle_diff(points[next_i].angle, points[i].angle));
 
             int n = floorf(delta_angle / (light_angle / min_points));
             for (int j = 0; j < n; j++) {
-                float a = points[i].angle + j * delta_angle / n;
+                float a = angle + points[i].angle + j * delta_angle / n;
                 end = polar_to_cartesian(range, a);
                 pos = world_to_screen(camera, sum(start, end));
                 vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, 0 };
                 vertices_size++;
+
+                // draw_circle(camera, sum(start, end), 0.05, COLOR_RED);
             }
         }
 
-        if (points[i].entity == points[next_i].entity) {
-            ColliderComponent* collider = ColliderComponent_get(points[i].entity);
-            if (collider && collider->type == COLLIDER_CIRCLE) {
-                Vector2f center = get_position(points[i].entity);
-                Vector2f r = diff(points[i].position, center);
-                Vector2f l = diff(points[next_i].position, center);
+        // if (points[i].entity == points[next_i].entity) {
+        //     ColliderComponent* collider = ColliderComponent_get(points[i].entity);
+        //     if (collider && collider->type == COLLIDER_CIRCLE) {
+        //         Vector2f center = get_position(points[i].entity);
+        //         Vector2f r = diff(points[i].position, center);
+        //         Vector2f l = diff(points[next_i].position, center);
 
-                float a = angle_diff(polar_angle(r), polar_angle(l));
+        //         float a = angle_diff(polar_angle(r), polar_angle(l));
 
-                int n = floorf(a / (light_angle / min_points));
-                Matrix2f rot = rotation_matrix(-a / n);
-                for (int j = 0; j < n; j++) {
-                    r = matrix_mult(rot, r);
+        //         int n = floorf(a / (light_angle / min_points));
+        //         Matrix2f rot = rotation_matrix(-a / n);
+        //         for (int j = 0; j < n; j++) {
+        //             r = matrix_mult(rot, r);
 
-                    d = dist(start, end);
-                    end = sum(center, r);
+        //             d = dist(start, end);
+        //             end = sum(center, r);
 
-                    color.a = 255 * brightness * (1.0 - d / (range + 0.25));
+        //             color.a = 255 * brightness * (1.0 - d / (range + 0.25));
                                         
-                    pos = world_to_screen(camera, end);
-                    vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
-                    vertices_size++;
-                }
-            }
-        }
+        //             pos = world_to_screen(camera, end);
+        //             vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+        //             vertices_size++;
+        //         }
+        //     }
+        // }
     }
 
-    vertices[vertices_size] = vertices[1];
-    vertices_size++;
+    // vertices[vertices_size] = vertices[1];
+    // vertices_size++;
 
     draw_triangle_fan(camera, vertices, vertices_size);
 
