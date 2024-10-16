@@ -250,7 +250,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
     int points_size = 0;
 
     // Minimum points per radian
-    int min_points = 50;
+    int min_points = 10;
 
     float delta = 0.01f;
 
@@ -398,22 +398,28 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         float d = dist(start, end);
         // end = sum(end, mult(0.25, mult(1.0 / d, diff(end, start))));
 
-        color.a = 255 * brightness * (1.0 - d / (range + 0.25));
+        color.a = 255 * brightness * (1.0 - d / range);
 
         pos = world_to_screen(camera, end);
         vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
         vertices_size++;
 
+        // draw_circle(camera, end, 0.05, COLOR_BLUE);
+
         // char string[100];
-        // sprintf(string, "%d", points[i].entity);
+        // sprintf(string, "%d", color.a);
         // draw_text(camera, end, string, 10, COLOR_WHITE);
 
         int next_i = i + 1;
-        if (next_i < points_size && points[i].entity == -1 && points[next_i].entity == -1) {
-            float delta_angle = fabsf(angle_diff(points[next_i].angle, points[i].angle));
+        if (next_i == points_size) {
+            break;
+        }
 
+        float delta_angle = fabsf(angle_diff(points[next_i].angle, points[i].angle));
+
+        if (points[i].entity == -1 && points[next_i].entity == -1) {
             int n = floorf(delta_angle / (light_angle / min_points));
-            for (int j = 0; j < n; j++) {
+            for (int j = 1; j < n; j++) {
                 float a = angle + points[i].angle + j * delta_angle / n;
                 end = polar_to_cartesian(range, a);
                 pos = world_to_screen(camera, sum(start, end));
@@ -424,31 +430,45 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
             }
         }
 
-        // if (points[i].entity == points[next_i].entity) {
-        //     ColliderComponent* collider = ColliderComponent_get(points[i].entity);
-        //     if (collider && collider->type == COLLIDER_CIRCLE) {
-        //         Vector2f center = get_position(points[i].entity);
-        //         Vector2f r = diff(points[i].position, center);
-        //         Vector2f l = diff(points[next_i].position, center);
+        if (points[i].entity == points[next_i].entity && points[i].entity != -1) {
+            ColliderComponent* collider = ColliderComponent_get(points[i].entity);
+            if (collider->type == COLLIDER_CIRCLE) {
+                Vector2f center = get_position(points[i].entity);
+                Vector2f r = diff(points[i].position, center);
+                Vector2f l = diff(points[next_i].position, center);
 
-        //         float a = angle_diff(polar_angle(r), polar_angle(l));
+                float a = angle_diff(polar_angle(r), polar_angle(l));
 
-        //         int n = floorf(a / (light_angle / min_points));
-        //         Matrix2f rot = rotation_matrix(-a / n);
-        //         for (int j = 0; j < n; j++) {
-        //             r = matrix_mult(rot, r);
+                int n = floorf(delta_angle / (light_angle / min_points));
+                Matrix2f rot = rotation_matrix(-a / n);
+                for (int j = 1; j < n; j++) {
+                    r = matrix_mult(rot, r);
 
-        //             d = dist(start, end);
-        //             end = sum(center, r);
+                    d = dist(start, end);
+                    end = sum(center, r);
 
-        //             color.a = 255 * brightness * (1.0 - d / (range + 0.25));
-                                        
-        //             pos = world_to_screen(camera, end);
-        //             vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
-        //             vertices_size++;
-        //         }
-        //     }
-        // }
+                    color.a = 255 * brightness * (1.0f - d / range);
+
+                    pos = world_to_screen(camera, end);
+                    vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+                    vertices_size++;
+
+                    // draw_circle(camera, end, 0.05, COLOR_GREEN);
+                }
+            } else if (collider->type == COLLIDER_RECTANGLE) {
+                int n = floorf(delta_angle / (light_angle / min_points));
+                for (int j = 1; j < n; j++) {
+                    float x = j / (float) n;
+                    end = lin_comb(1.0f - x, points[i].position, x, points[next_i].position);
+
+                    color.a = 255 * brightness * (1.0f - dist(start, end) / range);
+
+                    pos = world_to_screen(camera, end);
+                    vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+                    vertices_size++;
+                }
+            }
+        }
     }
 
     // vertices[vertices_size] = vertices[1];
