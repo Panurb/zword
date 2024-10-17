@@ -227,7 +227,9 @@ typedef enum ParticleType {
     PARTICLE_SPLINTER,
     PARTICLE_FIRE,
     PARTICLE_ENERGY,
-    PARTICLE_GLASS
+    PARTICLE_GLASS,
+    PARTICLE_SNOW,
+    PARTICLE_RAIN
 } ParticleType;
 
 typedef struct {
@@ -252,6 +254,8 @@ typedef struct {
     float rate;
     float timer;
     Vector2f origin;
+    float width;
+    float height;
     float stretch;
 } ParticleComponent;
 

@@ -396,6 +396,8 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
     particle->outer_color = outer_color;
     particle->inner_color = inner_color;
     particle->origin = zeros();
+    particle->width = 0.0f;
+    particle->height = 0.0f;
     particle->stretch = 0.1f;
 
     game_data->components->particle[entity] = particle;

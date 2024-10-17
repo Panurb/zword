@@ -44,6 +44,12 @@ ButtonText GAME_MODES[] = {
     "TUTORIAL"
 };
 
+ButtonText WEATHERS[] = {
+    "NONE",
+    "RAIN",
+    "SNOW"
+};
+
 
 static float game_over_timer = 0.0f;
 static bool level_won = false;
@@ -104,6 +110,7 @@ void create_game() {
 
     game_data->grid = grid;
     game_data->ambient_light = ambient_light;
+    game_data->weather = WEATHER_NONE;
     game_data->seed = seed;
     game_data->camera = camera;
     game_data->menu_camera = menu_camera;
@@ -191,6 +198,18 @@ void start_game(Filename map_name) {
             break;
         default:
             break;
+    }
+
+    if (game_data->weather) {
+        if (game_data->weather == WEATHER_RAIN) {
+            ParticleComponent* part = ParticleComponent_add_type(game_data->camera, PARTICLE_RAIN, 0.0f);
+        } else if (game_data->weather == WEATHER_SNOW) {
+            ParticleComponent* part = ParticleComponent_add_type(game_data->camera, PARTICLE_SNOW, 0.0f);
+        }
+        ParticleComponent* part = ParticleComponent_get(game_data->camera);
+        Vector2f size = camera_size(i);
+        part->width = size.x;
+        part->height = size.y;
     }
 }
 

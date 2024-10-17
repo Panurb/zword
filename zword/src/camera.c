@@ -19,9 +19,6 @@ int create_camera() {
     int i = create_entity();
     CoordinateComponent_add(i, zeros(), 0.0);
     CameraComponent_add(i, (Resolution) { game_settings.width, game_settings.height }, 40.0f);
-    // ParticleComponent* part = ParticleComponent_add(i, 0.0, 2 * M_PI, 0.1, 0.1, 1.0, 1.0, COLOR_WHITE, COLOR_WHITE);
-    // part->enabled = true;
-    // part->loop = true;
     return i;
 }
 

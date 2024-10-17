@@ -220,6 +220,13 @@ void set_ambient_light(int entity, int delta) {
 }
 
 
+void set_weather(int entity, int delta) {
+    UNUSED(delta);
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    game_data->weather = widget->value;
+}
+
+
 void toggle_editor_settings(int entity) {
     UNUSED(entity);
     static int window_id = -1;
@@ -231,7 +238,7 @@ void toggle_editor_settings(int entity) {
     }
    
     window_id = create_window(vec(0.0f, 0.0f), "SETTINGS", 1, toggle_editor_settings);
-    int container = create_container(vec(0.0f, -3 * BUTTON_HEIGHT), 1, 5);
+    int container = create_container(vec(0.0f, -4 * BUTTON_HEIGHT), 1, 7);
     add_child(window_id, container);
 
     int i = create_label("Game mode", zeros());
@@ -247,6 +254,14 @@ void toggle_editor_settings(int entity) {
 
     i = create_slider(zeros(), 0, 100, 50, set_ambient_light);
     add_widget_to_container(container, i);
+
+    i = create_label("Weather", zeros());
+    add_widget_to_container(container, i);
+
+    i = create_dropdown(zeros(), WEATHERS, 3);
+    add_widget_to_container(container, i);
+    widget = WidgetComponent_get(i);
+    widget->on_change = set_weather;
 }
 
 

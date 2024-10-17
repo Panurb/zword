@@ -3,17 +3,26 @@
 #include <stdbool.h>
 
 
-#define LOGGING_ENABLED
+#define LOGGING_LEVEL 3
 
-#ifdef LOGGING_ENABLED
+#if LOGGING_LEVEL > 3
     #define LOG_DEBUG(...) printf("DEBUG: "); printf(__VA_ARGS__); printf("\n");
-    #define LOG_INFO(...) printf("INFO: "); printf(__VA_ARGS__); printf("\n");
-    #define LOG_WARNING(...) printf("WARNING: "); printf(__VA_ARGS__); printf("\n");
-    #define LOG_ERROR(...) printf("ERROR: "); printf(__VA_ARGS__); printf("\n");
 #else
     #define LOG_DEBUG(...)
+#endif
+#if LOGGING_LEVEL > 2
+    #define LOG_INFO(...) printf("INFO: "); printf(__VA_ARGS__); printf("\n");
+#else
     #define LOG_INFO(...)
+#endif
+#if LOGGING_LEVEL > 1
+    #define LOG_WARNING(...) printf("WARNING: "); printf(__VA_ARGS__); printf("\n");
+#else
     #define LOG_WARNING(...)
+#endif
+#if LOGGING_LEVEL > 0
+    #define LOG_ERROR(...) printf("ERROR: "); printf(__VA_ARGS__); printf("\n");
+#else
     #define LOG_ERROR(...)
 #endif
 

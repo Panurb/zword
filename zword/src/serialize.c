@@ -959,6 +959,7 @@ cJSON* serialize_game(bool preserve_id) {
 
     cJSON_AddNumberToObject(json, "game_mode", game_data->game_mode);
     cJSON_AddNumberToObject(json, "ambient_light", game_data->ambient_light);
+    serialize_int(json, "weather", game_data->weather, WEATHER_NONE);
 
     serialize_map(json, preserve_id);
 
@@ -1029,6 +1030,8 @@ void deserialize_game(cJSON* json, bool preserve_id) {
     LOG_DEBUG("Game mode: %d", game_data->game_mode);
     game_data->ambient_light = deserialize_float(json, "ambient_light", game_data->ambient_light);
     LOG_DEBUG("Ambient light: %f", game_data->ambient_light);
+    game_data->weather = deserialize_int(json, "weather", game_data->weather);
+    LOG_DEBUG("Weather: %d", game_data->weather);
     deserialize_map(json, preserve_id);
 }
 

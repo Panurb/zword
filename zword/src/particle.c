@@ -81,6 +81,25 @@ void ParticleComponent_add_glass(int entity) {
 }
 
 
+void ParticleComponent_add_snow(int entity) {
+    ParticleComponent* part = ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.1, 0.0, 0.5, 10.0, COLOR_WHITE, COLOR_WHITE);
+    part->enabled = true;
+    part->loop = true;
+    part->max_time = 20.0f;
+}
+
+
+void ParticleComponent_add_rain(int entity) {
+    Color color = get_color(0.8f, 0.8f, 1.0f, 0.5f);
+    ParticleComponent* part = ParticleComponent_add(entity, -2.0f, 0.1, 0.05, 0.0, 1.0, 50.0, color, color);
+    part->enabled = true;
+    part->loop = true;
+    part->max_time = 0.5f;
+    part->stretch = 10.0f;
+    part->speed_spread = 0.0f;
+}
+
+
 ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, float size) {
     switch (type) {
         case PARTICLE_NONE:
@@ -112,6 +131,12 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
         case PARTICLE_GLASS:
             ParticleComponent_add_glass(entity);
             break;
+        case PARTICLE_SNOW:
+            ParticleComponent_add_snow(entity);
+            break;
+        case PARTICLE_RAIN:
+            ParticleComponent_add_rain(entity);
+            break;
     }
     ParticleComponent* particle = ParticleComponent_get(entity);
     particle->type = type;
@@ -125,6 +150,12 @@ void add_particles(int entity, int n) {
     for (int i = 0; i < n; i++) {
         int next = (part->first + part->particles) % part->max_particles;
 
+        if (part->width > 0.0f && part->height > 0.0f) {
+            part->origin = (Vector2f) { 
+                randf(-0.5f * part->width, 0.5f * part->width), 
+                randf(-0.5f * part->height, 0.5f * part->height) 
+            };
+        }
         part->position[next] = sum(get_position(entity), part->origin);
         float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
         float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
@@ -187,10 +218,7 @@ void draw_particles(int camera) {
         SDL_SetRenderTarget(app.renderer, NULL);
     }
 
-    ListNode* node;
-    FOREACH(node, game_data->components->image.order) {
-        int entity = node->value;
-
+    for (int entity = 0; entity < game_data->components->entities; entity++) {
         ParticleComponent* part = ParticleComponent_get(entity);
         if (!part) continue;
 

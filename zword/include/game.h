@@ -34,6 +34,7 @@ typedef enum {
 
 
 extern ButtonText GAME_MODES[];
+extern ButtonText WEATHERS[];
 
 
 typedef struct {
@@ -46,10 +47,18 @@ typedef struct {
 } Resources;
 
 
+typedef enum {
+    WEATHER_NONE,
+    WEATHER_RAIN,
+    WEATHER_SNOW
+} Weather;
+
+
 typedef struct {
     ComponentData* components;
     ColliderGrid* grid;
     float ambient_light;
+    Weather weather;
     int seed;
     int camera;
     int menu_camera;
