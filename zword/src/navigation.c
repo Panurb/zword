@@ -138,19 +138,29 @@ float connection_distance(int i, int j) {
 }
 
 
-void update_waypoints(int camera) {
+void update_waypoints(int camera, float range) {
     List* waypoints = List_create();
 
-    List* list = get_entities(get_position(camera), 20.0f);
-    for (ListNode* node = list->head; node; node = node->next) {
-        int i = node->value;
-        WaypointComponent* waypoint = WaypointComponent_get(i);
-        if (!waypoint) continue;
+    if (range == INFINITY) {
+        for (int i = 0; i < game_data->components->entities; i++) {
+            WaypointComponent* waypoint = WaypointComponent_get(i);
+            if (waypoint) {
+                List_clear(waypoint->neighbors);
+                List_add(waypoints, i);
+            }
+        }
+    } else {
+        List* list = get_entities(get_position(camera), range);
+        for (ListNode* node = list->head; node; node = node->next) {
+            int i = node->value;
+            WaypointComponent* waypoint = WaypointComponent_get(i);
+            if (!waypoint) continue;
 
-        List_clear(waypoint->neighbors);
-        List_add(waypoints, i);
+            List_clear(waypoint->neighbors);
+            List_add(waypoints, i);
+        }
+        List_delete(list);
     }
-    List_delete(list);
 
     for (ListNode* node = waypoints->head; node; node = node->next) {
         int i = node->value;

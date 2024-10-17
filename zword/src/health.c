@@ -139,13 +139,16 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
         health->health = maxi(0, health->health - dmg);
 
         if (health->decal[0] != '\0') {
-            // TODO: use decal
             Vector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
+            int i = -1;
             if (dmg < 40) {
-                create_decal(pos, "blood", 60.0f);
+                i = create_decal(pos, health->decal, 60.0f);
             } else {
-                create_decal(pos, "blood_large", 60.0f);
+                Filename buffer;
+                snprintf(buffer, sizeof(buffer), "%s_large", health->decal);
+                i = create_decal(pos, buffer, 60.0f);
             }
+            ImageComponent_get(i)->alpha = 0.8f;
         }
 
         if (prev_health > 0 && health->health == 0) {

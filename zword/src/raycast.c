@@ -46,11 +46,6 @@ Hit ray_intersection(int i, Vector2f start, Vector2f velocity, float range) {
                 }
             }
         }
-
-        if (n < 2) {
-            hit.time = range;
-            hit.normal = perp(velocity);
-        }
     } else {
         // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 
@@ -117,6 +112,11 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
             if (col->trigger_type != TRIGGER_NONE) continue;
 
             col->last_collision = id;
+
+            // Skip if ray starts inside collider
+            if (point_inside_collider(j, start)) {
+                continue;
+            }
 
             Hit hit = ray_intersection(j, start, velocity, range);
             if (hit.time < t_min) {

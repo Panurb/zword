@@ -530,7 +530,7 @@ void create_editor_menu() {
 void update_editor(float time_step) {
     // update(data.time_step, data.grid);
     // collide(data.data.grid);
-    update_waypoints(game_data->camera);
+    update_waypoints(game_data->camera, 50.0f);
 
     update_particles(game_data->camera, time_step);
     update_lights(time_step);

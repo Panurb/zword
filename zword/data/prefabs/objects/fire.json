@@ -17,7 +17,7 @@
 				"trigger_type":	4
 			},
 			"Light":	{
-				"range":	18,
+				"range":	10,
 				"angle":	6.2831854820251465,
 				"color_r":	255,
 				"color_g":	153,
