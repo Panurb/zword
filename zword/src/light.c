@@ -270,8 +270,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
     Edge points[1000];
     int points_size = 0;
 
-    // Minimum points per radian
-    int min_points = 10;
+    int points_per_radian = 10;
 
     float delta = 0.01f;
 
@@ -432,7 +431,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         points_size++;
     }
 
-    SDL_Vertex* vertices = malloc((points_size + 1 + ceilf(min_points * light_angle)) * sizeof(SDL_Vertex));
+    SDL_Vertex* vertices = malloc((points_size + 1 + ceilf(points_per_radian * light_angle)) * sizeof(SDL_Vertex));
     Vector2f pos = world_to_screen(camera, start);
 
     color.a = 255 * brightness;
@@ -443,19 +442,13 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         Vector2f end = points[i].position;
 
         float d = dist(start, end);
-        // end = sum(end, mult(0.25, mult(1.0 / d, diff(end, start))));
+        end = sum(end, mult(0.25f, mult(1.0f / d, diff(end, start))));
 
-        color.a = 255 * brightness * (1.0 - d / range);
+        color.a = 255 * brightness * (1.0f - d / range);
 
         pos = world_to_screen(camera, end);
         vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
         vertices_size++;
-
-        // draw_circle(camera, end, 0.05, COLOR_BLUE);
-
-        // char string[100];
-        // sprintf(string, "%d", points[i].entity);
-        // draw_text(camera, end, string, 10, COLOR_WHITE);
 
         int next_i = i + 1;
         if (next_i == points_size) {
@@ -466,15 +459,13 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 
         // Empty points
         if (points[i].entity == -1 && points[next_i].entity == -1) {
-            int n = floorf(delta_angle * min_points);
+            int n = floorf(delta_angle * points_per_radian);
             for (int j = 1; j < n; j++) {
                 float a = angle + points[i].angle + j * delta_angle / n;
                 end = polar_to_cartesian(range, a);
                 pos = world_to_screen(camera, sum(start, end));
                 vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, 0 };
                 vertices_size++;
-
-                // draw_circle(camera, sum(start, end), 0.05, COLOR_RED);
             }
         }
 
@@ -488,29 +479,31 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 
                 float a = angle_diff(polar_angle(r), polar_angle(l));
 
-                int n = floorf(delta_angle * min_points);
+                int n = floorf(delta_angle * points_per_radian);
                 Matrix2f rot = rotation_matrix(-a / n);
                 for (int j = 1; j < n; j++) {
                     r = matrix_mult(rot, r);
+                    end = sum(center, r);
 
                     d = dist(start, end);
-                    end = sum(center, r);
+                    end = sum(end, mult(0.25f, mult(1.0f / d, diff(end, start))));
 
                     color.a = 255 * brightness * (1.0f - d / range);
 
                     pos = world_to_screen(camera, end);
                     vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
                     vertices_size++;
-
-                    // draw_circle(camera, end, 0.05, COLOR_GREEN);
                 }
             } else if (collider->type == COLLIDER_RECTANGLE) {
-                int n = floorf(delta_angle * min_points);
+                int n = floorf(delta_angle * points_per_radian);
                 for (int j = 1; j < n; j++) {
                     float x = j / (float) n;
                     end = lin_comb(1.0f - x, points[i].position, x, points[next_i].position);
 
-                    color.a = 255 * brightness * (1.0f - dist(start, end) / range);
+                    d = dist(start, end);
+                    end = sum(end, mult(0.25f, mult(1.0f / d, diff(end, start))));
+
+                    color.a = 255 * brightness * (1.0f - d / range);
 
                     pos = world_to_screen(camera, end);
                     vertices[vertices_size] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
@@ -519,9 +512,6 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
             }
         }
     }
-
-    // vertices[vertices_size] = vertices[1];
-    // vertices_size++;
 
     draw_triangle_fan(camera, vertices, vertices_size);
 
