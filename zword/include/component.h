@@ -50,6 +50,13 @@ typedef struct {
     bool tile;
 } ImageComponent;
 
+typedef enum {
+    AXIS_NONE,
+    AXIS_POSITION,
+    AXIS_ANGLE, 
+    AXIS_ALL
+} AxisLock;
+
 typedef struct {
     Vector2f velocity;
     Vector2f acceleration;
@@ -72,6 +79,7 @@ typedef struct {
     float lifetime;
     bool slowed;
     bool on_ground;
+    AxisLock lock;
 } PhysicsComponent;
 
 typedef enum {

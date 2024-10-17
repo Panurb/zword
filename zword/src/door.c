@@ -42,8 +42,10 @@ void update_doors() {
 
         if (door->locked) {
             col->group = GROUP_WALLS;
+            phys->lock = AXIS_ALL;
         } else {
             col->group = GROUP_DOORS;
+            phys->lock = AXIS_NONE;
 
             if (phys->speed > 0.25f) {
                 loop_sound(i, "door", 0.3f, 1.0f);

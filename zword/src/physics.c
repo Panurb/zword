@@ -90,6 +90,25 @@ void update_physics(float time_step) {
         physics->velocity = sum(physics->velocity, mult(time_step, physics->acceleration));
         physics->acceleration = zeros();
 
+        switch (physics->lock) {
+            case AXIS_NONE:
+                break;
+            case AXIS_POSITION:
+                delta_angle = 0.0f;
+                physics->angular_velocity = 0.0f;
+                break;
+            case AXIS_ANGLE:
+                delta_pos = zeros();
+                physics->velocity = zeros();
+                break;
+            case AXIS_ALL:
+                delta_pos = zeros();
+                delta_angle = 0.0f;
+                physics->velocity = zeros();
+                physics->angular_velocity = 0.0f;
+                break;
+        }
+
         bool moved = col && col->enabled && (non_zero(delta_pos) || delta_angle != 0.0f);
         if (moved) {
             clear_grid(i);

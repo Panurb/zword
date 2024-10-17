@@ -488,12 +488,6 @@ void update_weapons(float time_step) {
             PhysicsComponent* phys = PhysicsComponent_get(parent);
             weapon->recoil -= time_step * weapon->recoil_down;
             weapon->recoil = fmaxf(weapon->recoil_up * phys->speed / phys->max_speed, weapon->recoil);
-
-            if (weapon->ammo_type == AMMO_MELEE) {
-                float x_max = 1.0f / get_fire_rate(i);
-                float x = 2.0f * (x_max - weapon->cooldown) / x_max;
-                coord->angle = M_PI * powf(x - 1.0f, 2.0f) - 0.45f * M_PI;
-            }
         }
     }
 }

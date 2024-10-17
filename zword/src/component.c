@@ -152,6 +152,7 @@ PhysicsComponent* PhysicsComponent_add(int entity, float mass) {
     phys->lifetime = INFINITY;
     phys->slowed = false;
     phys->on_ground = false;
+    phys->lock = AXIS_NONE;
 
     game_data->components->physics[entity] = phys;
 
