@@ -161,11 +161,16 @@ Vector2f rand_vector() {
 }
 
 int rand_choice(float* probs, int size) {
-    float x = randf(0.0f, 1.0f);
     float total = 0.0f;
     for (int i = 0; i < size; i++) {
         total += probs[i];
-        if (total >= x) {
+    }
+
+    float x = randf(0.0f, total);
+    float cum_total = 0.0f;
+    for (int i = 0; i < size; i++) {
+        cum_total += probs[i];
+        if (cum_total >= x) {
             return i;
         }
     }

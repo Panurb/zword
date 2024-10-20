@@ -670,6 +670,14 @@ void input_tool_tile(SDL_Event event) {
 
         if (width > 0.0f && height > 0.0f) {
             CoordinateComponent* coord = CoordinateComponent_get(entity);
+            
+            if (height > width) {
+                coord->angle = M_PI_2;
+                float temp = width;
+                width = height;
+                height = temp;
+            }
+
             ColliderComponent* collider = ColliderComponent_get(entity);
             ImageComponent* image = ImageComponent_get(entity);
             if (image) {

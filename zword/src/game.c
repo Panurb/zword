@@ -450,7 +450,7 @@ void update_lifetimes(float time_step) {
 void update_game(float time_step) {
     update_lifetimes(time_step);
     update_physics(time_step);
-    collide();
+    update_collisions();
     update_waypoints(game_data->camera, 20.0f);
     update_doors();
 

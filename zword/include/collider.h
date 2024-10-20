@@ -56,7 +56,7 @@ Vector2f overlap_rectangle_image(int i, int j);
 
 bool collides_with(int entity, List* entities);
 
-void collide();
+void update_collisions();
 
 void draw_occupied_tiles(int camera);
 

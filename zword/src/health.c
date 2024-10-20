@@ -27,6 +27,7 @@ void die(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
+    ParticleComponent* particle = ParticleComponent_get(entity);
 
     if (player) {
         float angle = coord->angle;
@@ -63,10 +64,52 @@ void die(int entity) {
             List_remove(coord->children, enemy->weapon);
             enemy->weapon = -1;
 
-            // FIXME: waypoing component is not removed
+            // Overkill
+            if (health->health < -health->max_health / 2) {
+                ImageComponent_remove(entity);
+                if (particle) {
+                    particle->origin = zeros();
+                    add_particles(entity, 100);
+                }
+            }
+
+            // FIXME: waypoint component is not removed
             WaypointComponent_remove(entity);
 
-            float probs[5] = { 0.1f, 0.15f, 0.15f, 0.1f, 0.5f };
+            float probs[5] = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+
+            ListNode* node;
+            FOREACH(node, game_data->components->player.order) {
+                int i = node->value;
+
+                PlayerComponent* player = PlayerComponent_get(i);
+                HealthComponent* health = HealthComponent_get(i);
+
+                int ammo = malloc(sizeof(int) * player->ammo_size);
+
+                int bandages = 0;
+                for (int j = 0; j < player->inventory_size; j++) {
+                    WeaponComponent* weapon = WeaponComponent_get(player->inventory[j]);
+                    if (weapon && weapon->ammo_type != AMMO_MELEE) {
+                        int ammo = player->ammo[weapon->ammo_type - 1];
+
+                        if (ammo < 2 * weapon->max_magazine) {
+                            LOG_INFO("ammo: %d\n", ammo);
+                            probs[weapon->ammo_type] += 1.0f;
+                        }
+                    }
+
+                    ItemComponent* item = ItemComponent_get(player->inventory[j]);
+                    if (item && item->type == ITEM_HEAL) {
+                        bandages++;
+                    }
+                }
+
+                if (bandages == 0 && health->health < health->max_health) {
+                    probs[0] += 1.0f;
+                }
+            }
+
             int j = -1;
             switch (rand_choice(probs, 5)) {
                 case 0:
@@ -120,8 +163,11 @@ void die(int entity) {
         remove_children(entity);
 
         if (!enemy) {
+            LOG_INFO("Destroying entity %d", entity);
             clear_grid(entity);
+            // FIXME: causes crash
             ColliderComponent_remove(entity);
+            LOG_INFO("Destroyed entity %d", entity);
         }
     }
 
@@ -136,7 +182,7 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
     EnemyComponent* enemy = EnemyComponent_get(entity);
     if (health) {
         int prev_health = health->health;
-        health->health = maxi(0, health->health - dmg);
+        health->health = health->health - dmg;
 
         if (health->decal[0] != '\0') {
             Vector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
@@ -151,7 +197,7 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
             ImageComponent_get(i)->alpha = 0.8f;
         }
 
-        if (prev_health > 0 && health->health == 0) {
+        if (prev_health > 0 && health->health <= 0) {
             die(entity);
 
             PlayerComponent* player = PlayerComponent_get(dealer);

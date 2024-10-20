@@ -76,6 +76,7 @@ static const char* IMAGES[] = {
     "lamp",
     "laser",
     "magazine",
+    "marschall",
     "mat",
     "menu",
     "pistol",

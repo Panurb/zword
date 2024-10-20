@@ -340,7 +340,90 @@ void apply_trigger(int trigger, int target) {
 }
 
 
-void collide() {
+void collide(int entity) {
+    ColliderComponent* collider = ColliderComponent_get(entity);
+    if (!collider) return;
+
+    PhysicsComponent* physics = PhysicsComponent_get(entity);
+    if (!physics) return;
+
+    Bounds bounds = get_bounds(entity);
+
+    for (int j = bounds.left; j <= bounds.right; j++) {
+        for (int k = bounds.bottom; k <= bounds.top; k++) {
+            for (ListNode* current = game_data->grid->array[j][k]->head; current; current = current->next) {
+                int n = current->value;
+                if (n == entity) continue;
+                ColliderComponent* collider_other = ColliderComponent_get(n);
+                if (collider_other->last_collision == entity) continue;
+
+                collider_other->last_collision = entity;
+
+                int collision_type = COLLISION_MATRIX[collider->group][collider_other->group];
+
+                if (collision_type == 0) continue;
+
+                Vector2f ol = overlap_collider_collider(entity, n);
+
+                if (!non_zero(ol)) continue;
+
+                if (collider_other->trigger_type != TRIGGER_NONE) {
+                    apply_trigger(n, entity);
+
+                    // Entity died by hurt trigger
+                    if (!ColliderComponent_get(entity)) {
+                        LOG_INFO("Entity %d died by hurt trigger", entity);
+                        return;
+                    }
+                    continue;
+                }
+
+                Vector2f dv = physics->velocity;
+                Vector2f no = normalized(ol);
+
+                float m = 1.0f;
+
+                PhysicsComponent* physics_other = PhysicsComponent_get(n);
+                if (physics_other) {
+                    dv = diff(dv, physics_other->velocity);
+                    m = physics_other->mass / (physics->mass + physics_other->mass);
+                }
+
+                Vector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
+
+                switch (collision_type) {
+                    case 0:
+                        break;
+                    case 1:
+                        physics->collision.velocity = sum(physics->collision.velocity, new_vel);
+                        physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
+                        List_add(physics->collision.entities, n);
+                        break;
+                    case 2:
+                        apply_force(entity, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
+
+                        ImageComponent* image = ImageComponent_get(n);
+                        if (image) {
+                            float x = norm(proj(ol, half_width(n)));
+                            float y = norm(proj(ol, half_height(n)));
+                            image->stretch = x / collider_width(n) - y / collider_height(n);
+                            image->stretch *= 0.5f;
+                            image->stretch_speed = 0.0f;
+                        }
+                        break;
+                    case 3:
+                        if (VehicleComponent_get(entity)) {
+                            VehicleComponent_get(entity)->on_road = true;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+}
+
+
+void update_collisions() {
     // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
 
     for (int i = 0; i < game_data->components->entities; i++) {
@@ -351,79 +434,7 @@ void collide() {
     }
 
     for (int i = 0; i < game_data->components->entities; i++) {
-        ColliderComponent* collider = ColliderComponent_get(i);
-        if (!collider) continue;
-
-        PhysicsComponent* physics = PhysicsComponent_get(i);
-        if (!physics) continue;
-
-        Bounds bounds = get_bounds(i);
-
-        for (int j = bounds.left; j <= bounds.right; j++) {
-            for (int k = bounds.bottom; k <= bounds.top; k++) {
-                for (ListNode* current = game_data->grid->array[j][k]->head; current; current = current->next) {
-                    int n = current->value;
-                    if (n == i) continue;
-                    ColliderComponent* collider_other = ColliderComponent_get(n);
-                    if (collider_other->last_collision == i) continue;
-
-                    collider_other->last_collision = i;
-
-                    int collision_type = COLLISION_MATRIX[collider->group][collider_other->group];
-
-                    if (collision_type == 0) continue;
-
-                    Vector2f ol = overlap_collider_collider(i, n);
-
-                    if (!non_zero(ol)) continue;
-
-                    if (collider_other->trigger_type != TRIGGER_NONE) {
-                        apply_trigger(n, i);
-                        continue;
-                    }
-
-                    Vector2f dv = physics->velocity;
-                    Vector2f no = normalized(ol);
-
-                    float m = 1.0f;
-
-                    PhysicsComponent* physics_other = PhysicsComponent_get(n);
-                    if (physics_other) {
-                        dv = diff(dv, physics_other->velocity);
-                        m = physics_other->mass / (physics->mass + physics_other->mass);
-                    }
-
-                    Vector2f new_vel = diff(physics->velocity, mult(2.0f * m * dot(dv, no), no));
-
-                    switch (collision_type) {
-                        case 0:
-                            break;
-                        case 1:
-                            physics->collision.velocity = sum(physics->collision.velocity, new_vel);
-                            physics->collision.overlap = sum(physics->collision.overlap, mult(m, ol));
-                            List_add(physics->collision.entities, n);
-                            break;
-                        case 2:
-                            apply_force(i, mult(fminf(50.0f * norm(ol), 50.0f), normalized(ol)));
-
-                            ImageComponent* image = ImageComponent_get(n);
-                            if (image) {
-                                float x = norm(proj(ol, half_width(n)));
-                                float y = norm(proj(ol, half_height(n)));
-                                image->stretch = x / collider_width(n) - y / collider_height(n);
-                                image->stretch *= 0.5f;
-                                image->stretch_speed = 0.0f;
-                            }
-                            break;
-                        case 3:
-                            if (VehicleComponent_get(i)) {
-                                VehicleComponent_get(i)->on_road = true;
-                            }
-                            break;
-                    }
-                }
-            }
-        }
+        collide(i);
     }
 }
 
