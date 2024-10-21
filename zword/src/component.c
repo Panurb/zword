@@ -515,7 +515,7 @@ ItemComponent* ItemComponent_add(int entity, int size, int price, ButtonText nam
     item->price = price;
     strcpy(item->name, name);
     item->use_time = 0.0f;
-    item->type = ITEM_HEAL;
+    item->type = ITEM_NONE;
     item->value = 0;
 
     game_data->components->item[entity] = item;

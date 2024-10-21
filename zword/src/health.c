@@ -30,106 +30,10 @@ void die(int entity) {
     ParticleComponent* particle = ParticleComponent_get(entity);
 
     if (player) {
-        float angle = coord->angle;
-        for (int j = 0; j < player->inventory_size; j++) {
-            if (player->inventory[j] != -1) {
-                coord->angle = rand_angle();
-                drop_item(entity);
-            }
-        }
-        coord->angle = angle;
-
-        for (int j = 1; j < player->ammo_size; j++) {
-            AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
-            while (ammo && ammo->size > 0) {
-                Vector2f pos = get_position(entity);
-                int k = create_ammo(sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
-                int size = mini(AmmoComponent_get(k)->size, ammo->size);
-                AmmoComponent* drop = AmmoComponent_get(k);
-                drop->size = size;
-                ammo->size -= size;
-            }
-        }
-
-        player->state = PLAYER_DEAD;
-        WaypointComponent_remove(entity);
+        player_die(entity);
     } else {
         if (enemy) {
-            coord->lifetime = 30.0f;
-
-            enemy->state = ENEMY_DEAD;
-            List_clear(enemy->path);
-            LightComponent_remove(entity);
-            destroy_entity(enemy->weapon);
-            List_remove(coord->children, enemy->weapon);
-            enemy->weapon = -1;
-
-            // Overkill
-            if (health->health < -health->max_health / 2) {
-                ImageComponent_remove(entity);
-                if (particle) {
-                    particle->origin = zeros();
-                    add_particles(entity, 100);
-                }
-            }
-
-            // FIXME: waypoint component is not removed
-            WaypointComponent_remove(entity);
-
-            float probs[5] = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-
-            ListNode* node;
-            FOREACH(node, game_data->components->player.order) {
-                int i = node->value;
-
-                PlayerComponent* player = PlayerComponent_get(i);
-                HealthComponent* health = HealthComponent_get(i);
-
-                int ammo = malloc(sizeof(int) * player->ammo_size);
-
-                int bandages = 0;
-                for (int j = 0; j < player->inventory_size; j++) {
-                    WeaponComponent* weapon = WeaponComponent_get(player->inventory[j]);
-                    if (weapon && weapon->ammo_type != AMMO_MELEE) {
-                        int ammo = player->ammo[weapon->ammo_type - 1];
-
-                        if (ammo < 2 * weapon->max_magazine) {
-                            LOG_INFO("ammo: %d\n", ammo);
-                            probs[weapon->ammo_type] += 1.0f;
-                        }
-                    }
-
-                    ItemComponent* item = ItemComponent_get(player->inventory[j]);
-                    if (item && item->type == ITEM_HEAL) {
-                        bandages++;
-                    }
-                }
-
-                if (bandages == 0 && health->health < health->max_health) {
-                    probs[0] += 1.0f;
-                }
-            }
-
-            int j = -1;
-            switch (rand_choice(probs, 5)) {
-                case 0:
-                    j = create_bandage(zeros());
-                    break;
-                case 1:
-                    j = create_ammo(zeros(), AMMO_PISTOL);
-                    break;
-                case 2:
-                    j = create_ammo(zeros(), AMMO_SHOTGUN);
-                    break;
-                case 3:
-                    j = create_ammo(zeros(), AMMO_RIFLE);
-                    break;
-                default:
-                    break;
-            }
-            if (j != -1) {
-                add_child(entity, j);
-            }
+            enemy_die(entity);
         }
 
         for (ListNode* node = coord->children->head; node; node = node->next) {
@@ -162,12 +66,10 @@ void die(int entity) {
         }
         remove_children(entity);
 
+        // Enemy retains collision after dying until stopping
         if (!enemy) {
-            LOG_INFO("Destroying entity %d", entity);
             clear_grid(entity);
-            // FIXME: causes crash
             ColliderComponent_remove(entity);
-            LOG_INFO("Destroyed entity %d", entity);
         }
     }
 

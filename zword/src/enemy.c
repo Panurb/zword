@@ -369,6 +369,95 @@ void alert_enemies(int player, float range) {
 }
 
 
+void enemy_die(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    EnemyComponent* enemy = EnemyComponent_get(entity);
+    HealthComponent* health = HealthComponent_get(entity);
+    ParticleComponent* particle = ParticleComponent_get(entity);
+
+    coord->lifetime = 30.0f;
+
+    enemy->state = ENEMY_DEAD;
+    List_clear(enemy->path);
+    LightComponent_remove(entity);
+    destroy_entity(enemy->weapon);
+    List_remove(coord->children, enemy->weapon);
+    enemy->weapon = -1;
+
+    // Overkill
+    if (health->health < -health->max_health / 2) {
+        ImageComponent_remove(entity);
+        if (particle) {
+            particle->origin = zeros();
+            add_particles(entity, 100);
+        }
+    }
+
+    // FIXME: waypoint component is not removed
+    WaypointComponent_remove(entity);
+
+    float probs[5] = { 0.1f, 0.1f, 0.1f, 0.1f, 1.0f };
+
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        int i = node->value;
+
+        PlayerComponent* player = PlayerComponent_get(i);
+        HealthComponent* health = HealthComponent_get(i);
+
+        int ammos[3] = { 0, 0, 0 };
+
+        for (int j = 0; j < player->ammo_size; j++) {
+            if (player->ammo[j] == -1) continue;
+            int ammo_type = AmmoComponent_get(player->ammo[j])->type;
+            ammos[ammo_type - 1] += AmmoComponent_get(player->ammo[j])->size;
+        }
+
+        int bandages = 0;
+        for (int j = 0; j < player->inventory_size; j++) {
+            WeaponComponent* weapon = WeaponComponent_get(player->inventory[j]);
+            if (weapon && weapon->ammo_type != AMMO_MELEE) {
+                int ammo = ammos[weapon->ammo_type - 1];
+
+                if (ammo < 2 * weapon->max_magazine) {
+                    probs[weapon->ammo_type] += 1.0f;
+                }
+            }
+
+            ItemComponent* item = ItemComponent_get(player->inventory[j]);
+            if (item && item->type == ITEM_HEAL) {
+                bandages++;
+            }
+        }
+
+        if (bandages == 0 && health->health < health->max_health) {
+            probs[0] += 1.0f;
+        }
+    }
+
+    int j = -1;
+    switch (rand_choice(probs, 5)) {
+        case 0:
+            j = create_bandage(zeros());
+            break;
+        case 1:
+            j = create_ammo(zeros(), AMMO_PISTOL);
+            break;
+        case 2:
+            j = create_ammo(zeros(), AMMO_SHOTGUN);
+            break;
+        case 3:
+            j = create_ammo(zeros(), AMMO_RIFLE);
+            break;
+        default:
+            break;
+    }
+    if (j != -1) {
+        add_child(entity, j);
+    }
+}
+
+
 void create_spawner(Vector2f position, float angle, float width, float height) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);

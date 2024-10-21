@@ -304,6 +304,7 @@ typedef struct {
 } WeaponComponent;
 
 typedef enum ItemType {
+    ITEM_NONE,
     ITEM_HEAL,
     ITEM_LIGHT,
     ITEM_LASER,

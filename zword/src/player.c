@@ -332,6 +332,36 @@ void update_players(float time_step) {
 }
 
 
+void player_die(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
+
+    float angle = coord->angle;
+    for (int j = 0; j < player->inventory_size; j++) {
+        if (player->inventory[j] != -1) {
+            coord->angle = rand_angle();
+            drop_item(entity);
+        }
+    }
+    coord->angle = angle;
+
+    for (int j = 1; j < player->ammo_size; j++) {
+        AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
+        while (ammo && ammo->size > 0) {
+            Vector2f pos = get_position(entity);
+            int k = create_ammo(sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
+            int size = mini(AmmoComponent_get(k)->size, ammo->size);
+            AmmoComponent* drop = AmmoComponent_get(k);
+            drop->size = size;
+            ammo->size -= size;
+        }
+    }
+
+    player->state = PLAYER_DEAD;
+    WaypointComponent_remove(entity);
+}
+
+
 void add_money(int entity, int amount) {
     if (amount == 0) return;
     

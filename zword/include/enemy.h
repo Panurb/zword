@@ -22,6 +22,8 @@ void draw_enemies(int camera);
 
 void alert_enemies(int player, float range);
 
+void enemy_die(int entity);
+
 void create_spawner(Vector2f position, float angle, float width, float height);
 
 void draw_spawners();

@@ -21,7 +21,7 @@
 			},
 			"Item":	{
 				"size":	0,
-				"type":	0,
+				"type":	1,
 				"value":	100,
 				"use_time":	2
 			}

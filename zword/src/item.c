@@ -67,6 +67,7 @@ int create_bandage(Vector2f position) {
     ItemComponent* item = ItemComponent_add(i, 0, 0, "");
     item->use_time = 2.0f;
     item->value = 100;
+    item->type = ITEM_HEAL;
 
     return i;
 }
