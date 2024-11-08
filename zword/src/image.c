@@ -100,6 +100,7 @@ static const char* IMAGES[] = {
     "sink",
     "smg",
     "sniper",
+    "spruce",
     "stone_tile",
     "stove",
     "swamp_tile",

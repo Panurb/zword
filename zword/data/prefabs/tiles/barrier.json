@@ -1,0 +1,18 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1,
+				"height":	1,
+				"group":	8
+			},
+			"Enemy":	{
+				"spawner":	1
+			}
+		}]
+}

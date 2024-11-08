@@ -76,6 +76,7 @@ typedef struct {
     int a;
 } Color;
 
+#define COLOR_NONE get_color(0.0f, 0.0f, 0.0f, 0.0f)
 #define COLOR_WHITE get_color(1.0f, 1.0f, 1.0f, 1.0f)
 #define COLOR_YELLOW get_color(1.0f, 1.0f, 0.0f, 1.0f)
 #define COLOR_RED get_color(1.0f, 0.0f, 0.0f, 1.0f)

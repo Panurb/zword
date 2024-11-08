@@ -372,7 +372,6 @@ void collide(int entity) {
 
                     // Entity died by hurt trigger
                     if (!ColliderComponent_get(entity)) {
-                        LOG_INFO("Entity %d died by hurt trigger", entity);
                         return;
                     }
                     continue;

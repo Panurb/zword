@@ -82,7 +82,7 @@ void ParticleComponent_add_glass(int entity) {
 
 
 void ParticleComponent_add_snow(int entity) {
-    ParticleComponent* part = ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.1, 0.0, 0.5, 10.0, COLOR_WHITE, COLOR_WHITE);
+    ParticleComponent* part = ParticleComponent_add(entity, 0.0, 2 * M_PI, 0.1, 0.0, 0.5, 10.0, COLOR_WHITE, COLOR_NONE);
     part->enabled = true;
     part->loop = true;
     part->max_time = 20.0f;
@@ -91,7 +91,7 @@ void ParticleComponent_add_snow(int entity) {
 
 void ParticleComponent_add_rain(int entity) {
     Color color = get_color(0.8f, 0.8f, 1.0f, 0.5f);
-    ParticleComponent* part = ParticleComponent_add(entity, -2.0f, 0.1, 0.05, 0.0, 1.0, 50.0, color, color);
+    ParticleComponent* part = ParticleComponent_add(entity, -2.0f, 0.1, 0.05, 0.0, 1.0, 50.0, color, COLOR_NONE);
     part->enabled = true;
     part->loop = true;
     part->max_time = 0.5f;
@@ -256,6 +256,8 @@ void draw_particles(int camera) {
 
             draw_ellipse(camera, part->position[p], fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[p])) * r, r, angle, color);
         }
+
+        if (part->inner_color.a == 0.0f) continue;
 
         for (int i = 0; i < part->particles; i++) {
             int p = (part->first + part->particles - i - 1) % part->max_particles;

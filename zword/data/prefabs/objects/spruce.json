@@ -1,0 +1,22 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0,
+				"scale_x":	1,
+				"scale_y":	1
+			},
+			"Image":	{
+				"filename":	"spruce",
+				"layer":	12
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	2.5,
+				"height":	2.5,
+				"group":	6
+			}
+		}]
+}
