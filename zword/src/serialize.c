@@ -320,6 +320,8 @@ void ParticleComponent_serialize(cJSON* entity_json, int entity) {
     } else {
         cJSON_AddNumberToObject(json, "type", particle->type);
         cJSON_AddNumberToObject(json, "start_size", particle->start_size);
+        serialize_float(json, "width", particle->width, 0.0f);
+        serialize_float(json, "height", particle->height, 0.0f);
     }
     serialize_int(json, "loop", particle->loop, false);
 }
@@ -358,6 +360,8 @@ void ParticleComponent_deserialize(cJSON* entity_json, int entity) {
         if (particle->loop) {
             particle->enabled = true;
         }
+        particle->width = deserialize_float(json, "width", particle->width);
+        particle->height = deserialize_float(json, "height", particle->height);
     }
 }
 

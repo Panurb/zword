@@ -93,6 +93,7 @@ static const char* IMAGES[] = {
     "rock",
     "roof_tile",
     "rope",
+    "sauna",
     "scope",
     "shard",
     "shotgun",

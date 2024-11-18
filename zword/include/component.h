@@ -229,7 +229,8 @@ typedef enum ParticleType {
     PARTICLE_ENERGY,
     PARTICLE_GLASS,
     PARTICLE_SNOW,
-    PARTICLE_RAIN
+    PARTICLE_RAIN,
+    PARTICLE_STEAM,
 } ParticleType;
 
 typedef struct {

@@ -670,6 +670,8 @@ void input_tool_tile(SDL_Event event) {
 
         if (width > 0.0f && height > 0.0f) {
             CoordinateComponent* coord = CoordinateComponent_get(entity);
+            ColliderComponent* collider = ColliderComponent_get(entity);
+            ImageComponent* image = ImageComponent_get(entity);
             
             if (height > width) {
                 coord->angle = M_PI_2;
@@ -678,8 +680,6 @@ void input_tool_tile(SDL_Event event) {
                 height = temp;
             }
 
-            ColliderComponent* collider = ColliderComponent_get(entity);
-            ImageComponent* image = ImageComponent_get(entity);
             if (image) {
                 coord->scale.x = width / image->width;
                 coord->scale.y = height / image->height;
@@ -822,6 +822,24 @@ void input_editor(SDL_Event event) {
 }
 
 
+void draw_barriers() {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ColliderComponent* collider = ColliderComponent_get(i);
+        if (!collider) continue;
+        if (collider->group != GROUP_BARRIERS) continue;
+
+        ImageComponent* image = ImageComponent_get(i);
+        if (image) continue;
+        
+        Color color = get_color(1.0f, 0.0f, 0.0f, 0.25f);
+        Vector2f pos = get_position(i);
+        float angle = get_angle(i);
+        draw_rectangle(game_data->camera, pos, collider_width(i), collider_height(i), angle, color);
+        draw_text(game_data->camera, pos, "barrier", 20, COLOR_RED);
+    }
+}
+
+
 void draw_editor() {
     draw_game();
     draw_grid(game_data->camera, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
@@ -848,6 +866,11 @@ void draw_editor() {
                 Vector2f pos = mult(0.5f, sum(end, tile_start));
                 draw_rectangle_outline(game_data->camera, pos, width, height, 0.0f, 0.05f, 
                     COLOR_WHITE);
+                String buffer;
+                snprintf(buffer, STRING_SIZE, "%.2f", width);
+                draw_text(game_data->camera, vec(pos.x, fmaxf(tile_start.y, end.y) + 0.5f), buffer, 20, COLOR_WHITE);
+                snprintf(buffer, STRING_SIZE, "%.2f", height);
+                draw_text(game_data->camera, vec(fmaxf(tile_start.x, end.x) + 1.0f, pos.y), buffer, 20, COLOR_WHITE);
             } else {
                 Vector2f pos = mouse_grid;
                 draw_line(game_data->camera, vec(pos.x - 0.2f, pos.y), vec(pos.x + 0.2f, pos.y), 0.05f, COLOR_WHITE);
@@ -905,12 +928,13 @@ void draw_editor() {
     }
 
     draw_waypoints(game_data->camera, waypoint_selected);
-
     draw_spawners();
-
+    draw_barriers();
     draw_tutorials();
-
     draw_widgets(game_data->menu_camera);
 
     draw_circle(game_data->camera, mouse_pos, 0.1f, COLOR_WHITE);
+    String buffer;
+    snprintf(buffer, STRING_SIZE, "x: %.2f y: %.2f", mouse_grid_center.x, mouse_grid_center.y);
+    draw_text(game_data->menu_camera, vec(-23.0f, -14.0f), buffer, 20, COLOR_WHITE);
 }
