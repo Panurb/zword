@@ -174,9 +174,8 @@ Color get_pixel(SDL_Surface *surface, int x, int y) {
 
 int create_decal(Vector2f pos, Filename filename, float lifetime) {
     int i = create_entity();
-    CoordinateComponent_add(i, pos, rand_angle())->lifetime = 60.0f;
+    CoordinateComponent_add(i, pos, rand_angle())->lifetime = lifetime;
     ImageComponent_add(i, filename, 0.0f, 0.0f, LAYER_DECALS);
-    PhysicsComponent_add(i, 0.0f)->lifetime = lifetime;
 
     return i;
 }

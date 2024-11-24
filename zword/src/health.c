@@ -100,8 +100,6 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
         }
 
         if (prev_health > 0 && health->health <= 0) {
-            die(entity);
-
             PlayerComponent* player = PlayerComponent_get(dealer);
             if (player && enemy) {
                 add_money(dealer, enemy->bounty);
@@ -157,6 +155,17 @@ void blunt_damage(int entity, Vector2f vel) {
     if (sound) {
         if (v > 5.0f) {
             // add_sound(entity, sound->hit_sound, 0.5f, 1.0f);
+        }
+    }
+}
+
+
+void update_health(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        HealthComponent* health = HealthComponent_get(i);
+        if (health && health->health <= 0 && !health->dead) {
+            die(i);
+            health->dead = true;
         }
     }
 }

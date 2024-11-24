@@ -26,21 +26,6 @@ void update_physics(float time_step) {
 
         ColliderComponent* col = ColliderComponent_get(i);
 
-        physics->lifetime -= time_step;
-        if (physics->lifetime <= 0.0f) {
-            if (col) {
-                clear_grid(i);
-            }
-            remove_children(i);
-            destroy_entity(i);
-            continue;
-        } else if (physics->lifetime <= 1.0f) {
-            ImageComponent* image = ImageComponent_get(i);
-            if (image) {
-                image->alpha = physics->lifetime;
-            }
-        }
-
         if (get_parent(i) != -1) continue;
 
         if (physics->collision.entities->size > 0) {

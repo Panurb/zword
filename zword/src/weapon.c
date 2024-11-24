@@ -197,13 +197,13 @@ void reload(int i) {
 
 void create_energy(Vector2f position, Vector2f velocity) {
     int i = create_entity();
-    CoordinateComponent_add(i, position, rand_angle());
+    CoordinateComponent* coord = CoordinateComponent_add(i, position, rand_angle());
+    coord->lifetime = 5.0f;
     ImageComponent_add(i, "energy", 1.0f, 1.0f, LAYER_PARTICLES);
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
     phys->velocity = velocity;
     phys->drag = 0.0f;
     phys->drag_sideways = 0.0f;
-    phys->lifetime = 5.0f;
     ColliderComponent_add_circle(i, 0.25f, GROUP_ENERGY);
     LightComponent_add(i, 8.0f, 2.0f * M_PI, COLOR_ENERGY, 0.5f, 2.5f)->enabled = false;
     ParticleComponent_add_type(i, PARTICLE_ENERGY, 0.0f);
@@ -213,6 +213,7 @@ void create_energy(Vector2f position, Vector2f velocity) {
 
 void update_energy() {
     for (int i = 0; i < game_data->components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(i);
         ColliderComponent* col = ColliderComponent_get(i);
         if (!col) continue;
         if (col->group == GROUP_ENERGY) {
@@ -231,7 +232,7 @@ void update_energy() {
                 ColliderComponent_get(i)->enabled = false;
                 ImageComponent_remove(i);
                 add_sound(i, "energy", 0.5f, randf(1.2f, 1.5f));
-                phys->lifetime = 1.0f;
+                coord->lifetime = 1.0f;
             }
         }
     }

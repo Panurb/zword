@@ -76,7 +76,6 @@ typedef struct {
     float max_speed;
     float angular_drag;
     float max_angular_speed;
-    float lifetime;
     bool slowed;
     bool on_ground;
     AxisLock lock;
@@ -337,6 +336,7 @@ typedef struct {
 } WaypointComponent;
 
 typedef struct {
+    bool dead;
     int health;
     int max_health;
     Filename dead_image;
