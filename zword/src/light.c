@@ -270,7 +270,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
     Edge points[1000];
     int points_size = 0;
 
-    int points_per_radian = 10;
+    int points_per_unit = 10;
 
     float delta = 0.01f;
 
@@ -431,7 +431,8 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         points_size++;
     }
 
-    SDL_Vertex* vertices = malloc((points_size + 1 + ceilf(points_per_radian * light_angle)) * sizeof(SDL_Vertex));
+    int max_vertices = points_size + 1 + ceilf(points_per_unit * range * light_angle);
+    SDL_Vertex* vertices = malloc(max_vertices * sizeof(SDL_Vertex));
     Vector2f pos = world_to_screen(camera, start);
 
     color.a = 255 * brightness;
@@ -439,6 +440,11 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 
     int vertices_size = 1;
     for (int i = 0; i < points_size; i++) {
+        if (vertices_size == max_vertices - 1) {
+            LOG_WARNING("Too many vertices in light");
+            break;
+        }
+
         Vector2f end = points[i].position;
 
         float d = dist(start, end);
@@ -456,10 +462,11 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         }
 
         float delta_angle = fabsf(angle_diff(points[next_i].angle, points[i].angle));
+        float delta_distance = dist(points[next_i].position, points[i].position);
 
         // Empty points
         if (points[i].entity == -1 && points[next_i].entity == -1) {
-            int n = floorf(delta_angle * points_per_radian);
+            int n = floorf(delta_distance * points_per_unit);
             for (int j = 1; j < n; j++) {
                 float a = angle + points[i].angle + j * delta_angle / n;
                 end = polar_to_cartesian(range, a);
@@ -479,7 +486,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 
                 float a = angle_diff(polar_angle(r), polar_angle(l));
 
-                int n = floorf(delta_angle * points_per_radian);
+                int n = floorf(delta_distance * points_per_unit);
                 Matrix2f rot = rotation_matrix(-a / n);
                 for (int j = 1; j < n; j++) {
                     r = matrix_mult(rot, r);
@@ -495,7 +502,7 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
                     vertices_size++;
                 }
             } else if (collider->type == COLLIDER_RECTANGLE) {
-                int n = floorf(delta_angle * points_per_radian);
+                int n = floorf(delta_distance * points_per_unit);
                 for (int j = 1; j < n; j++) {
                     float x = j / (float) n;
                     end = lin_comb(1.0f - x, points[i].position, x, points[next_i].position);

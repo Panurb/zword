@@ -204,6 +204,8 @@ void start_game(Filename map_name) {
     if (game_data->weather) {
         if (game_data->weather == WEATHER_RAIN) {
             ParticleComponent* part = ParticleComponent_add_type(game_data->camera, PARTICLE_RAIN, 0.0f);
+            SoundComponent* sound = SoundComponent_add(game_data->camera, "");
+            strcpy(sound->loop_sound, "rain");
         } else if (game_data->weather == WEATHER_SNOW) {
             ParticleComponent* part = ParticleComponent_add_type(game_data->camera, PARTICLE_SNOW, 0.0f);
         }
