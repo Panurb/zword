@@ -279,11 +279,12 @@ void draw_image(int entity, int camera) {
         return;
     }
 
-    Vector2f scale = get_scale(entity);
+    Vector2f scale = get_scale_interpolated(entity, app.delta);
+    // TODO: use delta
     scale.x *= 1.0f - image->stretch;
     scale.y *= 1.0f + image->stretch;
 
-    Vector2f pos = get_position(entity);
+    Vector2f pos = get_position_interpolated(entity, app.delta);
     float w = scale.x * image->width;
     float h = scale.y * image->height;
     float r = sqrtf(w * w + h * h);
@@ -297,11 +298,12 @@ void draw_image(int entity, int camera) {
         offset = animation->current_frame;
     }
 
+    float angle = get_angle_interpolated(entity, app.delta);
     if (image->tile) {
-        draw_tiles(camera, image->texture_index, w, h, pos, get_angle(entity), image->alpha);
+        draw_tiles(camera, image->texture_index, w, h, pos, angle, image->alpha);
         return;
     }
-    draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, get_angle(entity), scale, image->alpha);
+    draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, angle, scale, image->alpha);
 }
 
 

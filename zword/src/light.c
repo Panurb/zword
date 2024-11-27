@@ -431,8 +431,8 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
         points_size++;
     }
 
-    int max_vertices = points_size + 1 + ceilf(points_per_unit * range * light_angle);
-    SDL_Vertex* vertices = malloc(max_vertices * sizeof(SDL_Vertex));
+    int max_vertices = 1024;
+    SDL_Vertex vertices[1024];
     Vector2f pos = world_to_screen(camera, start);
 
     color.a = 255 * brightness;
@@ -521,8 +521,6 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
     }
 
     draw_triangle_fan(camera, vertices, vertices_size);
-
-    free(vertices);
 }
 
 

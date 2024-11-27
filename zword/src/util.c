@@ -300,6 +300,11 @@ float lerp(float a, float b, float t) {
     return a + t * (b - a);
 }
 
+float lerp_angle(float a, float b, float t) {
+    float d = angle_diff(b, a);
+    return angle_normalized(a + t * d);
+}
+
 float smoothstep(float x, float mu, float nu) {
     // https://wernerantweiler.ca/blog.php?item=2018-11-03
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);

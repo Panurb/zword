@@ -141,6 +141,8 @@ void init() {
 
     app.quit = false;
     app.focus = true;
+    app.time_step = 1.0f / 60.0f;
+    app.delta = 0.0f;
 }
 
 

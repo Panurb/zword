@@ -41,7 +41,7 @@ Vector2f camera_size(int camera) {
 
 Vector2f world_to_screen(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
-    Vector2f pos = sum(get_position(camera), cam->shake.position);
+    Vector2f pos = sum(get_position_interpolated(camera, app.delta), cam->shake.position);
     Vector2f b;
     b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
     b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.h;
@@ -51,7 +51,7 @@ Vector2f world_to_screen(int camera, Vector2f a) {
 
 Vector2f screen_to_world(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
-    Vector2f pos = sum(get_position(camera), cam->shake.position);
+    Vector2f pos = sum(get_position_interpolated(camera, app.delta), cam->shake.position);
     Vector2f b;
     b.x = (a.x - 0.5 * cam->resolution.w) / cam->zoom + pos.x;
     b.y = (0.5 * cam->resolution.h - a.y) / cam->zoom + pos.y;

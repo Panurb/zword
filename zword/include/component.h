@@ -16,6 +16,11 @@ typedef struct {
     float lifetime;
     Filename prefab;
     Vector2f scale;
+    struct {
+        Vector2f position;
+        float angle;
+        Vector2f scale;
+    } previous;
 } CoordinateComponent;
 
 typedef enum {
@@ -581,6 +586,10 @@ void ComponentData_clear();
 Vector2f get_position(int i);
 float get_angle(int i);
 Vector2f get_scale(int entity);
+
+Vector2f get_position_interpolated(int entity, float alpha);
+float get_angle_interpolated(int entity, float alpha);
+Vector2f get_scale_interpolated(int entity, float alpha);
 
 bool entity_exists(int entity);
 

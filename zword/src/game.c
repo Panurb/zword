@@ -449,7 +449,21 @@ void update_lifetimes(float time_step) {
 }
 
 
+void update_coordinates() {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (coord) {
+            coord->previous.position = get_position(i);
+            coord->previous.angle = get_angle(i);
+            coord->previous.scale = get_scale(i);
+        }
+    }
+}
+
+
 void update_game(float time_step) {
+    update_coordinates();
+
     update_lifetimes(time_step);
     update_health(time_step);
 
@@ -467,9 +481,6 @@ void update_game(float time_step) {
     update_lights(time_step);
     update_camera(game_data->camera, time_step, true);
 
-    draw_shadows(game_data->camera);
-    draw_lights(game_data->camera, game_data->ambient_light);
-
     animate(time_step);
 }
 
@@ -482,6 +493,9 @@ void draw_game() {
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
     draw_roofs(game_data->camera);
     draw_player_targets();
+
+    draw_shadows(game_data->camera);
+    draw_lights(game_data->camera, game_data->ambient_light);
 }
 
 

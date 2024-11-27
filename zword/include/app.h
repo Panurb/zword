@@ -22,6 +22,8 @@ typedef struct {
     bool quit;
     bool focus;
     FpsCounter* fps;
+    float time_step;
+    float delta;
 } App;
 
 extern App app;

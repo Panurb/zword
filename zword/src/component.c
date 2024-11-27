@@ -60,6 +60,9 @@ CoordinateComponent* CoordinateComponent_add(int entity, Vector2f pos, float ang
     coord->lifetime = -1.0f;
     coord->prefab[0] = '\0';
     coord->scale = ones();
+    coord->previous.position = pos;
+    coord->previous.angle = angle;
+    coord->previous.scale = ones();
 
     game_data->components->coordinate[entity] = coord;
 
@@ -998,6 +1001,7 @@ Vector2f get_position(int entity) {
     return position_from_transform(transform);
 }
 
+
 float get_angle(int entity) {
     Matrix3 transform = get_transform(entity);
     return angle_from_transform(transform);
@@ -1007,6 +1011,36 @@ float get_angle(int entity) {
 Vector2f get_scale(int entity) {
     Matrix3 transform = get_transform(entity);
     return scale_from_transform(transform);
+}
+
+
+Vector2f get_position_interpolated(int entity, float delta) {
+    Vector2f previous_position = CoordinateComponent_get(entity)->previous.position;
+    Vector2f current_position = get_position(entity);
+
+    float x = lerp(previous_position.x, current_position.x, delta);
+    float y = lerp(previous_position.y, current_position.y, delta);
+
+    return (Vector2f) { x, y };
+}
+
+
+float get_angle_interpolated(int entity, float delta) {
+    float previous_angle = CoordinateComponent_get(entity)->previous.angle;
+    float current_angle = get_angle(entity);
+
+    return lerp_angle(previous_angle, current_angle, delta);
+}
+
+
+Vector2f get_scale_interpolated(int entity, float delta) {
+    Vector2f previous_scale = CoordinateComponent_get(entity)->previous.scale;
+    Vector2f current_scale = get_scale(entity);
+
+    float x = lerp(previous_scale.x, current_scale.x, delta);
+    float y = lerp(previous_scale.y, current_scale.y, delta);
+
+    return (Vector2f) { x, y };
 }
 
 
