@@ -88,6 +88,8 @@ void end_game();
 
 void reset_game();
 
+void update_coordinates();
+
 void update_game(float time_step);
 
 void update_game_mode(float time_step);

@@ -302,6 +302,10 @@ void draw_light(int camera, Vector2f start, float angle, float light_angle, floa
 
         ColliderComponent* collider = ColliderComponent_get(entity);
 
+        if (!COLLISION_MATRIX[GROUP_LIGHTS][collider->group]) {
+            continue;
+        }
+
         float left;
         float right;
         float left_distance;

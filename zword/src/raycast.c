@@ -3,12 +3,14 @@
 #include <math.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdio.h>
 
 #include "component.h"
 #include "util.h"
 #include "collider.h"
 #include "raycast.h"
 #include "game.h"
+#include "app.h"
 
 
 typedef struct {
@@ -71,21 +73,28 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
     static int id = MAX_ENTITIES;
     id = (id < 2 * MAX_ENTITIES) ? id + 1 : MAX_ENTITIES;
 
-    float v = norm(velocity);
-    velocity = mult(1.0f / v, velocity);
-
     HitInfo info;
     info.entity = -1;
     info.normal = mult(-1.0f, velocity);
     info.position = zeros();
     info.distance = range;
 
+    float v = norm(velocity);
+
     if (v == 0.0f) {
         LOG_WARNING("Raycast with zero velocity");
         return info;
     }
 
+    velocity = mult(1.0f / v, velocity);
+
+    // SDL_SetRenderTarget(app.renderer, NULL);
+
     ColliderGrid* grid = game_data->grid;
+
+    // Starting ray at intersection of grid cells is undefined so nudge it slightly.
+    start.x += 1e-3f * velocity.x;
+    start.y += 1e-3f * velocity.y;
 
     int x = floorf((start.x + 0.5 * grid->width) / grid->tile_width);
     int y = floorf((start.y + 0.5 * grid->height) / grid->tile_height);
@@ -93,8 +102,8 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
     int step_x = sign(velocity.x);
     int step_y = sign(velocity.y);
 
-    float t_max_x = (grid->tile_width - mod(step_x * (start.x + 1e-6), grid->tile_width)) / fabs(velocity.x);
-    float t_max_y = (grid->tile_height - mod(step_y * (start.y + 1e-6), grid->tile_height)) / fabs(velocity.y);
+    float t_max_x = (grid->tile_width - mod(step_x * start.x, grid->tile_width)) / fabsf(velocity.x);
+    float t_max_y = (grid->tile_height - mod(step_y * start.y, grid->tile_height)) / fabsf(velocity.y);
 
     float t_delta_x = grid->tile_width / fabs(velocity.x);
     float t_delta_y = grid->tile_height / fabs(velocity.y);
@@ -102,6 +111,9 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
     float t_min = range;
 
     while (x > 0 && x < grid->columns && y > 0 && y < grid->rows) {
+        // Vector2f v = vec((x + 0.5) * grid->tile_width - 0.5 * grid->width, (y + 0.5) * grid->tile_height - 0.5 * grid->height);
+        // draw_rectangle(game_data->camera, v, grid->tile_width, grid->tile_height, 0.0f, get_color(0.0f, 0.0f, 1.0f, 0.1f));
+
         for (ListNode* current = grid->array[x][y]->head; current != NULL; current = current->next) {
             int j = current->value;
             if (j == -1) continue;
@@ -141,6 +153,15 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
 
     info.position = sum(start, mult(t_min, velocity));
     info.normal = normalized(info.normal);
+
+    // draw_line(game_data->camera, start, sum(start, mult(range, velocity)), 0.01f, COLOR_WHITE);
+    // draw_line(game_data->camera, start, info.position, 0.05f, COLOR_WHITE);
+
+    // String buffer;
+    // snprintf(buffer, STRING_SIZE, "x: %.2f, y: %.2f", start.y, grid->width);
+    // // draw_text(game_data->camera, info.position, buffer, 20, COLOR_WHITE);
+
+    // SDL_SetRenderTarget(app.renderer, app.light_texture);
 
     return info;
 }

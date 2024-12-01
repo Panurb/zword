@@ -281,8 +281,10 @@ void draw_image(int entity, int camera) {
 
     Vector2f scale = get_scale_interpolated(entity, app.delta);
     // TODO: use delta
-    scale.x *= 1.0f - image->stretch;
-    scale.y *= 1.0f + image->stretch;
+    float stretch_extrapolated = image->stretch + app.delta * app.time_step * image->stretch_speed;
+
+    scale.x *= 1.0f - stretch_extrapolated;
+    scale.y *= 1.0f + stretch_extrapolated;
 
     Vector2f pos = get_position_interpolated(entity, app.delta);
     float w = scale.x * image->width;

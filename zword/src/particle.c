@@ -183,7 +183,7 @@ void add_particles(int entity, int n) {
 }
 
 
-void update_particles(int camera, float delta_time) {
+void update_particles(int camera, float time_step) {
     for (int i = 0; i < game_data->components->entities; i++) {
         ParticleComponent* part = ParticleComponent_get(i);
         if (!part) continue;
@@ -201,7 +201,7 @@ void update_particles(int camera, float delta_time) {
                     part->timer += 1.0 / part->rate;
                 }
 
-                part->timer -= delta_time;
+                part->timer -= time_step;
             } else {
                 add_particles(i, part->rate);
                 part->enabled = false;
@@ -210,8 +210,8 @@ void update_particles(int camera, float delta_time) {
 
         for (int j = 0; j < part->particles; j++) {
             int p = (part->first + j) % part->max_particles;
-            part->position[p] = sum(part->position[p], mult(delta_time, part->velocity[p]));
-            part->time[p] = fmax(0.0f, part->time[p] - delta_time);
+            part->position[p] = sum(part->position[p], mult(time_step, part->velocity[p]));
+            part->time[p] = fmax(0.0f, part->time[p] - time_step);
         }
 
         if (part->particles > 0 && part->time[part->first] == 0.0f) {
@@ -242,12 +242,15 @@ void draw_particles(int camera) {
 
                 if (part->time[p] == 0.0) continue;
 
-                float t = 1.0f - part->time[p] / part->max_time;
+                float time = part->time[p] + (1.0f - app.delta) * app.time_step;
+                Vector2f position = diff(part->position[p], mult((1.0f - app.delta) * app.time_step, part->velocity[p]));
+
+                float t = 1.0f - time / part->max_time;
                 float r = lerp(part->start_size, part->end_size, t);
                 float angle = polar_angle(part->velocity[p]);
                 Vector2f scale = mult(2.0f * r, ones());
 
-                draw_sprite(camera, get_texture_index("blood_particle"), 1.0f, 1.0f, 0, part->position[p], 
+                draw_sprite(camera, get_texture_index("blood_particle"), 1.0f, 1.0f, 0, position, 
                     angle, scale, 1.0f);
             }
 
@@ -262,11 +265,15 @@ void draw_particles(int camera) {
 
             Color color = part->outer_color;
 
+            // Always extrapolate particles
+            float time = part->time[p] + app.delta * app.time_step;
+            Vector2f position = sum(part->position[p], mult(app.delta * app.time_step, part->velocity[p]));
+
             float t = 1.0f - part->time[p] / part->max_time;
             float r = lerp(part->start_size, part->end_size, t);
             float angle = polar_angle(part->velocity[p]);
 
-            draw_ellipse(camera, part->position[p], fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[p])) * r, r, angle, color);
+            draw_ellipse(camera, position, fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[p])) * r, r, angle, color);
         }
 
         if (part->inner_color.a == 0.0f) continue;
@@ -278,11 +285,15 @@ void draw_particles(int camera) {
 
             Color color = part->inner_color;
 
+            // Always extrapolate particles
+            float time = part->time[p] + app.delta * app.time_step;
+            Vector2f position = sum(part->position[p], mult(app.delta * app.time_step, part->velocity[p]));
+
             float t = 1.0f - part->time[p] / part->max_time;
             float r = 0.5f * lerp(part->start_size, part->end_size, t);
             float angle = polar_angle(part->velocity[p]);
 
-            draw_ellipse(camera, part->position[p], fmaxf(1.0f, part->stretch * norm(part->velocity[p])) * r, r, angle, color);
+            draw_ellipse(camera, position, fmaxf(1.0f, part->stretch * norm(part->velocity[p])) * r, r, angle, color);
         }   
     }
 

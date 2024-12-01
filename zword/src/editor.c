@@ -528,6 +528,8 @@ void create_editor_menu() {
 
 
 void update_editor(float time_step) {
+    update_coordinates();
+
     // update(data.time_step, data.grid);
     // collide(data.data.grid);
     update_waypoints(game_data->camera, 50.0f);
