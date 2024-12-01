@@ -587,9 +587,9 @@ Vector2f get_position(int i);
 float get_angle(int i);
 Vector2f get_scale(int entity);
 
-Vector2f get_position_interpolated(int entity, float alpha);
-float get_angle_interpolated(int entity, float alpha);
-Vector2f get_scale_interpolated(int entity, float alpha);
+Vector2f get_position_interpolated(int entity, float delta);
+float get_angle_interpolated(int entity, float delta);
+Vector2f get_scale_interpolated(int entity, float delta);
 
 bool entity_exists(int entity);
 

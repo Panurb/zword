@@ -7,11 +7,12 @@
 #include "weapon.h"
 #include "game.h"
 #include "input.h"
+#include "app.h"
 
 
 void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    Vector2f pos = get_position(entity);
+    Vector2f pos = get_position_interpolated(entity, app.delta);
 
     float gap = 0.2;
     float slice = (2 * M_PI / player->inventory_size);
@@ -46,7 +47,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
 
 void draw_menu_attachment(int camera, int entity, int slot, int atch, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    Vector2f pos = get_position(entity);
+    Vector2f pos = get_position_interpolated(entity, app.delta);
     ItemComponent* item = ItemComponent_get(player->inventory[slot]);
 
     float gap = 0.2;
@@ -80,7 +81,7 @@ void draw_menu_attachment(int camera, int entity, int slot, int atch, float offs
 
 void draw_ammo_slot(int camera, int entity, int slot, float offset, float alpha) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    Vector2f pos = get_position(entity);
+    Vector2f pos = get_position_interpolated(entity, app.delta);
 
     float gap = 0.2f;
     float slice = (2 * M_PI / (player->ammo_size - 1));
@@ -120,7 +121,7 @@ void draw_ammo_menu(int camera, int entity) {
 
 
 void draw_item_use(int camera, int entity) {
-    Vector2f position = get_position(entity);
+    Vector2f position = get_position_interpolated(entity, app.delta);
     PlayerComponent* player = PlayerComponent_get(entity);
     int i = player->inventory[player->item];
     ItemComponent* item = ItemComponent_get(i);
@@ -135,7 +136,7 @@ void draw_item_use(int camera, int entity) {
 
 void draw_money(int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    Vector2f position = sum(get_position(entity), 
+    Vector2f position = sum(get_position_interpolated(entity, app.delta), 
         vec(0.0f, (1.0f - player->money_timer) * sign(player->money_increment)));
 
     char buffer[256];
@@ -151,11 +152,11 @@ void draw_hud(int camera) {
     for (int i = 0; i < game_data->components->entities; i++) {
         if (!CoordinateComponent_get(i)) continue;
 
-        Vector2f position = get_position(i);
+        Vector2f position = get_position_interpolated(i, app.delta);
 
         TextComponent* text = TextComponent_get(i);
         if (text) {
-            float r = norm(diff(position, get_position(camera)));
+            float r = norm(diff(get_position(i), get_position(camera)));
             if (r < 8.0f) {
                 float alpha = 1.0f - 0.125f * r;
                 Color color = text->color;
