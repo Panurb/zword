@@ -188,7 +188,7 @@ void start_game(Filename map_name) {
     }
 
     init_grid();
-    update_waypoints(game_data->camera, INFINITY);
+    init_waypoints();
 
     switch (game_data->game_mode) {
         case MODE_SURVIVAL:
@@ -469,7 +469,7 @@ void update_game(float time_step) {
 
     update_physics(time_step);
     update_collisions();
-    update_waypoints(game_data->camera, 20.0f);
+    update_waypoints();
     update_doors();
 
     update_players(time_step);

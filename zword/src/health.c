@@ -49,7 +49,9 @@ void die(int entity) {
             }
 
             co->position = get_position(i);
+            co->previous.position = co->position;
             co->angle = get_angle(i);
+            co->previous.angle = co->angle;
 
             if (phys) {
                 Vector2f r = normalized(diff(co->position, get_position(entity)));

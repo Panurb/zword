@@ -16,6 +16,9 @@
 #define INFINITY 10000.0
 
 
+static int counter = 0;
+
+
 int create_waypoint(Vector2f pos) {
     int i = create_entity();
     CoordinateComponent_add(i, pos, 0.0);
@@ -138,56 +141,71 @@ float connection_distance(int i, int j) {
 }
 
 
-void update_waypoints(int camera, float range) {
-    List* waypoints = List_create();
+void update_connection(int i, int n) {
+    EnemyComponent* enemy = EnemyComponent_get(i);
+    EnemyComponent* enemy_neighbor = EnemyComponent_get(n);
 
-    if (range == INFINITY) {
-        for (int i = 0; i < game_data->components->entities; i++) {
-            WaypointComponent* waypoint = WaypointComponent_get(i);
-            if (waypoint) {
-                List_clear(waypoint->neighbors);
-                List_add(waypoints, i);
-            }
+    if (enemy && enemy_neighbor) {
+        return;
+    }
+
+    float d = connection_distance(i, n);
+    if (d > 0.0f) {
+        if (!enemy_neighbor) {
+            List_add(WaypointComponent_get(i)->neighbors, n);
         }
-    } else {
-        List* list = get_entities(get_position(camera), range);
-        for (ListNode* node = list->head; node; node = node->next) {
-            int i = node->value;
-            WaypointComponent* waypoint = WaypointComponent_get(i);
-            if (!waypoint) continue;
+        if (!enemy) {
+            List_add(WaypointComponent_get(n)->neighbors, i);
+        }
+    }
+}
+
+
+void init_waypoints() {
+    counter = 0;
+
+    for (int i = 0; i < game_data->components->entities; i++) {
+        if (!WaypointComponent_get(i)) continue;
+
+        for (int j = 0; j < game_data->components->entities; j++) {
+            if (i == j) continue;
+            if (!WaypointComponent_get(j)) continue;
+
+            update_connection(i, j);
+        }
+    }
+}
+
+
+void update_waypoints() {
+    int groups = 10;
+
+    int c = 0;
+    for (int i = 0; i < game_data->components->entities; i++) {
+        WaypointComponent* waypoint = WaypointComponent_get(i);
+        if (!waypoint) continue;
+        
+        if (c % groups == counter) {
+            draw_circle(game_data->camera, get_position(i), waypoint->range, COLOR_RED);
 
             List_clear(waypoint->neighbors);
-            List_add(waypoints, i);
+
+            List* neighbors = get_entities(get_position(i), waypoint->range);
+            ListNode* node;
+            FOREACH(node, neighbors) {
+                int n = node->value;
+                if (i == n) continue;
+                if (!WaypointComponent_get(n)) continue;
+
+                update_connection(i, n);
+            }
+            free(neighbors);
         }
-        List_delete(list);
+
+        c++;
     }
 
-    for (ListNode* node = waypoints->head; node; node = node->next) {
-        int i = node->value;
-        for (ListNode* nod = waypoints->head; nod; nod = nod->next) {
-            int n = nod->value;
-            if (n == i) break;
-
-            EnemyComponent* enemy = EnemyComponent_get(i);
-            EnemyComponent* enemy_neighbor = EnemyComponent_get(n);
-
-            if (enemy && enemy_neighbor) {
-                continue;
-            }
-
-            float d = connection_distance(i, n);
-            if (d > 0.0f) {
-                if (!enemy_neighbor) {
-                    List_add(WaypointComponent_get(i)->neighbors, n);
-                }
-                if (!enemy) {
-                    List_add(WaypointComponent_get(n)->neighbors, i);
-                }
-            }
-        }
-    }
-
-    List_delete(waypoints);
+    counter = (counter + 1) % groups;
 }
 
 

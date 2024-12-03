@@ -12,6 +12,8 @@ int create_waypoint(Vector2f pos);
 
 bool a_star(int start, int goal, List* path);
 
-void update_waypoints(int camera, float range);
+void init_waypoints();
+
+void update_waypoints();
 
 void draw_waypoints(int camera, bool draw_neighbors);
