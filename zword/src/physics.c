@@ -109,7 +109,7 @@ void update_physics(float time_step) {
         if (physics->slowed && !physics->on_ground) {
             max_speed *= 0.6f;
         }
-        if (physics->speed < 0.1f) {
+        if (physics->speed < 0.01f) {
             physics->velocity = zeros();
             physics->speed = 0.0f;
         } else if (physics->speed > max_speed) {

@@ -231,6 +231,8 @@ void update_players(float time_step) {
 
                 break;
             case PLAYER_MENU:
+                player->target = -1;
+                
                 phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
                 
                 if (light) {
@@ -315,6 +317,7 @@ void update_players(float time_step) {
 
                 break;
             case PLAYER_AMMO_MENU:
+                player->target = -1;
                 break;
             case PLAYER_DEAD:;
                 ColliderComponent* col = ColliderComponent_get(i);

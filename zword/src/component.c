@@ -546,6 +546,7 @@ WaypointComponent* WaypointComponent_add(int entity) {
     waypoint->g_score = INFINITY;
     waypoint->f_score = INFINITY;
     waypoint->neighbors = List_create();
+    waypoint->new_neighbors = List_create();
     waypoint->range = 16.0f;
 
     game_data->components->waypoint[entity] = waypoint;
@@ -563,7 +564,8 @@ WaypointComponent* WaypointComponent_get(int entity) {
 void WaypointComponent_remove(int entity) {
     WaypointComponent* waypoint = WaypointComponent_get(entity);
     if (waypoint) {
-        for (ListNode* node = waypoint->neighbors->head; node; node = node->next) {
+        ListNode* node;
+        FOREACH(node, waypoint->neighbors) {
             int n = node->value;
             WaypointComponent* neighbor = WaypointComponent_get(n);
             if (neighbor) {
@@ -571,6 +573,16 @@ void WaypointComponent_remove(int entity) {
             }
         }
         List_delete(waypoint->neighbors);
+
+        FOREACH(node, waypoint->new_neighbors) {
+            int n = node->value;
+            WaypointComponent* neighbor = WaypointComponent_get(n);
+            if (neighbor) {
+                List_remove(neighbor->new_neighbors, entity);
+            }
+        }
+        List_delete(waypoint->new_neighbors);
+
         free(waypoint);
         game_data->components->waypoint[entity] = NULL;
     }

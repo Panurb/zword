@@ -200,6 +200,17 @@ void input() {
                             }
                         }
                     }
+
+                    if (game_settings.debug) {
+                        if (sdl_event.type == SDL_MOUSEWHEEL) {
+                            CameraComponent* camera = CameraComponent_get(game_data->camera);
+                            if (sdl_event.wheel.y > 0) {
+                                camera->zoom_target = fminf(camera->zoom_target * 1.1f, 100.0f);
+                            } else if (sdl_event.wheel.y < 0) {
+                                camera->zoom_target = fmaxf(camera->zoom_target / 1.1f, 10.0f);
+                            }
+                        }
+                    }
                 } else if (game_state == STATE_PAUSE) {
                     if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
                         game_state = STATE_GAME;

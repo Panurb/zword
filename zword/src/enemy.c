@@ -393,7 +393,6 @@ void enemy_die(int entity) {
         }
     }
 
-    // FIXME: waypoint component is not removed
     WaypointComponent_remove(entity);
 
     float probs[5] = { 0.1f, 0.1f, 0.1f, 0.1f, 1.0f };

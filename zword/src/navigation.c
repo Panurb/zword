@@ -79,6 +79,9 @@ bool a_star(int start, int goal, List* path) {
             
             WaypointComponent* neighbor = WaypointComponent_get(n);
 
+            // Waypoint component may have been removed or entity destroyed
+            if (!neighbor) continue;
+
             float d = heuristic(current, n);
 
             float tentative_g_score = waypoint->g_score + d;
@@ -152,10 +155,12 @@ void update_connection(int i, int n) {
     float d = connection_distance(i, n);
     if (d > 0.0f) {
         if (!enemy_neighbor) {
-            List_add(WaypointComponent_get(i)->neighbors, n);
+            List_add(WaypointComponent_get(i)->new_neighbors, n);
         }
         if (!enemy) {
-            List_add(WaypointComponent_get(n)->neighbors, i);
+            if (!List_find(WaypointComponent_get(n)->new_neighbors, i)) {
+                List_add(WaypointComponent_get(n)->new_neighbors, i);
+            }
         }
     }
 }
@@ -178,34 +183,43 @@ void init_waypoints() {
 
 
 void update_waypoints() {
-    int groups = 10;
+    int groups = 20;
 
-    int c = 0;
-    for (int i = 0; i < game_data->components->entities; i++) {
-        WaypointComponent* waypoint = WaypointComponent_get(i);
-        if (!waypoint) continue;
-        
-        if (c % groups == counter) {
-            draw_circle(game_data->camera, get_position(i), waypoint->range, COLOR_RED);
+    if (counter == 0) {
+        for (int i = 0; i < game_data->components->entities; i++) {
+            WaypointComponent* waypoint = WaypointComponent_get(i);
+            if (!waypoint) continue;
 
-            List_clear(waypoint->neighbors);
+            List* temp = waypoint->neighbors;
+            waypoint->neighbors = waypoint->new_neighbors;
+            waypoint->new_neighbors = temp;
 
-            List* neighbors = get_entities(get_position(i), waypoint->range);
-            ListNode* node;
-            FOREACH(node, neighbors) {
-                int n = node->value;
-                if (i == n) continue;
-                if (!WaypointComponent_get(n)) continue;
-
-                update_connection(i, n);
-            }
-            free(neighbors);
+            List_clear(waypoint->new_neighbors);
         }
+    } else {
+        int c = 0;
+        for (int i = 0; i < game_data->components->entities; i++) {
+            WaypointComponent* waypoint = WaypointComponent_get(i);
+            if (!waypoint) continue;
+            
+            if (c % groups == counter - 1) {
+                List* neighbors = get_entities(get_position(i), waypoint->range);
+                ListNode* node;
+                FOREACH(node, neighbors) {
+                    int n = node->value;
+                    if (i == n) continue;
+                    if (!WaypointComponent_get(n)) continue;
 
-        c++;
+                    update_connection(i, n);
+                }
+                List_delete(neighbors);
+            }
+
+            c++;
+        }
     }
 
-    counter = (counter + 1) % groups;
+    counter = (counter + 1) % (groups + 1);
 }
 
 
