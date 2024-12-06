@@ -404,12 +404,12 @@ void enemy_die(int entity) {
         PlayerComponent* player = PlayerComponent_get(i);
         HealthComponent* health = HealthComponent_get(i);
 
-        int ammos[3] = { 0, 0, 0 };
+        int ammos[4] = { 0, 0, 0, 0 };
 
         for (int j = 0; j < player->ammo_size; j++) {
             if (player->ammo[j] == -1) continue;
             int ammo_type = AmmoComponent_get(player->ammo[j])->type;
-            ammos[ammo_type - 1] += AmmoComponent_get(player->ammo[j])->size;
+            ammos[ammo_type] += AmmoComponent_get(player->ammo[j])->size;
         }
 
         int bandages = 0;
@@ -443,10 +443,10 @@ void enemy_die(int entity) {
             j = create_ammo(zeros(), AMMO_PISTOL);
             break;
         case 2:
-            j = create_ammo(zeros(), AMMO_SHOTGUN);
+            j = create_ammo(zeros(), AMMO_RIFLE);
             break;
         case 3:
-            j = create_ammo(zeros(), AMMO_RIFLE);
+            j = create_ammo(zeros(), AMMO_SHOTGUN);
             break;
         default:
             break;

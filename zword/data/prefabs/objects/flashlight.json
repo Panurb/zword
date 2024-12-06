@@ -31,9 +31,9 @@
 			},
 			"Item":	{
 				"size":	0,
-				"price":	100,
+				"price":	0,
 				"name":	"Flashlight",
-				"type":	1
+				"type":	2
 			}
 		}]
 }
