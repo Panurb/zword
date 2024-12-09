@@ -56,7 +56,7 @@
 			"Coordinate":	{
 				"x":	8,
 				"y":	-6,
-				"angle":	2.61951470375061,
+				"angle":	0.902171552181244,
 				"prefab":	"weapons/axe",
 				"scale_x":	0.99999982118606567,
 				"scale_y":	0.99999982118606567
@@ -596,7 +596,7 @@
 			"Coordinate":	{
 				"x":	2.5,
 				"y":	-2.5,
-				"angle":	-2.0446250438690186,
+				"angle":	0.24529431760311127,
 				"prefab":	"objects/table",
 				"scale_x":	1.0000004768371582,
 				"scale_y":	1.0000004768371582
@@ -613,10 +613,10 @@
 			"Coordinate":	{
 				"x":	2,
 				"y":	-14,
-				"angle":	1.5307707786560059,
+				"angle":	-1.525779128074646,
 				"prefab":	"objects/lamp",
-				"scale_x":	0.99999988079071045,
-				"scale_y":	0.99999988079071045
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
 			}
 		}, {
 			"id":	75,
@@ -782,10 +782,10 @@
 			"Coordinate":	{
 				"x":	-6.75,
 				"y":	-35.25,
-				"angle":	0.22727341949939728,
+				"angle":	1.4418396949768066,
 				"prefab":	"objects/bandage",
-				"scale_x":	0.9999992847442627,
-				"scale_y":	0.9999992847442627
+				"scale_x":	0.999999225139618,
+				"scale_y":	0.999999225139618
 			}
 		}, {
 			"id":	95,
@@ -1288,7 +1288,7 @@
 			"Coordinate":	{
 				"x":	14.5,
 				"y":	-8,
-				"angle":	4.71238899230957,
+				"angle":	-1.5707963705062866,
 				"prefab":	"weapons/sniper"
 			}
 		}, {
@@ -1413,15 +1413,15 @@
 		}, {
 			"id":	171,
 			"Coordinate":	{
-				"x":	-28,
-				"y":	-25,
+				"x":	-30,
+				"y":	-20,
 				"prefab":	"objects/birch"
 			}
 		}, {
 			"id":	172,
 			"Coordinate":	{
-				"x":	-24,
-				"y":	-22,
+				"x":	-23,
+				"y":	-21,
 				"prefab":	"objects/birch"
 			}
 		}, {
@@ -2183,6 +2183,408 @@
 				"angle":	1.5707963705062866,
 				"prefab":	"tiles/fence",
 				"scale_x":	8
+			}
+		}, {
+			"id":	271,
+			"Coordinate":	{
+				"x":	39.5,
+				"y":	16.5,
+				"prefab":	"tiles/barrier",
+				"scale_x":	15
+			}
+		}, {
+			"id":	272,
+			"Coordinate":	{
+				"x":	8,
+				"y":	-56,
+				"prefab":	"tiles/grass",
+				"scale_x":	112,
+				"scale_y":	16
+			}
+		}, {
+			"id":	273,
+			"Coordinate":	{
+				"x":	47.5,
+				"y":	-38,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/fence",
+				"scale_x":	10.5
+			}
+		}, {
+			"id":	274,
+			"Coordinate":	{
+				"x":	36,
+				"y":	20,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	275,
+			"Coordinate":	{
+				"x":	46,
+				"y":	20,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	276,
+			"Coordinate":	{
+				"x":	35,
+				"y":	26,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	277,
+			"Coordinate":	{
+				"x":	46,
+				"y":	28,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	278,
+			"Coordinate":	{
+				"x":	-28,
+				"y":	-27,
+				"prefab":	"objects/fire"
+			}
+		}, {
+			"id":	279,
+			"Coordinate":	{
+				"x":	-28,
+				"y":	-51,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	280,
+			"Coordinate":	{
+				"x":	-21,
+				"y":	-56,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	281,
+			"Coordinate":	{
+				"x":	-15,
+				"y":	-56,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	282,
+			"Coordinate":	{
+				"x":	-9,
+				"y":	-52,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	283,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-56,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	284,
+			"Coordinate":	{
+				"x":	8,
+				"y":	-60,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	285,
+			"Coordinate":	{
+				"x":	19,
+				"y":	-52,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	286,
+			"Coordinate":	{
+				"x":	26,
+				"y":	-50,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	287,
+			"Coordinate":	{
+				"x":	37,
+				"y":	-49,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	288,
+			"Coordinate":	{
+				"x":	45,
+				"y":	-52,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	289,
+			"Coordinate":	{
+				"x":	44,
+				"y":	-59,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	290,
+			"Coordinate":	{
+				"x":	27,
+				"y":	-60,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	291,
+			"Coordinate":	{
+				"x":	8,
+				"y":	-51,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	292,
+			"Coordinate":	{
+				"x":	-11,
+				"y":	-61,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	293,
+			"Coordinate":	{
+				"x":	-38,
+				"y":	-54,
+				"prefab":	"objects/tree"
+			}
+		}, {
+			"id":	294,
+			"Coordinate":	{
+				"x":	-17,
+				"y":	-49,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	295,
+			"Coordinate":	{
+				"x":	-5,
+				"y":	-49,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	296,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-52,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	297,
+			"Coordinate":	{
+				"x":	12,
+				"y":	-56,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	298,
+			"Coordinate":	{
+				"x":	15,
+				"y":	-49,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	299,
+			"Coordinate":	{
+				"x":	30,
+				"y":	-51,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	300,
+			"Coordinate":	{
+				"x":	34,
+				"y":	-58,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	301,
+			"Coordinate":	{
+				"x":	40,
+				"y":	-53,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	302,
+			"Coordinate":	{
+				"x":	-4,
+				"y":	-60,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	303,
+			"Coordinate":	{
+				"x":	-28,
+				"y":	-60,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	304,
+			"Coordinate":	{
+				"x":	-25,
+				"y":	-49,
+				"prefab":	"objects/spruce"
+			}
+		}, {
+			"id":	305,
+			"Coordinate":	{
+				"x":	-21,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	306,
+			"Coordinate":	{
+				"x":	-11,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	307,
+			"Coordinate":	{
+				"x":	2,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	308,
+			"Coordinate":	{
+				"x":	5,
+				"y":	-55,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	309,
+			"Coordinate":	{
+				"x":	21,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	310,
+			"Coordinate":	{
+				"x":	37,
+				"y":	-55,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	311,
+			"Coordinate":	{
+				"x":	43,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	312,
+			"Coordinate":	{
+				"x":	33,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	313,
+			"Coordinate":	{
+				"x":	22,
+				"y":	-57,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	314,
+			"Coordinate":	{
+				"x":	15,
+				"y":	-61,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	315,
+			"Coordinate":	{
+				"x":	1,
+				"y":	-61,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	316,
+			"Coordinate":	{
+				"x":	-7,
+				"y":	-57,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	317,
+			"Coordinate":	{
+				"x":	-20,
+				"y":	-60,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	318,
+			"Coordinate":	{
+				"x":	-26,
+				"y":	-55,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	319,
+			"Coordinate":	{
+				"x":	-30,
+				"y":	-49,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	320,
+			"Coordinate":	{
+				"x":	39,
+				"y":	-62,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	321,
+			"Coordinate":	{
+				"x":	28,
+				"y":	-56,
+				"prefab":	"objects/birch"
+			}
+		}, {
+			"id":	322,
+			"Coordinate":	{
+				"x":	-17,
+				"y":	-53,
+				"angle":	-0.072098560631275177,
+				"prefab":	"objects/uranium",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
+			}
+		}, {
+			"id":	323,
+			"Coordinate":	{
+				"x":	34,
+				"y":	-53,
+				"angle":	-0.072098560631275177,
+				"prefab":	"objects/uranium",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
+			}
+		}, {
+			"id":	324,
+			"Coordinate":	{
+				"x":	17,
+				"y":	-58,
+				"angle":	-0.072098560631275177,
+				"prefab":	"objects/uranium",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
+			}
+		}, {
+			"id":	325,
+			"Coordinate":	{
+				"x":	-4,
+				"y":	-54,
+				"angle":	-0.072098560631275177,
+				"prefab":	"objects/uranium",
+				"scale_x":	0.99999994039535522,
+				"scale_y":	0.99999994039535522
 			}
 		}]
 }
