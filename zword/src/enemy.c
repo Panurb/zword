@@ -385,7 +385,7 @@ void enemy_die(int entity) {
     enemy->weapon = -1;
 
     // Overkill
-    if (health->health < -health->max_health / 2) {
+    if (health->health < -health->max_health) {
         ImageComponent_remove(entity);
         if (particle) {
             particle->origin = zeros();
@@ -430,7 +430,7 @@ void enemy_die(int entity) {
         }
 
         if (bandages == 0 && health->health < health->max_health) {
-            probs[0] += 1.0f;
+            probs[0] += 0.5f;
         }
     }
 

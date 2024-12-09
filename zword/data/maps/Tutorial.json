@@ -256,7 +256,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[MOVE_UP] [MOVE_LEFT] [MOVE_DOWN] [MOVE_RIGHT] to move.",
@@ -1078,7 +1078,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[AIM] to aim.",
@@ -1094,7 +1094,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[PICK_UP] to pick up item.",
@@ -1110,7 +1110,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[ATTACK] to attack.",
@@ -1126,7 +1126,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"Hold [INVENTORY] to open inventory.",
@@ -1142,7 +1142,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"Select item with [AIM].",
@@ -1158,7 +1158,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[RELOAD] to reload.",
@@ -1174,7 +1174,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"Select bandage and hold [ATTACK] to heal.",
@@ -1190,7 +1190,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[PICK_UP] to drop item in inventory.",
@@ -1206,7 +1206,7 @@
 				"type":	0,
 				"width":	2,
 				"height":	2,
-				"group":	11
+				"group":	15
 			},
 			"Text":	{
 				"source_string":	"[AMMO] to check ammo status.",

@@ -140,11 +140,13 @@ int get_magazine(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
     int magazine = weapon->max_magazine;
-    for (int i = 0; i < item->size; i++) {
-        ItemComponent* atch = ItemComponent_get(item->attachments[i]);
-        if (!atch) continue;
-        if (atch->type == ITEM_MAGAZINE) {
-            magazine = floorf(magazine * 1.5f);
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (!atch) continue;
+            if (atch->type == ITEM_MAGAZINE) {
+                magazine = floorf(magazine * 1.5f);
+            }
         }
     }
 
@@ -154,6 +156,8 @@ int get_magazine(int entity) {
 
 float has_silencer(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
+    if (!item) return false;
+    
     for (int i = 0; i < item->size; i++) {
         ItemComponent* atch = ItemComponent_get(item->attachments[i]);
         if (atch && atch->type == ITEM_SILENCER) {

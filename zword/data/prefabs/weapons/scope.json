@@ -23,7 +23,7 @@
 				"name":	"Scope",
 				"size":	0,
 				"type":	5, 
-                "price": 5000
+                "price": 1000
 			},
 			"Sound":	{
 				"hit_sound":	"metal"

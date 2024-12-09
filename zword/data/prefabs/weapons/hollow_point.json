@@ -23,7 +23,7 @@
 				"name":	"Hollow point",
 				"size":	0,
 				"type":	4, 
-                "price": 5000
+                "price": 1000
 			},
 			"Sound":	{
 				"hit_sound":	"metal"

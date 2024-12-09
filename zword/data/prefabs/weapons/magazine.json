@@ -23,7 +23,7 @@
 				"name":	"Drum magazine",
 				"size":	0,
 				"type":	6, 
-                "price": 5000
+                "price": 1000
 			},
 			"Sound":	{
 				"hit_sound":	"metal"
