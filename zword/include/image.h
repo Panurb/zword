@@ -34,3 +34,5 @@ void change_layer(int entity, Layer layer);
 // void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p);
 
 bool point_inside_image(int entity, Vector2f point);
+
+void draw_3d(int camera);

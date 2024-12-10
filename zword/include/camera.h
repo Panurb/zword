@@ -44,10 +44,10 @@ void draw_slice(int camera, Vector2f position, float min_range, float max_range,
 void draw_slice_outline(int camera, Vector2f position, float min_range, float max_range, 
     float angle, float spread);
 
-void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle, 
+void draw_sprite(int camera, int texture_index, float width, float height, float offset, Vector2f position, float angle, 
     Vector2f scale, float alpha);
 
-void draw_tiles(int camera, int texture_index, float width, float height, Vector2f position, float angle, float alpha);
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, float angle, float alpha);
 
 void draw_sprite_outline(int camera, int texture_index, float width, float height, int offset, Vector2f position, 
         float angle, Vector2f scale);

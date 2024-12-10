@@ -496,6 +496,8 @@ void draw_game() {
 
     draw_shadows(game_data->camera);
     draw_lights(game_data->camera, game_data->ambient_light);
+
+    draw_3d(game_data->camera);
 }
 
 

@@ -16,6 +16,7 @@
 typedef struct {
     float time;
     Vector2f normal;
+    float offset;
 } Hit;
 
 
@@ -45,6 +46,7 @@ Hit ray_intersection(int i, Vector2f start, Vector2f velocity, float range) {
                 if (t < hit.time) {
                     hit.time = t;
                     hit.normal = perp(dir);
+                    hit.offset = u * norm(dir);
                 }
             }
         }
@@ -60,6 +62,7 @@ Hit ray_intersection(int i, Vector2f start, Vector2f velocity, float range) {
             hit.time = t;
             Vector2f p = sum(start, mult(t, velocity));
             hit.normal = diff(p, get_position(i));
+            hit.offset = 0.0f;  // TODO
         }
     }
 
@@ -78,6 +81,7 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
     info.normal = mult(-1.0f, velocity);
     info.position = zeros();
     info.distance = range;
+    info.offset = 0.0f;
 
     float v = norm(velocity);
 
@@ -136,6 +140,7 @@ HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup gr
                 info.entity = j;
                 info.normal = hit.normal;
                 info.distance = t_min;
+                info.offset = hit.offset;
                 range = t_min;
             }
         }

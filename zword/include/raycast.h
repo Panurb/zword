@@ -9,6 +9,7 @@ typedef struct {
     int entity;
     Vector2f normal;
     float distance;
+    float offset;
 } HitInfo;
 
 HitInfo raycast(Vector2f start, Vector2f velocity, float range, ColliderGroup group);

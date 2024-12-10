@@ -268,7 +268,7 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
 }
 
 
-void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle, 
+void draw_sprite(int camera, int texture_index, float width, float height, float offset, Vector2f position, float angle, 
         Vector2f scale, float alpha) {
     if (texture_index == -1) {
         return;
@@ -316,9 +316,13 @@ void draw_sprite(int camera, int texture_index, float width, float height, int o
 }
 
 
-void draw_tiles(int camera, int texture_index, float width, float height, Vector2f position, float angle, float alpha) {
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, float angle, float alpha) {
     if (texture_index == -1) {
         return;
+    }
+
+    if (offset.x > 1.0f || offset.y > 1.0f) {
+        LOG_ERROR("Offset must be less than 1.0");
     }
 
     CameraComponent* cam = CameraComponent_get(camera);
@@ -335,39 +339,49 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     float tile_height = (float)src.h / PIXELS_PER_UNIT;
 
     SDL_FRect dest = { 0, 0, 0, 0 };
-    dest.w = tile_width * scaling.x * PIXELS_PER_UNIT;
-    dest.h = tile_height * scaling.y * PIXELS_PER_UNIT;
 
     Vector2f x = polar_to_cartesian(1.0f, angle);
     Vector2f y = perp(x);
-    
-    int nx = ceil(width / tile_width);
-    int ny = ceil(height / tile_height);
-    float current_tile_width = tile_width;
-    for (int i = 0; i < nx; i++) {
-        if (i == nx - 1) {
-            current_tile_width = (width - tile_width * (nx - 1));
-            src.w = current_tile_width * PIXELS_PER_UNIT;
-            dest.w = src.w * scaling.x;
-        }
 
-        float current_tile_height = tile_height;
-        src.h = tile_height * PIXELS_PER_UNIT;
-        dest.h = src.h * scaling.y;
-        for (int j = 0; j < ny; j++) {
-            if (j == ny - 1) {
-                current_tile_height = (height - tile_height * (ny - 1));
-                src.h = current_tile_height * PIXELS_PER_UNIT;
-                dest.h = src.h * scaling.y;
+    float accumulated_width = 0.0f;
+    float current_tile_width = tile_width * (1.0f - offset.x);
+    src.x = offset.x * PIXELS_PER_UNIT;
+
+    while (accumulated_width < width) {
+        if (width - accumulated_width < tile_width) {
+            current_tile_width = (width - accumulated_width);
+        }
+        
+        float accumulated_height = 0.0f;
+        float current_tile_height = tile_height * (1.0f - offset.y);
+        src.y = offset.y * PIXELS_PER_UNIT;
+        while (accumulated_height < height) {
+            if (height - accumulated_height < tile_height) {
+                current_tile_height = (height - accumulated_height);
             }
 
-            Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
-                                                j * tile_height - 0.5f * (height - current_tile_height), y));
+            Vector2f p = sum(position, lin_comb(accumulated_width - 0.5f * (width - current_tile_width), x, 
+                                                accumulated_height - 0.5f * (height - current_tile_height), y));
             Vector2f pos = world_to_screen(camera, p);
+
+            src.w = current_tile_width * PIXELS_PER_UNIT;
+            src.h = current_tile_height * PIXELS_PER_UNIT;
+
+            dest.w = src.w * scaling.x;
+            dest.h = src.h * scaling.y;
             dest.x = pos.x - 0.5f * dest.w;
             dest.y = pos.y - 0.5f * dest.h;
+
             SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+            // draw_rectangle_outline(camera, p, current_tile_width, current_tile_height, angle, 0.05f, COLOR_WHITE);
+            
+            accumulated_height += current_tile_height;
+            current_tile_height = tile_height;
+            src.y = 0;
         }
+        accumulated_width += current_tile_width;
+        current_tile_width = tile_width;
+        src.x = 0;
     }
 }
 

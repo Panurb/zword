@@ -302,7 +302,7 @@ void draw_image(int entity, int camera) {
 
     float angle = get_angle_interpolated(entity, app.delta);
     if (image->tile) {
-        draw_tiles(camera, image->texture_index, w, h, pos, angle, image->alpha);
+        draw_tiles(camera, image->texture_index, w, h, zeros(), pos, angle, image->alpha);
         return;
     }
     draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, angle, scale, image->alpha);
@@ -336,6 +336,43 @@ void draw_images(int camera) {
         if (image->layer >= LAYER_ROOFS) break;
 
         draw_image(i, camera);
+    }
+}
+
+
+void draw_3d(int camera) {
+    CameraComponent* cam = CameraComponent_get(camera);
+    int rays = cam->resolution.w;
+
+    float angle = get_angle(camera);
+    float fov = M_PI_2;
+    Vector2f start = get_position(camera);
+
+    float w = 1.0f / cam->zoom;
+
+    for (int i = 0; i < rays; i++) {
+        Vector2f velocity = polar_to_cartesian(1.0f, angle + 0.5f * fov - i * fov / (float) rays);
+
+        HitInfo info = raycast(start, velocity, 100.0f, GROUP_RAYS);
+        if (info.entity == -1) continue;
+        
+        float h = cam->resolution.h / cam->zoom / info.distance;
+        float x = (i - 0.5f * rays) * w;
+        Vector2f pos = vec(x, 0.0f);
+
+        ImageComponent* image = ImageComponent_get(info.entity);
+        if (image) {
+            if (image->tile) {
+                float offset = mod(info.offset, 1.0f);
+
+                Color color = get_color(offset, 0.0f, 0.0f, 1.0f);
+                // draw_rectangle(game_data->menu_camera, pos, w, h, 0.0f, color);
+
+                draw_tiles(game_data->menu_camera, image->texture_index, w, h, vec(offset, 0.0f), pos, 0.0f, 1.0f);
+            } else {
+                draw_sprite(game_data->menu_camera, image->texture_index, w, h, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
+            }
+        }
     }
 }
 
