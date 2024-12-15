@@ -260,7 +260,7 @@ PlayerComponent* PlayerComponent_add(int entity) {
     memcpy(player->controller.buttons, buttons, sizeof(buttons));
 
     player->controller.left_stick = zeros();
-    player->controller.right_stick = zeros();
+    player->controller.right_stick = vec(1.0f, 0.0f);
     for (int i = 0; i < 12; i++) {
         player->controller.buttons_down[i] = false;
         player->controller.buttons_pressed[i] = false;

@@ -302,7 +302,7 @@ void draw_image(int entity, int camera) {
 
     float angle = get_angle_interpolated(entity, app.delta);
     if (image->tile) {
-        draw_tiles(camera, image->texture_index, w, h, zeros(), pos, angle, image->alpha);
+        draw_tiles(camera, image->texture_index, w, h, zeros(), pos, angle, ones(), image->alpha);
         return;
     }
     draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, angle, scale, image->alpha);
@@ -310,6 +310,10 @@ void draw_image(int entity, int camera) {
 
 
 void draw_ground(int camera) {
+    SDL_SetRenderTarget(app.renderer, app.ground_texture);
+    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 0);
+    SDL_RenderClear(app.renderer);
+
     ListNode* node;
     FOREACH(node, game_data->components->image.order) {
         int i = node->value;
@@ -322,6 +326,10 @@ void draw_ground(int camera) {
         // TODO: check if on screen
         draw_road(camera, i);
     }
+
+    SDL_SetRenderTarget(app.renderer, NULL);
+
+    SDL_RenderCopy(app.renderer, app.ground_texture, NULL, NULL);
 }
 
 
@@ -342,21 +350,63 @@ void draw_images(int camera) {
 
 void draw_3d(int camera) {
     CameraComponent* cam = CameraComponent_get(camera);
-    int rays = cam->resolution.w;
 
-    float angle = get_angle(camera);
+    float angle = get_angle(camera) + M_PI_2;
     float fov = M_PI_2;
     Vector2f start = get_position(camera);
 
-    float w = 1.0f / cam->zoom;
+    float near_plane = 1.0f;
+
+    Vector2f direction = polar_to_cartesian(near_plane, angle);
+    Vector2f plane = perp(direction);
+
+    Vector2f size = camera_size(game_data->menu_camera);
+
+    // Why 2x?
+    float w = 2.0f / cam->zoom;
+
+    for (int i = 0; i < cam->resolution.h ; i++) {
+        int horizon = cam->resolution.h / 2;
+        int p = i - horizon;
+        float camera_z = 0.5f * cam->resolution.h;
+        float distance = camera_z * (near_plane / (float)p);
+
+        float y = (i - 0.5f * cam->resolution.h) * w;
+
+        Color color = get_color(distance, 0.0f, 0.0f, 1.0f);
+        draw_line(game_data->menu_camera, vec(-0.5f * size.x, y), vec(0.5f * size.x, y), w, color);
+
+        float ground_texture_height = camera_size(camera).y * cam->zoom / PIXELS_PER_UNIT;
+        ground_texture_height = 10.0f;
+        if (i < cam->resolution.h / 2 - 1) {
+            float width = -cam->resolution.w / cam->zoom / distance;
+            float offset = mod(distance, ground_texture_height) - 0.5f * ground_texture_height;
+
+            Vector2f scale = vec(width, 1.0f);
+            // draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, size.x, w, vec(0.0f, offset), vec(0.0f, y),
+            //     0.0f, vec(1.0f, 1.0f), 1.0f);
+        }
+    }
+
+    int rays = cam->resolution.w;
+
+    Vector2f v = sum(start, direction);
+    draw_line(camera, start, v, 0.01f, COLOR_WHITE);
+    draw_line(camera, sum(v, plane), diff(v, plane), 0.01f, COLOR_WHITE);
 
     for (int i = 0; i < rays; i++) {
-        Vector2f velocity = polar_to_cartesian(1.0f, angle + 0.5f * fov - i * fov / (float) rays);
+        Vector2f velocity = sum(direction, mult(1.0f - i / (float) rays * 2.0f, plane));
+        // Vector2f velocity = polar_to_cartesian(1.0f, angle + 0.5f * fov - i * fov / (float) rays);
 
         HitInfo info = raycast(start, velocity, 100.0f, GROUP_RAYS);
         if (info.entity == -1) continue;
+
+        // Perpendicular distance to the camera
+        Vector2f u = diff(info.position, start);
+        u = diff(u, velocity);
+        float distance = dot(u, normalized(direction));
         
-        float h = cam->resolution.h / cam->zoom / info.distance;
+        float height = size.y / distance;
         float x = (i - 0.5f * rays) * w;
         Vector2f pos = vec(x, 0.0f);
 
@@ -368,9 +418,10 @@ void draw_3d(int camera) {
                 Color color = get_color(offset, 0.0f, 0.0f, 1.0f);
                 // draw_rectangle(game_data->menu_camera, pos, w, h, 0.0f, color);
 
-                draw_tiles(game_data->menu_camera, image->texture_index, w, h, vec(offset, 0.0f), pos, 0.0f, 1.0f);
+                // draw_line(camera, start, info.position, 0.01f, COLOR_RED);
+                draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, vec(1.0f, height), 1.0f);
             } else {
-                draw_sprite(game_data->menu_camera, image->texture_index, w, h, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
+                draw_sprite(game_data->menu_camera, image->texture_index, w, height, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
             }
         }
     }

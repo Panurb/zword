@@ -41,11 +41,19 @@ Vector2f camera_size(int camera) {
 
 Vector2f world_to_screen(int camera, Vector2f a) {
     CameraComponent* cam = CameraComponent_get(camera);
+    float angle = get_angle_interpolated(camera, app.delta);
     Vector2f pos = sum(get_position_interpolated(camera, app.delta), cam->shake.position);
+    a = rotate(diff(a, pos), -angle);
     Vector2f b;
-    b.x = (a.x - pos.x) * cam->zoom + 0.5 * cam->resolution.w;
-    b.y = (pos.y - a.y) * cam->zoom + 0.5 * cam->resolution.h;
+    b.x = a.x * cam->zoom + 0.5 * cam->resolution.w;
+    b.y = -a.y * cam->zoom + 0.5 * cam->resolution.h;
     return b;
+}
+
+
+float world_to_screen_angle(int camera, float angle) {
+    CameraComponent* cam = CameraComponent_get(camera);
+    return -to_degrees(angle - get_angle_interpolated(camera, app.delta));
 }
 
 
@@ -55,6 +63,8 @@ Vector2f screen_to_world(int camera, Vector2f a) {
     Vector2f b;
     b.x = (a.x - 0.5 * cam->resolution.w) / cam->zoom + pos.x;
     b.y = (0.5 * cam->resolution.h - a.y) / cam->zoom + pos.y;
+    float angle = get_angle_interpolated(camera, app.delta);
+    b = rotate(b, angle);
     return b;
 }
 
@@ -312,24 +322,29 @@ void draw_sprite(int camera, int texture_index, float width, float height, float
     if (width == 0.0f || height == 0.0f) {
         SDL_Rect* psrc = NULL;
     }
-    SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, world_to_screen_angle(camera, angle), NULL, SDL_FLIP_NONE);
 }
 
 
-void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, float angle, float alpha) {
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, float angle, Vector2f scale, float alpha) {
     if (texture_index == -1) {
         return;
     }
 
-    if (offset.x > 1.0f || offset.y > 1.0f) {
-        LOG_ERROR("Offset must be less than 1.0");
-    }
+    // if (offset.x > 1.0f || offset.y > 1.0f) {
+    //     LOG_ERROR("Offset must be less than 1.0");
+    // }
 
     CameraComponent* cam = CameraComponent_get(camera);
     
     Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, ones());
 
-    SDL_Texture* texture = resources.textures[texture_index];
+    SDL_Texture* texture;
+    if (texture_index == GROUND_TEXTURE_INDEX) {
+        texture = app.ground_texture;
+    } else {
+        texture = resources.textures[texture_index];
+    }
     SDL_SetTextureAlphaMod(texture, 255 * alpha);
 
     SDL_Rect src = { 0, 0, 0, 0 };
@@ -344,7 +359,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     Vector2f y = perp(x);
 
     float accumulated_width = 0.0f;
-    float current_tile_width = tile_width * (1.0f - offset.x);
+    float current_tile_width = tile_width * (1.0f - offset.x) * scale.x;
     src.x = offset.x * PIXELS_PER_UNIT;
 
     while (accumulated_width < width) {
@@ -353,7 +368,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
         }
         
         float accumulated_height = 0.0f;
-        float current_tile_height = tile_height * (1.0f - offset.y);
+        float current_tile_height = tile_height * (1.0f - offset.y) * scale.y;
         src.y = offset.y * PIXELS_PER_UNIT;
         while (accumulated_height < height) {
             if (height - accumulated_height < tile_height) {
@@ -372,15 +387,15 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
             dest.x = pos.x - 0.5f * dest.w;
             dest.y = pos.y - 0.5f * dest.h;
 
-            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, world_to_screen_angle(camera, angle), NULL, SDL_FLIP_NONE);
             // draw_rectangle_outline(camera, p, current_tile_width, current_tile_height, angle, 0.05f, COLOR_WHITE);
             
             accumulated_height += current_tile_height;
-            current_tile_height = tile_height;
+            current_tile_height = tile_height * scale.y;
             src.y = 0;
         }
         accumulated_width += current_tile_width;
-        current_tile_width = tile_width;
+        current_tile_width = tile_width * scale.x;
         src.x = 0;
     }
 }
@@ -437,6 +452,27 @@ void draw_sprite_outline(int camera, int texture_index, float width, float heigh
 }
 
 
+void draw_skewed(int camera, SDL_Texture* texture, Vector2f corners[4]) {
+    SDL_Vertex vertices[4];
+    for (int i = 0; i < 4; i++) {
+        Vector2f v = world_to_screen(camera, corners[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { 255, 255, 255, 255 };
+    }
+    vertices[0].tex_coord = (SDL_FPoint) { 0.0f, 0.0f };
+    vertices[1].tex_coord = (SDL_FPoint) { 1.0f, 0.0f };
+    vertices[2].tex_coord = (SDL_FPoint) { 1.0f, 1.0f };
+    vertices[3].tex_coord = (SDL_FPoint) { 0.0f, 1.0f };
+
+    int indices[6] = { 0, 1, 2, 2, 3, 0 };
+
+    int err = SDL_RenderGeometry(app.renderer, texture, vertices, 4, indices, 6);
+    if (err != 0) {
+        LOG_ERROR("Error drawing skewed texture: %s", SDL_GetError());
+    } 
+}
+
+
 void draw_text(int camera, Vector2f position, char string[100], int size, Color color) {
     if (color.a == 0) {
         return;
@@ -477,6 +513,10 @@ void update_camera(int camera, float time_step, bool follow_players) {
             int i = node->value;
             PlayerComponent* player = PlayerComponent_get(i);
             if (player->state != PLAYER_DEAD) {
+                coord->position = get_position(i);
+                coord->angle = get_angle(i);
+                return;
+
                 n += 1;
                 pos = sum(pos, get_position(i));
             }

@@ -17,6 +17,7 @@ typedef struct {
     SDL_Texture* blood_texture;
     SDL_Texture* blood_threshold_texture;
     SDL_Texture* blood_multiply_texture;
+    SDL_Texture* ground_texture;
     SDL_GameController* controllers[8];
     int player_controllers[4];
     bool quit;

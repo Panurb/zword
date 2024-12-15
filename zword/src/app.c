@@ -59,6 +59,9 @@ void create_screen_textures() {
         SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_DST_ALPHA, SDL_BLENDOPERATION_ADD
     );
     SDL_SetTextureBlendMode(app.blood_multiply_texture, bm);
+
+    app.ground_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        game_settings.width, game_settings.height);
 }
 
 
@@ -158,6 +161,12 @@ void quit() {
 
 
 void input() {
+    if (game_state == STATE_GAME) {
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    } else {
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+    }
+
     SDL_Event sdl_event;
     while (SDL_PollEvent(&sdl_event))
     {
@@ -210,6 +219,13 @@ void input() {
                                 camera->zoom_target = fmaxf(camera->zoom_target / 1.1f, 10.0f);
                             }
                         }
+                    }
+
+                    if (sdl_event.type == SDL_MOUSEMOTION) {
+                        int player = game_data->components->player.order->head->value;
+
+                        PlayerComponent* p = PlayerComponent_get(player);
+                        p->controller.right_stick = rotate(p->controller.right_stick, -0.01f * sdl_event.motion.xrel);
                     }
                 } else if (game_state == STATE_PAUSE) {
                     if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {

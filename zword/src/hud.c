@@ -186,20 +186,20 @@ void draw_hud(int camera) {
         }
 
         if (player->state != PLAYER_DEAD) {
-            if (weapon) {
-                float r = fmaxf(dist(pos, position) * tanf(0.5f * fmaxf(weapon->spread, weapon->recoil)), 0.1f);
-                if (weapon->ammo_type == AMMO_MELEE) {
-                    r = 0.1f;
-                }
+            // if (weapon) {
+            //     float r = fmaxf(dist(pos, position) * tanf(0.5f * fmaxf(weapon->spread, weapon->recoil)), 0.1f);
+            //     if (weapon->ammo_type == AMMO_MELEE) {
+            //         r = 0.1f;
+            //     }
 
-                if (r > 0.1f) {
-                    draw_circle_outline(camera, pos, r, 0.03f, COLOR_WHITE);
-                } else {
-                    draw_circle(camera, pos, r, COLOR_WHITE);
-                }
-            } else {
-                draw_circle(camera, pos, 0.1f, COLOR_WHITE);
-            }
+            //     if (r > 0.1f) {
+            //         draw_circle_outline(camera, pos, r, 0.03f, COLOR_WHITE);
+            //     } else {
+            //         draw_circle(camera, pos, r, COLOR_WHITE);
+            //     }
+            // } else {
+            //     draw_circle(camera, pos, 0.1f, COLOR_WHITE);
+            // }
 
             HealthComponent* health = HealthComponent_get(i);
             float x = 2.0f * M_PI * (health->max_health - health->health) / health->max_health;

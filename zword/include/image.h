@@ -8,6 +8,7 @@
 
 
 #define PIXELS_PER_UNIT 128
+#define GROUND_TEXTURE_INDEX 1000
 
 
 float image_width(int entity);

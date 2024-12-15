@@ -187,7 +187,7 @@ void update_controller(int camera, int i) {
     int joystick = player->controller.joystick;
 
     Vector2f left_stick = zeros();
-    Vector2f right_stick = zeros();
+    Vector2f right_stick = player->controller.right_stick;
     if (player->controller.joystick == -1) {
         if (keybind_pressed(ACTION_LEFT)) {
             left_stick.x -= 1.0f;
@@ -203,9 +203,9 @@ void update_controller(int camera, int i) {
         }
         player->controller.left_stick = normalized(left_stick);
 
-        Vector2f mouse = get_mouse_position(camera);
-        right_stick = diff(mouse, get_position(i));
-        player->controller.right_stick = normalized(right_stick);
+        // Vector2f mouse = get_mouse_position(camera);
+        // right_stick = diff(mouse, get_position(i));
+        // player->controller.right_stick = normalized(right_stick);
 
         player->controller.left_trigger = keybind_pressed(ACTION_ATTACK) ? 1.0f : 0.0f;
         player->controller.right_trigger = keybind_pressed(ACTION_PICKUP) ? 1.0f : 0.0f;
