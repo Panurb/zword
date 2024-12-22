@@ -33,7 +33,7 @@
 #include "settings.h"
 
 
-GameState game_state = STATE_MENU;
+GameState game_state = STATE_START;
 GameData* game_data;
 
 Resources resources;
@@ -99,7 +99,7 @@ void load_resources() {
 void create_game() {
     game_data = malloc(sizeof(GameData));
 
-    strcpy(game_data->map_name, "");
+    strcpy(game_data->map_name, "test");
 
     game_data->components = ComponentData_create();
     ColliderGrid* grid = ColliderGrid_create();
@@ -487,6 +487,7 @@ void update_game(float time_step) {
 
 void draw_game() {
     draw_ground(game_data->camera);
+    
     SDL_RenderCopy(app.renderer, app.shadow_texture, NULL, NULL);
     draw_images(game_data->camera);
     draw_particles(game_data->camera);

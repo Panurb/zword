@@ -336,8 +336,6 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     // }
 
     CameraComponent* cam = CameraComponent_get(camera);
-    
-    Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, ones());
 
     SDL_Texture* texture;
     if (texture_index == GROUND_TEXTURE_INDEX) {
@@ -359,7 +357,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     Vector2f y = perp(x);
 
     float accumulated_width = 0.0f;
-    float current_tile_width = tile_width * (1.0f - offset.x) * scale.x;
+    float current_tile_width = tile_width * (1.0f - offset.x);
     src.x = offset.x * PIXELS_PER_UNIT;
 
     while (accumulated_width < width) {
@@ -368,7 +366,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
         }
         
         float accumulated_height = 0.0f;
-        float current_tile_height = tile_height * (1.0f - offset.y) * scale.y;
+        float current_tile_height = tile_height * (1.0f - offset.y);
         src.y = offset.y * PIXELS_PER_UNIT;
         while (accumulated_height < height) {
             if (height - accumulated_height < tile_height) {
@@ -379,11 +377,11 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
                                                 accumulated_height - 0.5f * (height - current_tile_height), y));
             Vector2f pos = world_to_screen(camera, p);
 
-            src.w = current_tile_width * PIXELS_PER_UNIT;
-            src.h = current_tile_height * PIXELS_PER_UNIT;
+            src.w = current_tile_width * PIXELS_PER_UNIT / scale.x;
+            src.h = current_tile_height * PIXELS_PER_UNIT / scale.y;
 
-            dest.w = src.w * scaling.x;
-            dest.h = src.h * scaling.y;
+            dest.w = current_tile_width * cam->zoom;
+            dest.h = current_tile_height * cam->zoom;
             dest.x = pos.x - 0.5f * dest.w;
             dest.y = pos.y - 0.5f * dest.h;
 
