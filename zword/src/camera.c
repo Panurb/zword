@@ -326,7 +326,8 @@ void draw_sprite(int camera, int texture_index, float width, float height, float
 }
 
 
-void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, float angle, Vector2f scale, float alpha) {
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, 
+        float angle, Vector2f scale, float alpha) {
     if (texture_index == -1) {
         return;
     }
@@ -347,8 +348,8 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     SDL_Rect src = { 0, 0, 0, 0 };
     
     SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
-    float tile_width = (float)src.w / pixels_per_unit;
-    float tile_height = (float)src.h / pixels_per_unit;
+    float tile_width = (float)src.w / pixels_per_unit * scale.x;
+    float tile_height = (float)src.h / pixels_per_unit * scale.y;
     
     if (offset.x > tile_width || offset.y > tile_height || offset.x < 0.0f || offset.y < 0.0f) {
         LOG_ERROR("Offset out of bounds: %f, %f", offset.x, offset.y);
@@ -360,7 +361,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     Vector2f y = perp(x);
 
     float accumulated_width = 0.0f;
-    float current_tile_width = tile_width - offset.x;
+    float current_tile_width = (tile_width - offset.x) * scale.x;
     src.x = offset.x * pixels_per_unit;
 
     while (accumulated_width < width) {
@@ -369,7 +370,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
         }
         
         float accumulated_height = 0.0f;
-        float current_tile_height = tile_height - offset.y;
+        float current_tile_height = (tile_height - offset.y) * scale.y;
         src.y = offset.y * pixels_per_unit;
         while (accumulated_height < height) {
             if (height - accumulated_height < tile_height) {
@@ -380,8 +381,8 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
                                                 accumulated_height - 0.5f * (height - current_tile_height), y));
             Vector2f pos = world_to_screen(camera, p);
 
-            src.w = current_tile_width * pixels_per_unit;
-            src.h = current_tile_height * pixels_per_unit;
+            src.w = current_tile_width * pixels_per_unit / scale.x;
+            src.h = current_tile_height * pixels_per_unit / scale.y;
 
             dest.w = current_tile_width * cam->zoom;
             dest.h = current_tile_height * cam->zoom;
@@ -392,11 +393,11 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
             // draw_rectangle_outline(camera, p, current_tile_width, current_tile_height, angle, 0.05f, COLOR_WHITE);
             
             accumulated_height += current_tile_height;
-            current_tile_height = tile_height;
+            current_tile_height = tile_height * scale.y;
             src.y = 0;
         }
         accumulated_width += current_tile_width;
-        current_tile_width = tile_width;
+        current_tile_width = tile_width * scale.x;
         src.x = 0;
     }
 }

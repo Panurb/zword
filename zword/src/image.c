@@ -393,28 +393,22 @@ void draw_3d(int camera) {
 
             Color color = get_color(offset, 0.0f, 0.0f, 1.0f);
 
-            if (i % 10 == 0) {
-                char buffer[100];
-                snprintf(buffer, 100, "%f", floor_width);
-                // draw_text(camera, floor_left, buffer, 10, COLOR_WHITE);
-            }
-
-            draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, floor_width, w, 
-                vec(offset_x, offset), 
-                vec(0.0f, distance),
-                0.0f, vec(1.0f, 1.0f), 1.0f);
+            // draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, floor_width, w, 
+            //     vec(offset_x, offset), 
+            //     vec(0.0f, distance),
+            //     0.0f, vec(1.0f, 1.0f), 1.0f);
             
             // draw_line(game_data->menu_camera, vec(-0.5 * floor_width, distance), vec(0.5f * floor_width, distance), 0.01f, color);
 
             // draw_line(game_data->menu_camera, vec(-0.5f * screen_size.x, y), vec(0.5f * screen_size.x, y), w, color);
 
             Vector2f ground_size = camera_size(camera);
-            float width = ground_size.x * screen_size.x / distance;
+            float width = screen_size.x;
             // LOG_INFO("distance: %f, offset: %f", distance, offset);
 
             Vector2f scale = vec(width, 1.0f);
-            // draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, width, w, vec(0.0f, offset * cam->zoom / PIXELS_PER_UNIT), vec(0.0f, y),
-            //     0.0f, vec(width, 1.0f), 1.0f);
+            draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, screen_size.x, w, vec(offset_x, offset), vec(0.0f, y),
+                0.0f, vec(screen_size.x / floor_width, 1.0f), 1.0f);
         }
     }
 
