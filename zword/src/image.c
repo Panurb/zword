@@ -370,7 +370,7 @@ void draw_3d(int camera) {
     draw_circle(camera, left, 0.05f, COLOR_RED);
     draw_circle(camera, right, 0.05f, COLOR_RED);
 
-    for (int i = 0; i < cam->resolution.h ; i++) {
+    for (int i = 0; i < cam->resolution.h; i++) {
         int horizon = cam->resolution.h / 2;
         int p = i - horizon;
         float camera_z = 0.5f * cam->resolution.h;
@@ -380,7 +380,6 @@ void draw_3d(int camera) {
 
         float max_distance = 0.5f * camera_size(camera).y;
         if (distance < max_distance && i < horizon) {
-            Color color = get_color(distance, 0.0f, 0.0f, 1.0f);
 
             Vector2f floor_left = sum(start, mult(distance, left));
             Vector2f floor_right = sum(start, mult(distance, right));
@@ -388,12 +387,24 @@ void draw_3d(int camera) {
 
             float floor_width = dist(floor_left, floor_right);
             float offset = max_distance - distance;
-            offset = 0.5f * offset;
+            offset += max_distance / 2.0f + near_plane;
+
+            float offset_x = (screen_size.x - floor_width) / 2.0f;
+
+            Color color = get_color(offset, 0.0f, 0.0f, 1.0f);
+
+            if (i % 10 == 0) {
+                char buffer[100];
+                snprintf(buffer, 100, "%f", floor_width);
+                // draw_text(camera, floor_left, buffer, 10, COLOR_WHITE);
+            }
 
             draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, floor_width, w, 
-                vec((screen_size.x - floor_width) * 0.25f * cam->zoom / PIXELS_PER_UNIT, offset), 
+                vec(offset_x, offset), 
                 vec(0.0f, distance),
                 0.0f, vec(1.0f, 1.0f), 1.0f);
+            
+            // draw_line(game_data->menu_camera, vec(-0.5 * floor_width, distance), vec(0.5f * floor_width, distance), 0.01f, color);
 
             // draw_line(game_data->menu_camera, vec(-0.5f * screen_size.x, y), vec(0.5f * screen_size.x, y), w, color);
 
@@ -440,7 +451,7 @@ void draw_3d(int camera) {
                 // draw_line(camera, start, info.position, 0.01f, COLOR_RED);
                 // draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, vec(1.0f, height), 1.0f);
             } else {
-                draw_sprite(game_data->menu_camera, image->texture_index, w, height, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
+                // draw_sprite(game_data->menu_camera, image->texture_index, w, height, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
             }
         }
     }

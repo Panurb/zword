@@ -188,6 +188,8 @@ float angle_from_transform(Matrix3 m);
 
 Color get_color(float r, float g, float b, float a);
 
+Color random_color();
+
 void permute(int* array, int size);
 
 float lerp(float a, float b, float t);

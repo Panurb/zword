@@ -286,6 +286,10 @@ Color get_color(float r, float g, float b, float a) {
     return color;
 }
 
+Color random_color() {
+    return get_color(randf(0.0f, 1.0f), randf(0.0f, 1.0f), randf(0.0f, 1.0f), 1.0f);
+}
+
 void permute(int* array, int size) {
     for (int i = 0; i < size; i++) {
         // Warning: skewed distribution
