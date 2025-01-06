@@ -349,55 +349,55 @@ void draw_images(int camera) {
 
 
 void draw_3d(int camera) {
-    CameraComponent* cam = CameraComponent_get(camera);
+    Color sky = get_color(0.1f, 0.1f, 0.1f, 1.0f);
+    SDL_SetRenderDrawColor(app.renderer, sky.r, sky.g, sky.b, sky.a);
+    SDL_RenderClear(app.renderer);
+
+    CameraComponent* cam = CameraComponent_get(game_data->menu_camera);
 
     float angle = get_angle(camera) + M_PI_2;
     float fov = M_PI_2;
     Vector2f start = get_position(camera);
 
-    float near_plane = 1.0f;
+    float near_plane = 0.1f;
+    float far_plane = 100.0f;
 
     Vector2f direction = polar_to_cartesian(near_plane, angle);
     Vector2f plane = perp(direction);
 
     Vector2f screen_size = camera_size(game_data->menu_camera);
 
-    // Why 2x?
-    float w = 2.0f / cam->zoom;
+    float w = 1.0f / cam->zoom;
 
     Vector2f left = sum(direction, plane);
     Vector2f right = diff(direction, plane);
-    draw_circle(camera, left, 0.05f, COLOR_RED);
-    draw_circle(camera, right, 0.05f, COLOR_RED);
-
+    
     for (int i = 0; i < cam->resolution.h; i++) {
         int horizon = cam->resolution.h / 2;
-        int p = i - horizon;
-        float camera_z = 0.5f * cam->resolution.h;
-        float distance = fabsf(camera_z * (near_plane / (float)p));
+        float p = i - horizon;
+        float camera_z = 9000.0f;
+        float distance = fabsf(camera_z * (near_plane / p));
 
         float y = (i - 0.5f * cam->resolution.h) * w;
 
         float max_distance = 0.5f * camera_size(camera).y;
         if (distance < max_distance && i < horizon) {
-
-            Vector2f floor_left = sum(start, mult(distance, left));
-            Vector2f floor_right = sum(start, mult(distance, right));
-            // draw_line(camera, floor_left, floor_right, 0.01f, color);
+            Vector2f floor_left = sum(start, mult(distance / near_plane, left));
+            Vector2f floor_right = sum(start, mult(distance / near_plane, right));
 
             float floor_width = dist(floor_left, floor_right);
             float offset = max_distance - distance;
-            offset += max_distance / 2.0f + near_plane;
+            offset += max_distance / 2.0f + 0.9f;
 
             float offset_x = (screen_size.x - floor_width) / 2.0f;
-
-            Color color = get_color(offset, 0.0f, 0.0f, 1.0f);
 
             // draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, floor_width, w, 
             //     vec(offset_x, offset), 
             //     vec(0.0f, distance),
             //     0.0f, vec(1.0f, 1.0f), 1.0f);
-            
+
+            // draw_rectangle(game_data->menu_camera, vec(0.0f, distance), floor_width, w, 0.0f, COLOR_WHITE);
+
             // draw_line(game_data->menu_camera, vec(-0.5 * floor_width, distance), vec(0.5f * floor_width, distance), 0.01f, color);
 
             // draw_line(game_data->menu_camera, vec(-0.5f * screen_size.x, y), vec(0.5f * screen_size.x, y), w, color);
@@ -422,13 +422,13 @@ void draw_3d(int camera) {
         Vector2f velocity = sum(direction, mult(1.0f - i / (float) rays * 2.0f, plane));
         // Vector2f velocity = polar_to_cartesian(1.0f, angle + 0.5f * fov - i * fov / (float) rays);
 
-        HitInfo info = raycast(start, velocity, 100.0f, GROUP_RAYS);
+        HitInfo info = raycast(start, velocity, far_plane, GROUP_RAYS);
         if (info.entity == -1) continue;
 
         // Perpendicular distance to the camera
         Vector2f u = diff(info.position, start);
-        u = diff(u, velocity);
-        float distance = dot(u, normalized(direction));
+        float distance = dot(u, normalized(direction)) - near_plane;
+        distance = clamp(distance, near_plane, far_plane);
         
         float height = screen_size.y / distance;
         float x = (i - 0.5f * rays) * w;
@@ -439,11 +439,11 @@ void draw_3d(int camera) {
             if (image->tile) {
                 float offset = mod(info.offset, 1.0f);
 
-                Color color = get_color(offset, 0.0f, 0.0f, 1.0f);
-                // draw_rectangle(game_data->menu_camera, pos, w, h, 0.0f, color);
+                Color color = get_color(offset, 0.0f, 0.0f, 0.2f);
+                // draw_rectangle(game_data->menu_camera, pos, w, height, 0.0f, color);
 
-                // draw_line(camera, start, info.position, 0.01f, COLOR_RED);
-                // draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, vec(1.0f, height), 1.0f);
+                // draw_line(camera, start, info.position, 0.01f, get_color(0.0f, distance / 10.0f, 0.0f, 1.0f));
+                draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, vec(1.0f, height), 1.0f);
             } else {
                 // draw_sprite(game_data->menu_camera, image->texture_index, w, height, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
             }

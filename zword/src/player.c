@@ -100,7 +100,7 @@ void update_players(float time_step) {
         ImageComponent* image = ImageComponent_get(item);
 
         if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
-            phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+            phys->acceleration = sum(phys->acceleration, mult(player->acceleration, rotate(left_stick, get_angle(i))));
             if (non_zero(right_stick)) {
                 coord->angle = polar_angle(right_stick);
                 if (coord->parent != -1) {

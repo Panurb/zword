@@ -348,8 +348,8 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     SDL_Rect src = { 0, 0, 0, 0 };
     
     SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
-    float tile_width = (float)src.w / pixels_per_unit * scale.x;
-    float tile_height = (float)src.h / pixels_per_unit * scale.y;
+    float tile_width = (float)src.w / pixels_per_unit;
+    float tile_height = (float)src.h / pixels_per_unit;
     
     if (offset.x > tile_width || offset.y > tile_height || offset.x < 0.0f || offset.y < 0.0f) {
         LOG_ERROR("Offset out of bounds: %f, %f", offset.x, offset.y);
