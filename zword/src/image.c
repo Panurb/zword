@@ -348,10 +348,24 @@ void draw_images(int camera) {
 }
 
 
+typedef struct {
+    int entity;
+    float distance;
+} Sprite;
+
+
+int compare_distance(const void* a, const void* b) {
+    Sprite* sa = (Sprite*) a;
+    Sprite* sb = (Sprite*) b;
+
+    return sb->distance - sa->distance;
+}
+
+
 void draw_3d(int camera) {
     Color sky = get_color(0.1f, 0.1f, 0.1f, 1.0f);
     SDL_SetRenderDrawColor(app.renderer, sky.r, sky.g, sky.b, sky.a);
-    SDL_RenderClear(app.renderer);
+    // SDL_RenderClear(app.renderer);
 
     CameraComponent* cam = CameraComponent_get(game_data->menu_camera);
 
@@ -371,6 +385,7 @@ void draw_3d(int camera) {
 
     Vector2f left = sum(direction, plane);
     Vector2f right = diff(direction, plane);
+    float max_distance = 0.5f * camera_size(camera).y;
     
     for (int i = 0; i < cam->resolution.h; i++) {
         int horizon = cam->resolution.h / 2;
@@ -380,13 +395,13 @@ void draw_3d(int camera) {
 
         float y = (i - 0.5f * cam->resolution.h) * w;
 
-        float max_distance = 0.5f * camera_size(camera).y;
         if (distance < max_distance && i < horizon) {
             Vector2f floor_left = sum(start, mult(distance / near_plane, left));
             Vector2f floor_right = sum(start, mult(distance / near_plane, right));
 
             float floor_width = dist(floor_left, floor_right);
             float offset = max_distance - distance;
+            // Why 0.9f?
             offset += max_distance / 2.0f + 0.9f;
 
             float offset_x = (screen_size.x - floor_width) / 2.0f;
@@ -396,15 +411,8 @@ void draw_3d(int camera) {
             //     vec(0.0f, distance),
             //     0.0f, vec(1.0f, 1.0f), 1.0f);
 
-            // draw_rectangle(game_data->menu_camera, vec(0.0f, distance), floor_width, w, 0.0f, COLOR_WHITE);
-
-            // draw_line(game_data->menu_camera, vec(-0.5 * floor_width, distance), vec(0.5f * floor_width, distance), 0.01f, color);
-
-            // draw_line(game_data->menu_camera, vec(-0.5f * screen_size.x, y), vec(0.5f * screen_size.x, y), w, color);
-
             Vector2f ground_size = camera_size(camera);
             float width = screen_size.x;
-            // LOG_INFO("distance: %f, offset: %f", distance, offset);
 
             Vector2f scale = vec(width, 1.0f);
             draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, screen_size.x, w, vec(offset_x, offset), vec(0.0f, y),
@@ -413,10 +421,7 @@ void draw_3d(int camera) {
     }
 
     int rays = cam->resolution.w;
-
-    Vector2f v = sum(start, direction);
-    draw_line(camera, start, v, 0.01f, COLOR_WHITE);
-    draw_line(camera, sum(v, plane), diff(v, plane), 0.01f, COLOR_WHITE);
+    float* z_buffer = malloc(rays * sizeof(float));
 
     for (int i = 0; i < rays; i++) {
         Vector2f velocity = sum(direction, mult(1.0f - i / (float) rays * 2.0f, plane));
@@ -429,6 +434,8 @@ void draw_3d(int camera) {
         Vector2f u = diff(info.position, start);
         float distance = dot(u, normalized(direction)) - near_plane;
         distance = clamp(distance, near_plane, far_plane);
+
+        z_buffer[i] = distance;
         
         float height = screen_size.y / distance;
         float x = (i - 0.5f * rays) * w;
@@ -440,15 +447,88 @@ void draw_3d(int camera) {
                 float offset = mod(info.offset, 1.0f);
 
                 Color color = get_color(offset, 0.0f, 0.0f, 0.2f);
-                // draw_rectangle(game_data->menu_camera, pos, w, height, 0.0f, color);
-
-                // draw_line(camera, start, info.position, 0.01f, get_color(0.0f, distance / 10.0f, 0.0f, 1.0f));
                 draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, vec(1.0f, height), 1.0f);
-            } else {
-                // draw_sprite(game_data->menu_camera, image->texture_index, w, height, 0.0f, pos, 0.0f, vec(1.0f, 1.0f), 1.0f);
             }
         }
     }
+
+    Matrix2f camera_matrix = { plane.x, direction.x, plane.y, direction.y };
+    Matrix2f inv_camera_matrix = matrix_inverse(camera_matrix);
+
+    List* entities = get_entities(start, 100.0f);
+    Sprite* sprites = malloc(entities->size * sizeof(Sprite));
+
+    int i = 0;
+    int image_entities = 0;
+    ListNode* node;
+    FOREACH(node, entities) {
+        int j = node->value;
+
+        ImageComponent* image = ImageComponent_get(j);
+        if (!image) continue;
+        if (image->tile) continue;
+
+        Vector2f pos = get_position(j);
+        float distance = dist(pos, start);
+        if (distance < near_plane) continue;
+
+        sprites[i].entity = j;
+        sprites[i].distance = distance;
+        i++;
+        image_entities++;
+    }
+
+    List_delete(entities);
+
+    qsort(sprites, image_entities, sizeof(Sprite), compare_distance);
+
+    for (int i = 0; i < image_entities; i++) {
+        int entity = sprites[i].entity;
+
+        ImageComponent* image = ImageComponent_get(entity);
+
+        Vector2f pos = get_position(entity);
+        Vector2f sprite_position = diff(pos, start);
+        sprite_position = matrix_mult(inv_camera_matrix, sprite_position);
+
+        // Perpendicular distance to the camera
+        float distance = sprite_position.y * near_plane;
+        float x = -sprite_position.x * 0.5f * screen_size.x / sprite_position.y;
+        float y = -100.0f / sprite_position.y;
+
+        String buffer;
+        sprintf(buffer, "Distance: %.2f", distance);
+        draw_text(camera, pos, buffer, 10.0f, COLOR_WHITE);
+
+        if (distance < 0.0f) continue;
+        if (distance > max_distance) continue;
+
+        // TODO: scale
+        float width = 0.5f * image->width * screen_size.y / distance;
+        float height = 0.5f * image->height * screen_size.y / distance;
+
+        if (fabsf(x) - 0.5f * width > 0.5f * screen_size.x) continue;
+
+        // draw_sprite(game_data->menu_camera, image->texture_index, width, height, 0.0f, vec(x, y), 0.0f, ones(), 1.0f);
+        // draw_circle(game_data->menu_camera, vec(x * 0.5f * screen_size.x, 0.0f), 0.1f, COLOR_RED);
+        // LOG_WARNING("Screen size: %.2f, %.2f", x * 0.5f * screen_size.x, x);
+
+        float sprite_left = x - 0.5f * width;
+
+        int stripes = width * cam->zoom;
+
+        for (int j = 0; j < stripes; j++) {
+            float offset = image->width * j / (float)stripes;
+            x = sprite_left + j * width / (float)stripes;
+
+            draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), vec(x, y),
+                0.0f, vec(1.0f, height), 1.0f);
+        }
+    }
+
+    free(sprites);
+
+    free(z_buffer);
 }
 
 
