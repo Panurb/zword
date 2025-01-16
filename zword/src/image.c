@@ -302,7 +302,7 @@ void draw_image(int entity, int camera) {
 
     float angle = get_angle_interpolated(entity, app.delta);
     if (image->tile) {
-        draw_tiles(camera, image->texture_index, w, h, zeros(), pos, angle, ones(), image->alpha);
+        draw_tiles(camera, image->texture_index, w, h, zeros(), pos, angle, ones(), image->alpha, 0.0f);
         return;
     }
     draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, angle, scale, image->alpha);
@@ -362,10 +362,15 @@ int compare_distance(const void* a, const void* b) {
 }
 
 
+float get_fog_shade(float distance, float max_distance) {
+    return powf(1.0f - (max_distance - distance) / max_distance, 8.0f);
+}
+
+
 void draw_3d(int camera) {
-    Color sky = get_color(0.1f, 0.1f, 0.1f, 1.0f);
+    Color sky = COLOR_BLACK;
     SDL_SetRenderDrawColor(app.renderer, sky.r, sky.g, sky.b, sky.a);
-    // SDL_RenderClear(app.renderer);
+    SDL_RenderClear(app.renderer);
 
     CameraComponent* cam = CameraComponent_get(game_data->menu_camera);
 
@@ -411,12 +416,12 @@ void draw_3d(int camera) {
             //     vec(0.0f, distance),
             //     0.0f, vec(1.0f, 1.0f), 1.0f);
 
-            Vector2f ground_size = camera_size(camera);
             float width = screen_size.x;
 
             Vector2f scale = vec(width, 1.0f);
+            float shade = get_fog_shade(distance, max_distance);
             draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, screen_size.x, w, vec(offset_x, offset), vec(0.0f, y),
-                0.0f, vec(screen_size.x / floor_width, 1.0f), 1.0f);
+                0.0f, vec(screen_size.x / floor_width, 1.0f), 1.0f, shade);
         }
     }
 
@@ -449,8 +454,14 @@ void draw_3d(int camera) {
             if (image->tile) {
                 float offset = mod(info.offset, 1.0f);
 
-                Color color = get_color(offset, 0.0f, 0.0f, 0.2f);
-                draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, vec(1.0f, height), 1.0f);
+                if (distance < max_distance) {
+                    float shade = get_fog_shade(distance, max_distance);
+                    draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, 
+                        vec(1.0f, height), 1.0f, shade);
+
+                    // Color color = get_fog_color(distance, max_distance);
+                    // draw_rectangle(game_data->menu_camera, pos, w, height, 0.0f, color);
+                }
             }
         }
     }
@@ -523,12 +534,14 @@ void draw_3d(int camera) {
 
         for (int j = left; j < right; j++) {
             if (distance > z_buffer[j]) continue;
+            if (distance > max_distance) continue;
 
             float offset = image->width * (j - unclamped_left) / (float)stripes;
             x = (j - 0.5f * rays) * w;
 
+            float shade = get_fog_shade(distance, max_distance);
             draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), vec(x, y),
-                0.0f, vec(1.0f, height), 1.0f);
+                0.0f, vec(1.0f, height), 1.0f, shade);
         }
     }
 

@@ -327,7 +327,7 @@ void draw_sprite(int camera, int texture_index, float width, float height, float
 
 
 void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, 
-        float angle, Vector2f scale, float alpha) {
+        float angle, Vector2f scale, float alpha, float shade) {
     if (texture_index == -1) {
         return;
     }
@@ -344,6 +344,10 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
         texture = resources.textures[texture_index];
     }
     SDL_SetTextureAlphaMod(texture, 255 * alpha);
+    if (shade > 0.0f) {
+        int color_mod = 255 * (1.0f - shade);
+        SDL_SetTextureColorMod(texture, color_mod, color_mod, color_mod);
+    }
 
     SDL_Rect src = { 0, 0, 0, 0 };
     
@@ -399,6 +403,10 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
         accumulated_width += current_tile_width;
         current_tile_width = tile_width * scale.x;
         src.x = 0;
+    }
+
+    if (shade > 0.0f) {
+        SDL_SetTextureColorMod(texture, 255, 255, 255);
     }
 }
 
