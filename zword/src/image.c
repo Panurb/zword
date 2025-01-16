@@ -358,7 +358,7 @@ int compare_distance(const void* a, const void* b) {
     Sprite* sa = (Sprite*) a;
     Sprite* sb = (Sprite*) b;
 
-    return sb->distance - sa->distance;
+    return (sb->distance > sa->distance) - (sb->distance < sa->distance);
 }
 
 
@@ -428,7 +428,10 @@ void draw_3d(int camera) {
         // Vector2f velocity = polar_to_cartesian(1.0f, angle + 0.5f * fov - i * fov / (float) rays);
 
         HitInfo info = raycast(start, velocity, far_plane, GROUP_RAYS);
-        if (info.entity == -1) continue;
+        if (info.entity == -1) {
+            z_buffer[i] = far_plane;
+            continue;
+        }
 
         // Perpendicular distance to the camera
         Vector2f u = diff(info.position, start);
@@ -455,10 +458,9 @@ void draw_3d(int camera) {
     Matrix2f camera_matrix = { plane.x, direction.x, plane.y, direction.y };
     Matrix2f inv_camera_matrix = matrix_inverse(camera_matrix);
 
-    List* entities = get_entities(start, 100.0f);
+    List* entities = get_entities(start, far_plane);
     Sprite* sprites = malloc(entities->size * sizeof(Sprite));
 
-    int i = 0;
     int image_entities = 0;
     ListNode* node;
     FOREACH(node, entities) {
@@ -467,14 +469,14 @@ void draw_3d(int camera) {
         ImageComponent* image = ImageComponent_get(j);
         if (!image) continue;
         if (image->tile) continue;
+        if (image->layer <= LAYER_DECALS) continue;
 
         Vector2f pos = get_position(j);
         float distance = dist(pos, start);
         if (distance < near_plane) continue;
 
-        sprites[i].entity = j;
-        sprites[i].distance = distance;
-        i++;
+        sprites[image_entities].entity = j;
+        sprites[image_entities].distance = distance;
         image_entities++;
     }
 
@@ -497,17 +499,15 @@ void draw_3d(int camera) {
         float y = -100.0f / sprite_position.y;
 
         String buffer;
-        sprintf(buffer, "Distance: %.2f", distance);
+        sprintf(buffer, "%d, %.2f", i, distance);
         draw_text(camera, pos, buffer, 10.0f, COLOR_WHITE);
 
         if (distance < 0.0f) continue;
-        if (distance > max_distance) continue;
+        if (distance > far_plane) continue;
 
         // TODO: scale
         float width = 0.5f * image->width * screen_size.y / distance;
         float height = 0.5f * image->height * screen_size.y / distance;
-
-        if (fabsf(x) - 0.5f * width > 0.5f * screen_size.x) continue;
 
         // draw_sprite(game_data->menu_camera, image->texture_index, width, height, 0.0f, vec(x, y), 0.0f, ones(), 1.0f);
         // draw_circle(game_data->menu_camera, vec(x * 0.5f * screen_size.x, 0.0f), 0.1f, COLOR_RED);
@@ -517,9 +517,15 @@ void draw_3d(int camera) {
 
         int stripes = width * cam->zoom;
 
-        for (int j = 0; j < stripes; j++) {
-            float offset = image->width * j / (float)stripes;
-            x = sprite_left + j * width / (float)stripes;
+        int unclamped_left = sprite_left * cam->zoom + 0.5f * rays;
+        int left = clamp(unclamped_left, 0, cam->resolution.w);
+        int right = clamp(((sprite_left + width) * cam->zoom) + 0.5f * rays, 0, cam->resolution.w);
+
+        for (int j = left; j < right; j++) {
+            if (distance > z_buffer[j]) continue;
+
+            float offset = image->width * (j - unclamped_left) / (float)stripes;
+            x = (j - 0.5f * rays) * w;
 
             draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), vec(x, y),
                 0.0f, vec(1.0f, height), 1.0f);
