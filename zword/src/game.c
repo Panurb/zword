@@ -107,6 +107,7 @@ void create_game() {
     int seed = time(NULL);
     int camera = create_camera();
     int menu_camera = create_menu_camera();
+    int pixel_camera = create_pixel_camera();
 
     game_data->grid = grid;
     game_data->ambient_light = ambient_light;
@@ -114,6 +115,7 @@ void create_game() {
     game_data->seed = seed;
     game_data->camera = camera;
     game_data->menu_camera = menu_camera;
+    game_data->pixel_camera = pixel_camera;
 
     game_data->game_mode = MODE_SURVIVAL;
 }
@@ -167,6 +169,7 @@ void start_game(Filename map_name) {
     ComponentData_clear();
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
+    game_data->pixel_camera = create_pixel_camera();
     game_data->ambient_light = 0.5f;
     create_pause_menu();
     // create_level(data.components, data.grid, data.seed);
@@ -222,6 +225,7 @@ void end_game() {
     ComponentData_clear();
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
+    game_data->pixel_camera = create_pixel_camera();
     create_menu();
 }
 
@@ -479,7 +483,7 @@ void update_game(float time_step) {
 
     update_particles(game_data->camera, time_step);
     update_lights(time_step);
-    update_camera(game_data->camera, time_step, true);
+    // update_camera(game_data->camera, time_step, true);
 
     animate(time_step);
 }
@@ -498,7 +502,8 @@ void draw_game() {
     draw_shadows(game_data->camera);
     draw_lights(game_data->camera, game_data->ambient_light);
 
-    draw_3d(game_data->camera);
+    int player = game_data->components->player.order->head->value;
+    draw_3d(player, game_data->camera);
 }
 
 

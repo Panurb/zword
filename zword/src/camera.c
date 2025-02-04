@@ -31,6 +31,14 @@ int create_menu_camera() {
 }
 
 
+int create_pixel_camera() {
+    int i = create_entity();
+    CoordinateComponent_add(i, zeros(), 0.0);
+    CameraComponent_add(i, (Resolution) { game_settings.width, game_settings.height }, 720.0f / game_settings.height);
+    return i;
+}
+
+
 Vector2f camera_size(int camera) {
     CameraComponent* cam = CameraComponent_get(camera);
     Resolution res = cam->resolution;
@@ -356,7 +364,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     float tile_height = (float)src.h / pixels_per_unit;
     
     if (offset.x > tile_width || offset.y > tile_height || offset.x < 0.0f || offset.y < 0.0f) {
-        LOG_ERROR("Offset out of bounds: %f, %f", offset.x, offset.y);
+        LOG_ERROR("Offset: %f, %f out of bounds: %f, %f", offset.x, offset.y, tile_width, tile_height);
     }
 
     SDL_FRect dest = { 0, 0, 0, 0 };
@@ -523,10 +531,6 @@ void update_camera(int camera, float time_step, bool follow_players) {
             int i = node->value;
             PlayerComponent* player = PlayerComponent_get(i);
             if (player->state != PLAYER_DEAD) {
-                coord->position = get_position(i);
-                coord->angle = get_angle(i);
-                return;
-
                 n += 1;
                 pos = sum(pos, get_position(i));
             }

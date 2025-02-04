@@ -103,6 +103,7 @@ void resize_game_window() {
         SDL_DestroyTexture(app.blood_texture);
         SDL_DestroyTexture(app.blood_threshold_texture);
         SDL_DestroyTexture(app.blood_multiply_texture);
+        SDL_DestroyTexture(app.ground_texture);
 
         create_screen_textures();
     }

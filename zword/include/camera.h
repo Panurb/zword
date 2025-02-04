@@ -14,6 +14,8 @@ int create_camera();
 
 int create_menu_camera();
 
+int create_pixel_camera();
+
 Vector2f camera_size(int camera);
 
 Vector2f world_to_screen(int camera, Vector2f a);
@@ -48,7 +50,7 @@ void draw_sprite(int camera, int texture_index, float width, float height, float
     Vector2f scale, float alpha);
 
 void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, 
-    float angle, Vector2f scale, float alpha);
+    float angle, Vector2f scale, float alpha, float shade);
 
 void draw_sprite_outline(int camera, int texture_index, float width, float height, int offset, Vector2f position, 
         float angle, Vector2f scale);

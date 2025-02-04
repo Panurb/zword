@@ -36,4 +36,4 @@ void change_layer(int entity, Layer layer);
 
 bool point_inside_image(int entity, Vector2f point);
 
-void draw_3d(int camera);
+void draw_3d(int player, int camera);

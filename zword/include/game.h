@@ -62,6 +62,7 @@ typedef struct {
     int seed;
     int camera;
     int menu_camera;
+    int pixel_camera;
     ButtonText map_name;
     GameMode game_mode;
 } GameData;
