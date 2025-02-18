@@ -489,10 +489,31 @@ void update_game(float time_step) {
 }
 
 
-void draw_game() {
+void draw_game_3d() {
     draw_ground(game_data->camera);
-    
+
+    draw_shadows(game_data->camera);
+    draw_lights(game_data->camera, game_data->ambient_light);
+
+    // draw shadow texture to ground texture
+    SDL_SetRenderTarget(app.renderer, app.ground_texture);
     SDL_RenderCopy(app.renderer, app.shadow_texture, NULL, NULL);
+    SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
+    SDL_SetRenderTarget(app.renderer, NULL);
+
+    int player = game_data->components->player.order->head->value;
+    draw_3d(player, game_data->camera);
+
+    draw_player_targets();
+}
+
+
+void draw_game() {
+    draw_game_3d();
+    return;
+
+    draw_ground(game_data->camera);
+
     draw_images(game_data->camera);
     draw_particles(game_data->camera);
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
@@ -501,9 +522,6 @@ void draw_game() {
 
     draw_shadows(game_data->camera);
     draw_lights(game_data->camera, game_data->ambient_light);
-
-    int player = game_data->components->player.order->head->value;
-    draw_3d(player, game_data->camera);
 }
 
 

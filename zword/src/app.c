@@ -332,8 +332,9 @@ void draw() {
             draw_game_mode();
             break;
         case STATE_PAUSE:
+            app.delta = 0.0f;
             draw_game();
-            draw_overlay(game_data->camera, 0.4f);
+            draw_overlay(game_data->menu_camera, 0.4f);
             draw_menu();
             break;
         case STATE_LOAD:

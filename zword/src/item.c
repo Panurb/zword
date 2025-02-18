@@ -265,8 +265,8 @@ void draw_player_targets() {
         Vector2f pos = get_position(player->target);
         float angle = get_angle(player->target);
         if (image->alpha != 0.0f) {
-            draw_sprite_outline(game_data->camera, image->texture_index, image->width, image->height, 0, pos, angle, 
-                get_scale(player->target));
+            draw_sprite_outline(game_data->menu_camera, image->texture_index, image->width, image->height, 0, zeros(), 0.0f, 
+                mult(4.0f, get_scale(player->target)));
         }
 
         if (item) {
@@ -278,7 +278,7 @@ void draw_player_targets() {
                 pos = sum(pos, vec(0.0f, 1.0f));
             }
 
-            draw_text(game_data->camera, pos, item->name, 20, COLOR_YELLOW);
+            draw_text(game_data->menu_camera, zeros(), item->name, 20, COLOR_YELLOW);
         }
 
         if (door) {

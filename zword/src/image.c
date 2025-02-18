@@ -26,6 +26,7 @@ static const char* IMAGES[] = {
     "arms",
     "arms_assault_rifle",
     "arms_axe",
+    "arms_axe_3d",
     "arms_combat_shotgun",
     "arms_pistol",
     "arms_shotgun",
@@ -119,6 +120,7 @@ static const char* IMAGES[] = {
     "window_destroyed",
     "wood_tile",
     "zombie",
+    "zombie_3d",
     "zombie_dead"
 };
 
@@ -363,21 +365,18 @@ int compare_distance(const void* a, const void* b) {
 
 
 float get_fog_shade(float distance, float max_distance) {
-    return powf(1.0f - (max_distance - distance) / max_distance, 8.0f);
+    return powf(1.0f - (max_distance - distance) / max_distance, 4.0f);
 }
 
 
 void draw_3d(int player, int camera) {
     Color sky = COLOR_BLACK;
     SDL_SetRenderDrawColor(app.renderer, sky.r, sky.g, sky.b, sky.a);
-    // SDL_RenderClear(app.renderer);
+    SDL_RenderClear(app.renderer);
 
-    Vector2f light_direction = vec(1.0f, 0.0f);
-
-    CameraComponent* cam = CameraComponent_get(game_data->menu_camera);
+    CameraComponent* cam = CameraComponent_get(game_data->pixel_camera);
 
     float angle = get_angle(player);
-    float fov = M_PI_2;
     Vector2f start = get_position(player);
 
     float near_plane = 0.1;
@@ -386,17 +385,14 @@ void draw_3d(int player, int camera) {
     Vector2f direction = polar_to_cartesian(near_plane, angle);
     Vector2f plane = perp(direction);
 
-    Vector2f screen_size = camera_size(game_data->menu_camera);
-    float aspect_ratio = screen_size.x / screen_size.y;
+    float aspect_ratio = cam->resolution.w / (float) cam->resolution.h;
 
-    float w = 1.0f / cam->zoom;
+    float camera_z = 4.0f;
 
     Vector2f left = sum(direction, plane);
     Vector2f right = diff(direction, plane);
     float max_distance = camera_size(camera).y;
     float max_width = camera_size(camera).x;
-
-    draw_circle_outline(camera, start, max_distance, 0.01f, COLOR_WHITE);
 
     CoordinateComponent* coord = CoordinateComponent_get(camera);
     coord->position = sum(start, mult(0.5f * max_distance / near_plane, direction));
@@ -405,12 +401,9 @@ void draw_3d(int player, int camera) {
     int horizon = cam->resolution.h / 2;
     for (int i = 0; i < cam->resolution.h; i++) {
         int p = i - horizon;
-        float camera_z = 4.0f;
         float dz = aspect_ratio * near_plane * p / cam->resolution.h;
         float distance = fabsf(camera_z * (near_plane / dz));
-
-        float y = (i - horizon) * w;
-
+    
         if (distance < max_distance && i < horizon) {
             Vector2f floor_left = sum(start, mult(distance / near_plane, left));
             Vector2f floor_right = sum(start, mult(distance / near_plane, right));
@@ -420,36 +413,24 @@ void draw_3d(int player, int camera) {
 
             Vector2f offset = vec(0.5f * (max_width - floor_width), max_distance - distance);
 
-            draw_tiles(camera, GROUND_TEXTURE_INDEX, floor_width, w, offset, sum(start, polar_to_cartesian(distance, angle)),
-                angle - M_PI_2, ones(), 1.0f, 0.0f);
+            float shade = get_fog_shade(distance, max_distance);
 
             draw_tiles(game_data->pixel_camera, GROUND_TEXTURE_INDEX, cam->resolution.w, 1.0f, 
                 vec(offset.x / max_width * cam->resolution.w, offset.y / max_distance * cam->resolution.h),
                 vec(0.0f, p),
-                0.0f, vec(max_width / floor_width, 1.0f), 0.1f, 0.0f);
-
-            // offset.x += 0.25f * max_width;
-            // offset.y += 0.25f * max_distance;
-            float width = screen_size.x;
-
-            float ratio = cam->zoom / CameraComponent_get(game_data->menu_camera)->zoom;
-            Vector2f scale = vec(width, 1.0f);
-            float shade = get_fog_shade(distance, max_distance);
-            // draw_tiles(game_data->menu_camera, GROUND_TEXTURE_INDEX, screen_size.x, w, offset, vec(0.0f, y),
-            //     0.0f, vec(ratio * screen_size.x / floor_width, 1.0f), 0.1f, shade);
-            Color color = get_color(distance, 0.0f, 0.0f, 1.0f);
-            // draw_rectangle(game_data->menu_camera, vec(0.0f, y), width, w, 0.0f, color);
+                0.0f, vec(max_width / floor_width, 1.0f), 1.0f, shade);
         }
     }
+
+    Vector2f light_direction = vec(1.0f, 0.0f);
 
     int rays = cam->resolution.w;
     float* z_buffer = malloc(rays * sizeof(float));
 
     for (int i = 0; i < rays; i++) {
         Vector2f velocity = sum(direction, mult(1.0f - i / (float) rays * 2.0f, plane));
-        // Vector2f velocity = polar_to_cartesian(1.0f, angle + 0.5f * fov - i * fov / (float) rays);
 
-        HitInfo info = raycast(start, velocity, far_plane, GROUP_RAYS);
+        HitInfo info = raycast(start, velocity, far_plane, GROUP_WALLS);
         if (info.entity == -1) {
             z_buffer[i] = far_plane;
             continue;
@@ -461,8 +442,8 @@ void draw_3d(int player, int camera) {
         distance = clamp(distance, near_plane, far_plane);
         z_buffer[i] = distance;
         
-        float height = 4.5f * screen_size.y / distance;    
-        float x = (i - 0.5f * rays) * w;
+        float height = (camera_z + 0.5f) * cam->resolution.h / distance;    
+        float x = (i - 0.5f * rays);
         Vector2f pos = vec(x, 0.0f);
 
         ImageComponent* image = ImageComponent_get(info.entity);
@@ -474,7 +455,7 @@ void draw_3d(int player, int camera) {
                     float shade = get_fog_shade(distance, max_distance);
                     shade += 0.25f * fabsf(dot(info.normal, light_direction));
                     shade = clamp(shade, 0.0f, 1.0f);
-                    draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), pos, 0.0f, 
+                    draw_tiles(game_data->pixel_camera, image->texture_index, 1.1f, height, vec(offset, 0.0f), pos, 0.0f, 
                         vec(1.0f, height), 1.0f, shade);
                 }
             }
@@ -521,34 +502,35 @@ void draw_3d(int player, int camera) {
 
         // Perpendicular distance to the camera
         float distance = sprite_position.y * near_plane;
-        float x = -sprite_position.x * 0.5f * screen_size.x / sprite_position.y;
-        float y = -100.0f / sprite_position.y;
 
-        if (distance < 0.0f) continue;
+        if (distance < near_plane) continue;
         if (distance > far_plane) continue;
 
         // TODO: scale
-        float width = 0.5f * image->width * screen_size.y / distance;
-        float height = 0.5f * image->height * screen_size.y / distance;
+        float width = image->width * cam->resolution.h / distance;
+        float height = image->height * cam->resolution.h / distance;
+
+        float x = -sprite_position.x * 0.5f * cam->resolution.w / sprite_position.y;
+        float y = 0.5f * height - 2.0f * cam->resolution.h / distance;
 
         float sprite_left = x - 0.5f * width;
 
-        int stripes = width * cam->zoom;
+        int stripes = width;
 
-        int unclamped_left = sprite_left * cam->zoom + 0.5f * rays;
+        int unclamped_left = sprite_left + 0.5f * rays;
         int left = clamp(unclamped_left, 0, cam->resolution.w);
-        int right = clamp(((sprite_left + width) * cam->zoom) + 0.5f * rays, 0, cam->resolution.w);
+        int right = clamp(sprite_left + width + 0.5f * rays, 0, cam->resolution.w);
 
         for (int j = left; j < right; j++) {
             if (distance > z_buffer[j]) continue;
             if (distance > max_distance) continue;
 
             float offset = image->width * (j - unclamped_left) / (float)stripes;
-            x = (j - 0.5f * rays) * w;
+            x = (j - 0.5f * rays);
 
             float shade = get_fog_shade(distance, max_distance);
-            draw_tiles(game_data->menu_camera, image->texture_index, w, height, vec(offset, 0.0f), vec(x, y),
-                0.0f, vec(1.0f, height), 1.0f, shade);
+            draw_tiles(game_data->pixel_camera, image->texture_index, 1.0f, height, vec(offset, 0.0f), vec(x, y),
+                0.0f, vec(1.0f, cam->resolution.h / distance), 1.0f, shade);
         }
     }
 

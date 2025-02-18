@@ -25,7 +25,7 @@ int create_zombie(Vector2f pos, float angle) {
     CoordinateComponent_add(i, pos, angle);
     ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
-    ImageComponent_add(i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
+    ImageComponent_add(i, "zombie_3d", 1.0, 2.0, LAYER_ENEMIES);
     PhysicsComponent_add(i, 1.0f);
     EnemyComponent* enemy = EnemyComponent_add(i);
     ParticleComponent_add_type(i, PARTICLE_BLOOD, 0.0f);
