@@ -286,6 +286,13 @@ Color get_color(float r, float g, float b, float a) {
     return color;
 }
 
+
+Color get_color_shade(Color color, float shade) {
+    shade = clamp(shade, 0.0f, 1.0f);
+    return get_color(shade * color.r / 255.0f, shade * color.g / 255.0f, shade * color.b / 255.0f, color.a / 255.0f);
+}
+
+
 Color random_color() {
     return get_color(randf(0.0f, 1.0f), randf(0.0f, 1.0f), randf(0.0f, 1.0f), 1.0f);
 }

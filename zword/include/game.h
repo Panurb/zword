@@ -97,6 +97,8 @@ void update_game_mode(float time_step);
 
 void draw_game();
 
+void draw_game_3d();
+
 void draw_debug(int debug_level);
 
 void update_game_over(float time_step);

@@ -398,6 +398,8 @@ void draw_3d(int player, int camera) {
     coord->position = sum(start, mult(0.5f * max_distance / near_plane, direction));
     coord->angle = get_angle(player) - M_PI_2;
 
+    // FLOORS
+
     int horizon = cam->resolution.h / 2;
     for (int i = 0; i < cam->resolution.h; i++) {
         int p = i - horizon;
@@ -421,6 +423,8 @@ void draw_3d(int player, int camera) {
                 0.0f, vec(max_width / floor_width, 1.0f), 1.0f, shade);
         }
     }
+
+    // WALLS
 
     Vector2f light_direction = vec(1.0f, 0.0f);
 
@@ -462,39 +466,53 @@ void draw_3d(int player, int camera) {
         }
     }
 
+    // SPRITES
+
     Matrix2f camera_matrix = { plane.x, direction.x, plane.y, direction.y };
     Matrix2f inv_camera_matrix = matrix_inverse(camera_matrix);
 
     List* entities = get_entities(start, far_plane);
     Sprite* sprites = malloc(entities->size * sizeof(Sprite));
+    Sprite* particles = malloc(entities->size * sizeof(Sprite));
 
-    int image_entities = 0;
+    int sprites_size = 0;
+    int particles_size = 0;
     ListNode* node;
     FOREACH(node, entities) {
         int j = node->value;
+
+        Vector2f pos = get_position(j);
+        float distance = dist(pos, start);
+        if (distance < near_plane) continue;
+        if (distance > far_plane) continue;
+        if (dot(normalized(diff(pos, start)), direction) < 0.0f) continue;
+
+        ParticleComponent* particle = ParticleComponent_get(j);
+        if (particle) {
+            particles[particles_size].entity = j;
+            particles[particles_size].distance = distance;
+            particles_size++;
+        }
 
         ImageComponent* image = ImageComponent_get(j);
         if (!image) continue;
         if (image->tile) continue;
         if (image->layer <= LAYER_DECALS) continue;
 
-        Vector2f pos = get_position(j);
-        float distance = dist(pos, start);
-        if (distance < near_plane) continue;
-
-        sprites[image_entities].entity = j;
-        sprites[image_entities].distance = distance;
-        image_entities++;
+        sprites[sprites_size].entity = j;
+        sprites[sprites_size].distance = distance;
+        sprites_size++;
     }
 
     List_delete(entities);
 
-    qsort(sprites, image_entities, sizeof(Sprite), compare_distance);
+    qsort(sprites, sprites_size, sizeof(Sprite), compare_distance);
 
-    for (int i = 0; i < image_entities; i++) {
+    for (int i = 0; i < sprites_size; i++) {
         int entity = sprites[i].entity;
 
         ImageComponent* image = ImageComponent_get(entity);
+        ParticleComponent* particle = ParticleComponent_get(entity);
 
         Vector2f pos = get_position(entity);
         Vector2f sprite_position = diff(pos, start);
@@ -502,9 +520,6 @@ void draw_3d(int player, int camera) {
 
         // Perpendicular distance to the camera
         float distance = sprite_position.y * near_plane;
-
-        if (distance < near_plane) continue;
-        if (distance > far_plane) continue;
 
         // TODO: scale
         float width = image->width * cam->resolution.h / distance;
@@ -534,8 +549,54 @@ void draw_3d(int player, int camera) {
         }
     }
 
-    free(sprites);
+    qsort(particles, particles_size, sizeof(Sprite), compare_distance);
 
+    for (int i = 0; i < particles_size; i++) {
+        int entity = particles[i].entity;
+
+        ParticleComponent* part = ParticleComponent_get(entity);
+
+        Vector2f pos = get_position(entity);
+        Vector2f sprite_position = diff(pos, start);
+        sprite_position = matrix_mult(inv_camera_matrix, sprite_position);
+
+        // Perpendicular distance to the camera
+        float distance = sprite_position.y * near_plane;
+
+        float x = -sprite_position.x * 0.5f * cam->resolution.w / sprite_position.y;
+        float y = -1.0f * cam->resolution.h / distance;
+
+        int index = clamp(x + 0.5f * rays, 0, cam->resolution.w);
+
+        if (distance > z_buffer[index]) continue;
+
+        float shade = get_fog_shade(distance, max_distance);
+
+        Vector2f offset = diff(vec(x, y), pos);
+
+        for (int j = 0; j < part->particles; j++) {
+            int p = (part->first + part->particles - j - 1) % part->max_particles;
+
+            if (part->time[p] == 0.0) continue;
+
+            Color color = get_color_shade(part->outer_color, 1.0f - shade);
+
+            // Always extrapolate particles
+            float time = part->time[p] + app.delta * app.time_step;
+            Vector2f position = sum(part->position[p], offset);
+            position = sum(position, mult(app.delta * app.time_step, part->velocity[p]));
+
+            float t = 1.0f - part->time[p] / part->max_time;
+            float r = lerp(part->start_size, part->end_size, t) * cam->resolution.h / distance;
+            float angle = polar_angle(part->velocity[p]);
+
+            draw_ellipse(game_data->pixel_camera, position, 
+                fmaxf(1.0f, 0.6f * part->stretch * norm(part->velocity[p])) * r, r, angle, color);
+        }
+    }   
+
+    free(sprites);
+    free(particles);
     free(z_buffer);
 }
 

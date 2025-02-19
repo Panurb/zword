@@ -509,9 +509,6 @@ void draw_game_3d() {
 
 
 void draw_game() {
-    draw_game_3d();
-    return;
-
     draw_ground(game_data->camera);
 
     draw_images(game_data->camera);

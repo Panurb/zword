@@ -327,13 +327,13 @@ void draw() {
             draw_text(game_data->menu_camera, zeros(), "LOADING", 20, COLOR_WHITE);
             break;
         case STATE_GAME:
-            draw_game();
+            draw_game_3d();
             draw_hud(game_data->camera);
             draw_game_mode();
             break;
         case STATE_PAUSE:
             app.delta = 0.0f;
-            draw_game();
+            draw_game_3d();
             draw_overlay(game_data->menu_camera, 0.4f);
             draw_menu();
             break;
