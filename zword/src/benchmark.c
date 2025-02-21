@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <time.h>
 
 #include "game.h"
 #include "app.h"

@@ -31,6 +31,7 @@
 #include "item.h"
 #include "widget.h"
 #include "settings.h"
+#include "health.h"
 
 
 GameState game_state = STATE_MENU;

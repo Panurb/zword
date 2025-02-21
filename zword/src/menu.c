@@ -124,7 +124,7 @@ void toggle_play(int entity) {
     Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
     window_play = create_window(pos, "PLAY", 1, toggle_play);
 
-    int container = create_container(vec(0.0f, -1.5f * BUTTON_HEIGHT), 1, 2);
+    int container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 1, 3);
     add_child(window_play, container);
 
     if (game_settings.debug) {
@@ -133,6 +133,7 @@ void toggle_play(int entity) {
     } else {    
         add_button_to_container(container, "Tutorial", change_state_start);
         add_button_to_container(container, "Survival", change_state_start);
+        add_button_to_container(container, "Swampland", change_state_start);
     }
 }
 

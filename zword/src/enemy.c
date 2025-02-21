@@ -16,6 +16,7 @@
 #include "weapon.h"
 #include "game.h"
 #include "list.h"
+#include "item.h"
 
 
 int create_zombie(Vector2f pos, float angle) {
