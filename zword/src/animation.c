@@ -34,7 +34,7 @@ void animate(float time_step) {
         if (!animation) continue;
 
         if (animation->wind_factor > 0.0f) {
-            image->offset = sum(image->offset, mult(animation->wind_factor * time_step, game_data->wind));
+            image->offset = sum(image->offset, mult(-animation->wind_factor * time_step, game_data->wind));
             image->offset.x = mod(image->offset.x, resources.texture_sizes[image->texture_index].w);
             image->offset.y = mod(image->offset.y, resources.texture_sizes[image->texture_index].h);
             continue;

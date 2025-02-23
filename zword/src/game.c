@@ -517,6 +517,7 @@ void draw_entities() {
 
 
 void draw_debug(int debug_level) {
+    draw_line(game_data->menu_camera, zeros(), game_data->wind, 0.5f, COLOR_BLUE);
     draw_colliders(game_data->camera);
     draw_waypoints(game_data->camera, true);
     draw_enemies(game_data->camera);

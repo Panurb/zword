@@ -340,9 +340,11 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
     SDL_FRect dest = { 0, 0, 0, 0 };
 
     Vector2f x = polar_to_cartesian(1.0f, angle);
-    // Flip y-axis because of screen coordinates
-    Vector2f y = mult(-1.0f, perp(x));
 
+    // Flip y-axis because of screen coordinates, offset is inverted as well
+    Vector2f y = mult(-1.0f, perp(x));
+    offset.y = tile_height - offset.y;
+    
     float accumulated_width = 0.0f;
     float current_tile_width = (tile_width - offset.x) * scale.x;
     src.x = offset.x * PIXELS_PER_UNIT;
@@ -372,7 +374,7 @@ void draw_tiles(int camera, int texture_index, float width, float height, Vector
             dest.x = pos.x - 0.5f * dest.w;
             dest.y = pos.y - 0.5f * dest.h;
 
-            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, angle, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
             // draw_rectangle_outline(camera, p, current_tile_width, current_tile_height, angle, 0.05f, COLOR_WHITE);
             
             accumulated_height += current_tile_height;
