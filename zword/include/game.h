@@ -40,6 +40,7 @@ extern ButtonText WEATHERS[];
 typedef struct {
     SDL_Texture** textures;
     SDL_Texture** outline_textures;
+    Resolution* texture_sizes;
     TTF_Font* fonts[301];
     Mix_Chunk* sounds[100];
     Mix_Music* music[10];
@@ -59,6 +60,8 @@ typedef struct {
     ColliderGrid* grid;
     float ambient_light;
     Weather weather;
+    Vector2f wind;
+    float wind_speed;
     int seed;
     int camera;
     int menu_camera;

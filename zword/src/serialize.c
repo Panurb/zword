@@ -632,6 +632,7 @@ void AnimationComponent_serialize(cJSON* entity_json, int entity) {
     serialize_float(json, "framerate", animation->framerate, 10.0f);
     serialize_float(json, "timer", animation->timer, 0.0f);
     serialize_int(json, "play_once", animation->play_once, false);
+    serialize_float(json, "wind_factor", animation->wind_factor, 0.0f);
 }
 
 
@@ -645,6 +646,7 @@ void AnimationComponent_deserialize(cJSON* entity_json, int entity) {
     animation->framerate = deserialize_float(json, "framerate", animation->framerate);
     animation->timer = deserialize_float(json, "timer", animation->timer);
     animation->play_once = deserialize_int(json, "play_once", animation->play_once);
+    animation->wind_factor = deserialize_float(json, "wind_factor", animation->wind_factor);
 }
 
 
@@ -813,7 +815,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     }
 
     int entity;
-    if (preserve_id && !is_prefab(entity)) {
+    if (preserve_id && prefab[0] == '\0') {
         entity = cJSON_GetObjectItem(entity_json, "id")->valueint;
         if (CoordinateComponent_get(entity)) {
             destroy_entity(entity);

@@ -239,10 +239,13 @@ SDL_Texture* create_blood_particle_texture() {
 
 
 void load_textures() {
+    LOG_INFO("Loading textures");
+
     int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
 
     SDL_Texture** textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
     SDL_Texture** outline_textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
+    Resolution* texture_sizes = malloc(sizeof(IMAGES) * sizeof(Resolution));
     for (int i = 0; i < n; i++) {
         if (strcmp(IMAGES[i], "blood_particle") == 0) {
             textures[i] = create_blood_particle_texture();
@@ -260,6 +263,15 @@ void load_textures() {
 
     resources.textures = textures;
     resources.outline_textures = outline_textures;
+
+    for (int i = 0; i < n; i++) {
+        Resolution texture_size = get_texture_size(IMAGES[i]);
+        texture_size.w /= PIXELS_PER_UNIT;
+        texture_size.h /= PIXELS_PER_UNIT;
+        texture_sizes[i] = texture_size;
+    }
+
+    resources.texture_sizes = texture_sizes;
 }
 
 
@@ -294,16 +306,18 @@ void draw_image(int entity, int camera) {
         return;
     }
     
-    int offset = 0;
+
     AnimationComponent* animation = AnimationComponent_get(entity);
-    if (animation) {
-        offset = animation->current_frame;
-    }
 
     float angle = get_angle_interpolated(entity, app.delta);
     if (image->tile) {
-        draw_tiles(camera, image->texture_index, w, h, pos, angle, image->alpha);
+        draw_tiles(camera, image->texture_index, w, h, image->offset, pos, angle, ones(), image->alpha);
         return;
+    }
+
+    int offset = 0;
+    if (animation) {
+        offset = animation->current_frame;
     }
     draw_sprite(camera, image->texture_index, image->width, image->height, offset, pos, angle, scale, image->alpha);
 }

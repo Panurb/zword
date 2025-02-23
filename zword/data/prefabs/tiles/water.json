@@ -14,6 +14,10 @@
 				"width":	8,
 				"height":	8,
 				"group":	8
+			},
+			"Animation":	{
+				"frames": 0,
+				"wind_factor":	0.5
 			}
 		}]
 }

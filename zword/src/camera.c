@@ -316,58 +316,72 @@ void draw_sprite(int camera, int texture_index, float width, float height, int o
 }
 
 
-void draw_tiles(int camera, int texture_index, float width, float height, Vector2f position, float angle, float alpha) {
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, 
+        float angle, Vector2f scale, float alpha) {
     if (texture_index == -1) {
         return;
     }
 
     CameraComponent* cam = CameraComponent_get(camera);
-    
-    Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, ones());
 
     SDL_Texture* texture = resources.textures[texture_index];
-    SDL_SetTextureAlphaMod(texture, 255 * alpha);
-
     SDL_Rect src = { 0, 0, 0, 0 };
     
-    SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
-    float tile_width = (float)src.w / PIXELS_PER_UNIT;
-    float tile_height = (float)src.h / PIXELS_PER_UNIT;
+    Resolution texture_size = resources.texture_sizes[texture_index];
+    src.w = texture_size.w * PIXELS_PER_UNIT;
+    src.h = texture_size.h * PIXELS_PER_UNIT;
+    float tile_width = texture_size.w;
+    float tile_height = texture_size.h;
+    
+    if (offset.x > tile_width || offset.y > tile_height || offset.x < 0.0f || offset.y < 0.0f) {
+        LOG_ERROR("Offset: %f, %f out of bounds: %f, %f", offset.x, offset.y, tile_width, tile_height);
+    }
 
     SDL_FRect dest = { 0, 0, 0, 0 };
-    dest.w = tile_width * scaling.x * PIXELS_PER_UNIT;
-    dest.h = tile_height * scaling.y * PIXELS_PER_UNIT;
 
     Vector2f x = polar_to_cartesian(1.0f, angle);
-    Vector2f y = perp(x);
-    
-    int nx = ceil(width / tile_width);
-    int ny = ceil(height / tile_height);
-    float current_tile_width = tile_width;
-    for (int i = 0; i < nx; i++) {
-        if (i == nx - 1) {
-            current_tile_width = (width - tile_width * (nx - 1));
-            src.w = current_tile_width * PIXELS_PER_UNIT;
-            dest.w = src.w * scaling.x;
-        }
+    // Flip y-axis because of screen coordinates
+    Vector2f y = mult(-1.0f, perp(x));
 
-        float current_tile_height = tile_height;
-        src.h = tile_height * PIXELS_PER_UNIT;
-        dest.h = src.h * scaling.y;
-        for (int j = 0; j < ny; j++) {
-            if (j == ny - 1) {
-                current_tile_height = (height - tile_height * (ny - 1));
-                src.h = current_tile_height * PIXELS_PER_UNIT;
-                dest.h = src.h * scaling.y;
+    float accumulated_width = 0.0f;
+    float current_tile_width = (tile_width - offset.x) * scale.x;
+    src.x = offset.x * PIXELS_PER_UNIT;
+
+    while (accumulated_width < width) {
+        if ((width - accumulated_width) * scale.x < current_tile_width) {
+            current_tile_width = (width - accumulated_width) * scale.x;
+        }
+        
+        float accumulated_height = 0.0f;
+        float current_tile_height = (tile_height - offset.y) * scale.y;
+        src.y = offset.y * PIXELS_PER_UNIT;
+        while (accumulated_height < height) {
+            if ((height - accumulated_height) * scale.y < current_tile_height) {
+                current_tile_height = (height - accumulated_height) * scale.y;
             }
 
-            Vector2f p = sum(position, lin_comb(i * tile_width - 0.5f * (width - current_tile_width), x, 
-                                                j * tile_height - 0.5f * (height - current_tile_height), y));
+            Vector2f p = sum(position, lin_comb(accumulated_width - 0.5f * (width - current_tile_width), x, 
+                                                accumulated_height - 0.5f * (height - current_tile_height), y));
             Vector2f pos = world_to_screen(camera, p);
+
+            src.w = current_tile_width * PIXELS_PER_UNIT / scale.x;
+            src.h = current_tile_height * PIXELS_PER_UNIT / scale.y;
+
+            dest.w = current_tile_width * cam->zoom;
+            dest.h = current_tile_height * cam->zoom;
             dest.x = pos.x - 0.5f * dest.w;
             dest.y = pos.y - 0.5f * dest.h;
-            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
+
+            SDL_RenderCopyExF(app.renderer, texture, &src, &dest, angle, NULL, SDL_FLIP_NONE);
+            // draw_rectangle_outline(camera, p, current_tile_width, current_tile_height, angle, 0.05f, COLOR_WHITE);
+            
+            accumulated_height += current_tile_height;
+            current_tile_height = tile_height * scale.y;
+            src.y = 0;
         }
+        accumulated_width += current_tile_width;
+        current_tile_width = tile_width * scale.x;
+        src.x = 0;
     }
 }
 

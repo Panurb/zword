@@ -47,7 +47,8 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
 void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle, 
     Vector2f scale, float alpha);
 
-void draw_tiles(int camera, int texture_index, float width, float height, Vector2f position, float angle, float alpha);
+void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, 
+        float angle, Vector2f scale, float alpha);
 
 void draw_sprite_outline(int camera, int texture_index, float width, float height, int offset, Vector2f position, 
         float angle, Vector2f scale);

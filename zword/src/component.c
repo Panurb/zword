@@ -107,6 +107,7 @@ ImageComponent* ImageComponent_add(int entity, Filename filename, float width, f
     image->stretch = 0.0f;
     image->stretch_speed = 0.0f;
     image->tile = false;
+    image->offset = zeros();
     
     game_data->components->image.array[entity] = image;
 
@@ -754,6 +755,7 @@ AnimationComponent* AnimationComponent_add(int entity, int frames) {
     anim->framerate = 10.0f;
     anim->timer = 0.0f;
     anim->play_once = false;
+    anim->wind_factor = 0.0f;
 
     game_data->components->animation[entity] = anim;
     return anim;

@@ -58,6 +58,7 @@ set(SOURCES
     zword/src/zword.c
     zword/src/vehicle.c
     zword/src/weapon.c
+    zword/src/weather.c
     zword/src/widget.c
     zword/src/outline.frag
 )

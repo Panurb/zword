@@ -53,6 +53,9 @@ typedef struct {
     float stretch;
     float stretch_speed;
     bool tile;
+    Vector2f offset;
+    float tile_width;
+    float tile_height;
 } ImageComponent;
 
 typedef enum {
@@ -397,6 +400,7 @@ typedef struct {
     float timer;
     float framerate;
     bool play_once;
+    float wind_factor;
 } AnimationComponent;
 
 typedef struct {

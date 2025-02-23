@@ -32,6 +32,7 @@
 #include "widget.h"
 #include "settings.h"
 #include "health.h"
+#include "weather.h"
 
 
 GameState game_state = STATE_MENU;
@@ -112,6 +113,8 @@ void create_game() {
     game_data->grid = grid;
     game_data->ambient_light = ambient_light;
     game_data->weather = WEATHER_NONE;
+    game_data->wind = zeros();
+    game_data->wind_speed = 1.0f;
     game_data->seed = seed;
     game_data->camera = camera;
     game_data->menu_camera = menu_camera;
@@ -202,19 +205,7 @@ void start_game(Filename map_name) {
             break;
     }
 
-    if (game_data->weather) {
-        if (game_data->weather == WEATHER_RAIN) {
-            ParticleComponent* part = ParticleComponent_add_type(game_data->camera, PARTICLE_RAIN, 0.0f);
-            SoundComponent* sound = SoundComponent_add(game_data->camera, "");
-            strcpy(sound->loop_sound, "rain");
-        } else if (game_data->weather == WEATHER_SNOW) {
-            ParticleComponent* part = ParticleComponent_add_type(game_data->camera, PARTICLE_SNOW, 0.0f);
-        }
-        ParticleComponent* part = ParticleComponent_get(game_data->camera);
-        Vector2f size = camera_size(i);
-        part->width = size.x;
-        part->height = size.y;
-    }
+    init_weather();
 }
 
 
@@ -481,6 +472,7 @@ void update_game(float time_step) {
     update_particles(game_data->camera, time_step);
     update_lights(time_step);
     update_camera(game_data->camera, time_step, true);
+    update_weather(time_step);
 
     animate(time_step);
 }
