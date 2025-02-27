@@ -314,6 +314,7 @@ void apply_trigger(int trigger, int target) {
     ColliderComponent* collider = ColliderComponent_get(trigger);
     PlayerComponent* player = PlayerComponent_get(target);
     PhysicsComponent* physics = PhysicsComponent_get(target);
+    HealthComponent* health = HealthComponent_get(target);
 
     switch (collider->trigger_type) {
         case TRIGGER_NONE:
@@ -335,6 +336,11 @@ void apply_trigger(int trigger, int target) {
             break;
         case TRIGGER_DAMAGE:
             damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 10, trigger);
+            break;
+        case TRIGGER_BURN:
+            burn(target);
+            break;
+        case TRIGGER_FREEZE:
             break;
     }
 }

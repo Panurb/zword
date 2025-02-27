@@ -8,6 +8,10 @@
 #define MAX_ENTITIES 2000
 
 
+typedef int Entity;
+#define NULL_ENTITY -1
+
+
 typedef struct {
     Vector2f position;
     float angle;
@@ -121,6 +125,8 @@ typedef enum {
     TRIGGER_SLOW,
     TRIGGER_GROUND,
     TRIGGER_DAMAGE,
+    TRIGGER_BURN,
+    TRIGGER_FREEZE
 } TriggerType;
 
 typedef struct {
@@ -344,6 +350,12 @@ typedef struct {
     float range;
 } WaypointComponent;
 
+typedef enum {
+    STATUS_NONE,
+    STATUS_BURNING,
+    STATUS_FROZEN
+} StatusEffect;
+
 typedef struct {
     bool dead;
     int health;
@@ -351,6 +363,12 @@ typedef struct {
     Filename dead_image;
     Filename decal;
     Filename die_sound;
+    struct {
+        StatusEffect type;
+        float lifetime;
+        Entity entity;
+        float timer;
+    } status;
 } HealthComponent;
 
 typedef struct {
@@ -585,6 +603,7 @@ void destroy_entity_recursive(int entity);
 int get_root(int entity);
 void add_child(int parent, int child);
 void remove_children(int parent);
+void remove_parent(int child);
 
 void ComponentData_clear();
 

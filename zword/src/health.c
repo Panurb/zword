@@ -14,6 +14,17 @@
 #include "weapon.h"
 
 
+void reset_status(int entity) {
+    HealthComponent* health = HealthComponent_get(entity);
+    health->status.type = STATUS_NONE;
+    if (health->status.entity != NULL_ENTITY) {
+        remove_parent(health->status.entity);
+        destroy_entity(health->status.entity);
+        health->status.entity = NULL_ENTITY;
+    }
+}
+
+
 void die(int entity) {
     HealthComponent* health = HealthComponent_get(entity);
 
@@ -23,6 +34,8 @@ void die(int entity) {
 
     change_texture(entity, health->dead_image, 0.0f, 0.0f);
     change_layer(entity, LAYER_CORPSES);
+
+    reset_status(entity);
 
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
@@ -162,10 +175,73 @@ void blunt_damage(int entity, Vector2f vel) {
 }
 
 
+void burn(Entity entity) {
+    static float burn_time = 5.0f;
+
+    HealthComponent* health = HealthComponent_get(entity);
+    if (!health) return;
+    
+    if (health->status.type == STATUS_NONE) {
+        int i = create_entity();
+        CoordinateComponent_add(i, zeros(), 0.0f);
+        ParticleComponent_add_type(i, PARTICLE_FIRE, 0.3f);
+        LightComponent_add(i, 4.0f, 2.0f * M_PI, COLOR_ORANGE, 0.8f, 10.0f);
+        SoundComponent* sound = SoundComponent_add(i, "");
+        strcpy(sound->loop_sound, "fire");
+        add_child(entity, i);
+
+        health->status.entity = i;
+        health->status.type = STATUS_BURNING;
+        health->status.lifetime = burn_time;
+    } else if (health->status.type == STATUS_BURNING) {
+        health->status.lifetime = burn_time;
+    } else if (health->status.type == STATUS_FROZEN) {
+        reset_status(entity);
+    }
+}
+
+
 void update_health(float time_step) {
+    static float burn_delay = 1.0f;
+    static float burn_damage = 5.0f;
+
     for (int i = 0; i < game_data->components->entities; i++) {
         HealthComponent* health = HealthComponent_get(i);
-        if (health && health->health <= 0 && !health->dead) {
+        if (!health) continue;
+        
+        PhysicsComponent* physics = PhysicsComponent_get(i);
+
+        if (health->status.lifetime > 0.0f) {
+            health->status.lifetime -= time_step;
+            if (health->status.lifetime <= 0.0f) {
+                reset_status(i);
+            }
+        }
+
+        if (health->status.timer > 0.0f) {
+            health->status.timer -= time_step;
+        }
+
+        switch (health->status.type) {
+            case STATUS_BURNING:
+                if (health->status.timer <= 0.0f) {
+                    damage(i, get_position(i), zeros(), burn_damage, health->status.entity);
+                    health->status.timer = burn_delay;
+                }
+                break;
+            case STATUS_FROZEN:
+                if (physics) {
+                    physics->slowed = true;
+                }
+                break;
+            default:
+                if (physics) {
+                    physics->slowed = false;
+                }
+                break;
+        }
+
+        if (health->health <= 0 && !health->dead) {
             die(i);
             health->dead = true;
         }

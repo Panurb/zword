@@ -351,6 +351,13 @@ void draw_enemies(int camera) {
                 draw_line(camera, start, end, 0.05, COLOR_RED);
             }
         }
+
+        HealthComponent* health = HealthComponent_get(i);
+        if (health) {
+            String buffer;
+            snprintf(buffer, sizeof(buffer), "%d", health->status);
+            draw_text(camera, get_position(i), buffer, 20, COLOR_WHITE);
+        }
     }
 }
 

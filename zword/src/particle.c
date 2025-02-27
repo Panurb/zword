@@ -62,7 +62,7 @@ void ParticleComponent_add_splinter(int entity) {
 
 void ParticleComponent_add_fire(int entity, float size) {
     float angle = 0.5f * M_PI - get_angle(entity);
-    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 5.0, COLOR_ORANGE, COLOR_YELLOW);
+    ParticleComponent* particle = ParticleComponent_add(entity, angle, 1.0, size, 0.25f * size, 1.0, 10.0, COLOR_ORANGE, COLOR_YELLOW);
     particle->loop = true;
     particle->enabled = true;
 }

@@ -297,7 +297,7 @@ int create_flame(Vector2f position, Vector2f velocity) {
     particle->stretch = 1.0f;
     particle->angle = polar_angle(velocity);
     ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
-    collider->trigger_type = TRIGGER_DAMAGE;
+    collider->trigger_type = TRIGGER_BURN;
     ImageComponent_add(i, "", 0.0f, 0.0f, LAYER_PARTICLES);
 
     return i;

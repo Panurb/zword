@@ -12,6 +12,7 @@
 
 
 void apply_force(int entity, Vector2f force) {
+    // TODO: use delta time?
     PhysicsComponent* physics = PhysicsComponent_get(entity);
 
     Vector2f a = mult(1.0f / physics->mass, force);

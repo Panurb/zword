@@ -598,6 +598,10 @@ HealthComponent* HealthComponent_add(int entity, int health, Filename dead_image
     strcpy(comp->dead_image, dead_image);
     strcpy(comp->decal, decal);
     strcpy(comp->die_sound, die_sound);
+    comp->status.type = STATUS_NONE;
+    comp->status.lifetime = 0.0f;
+    comp->status.entity = NULL_ENTITY;
+    comp->status.timer = 0.0f;
 
     game_data->components->health[entity] = comp;
 
@@ -942,8 +946,19 @@ void remove_children(int parent) {
 }
 
 
+void remove_parent(int child) {
+    CoordinateComponent* coord = CoordinateComponent_get(child);
+    if (coord->parent != NULL_ENTITY) {
+        List_remove(CoordinateComponent_get(coord->parent)->children, child);
+        coord->parent = NULL_ENTITY;
+    }
+}
+
+
 void destroy_entity(int entity) {
     if (entity == -1) return;
+
+    // TODO: remove parent
 
     CoordinateComponent_remove(entity);
     ImageComponent_remove(entity);
@@ -982,13 +997,19 @@ void destroy_entities(List* entities) {
 }
 
 
-void destroy_entity_recursive(int entity) {
+void do_destroy_entity_recursive(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     for (ListNode* node = coord->children->head; node; node = node->next) {
-        destroy_entity_recursive(node->value);
+        do_destroy_entity_recursive(node->value);
     }
     List_clear(coord->children);
     destroy_entity(entity);
+}
+
+
+void destroy_entity_recursive(int entity) {
+    remove_parent(entity);
+    do_destroy_entity_recursive(entity);
 }
 
 
