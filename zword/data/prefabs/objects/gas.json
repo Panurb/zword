@@ -21,7 +21,8 @@
 			},
 			"Item":	{
 				"size":	0,
-				"type":	0
+				"type":	11,
+				"value": 6
 			}
 		}]
 }

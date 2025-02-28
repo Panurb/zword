@@ -311,6 +311,7 @@ bool collides_with(int i, List* entities) {
 
 
 void apply_trigger(int trigger, int target) {
+    CoordinateComponent* coord = CoordinateComponent_get(trigger);
     ColliderComponent* collider = ColliderComponent_get(trigger);
     PlayerComponent* player = PlayerComponent_get(target);
     PhysicsComponent* physics = PhysicsComponent_get(target);
@@ -335,12 +336,16 @@ void apply_trigger(int trigger, int target) {
             }
             break;
         case TRIGGER_DAMAGE:
-            damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 10, trigger);
+            damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 10, trigger, DAMAGE_BLUNT);
             break;
         case TRIGGER_BURN:
             burn(target);
+            coord->lifetime = 0.0f;
             break;
         case TRIGGER_FREEZE:
+            break;
+        case TRIGGER_WET:
+            coord->lifetime = 0.0f;
             break;
     }
 }

@@ -34,14 +34,14 @@
 				"sound_range":	30,
 				"spread":	0,
 				"shots":	1,
-				"ammo_type":	6,
+				"ammo_type":	7,
 				"sound":	"flame",
 				"automatic":	true
 			},
 			"Item":	{
-				"size": 0,
+				"size": 1,
 				"price":	0,
-				"name":	"Flamethrower",
+				"name":	"Water gun",
 				"type":	0
 			},
 			"Sound":	{

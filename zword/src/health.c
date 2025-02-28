@@ -94,7 +94,7 @@ void die(int entity) {
 }
 
 
-void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
+void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageType type) {
     HealthComponent* health = HealthComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     if (health) {
@@ -104,14 +104,16 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer) {
         if (health->decal[0] != '\0') {
             Vector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
             int i = -1;
-            if (dmg < 40) {
-                i = create_decal(pos, health->decal, 60.0f);
-            } else {
-                Filename buffer;
-                snprintf(buffer, sizeof(buffer), "%s_large", health->decal);
-                i = create_decal(pos, buffer, 60.0f);
+            if (type == DAMAGE_BULLET) {
+                if (dmg < 40) {
+                    i = create_decal(pos, health->decal, 60.0f);
+                } else {
+                    Filename buffer;
+                    snprintf(buffer, sizeof(buffer), "%s_large", health->decal);
+                    i = create_decal(pos, buffer, 60.0f);
+                }
+                ImageComponent_get(i)->alpha = 0.8f;
             }
-            ImageComponent_get(i)->alpha = 0.8f;
         }
 
         if (prev_health > 0 && health->health <= 0) {
@@ -161,7 +163,7 @@ void blunt_damage(int entity, Vector2f vel) {
                 if (sound) {
                     add_sound(entity, sound->hit_sound, 1.0, 0.8);
                 }
-                damage(entity, get_position(entity), vel, 100, -1);
+                damage(entity, get_position(entity), vel, 100, -1, DAMAGE_BLUNT);
             }
         }
     }
@@ -225,7 +227,7 @@ void update_health(float time_step) {
         switch (health->status.type) {
             case STATUS_BURNING:
                 if (health->status.timer <= 0.0f) {
-                    damage(i, get_position(i), zeros(), burn_damage, health->status.entity);
+                    damage(i, get_position(i), zeros(), burn_damage, health->status.entity, DAMAGE_BURN);
                     health->status.timer = burn_delay;
                 }
                 break;

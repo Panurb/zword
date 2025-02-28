@@ -126,7 +126,8 @@ typedef enum {
     TRIGGER_GROUND,
     TRIGGER_DAMAGE,
     TRIGGER_BURN,
-    TRIGGER_FREEZE
+    TRIGGER_FREEZE,
+    TRIGGER_WET
 } TriggerType;
 
 typedef struct {
@@ -244,6 +245,7 @@ typedef enum ParticleType {
     PARTICLE_SNOW,
     PARTICLE_RAIN,
     PARTICLE_STEAM,
+    PARTICLE_WATER,
 } ParticleType;
 
 typedef struct {
@@ -293,6 +295,7 @@ typedef enum {
     AMMO_ENERGY,
     AMMO_ROPE,
     AMMO_FLAME,
+    AMMO_WATER,
 } AmmoType;
 
 typedef struct {
@@ -328,7 +331,8 @@ typedef enum ItemType {
     ITEM_MAGAZINE,
     ITEM_STOCK,
     ITEM_BARREL,
-    ITEM_GRIP
+    ITEM_GRIP,
+    ITEM_FUEL
 } ItemType;
 
 typedef struct {

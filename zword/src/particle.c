@@ -109,6 +109,15 @@ void ParticleComponent_add_steam(int entity, float size) {
 }
 
 
+void ParticleComponent_add_water(int entity, float size) {
+    Color color = get_color(0.5f, 0.5f, 1.0f, 0.5f);
+    Color inner_color = get_color(0.5f, 0.5f, 1.0f, 1.0f);
+    ParticleComponent* particle = ParticleComponent_add(entity, 0.0f, 1.0, size, 0.25f * size, 1.0, 10.0, color, inner_color);
+    particle->loop = true;
+    particle->enabled = true;
+}
+
+
 ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, float size) {
     switch (type) {
         case PARTICLE_NONE:
@@ -148,6 +157,9 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
             break;
         case PARTICLE_STEAM:
             ParticleComponent_add_steam(entity, size);
+            break;
+        case PARTICLE_WATER:
+            ParticleComponent_add_water(entity, size);
             break;
     }
     ParticleComponent* particle = ParticleComponent_get(entity);

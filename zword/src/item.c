@@ -20,6 +20,7 @@ bool is_attachment(int entity) {
         case ITEM_SCOPE:
         case ITEM_MAGAZINE:
         case ITEM_HOLLOW_POINT:
+        case ITEM_FUEL:
             return true;
         default:
             return false;

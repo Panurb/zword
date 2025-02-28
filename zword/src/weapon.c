@@ -17,6 +17,23 @@
 #include "particle.h"
 
 
+AmmoType get_ammo_type(int entity) {
+    WeaponComponent* weapon = WeaponComponent_get(entity);
+    ItemComponent* item = ItemComponent_get(entity);
+
+    if (weapon->ammo_type == AMMO_WATER && item) {
+        for (int i = 0; i < item->size; i++) {
+            ItemComponent* atch = ItemComponent_get(item->attachments[i]);
+            if (atch && atch->type == ITEM_FUEL) {
+                return atch->value;
+            }
+        }
+    }
+
+    return weapon->ammo_type;
+}
+
+
 int get_akimbo(int entity) {
     ItemComponent* item = ItemComponent_get(entity);
 
@@ -226,7 +243,7 @@ void update_energy() {
 
             for (ListNode* node = phys->collision.entities->head; node; node = node->next) {
                 int j = node->value;
-                damage(j, get_position(i), zeros(), 20, -1);
+                damage(j, get_position(i), zeros(), 20, -1, DAMAGE_BULLET);
             }
             
             if (phys->collision.entities->size > 0) {
@@ -298,7 +315,28 @@ int create_flame(Vector2f position, Vector2f velocity) {
     particle->angle = polar_angle(velocity);
     ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
     collider->trigger_type = TRIGGER_BURN;
-    ImageComponent_add(i, "", 0.0f, 0.0f, LAYER_PARTICLES);
+
+    return i;
+}
+
+
+int create_splash(Vector2f position, Vector2f velocity) {
+    int i = create_entity();
+
+    CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
+    coord->lifetime = 0.3f;
+    PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
+    phys->velocity = velocity;
+    phys->drag = 0.0f;
+    phys->max_speed = norm(velocity);
+    phys->bounce = 0.0f;
+    ParticleComponent* particle = ParticleComponent_add_type(i, PARTICLE_WATER, 0.5f);
+    particle->rate = 30.0f;
+    particle->speed = 1.0f;
+    particle->stretch = 1.0f;
+    particle->angle = polar_angle(velocity);
+    ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
+    collider->trigger_type = TRIGGER_WET;
 
     return i;
 }
@@ -330,7 +368,8 @@ void attack(int entity) {
 
     Vector2f pos = get_position(parent);
 
-    switch (weapon->ammo_type) {
+    AmmoType ammo_type = get_ammo_type(entity);
+    switch (ammo_type) {
         case AMMO_MELEE: {
             HitInfo min_info[7];
             float min_dist[7];
@@ -374,7 +413,7 @@ void attack(int entity) {
                     dmg *= 2;
                 }
                 Vector2f dir = normalized(diff(min_info[i].position, pos));
-                damage(min_info[i].entity, min_info[i].position, dir, dmg, parent);
+                damage(min_info[i].entity, min_info[i].position, dir, dmg, parent, DAMAGE_BULLET);
                 shake_camera(0.0125f * weapon->damage);
             }
             break;
@@ -402,11 +441,14 @@ void attack(int entity) {
             // coord->
             // PhysicsComponent_remove(j);
 
-            damage(info.entity, info.position, dir, weapon->damage, parent);
+            damage(info.entity, info.position, dir, weapon->damage, parent, DAMAGE_BULLET);
 
             break;
         } case AMMO_FLAME: {
             create_flame(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+            break;
+        } case AMMO_WATER: {
+            create_splash(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
             break;
         } default: {
             ParticleComponent* particle = ParticleComponent_get(entity);
@@ -429,7 +471,7 @@ void attack(int entity) {
                     if (dot(info.normal, dir) < -0.99f) {
                         dmg *= 2;
                     }
-                    damage(info.entity, info.position, dir, dmg, parent);
+                    damage(info.entity, info.position, dir, dmg, parent, DAMAGE_BULLET);
 
                     start = sum(info.position, mult(0.1f, dir));
                     range -= dist(pos, info.position);
