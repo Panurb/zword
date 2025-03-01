@@ -203,6 +203,35 @@ void burn(Entity entity) {
 }
 
 
+void freeze(Entity entity) {
+    static float status_time = 5.0f;
+
+    HealthComponent* health = HealthComponent_get(entity);
+    if (!health) return;
+
+    switch (health->status.type) {
+        case STATUS_NONE:
+            int i = create_entity();
+            CoordinateComponent_add(i, zeros(), 0.0f);
+            ParticleComponent_add_type(i, PARTICLE_STEAM, 0.3f);
+            add_child(entity, i);
+
+            health->status.entity = i;
+            health->status.type = STATUS_FROZEN;
+            health->status.lifetime = status_time;
+            break;
+        case STATUS_BURNING:
+            reset_status(entity);
+            break;
+        case STATUS_FROZEN:
+            health->status.lifetime = status_time;
+            break;
+        default:
+            break;
+    }
+}
+
+
 void update_health(float time_step) {
     static float burn_delay = 1.0f;
     static float burn_damage = 5.0f;

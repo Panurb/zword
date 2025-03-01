@@ -14,36 +14,14 @@
 #include "game.h"
 
 
-static const char* SOUNDS[] = {
-    "assault_rifle",
-    "axe",
-    "car",
-    "car_door",
-    "door",
-    "energy",
-    "fire",
-    "flame",
-    "geiger",
-    "glass_hit",
-    "metal_hit",
-    "pistol",
-    "rain",
-    "shotgun",
-    "silencer",
-    "sniper",
-    "squish",
-    "stone_hit",
-    "wood_destroy",
-    "wood_hit"
-};
-
-
 void load_sounds() {
-    int n = sizeof(SOUNDS) / sizeof(SOUNDS[0]);
+    LOG_INFO("Loading sounds");
 
-    for (int i = 0; i < n; i++) {
-        char path[100];
-        snprintf(path, 100, "%s%s%s", "data/sfx/", SOUNDS[i], ".wav");
+    resources.sounds_size = list_files_alphabetically("data/sfx/*.wav", resources.sound_names); 
+
+    for (int i = 0; i < resources.sounds_size; i++) {
+        String path;
+        snprintf(path, sizeof(path), "%s%s%s", "data/sfx/", resources.sound_names[i], ".wav");
 
         resources.sounds[i] = Mix_LoadWAV(path);
     }
@@ -51,7 +29,7 @@ void load_sounds() {
 
 
 int sound_index(Filename filename) {
-    return binary_search_filename(filename, (char**) SOUNDS, sizeof(SOUNDS) / sizeof(SOUNDS[0]));
+    return binary_search_filename(filename, resources.sound_names, resources.sounds_size);
 }
 
 

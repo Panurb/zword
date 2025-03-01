@@ -342,6 +342,28 @@ int create_splash(Vector2f position, Vector2f velocity) {
 }
 
 
+int create_freeze(Vector2f position, Vector2f velocity) {
+    int i = create_entity();
+
+    CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
+    coord->lifetime = 0.3f;
+    PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
+    phys->velocity = velocity;
+    phys->drag = 0.0f;
+    phys->max_speed = norm(velocity);
+    phys->bounce = 0.0f;
+    ParticleComponent* particle = ParticleComponent_add_type(i, PARTICLE_STEAM, 0.5f);
+    particle->rate = 30.0f;
+    particle->speed = 1.0f;
+    particle->stretch = 1.0f;
+    particle->angle = polar_angle(velocity);
+    ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
+    collider->trigger_type = TRIGGER_FREEZE;
+
+    return i;
+}
+
+
 void attack(int entity) {
     WeaponComponent* weapon = WeaponComponent_get(entity);
     int parent = CoordinateComponent_get(entity)->parent;
@@ -449,6 +471,9 @@ void attack(int entity) {
             break;
         } case AMMO_WATER: {
             create_splash(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+            break;
+        } case AMMO_FREEZE: {
+            create_freeze(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
             break;
         } default: {
             ParticleComponent* particle = ParticleComponent_get(entity);

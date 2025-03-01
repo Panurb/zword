@@ -340,7 +340,7 @@ int list_files_alphabetically(String path, String* files) {
     return files_size;
 }
 
-int binary_search_filename(Filename filename, Filename* array, int size) {
+int binary_search_filename(String filename, String* array, int size) {
     int l = 0;
     int r = size - 1;
 

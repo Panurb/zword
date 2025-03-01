@@ -343,6 +343,8 @@ void apply_trigger(int trigger, int target) {
             coord->lifetime = 0.0f;
             break;
         case TRIGGER_FREEZE:
+            freeze(target);
+            coord->lifetime = 0.0f;
             break;
         case TRIGGER_WET:
             coord->lifetime = 0.0f;

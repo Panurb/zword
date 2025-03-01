@@ -18,111 +18,6 @@
 #include "list.h"
 
 
-static const char* IMAGES[] = {
-    "altar_tile",
-    "ammo_pistol",
-    "ammo_rifle",
-    "ammo_shotgun",
-    "arms",
-    "arms_assault_rifle",
-    "arms_axe",
-    "arms_combat_shotgun",
-    "arms_pistol",
-    "arms_shotgun",
-    "arms_smg",
-    "arms_sniper",
-    "arms_sword",
-    "arms_watergun",
-    "assault_rifle",
-    "axe",
-    "bandage",
-    "beach_corner",
-    "beach_tile",
-    "bed",
-    "bench",
-    "bench_debris",
-    "bench_destroyed",
-    "big_boy",
-    "big_boy_dead",
-    "birch",
-    "blood",
-    "blood_large",
-    "blood_particle",
-    "board_tile",
-    "boss_body",
-    "boss_dead",
-    "boss_head",
-    "brick_tile",
-    "candle",
-    "car",
-    "combat_shotgun",
-    "desk",
-    "desk_debris",
-    "desk_destroyed",
-    "door",
-    "duckboard",
-    "energy",
-    "farmer",
-    "farmer_dead",
-    "fence_tile",
-    "fire",
-    "flashlight",
-    "gas",
-    "grass_tile",
-    "hay_bale",
-    "hinge",
-    "hole",
-    "hollow_point",
-    "lamp",
-    "laser",
-    "magazine",
-    "marschall",
-    "mat",
-    "menu",
-    "pistol",
-    "player",
-    "player_dead",
-    "priest",
-    "priest_dead",
-    "river_curve",
-    "river_end",
-    "river_tile",
-    "road_curve",
-    "road_end",
-    "road_tile",
-    "rock",
-    "roof_tile",
-    "rope",
-    "sauna",
-    "scope",
-    "shard",
-    "shotgun",
-    "silencer",
-    "sink",
-    "smg",
-    "sniper",
-    "spruce",
-    "stone_tile",
-    "stove",
-    "swamp_tile",
-    "sword",
-    "table",
-    "table_destroyed",
-    "tiles_tile",
-    "title",
-    "toilet",
-    "tree",
-    "uranium",
-    "water_tile",
-    "watergun",
-    "window",
-    "window_destroyed",
-    "wood_tile",
-    "zombie",
-    "zombie_dead"
-};
-
-
 float image_width(int entity) {
     Vector2f scale = get_scale(entity);
     ImageComponent* image = ImageComponent_get(entity);
@@ -241,29 +136,22 @@ SDL_Texture* create_blood_particle_texture() {
 void load_textures() {
     LOG_INFO("Loading textures");
 
-    resources.textures_size = 0;
+    resources.textures_size = list_files_alphabetically("data/images/*.png", resources.texture_names);
+    LOG_INFO("Found %d textures", resources.textures_size);
 
-    String path;
-    snprintf(path, 128, "%s/%s/*.*", "data", "images");
-
-    String files[MAX_TEXTURES];
-    int files_size = list_files_alphabetically(path, files);
-
-    for (int i = 0; i < files_size; i++) {
+    for (int i = 0; i < resources.textures_size; i++) {
         // if (strcmp(files[i], "blood_particle") == 0) {
         //     resources.blood_particle = create_blood_particle_texture();
         //     continue;
         // }
 
         String path;
-        snprintf(path, sizeof(path), "%s%s%s", "data/images/", files[i], ".png");
+        snprintf(path, sizeof(path), "%s%s%s", "data/images/", resources.texture_names[i], ".png");
 
         SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
 
-        strcpy(resources.texture_names[resources.textures_size], files[i]);
-        resources.textures[resources.textures_size] = texture;
-        resources.outline_textures[resources.textures_size] = create_outline_texture(path);
-        resources.textures_size++;
+        resources.textures[i] = texture;
+        resources.outline_textures[i] = create_outline_texture(path);
     }
 
     for (int i = 0; i < resources.textures_size; i++) {

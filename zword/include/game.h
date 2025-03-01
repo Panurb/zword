@@ -11,6 +11,7 @@
 
 
 #define MAX_TEXTURES 128
+#define MAX_SOUNDS 128
 
 
 typedef enum {
@@ -41,12 +42,14 @@ extern ButtonText WEATHERS[];
 
 
 typedef struct {
-    Filename texture_names[MAX_TEXTURES];
+    String texture_names[MAX_TEXTURES];
     int textures_size;
     SDL_Texture* textures[MAX_TEXTURES];
     SDL_Texture* outline_textures[MAX_TEXTURES];
     Resolution texture_sizes[MAX_TEXTURES];
     TTF_Font* fonts[301];
+    String sound_names[MAX_SOUNDS];
+    int sounds_size;
     Mix_Chunk* sounds[100];
     Mix_Music* music[10];
     SDL_Texture* blood_particle;
