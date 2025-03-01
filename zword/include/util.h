@@ -196,7 +196,9 @@ float lerp_angle(float a, float b, float t);
 
 float smoothstep(float x, float mu, float nu);
 
-int binary_search_filename(Filename filename, char** array, int size);
+int list_files_alphabetically(String path, String* files);
+
+int binary_search_filename(Filename filename, Filename* array, int size);
 
 bool non_zero(Vector2f v);
 

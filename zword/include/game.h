@@ -10,6 +10,9 @@
 #include "sound.h"
 
 
+#define MAX_TEXTURES 128
+
+
 typedef enum {
     STATE_MENU,
     STATE_START,
@@ -38,9 +41,11 @@ extern ButtonText WEATHERS[];
 
 
 typedef struct {
-    SDL_Texture** textures;
-    SDL_Texture** outline_textures;
-    Resolution* texture_sizes;
+    Filename texture_names[MAX_TEXTURES];
+    int textures_size;
+    SDL_Texture* textures[MAX_TEXTURES];
+    SDL_Texture* outline_textures[MAX_TEXTURES];
+    Resolution texture_sizes[MAX_TEXTURES];
     TTF_Font* fonts[301];
     Mix_Chunk* sounds[100];
     Mix_Music* music[10];

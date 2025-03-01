@@ -296,6 +296,7 @@ typedef enum {
     AMMO_ROPE,
     AMMO_FLAME,
     AMMO_WATER,
+    AMMO_FREEZE
 } AmmoType;
 
 typedef struct {

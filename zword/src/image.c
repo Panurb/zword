@@ -241,42 +241,42 @@ SDL_Texture* create_blood_particle_texture() {
 void load_textures() {
     LOG_INFO("Loading textures");
 
-    int n = sizeof(IMAGES) / sizeof(IMAGES[0]);
+    resources.textures_size = 0;
 
-    SDL_Texture** textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
-    SDL_Texture** outline_textures = malloc(sizeof(IMAGES) * sizeof(SDL_Texture*));
-    Resolution* texture_sizes = malloc(sizeof(IMAGES) * sizeof(Resolution));
-    for (int i = 0; i < n; i++) {
-        if (strcmp(IMAGES[i], "blood_particle") == 0) {
-            textures[i] = create_blood_particle_texture();
-            continue;
-        }
+    String path;
+    snprintf(path, 128, "%s/%s/*.*", "data", "images");
 
-        char path[100];
-        snprintf(path, 100, "%s%s%s", "data/images/", IMAGES[i], ".png");
+    String files[MAX_TEXTURES];
+    int files_size = list_files_alphabetically(path, files);
+
+    for (int i = 0; i < files_size; i++) {
+        // if (strcmp(files[i], "blood_particle") == 0) {
+        //     resources.blood_particle = create_blood_particle_texture();
+        //     continue;
+        // }
+
+        String path;
+        snprintf(path, sizeof(path), "%s%s%s", "data/images/", files[i], ".png");
 
         SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
 
-        textures[i] = texture;
-        outline_textures[i] = create_outline_texture(path);
+        strcpy(resources.texture_names[resources.textures_size], files[i]);
+        resources.textures[resources.textures_size] = texture;
+        resources.outline_textures[resources.textures_size] = create_outline_texture(path);
+        resources.textures_size++;
     }
 
-    resources.textures = textures;
-    resources.outline_textures = outline_textures;
-
-    for (int i = 0; i < n; i++) {
-        Resolution texture_size = get_texture_size(IMAGES[i]);
+    for (int i = 0; i < resources.textures_size; i++) {
+        Resolution texture_size = get_texture_size(resources.texture_names[i]);
         texture_size.w /= PIXELS_PER_UNIT;
         texture_size.h /= PIXELS_PER_UNIT;
-        texture_sizes[i] = texture_size;
+        resources.texture_sizes[i] = texture_size;
     }
-
-    resources.texture_sizes = texture_sizes;
 }
 
 
 int get_texture_index(Filename filename) {
-    return binary_search_filename(filename, (char**) IMAGES, sizeof(IMAGES) / sizeof(IMAGES[0]));
+    return binary_search_filename(filename, resources.texture_names, resources.textures_size);
 }
 
 

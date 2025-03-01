@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#define NOMINMAX
+#include <windows.h>
 
 #include "util.h"
 
@@ -310,7 +312,35 @@ float smoothstep(float x, float mu, float nu) {
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
 }
 
-int binary_search_filename(Filename filename, char** array, int size) {
+int list_files_alphabetically(String path, String* files) {
+    WIN32_FIND_DATA file;
+    HANDLE handle = FindFirstFile(path, &file);
+
+    if (handle == INVALID_HANDLE_VALUE) {
+        printf("Path not found: %s\n", path);
+        return 0;
+    }
+
+    int files_size = 0;
+
+    do {
+        if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
+            continue;
+        }
+        char* dot = strchr(file.cFileName, '.');
+        if (dot) {
+            *dot = '\0';
+        }
+        strcpy(files[files_size], file.cFileName);
+        files_size++;
+    } while (FindNextFile(handle, &file));
+
+    qsort(files, files_size, sizeof(String), strcmp);
+
+    return files_size;
+}
+
+int binary_search_filename(Filename filename, Filename* array, int size) {
     int l = 0;
     int r = size - 1;
 
