@@ -435,6 +435,7 @@ void create_menu() {
         height++;
     }
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
+    WidgetComponent_get(container)->enabled = false;
 
     String files[128];
     int files_count = list_files_alphabetically("save", files);

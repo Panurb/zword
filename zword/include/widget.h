@@ -7,6 +7,7 @@
 
 #define BUTTON_WIDTH 8.0f
 #define BUTTON_HEIGHT 2.0f
+#define MARGIN 0.3f
 #define BORDER_WIDTH 0.2f
 #define SCROLLBAR_WIDTH 1.0f
 #define COLOR_CONTAINER get_color(0.15f, 0.15f, 0.15f, 1.0f)

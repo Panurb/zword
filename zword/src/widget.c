@@ -471,13 +471,13 @@ void draw_widgets(int camera) {
         case WIDGET_LABEL:
             break;
         case WIDGET_BUTTON:
-            draw_button(camera, pos, w, h, widget->selected);
+            draw_button(camera, pos, w - MARGIN, h - MARGIN, widget->selected);
             break;
         case WIDGET_DROPDOWN:
-            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_rectangle(camera, pos, w - MARGIN, h - MARGIN, 0.0f, COLOR_SHADOW);
 
             r = sum(pos, vec(-0.1f, 0.1f));
-            draw_rectangle(camera, r, w - 0.2f, h - 0.2f, 0.0f, COLOR_BUTTON);
+            draw_rectangle(camera, r, w - BORDER_WIDTH - MARGIN, h - BORDER_WIDTH - MARGIN, 0.0f, COLOR_BUTTON);
 
             r = sum(pos, vec(0.5f * BUTTON_WIDTH - 0.5f * BUTTON_HEIGHT, 0.0f));
             if (CoordinateComponent_get(i)->children->size == 0) {
@@ -487,7 +487,7 @@ void draw_widgets(int camera) {
             }
             break;
         case WIDGET_SLIDER:
-            draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
+            draw_rectangle(camera, pos, w - MARGIN, h - MARGIN, 0.0f, COLOR_SHADOW);
             float x = widget->value / (float) (widget->max_value - widget->min_value);
             draw_rectangle(camera, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 
                 0.0f, COLOR_BUTTON);
