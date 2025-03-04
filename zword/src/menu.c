@@ -12,6 +12,7 @@
 #include "input.h"
 #include "app.h"
 #include "benchmark.h"
+#include "util.h"
 
 
 static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
@@ -81,10 +82,22 @@ void change_state_game(int entity) {
 }
 
 
+void change_state_save(int entity) {
+    UNUSED(entity);
+    game_state = STATE_SAVE;
+}
+
+
 void change_state_load(int entity) {
+    UNUSED(entity);
+    game_state = STATE_LOAD;
+}
+
+
+void change_state_load_editor(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(game_data->map_name, widget->string);
-    game_state = STATE_LOAD;
+    game_state = STATE_LOAD_EDITOR;
     reset_ids();
 }
 
@@ -113,7 +126,7 @@ void apply(int entity) {
 }
 
 
-void toggle_play(int entity) {
+void toggle_survival(int entity) {
     UNUSED(entity);
     if (window_play != -1) {
         destroy_entity_recursive(window_play);
@@ -122,7 +135,7 @@ void toggle_play(int entity) {
     }
 
     Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
-    window_play = create_window(pos, "PLAY", 1, toggle_play);
+    window_play = create_window(pos, "PLAY", 1, toggle_survival);
 
     int container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 1, 3);
     add_child(window_play, container);
@@ -130,8 +143,7 @@ void toggle_play(int entity) {
     if (game_settings.debug) {
         add_files_to_container(container, "maps", change_state_start);
         add_scrollbar_to_container(container);
-    } else {    
-        add_button_to_container(container, "Tutorial", change_state_start);
+    } else {
         add_button_to_container(container, "Survival", change_state_start);
         add_button_to_container(container, "Swampland", change_state_start);
     }
@@ -174,7 +186,7 @@ void toggle_editor(int entity) {
     add_child(window_editor, container);
 
     add_button_to_container(container, "NEW MAP", toggle_new_map);
-    add_files_to_container(container, "maps", change_state_load);
+    add_files_to_container(container, "maps", change_state_load_editor);
 }
 
 
@@ -392,6 +404,26 @@ void update_benchmark(int entity) {
 }
 
 
+void start_campaign(int entity) {
+    UNUSED(entity);
+    strcpy(game_data->map_name, "Campaign");
+    change_state_start(entity);
+}
+
+
+void load_campaign(int entity) {
+    UNUSED(entity);
+    strcpy(game_data->map_name, "Campaign");
+    change_state_load(entity);
+}
+
+
+void start_tutorial(int entity) {
+    strcpy(game_data->map_name, "Tutorial");
+    change_state_start(entity);
+}
+
+
 void create_menu() {
     #ifdef __EMSCRIPTEN__
         int height = 5;
@@ -403,7 +435,17 @@ void create_menu() {
         height++;
     }
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
-    add_button_to_container(container, "PLAY", toggle_play);
+
+    String files[128];
+    int files_count = list_files_alphabetically("save", files);
+
+    if (files_count > 0) {
+        add_button_to_container(container, "CONTINUE", load_campaign);
+    }
+
+    add_button_to_container(container, "NEW GAME", start_campaign);
+    add_button_to_container(container, "TUTORIAL", start_tutorial);
+    add_button_to_container(container, "SURVIVAL", toggle_survival);
     if (game_settings.debug) {
         add_button_to_container(container, "EDITOR", toggle_editor);
     }
@@ -428,8 +470,13 @@ void destroy_menu() {
 
 
 void create_pause_menu() {
-    int container = create_container(vec(-20.0f, 0.0f), 1, 3);
+    int height = game_data->game_mode == MODE_CAMPAIGN ? 5 : 3;
+    int container = create_container(vec(-20.0f, 0.0f), 1, height);
     add_button_to_container(container, "RESUME", change_state_game);
+    if (game_data->game_mode == MODE_CAMPAIGN) {
+        add_button_to_container(container, "SAVE", change_state_save);
+        add_button_to_container(container, "LOAD", change_state_load);
+    }
     add_button_to_container(container, "SETTINGS", toggle_settings);
     add_button_to_container(container, "QUIT TO MENU", change_state_end);
 }

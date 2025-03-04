@@ -494,9 +494,9 @@ void update_selections() {
 }
 
 
-void save_map(int entity) {
+void save_current_map(int entity) {
     UNUSED(entity);
-    save_game(game_data->map_name);
+    save_map(game_data->map_name);
 }
 
 
@@ -521,7 +521,7 @@ void create_editor_menu() {
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
-    create_button("SAVE", pos, save_map);
+    create_button("SAVE", pos, save_current_map);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("QUIT", pos, quit_editor);
 }

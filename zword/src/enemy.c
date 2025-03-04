@@ -236,6 +236,8 @@ void update_enemies(float time_step) {
 
         switch (enemy->state) {
             case ENEMY_IDLE: {
+                break;
+            } case ENEMY_WANDER: {
                 Vector2f r = polar_to_cartesian(1.0f, enemy->desired_angle);
                 HitInfo info = raycast(get_position(i), r, 2.0f, GROUP_ENEMIES);
                 if (info.entity != -1) {
@@ -250,7 +252,7 @@ void update_enemies(float time_step) {
                     Vector2f a = polar_to_cartesian(enemy->acceleration, coord->angle);
                     phys->acceleration = sum(phys->acceleration, a);
                 }
-
+                
                 break;
             } case ENEMY_INVESTIGATE: {
                 a_star(i, enemy->target, enemy->path);

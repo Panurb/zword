@@ -229,6 +229,8 @@ void input() {
 
 
 void update(float time_step) {
+    static GameState previous_state = STATE_MENU;
+
     switch (game_state) {
         case STATE_MENU:
             update_menu();
@@ -255,6 +257,16 @@ void update(float time_step) {
         case STATE_PAUSE:
             update_menu();
             break;
+        case STATE_SAVE:
+            save_state(game_data->map_name);
+            game_state = previous_state;
+            break;
+        case STATE_LOAD:
+            end_game();
+            clear_all_sounds();
+            load_state(game_data->map_name);
+            game_state = STATE_GAME;
+            break;
         case STATE_APPLY:
             resize_game();
             resize_game_window();
@@ -266,10 +278,10 @@ void update(float time_step) {
             create_editor_menu();
             game_state = STATE_EDITOR;
             break;
-        case STATE_LOAD:
+        case STATE_LOAD_EDITOR:
             destroy_menu();
             create_editor_menu();
-            load_game(game_data->map_name);
+            load_map(game_data->map_name);
             game_state = STATE_EDITOR;
             break;
         case STATE_EDITOR:
@@ -285,6 +297,7 @@ void update(float time_step) {
 
     float time = SDL_GetTicks() / 1000.0f;
     title_scale = 2.5f + 0.1f * sinf(2.0f * time);
+    previous_state = game_state;
 }
 
 
@@ -320,7 +333,7 @@ void draw() {
             draw_overlay(game_data->camera, 0.4f);
             draw_menu();
             break;
-        case STATE_LOAD:
+        case STATE_LOAD_EDITOR:
             draw_text(game_data->menu_camera, zeros(), "LOADING", 20, COLOR_WHITE);
             break;
         case STATE_EDITOR:

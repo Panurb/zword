@@ -20,6 +20,7 @@
 				"group":	2
 			},
 			"Item":	{
+				"name": "Gasoline",
 				"size":	0,
 				"type":	11,
 				"value": 6

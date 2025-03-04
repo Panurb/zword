@@ -172,10 +172,10 @@ void start_game(Filename map_name) {
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
     game_data->ambient_light = 0.5f;
-    create_pause_menu();
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);
-    load_game(map_name);
+    create_pause_menu();
+    load_map(map_name);
 
     int i = 0;
     ListNode* node;

@@ -206,6 +206,7 @@ typedef struct {
 
 typedef enum {
     ENEMY_IDLE,
+    ENEMY_WANDER,
     ENEMY_INVESTIGATE,
     ENEMY_CHASE,
     ENEMY_ATTACK,
@@ -229,6 +230,7 @@ typedef struct {
     float attack_timer;
     float turn_speed;
     int bounty;
+    Vector2f start_position;
 } EnemyComponent;
 
 typedef enum ParticleType {
@@ -245,7 +247,7 @@ typedef enum ParticleType {
     PARTICLE_SNOW,
     PARTICLE_RAIN,
     PARTICLE_STEAM,
-    PARTICLE_WATER,
+    PARTICLE_WATER
 } ParticleType;
 
 typedef struct {

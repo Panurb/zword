@@ -350,6 +350,7 @@ EnemyComponent* EnemyComponent_add(int entity) {
     enemy->turn_speed = 5.0f;
     enemy->spawner = false;
     enemy->bounty = 100;
+    enemy->start_position = get_position(entity);
 
     game_data->components->enemy[entity] = enemy;
 

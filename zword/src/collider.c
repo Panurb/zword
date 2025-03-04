@@ -340,7 +340,9 @@ void apply_trigger(int trigger, int target) {
             break;
         case TRIGGER_BURN:
             burn(target);
-            coord->lifetime = 0.0f;
+            if (PhysicsComponent_get(trigger)) {
+                coord->lifetime = 0.0f;
+            }
             break;
         case TRIGGER_FREEZE:
             freeze(target);
