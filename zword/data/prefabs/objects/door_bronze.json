@@ -1,0 +1,53 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0
+			},
+			"Image":	{
+				"filename":	"hinge",
+				"layer":	7
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	-1,
+				"y":	0,
+				"angle":	0
+			},
+			"Image":	{
+				"filename":	"door_bronze",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	2,
+				"height":	0.300000011920929,
+				"group":	16
+			},
+			"Particle":	{
+				"type":	6,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"wood_hit"
+			},
+			"Joint":	{
+				"parent":	0,
+				"min_length":	1,
+				"max_length":	1,
+				"strength":	1,
+				"max_angle":	1.5707963705062866
+			},
+			"Door":	{
+				"locked":	true,
+				"price": 500,
+				"key": 0
+			}
+		}]
+}

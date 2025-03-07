@@ -236,21 +236,19 @@ PlayerComponent* PlayerComponent_add(int entity) {
     player->vehicle = -1;
     player->item = 0;
     player->inventory_size = 4;
-    for (int i = 0; i < player->inventory_size; i++) {
-        player->inventory[i] = -1;
-    }
+    memset(player->inventory, NULL_ENTITY, sizeof(player->inventory));
     player->grabbed_item = -1;
     player->state = PLAYER_ON_FOOT;
     player->ammo_size = 4;
-    for (int i = 0; i < player->ammo_size; i++) {
-        player->ammo[i] = -1;
-    }
+    memset(player->ammo, NULL_ENTITY, sizeof(player->ammo));
     player->arms = -1;
     player->money = 0;
     player->use_timer = 0.0f;
     player->money_increment = 0;
     player->money_timer = 0.0f;
     player->won = false;
+    player->keys_size = 3;
+    memset(player->keys, NULL_ENTITY, sizeof(player->keys));
 
     player->controller.joystick = -1;
     

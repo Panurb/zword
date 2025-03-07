@@ -423,6 +423,7 @@ void PlayerComponent_serialize(cJSON* entity_json, int entity) {
     serialize_int(json, "state", player->state, PLAYER_ON_FOOT);
     serialize_id(json, "arms", player->arms);
     serialize_int(json, "money", player->money, 0);
+    serialize_id_array(json, "keys", player->keys, player->keys_size);
 }
 
 void PlayerComponent_deserialize(cJSON* entity_json, int entity) {
@@ -437,6 +438,7 @@ void PlayerComponent_deserialize(cJSON* entity_json, int entity) {
     player->state = deserialize_int(json, "state", player->state);
     deserialize_id(json, "arms", &player->arms);
     player->money = deserialize_int(json, "money", player->money);
+    deserialize_id_array(json, "keys", player->keys);
 }
 
 
@@ -679,6 +681,7 @@ void DoorComponent_serialize(cJSON* entity_json, int entity) {
     cJSON_AddItemToObject(entity_json, "Door", json);
     serialize_int(json, "price", door->price, 0);
     serialize_int(json, "locked", door->locked, false);
+    serialize_int(json, "key", door->key, -1);
 }
 
 
@@ -689,6 +692,7 @@ void DoorComponent_deserialize(cJSON* entity_json, int entity) {
     int price = deserialize_int(json, "price", 0);
     DoorComponent* door = DoorComponent_add(entity, price);
     door->locked = deserialize_int(json, "locked", door->locked);
+    door->key = deserialize_int(json, "key", door->key);
 }
 
 

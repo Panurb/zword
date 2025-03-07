@@ -7,6 +7,7 @@
 #include "weapon.h"
 #include "game.h" 
 #include "player.h"
+#include "door.h"
 
 
 bool is_attachment(int entity) {
@@ -143,31 +144,44 @@ void pick_up_item(int entity) {
             destroy_entity(player->target);
             player->target = -1;
         }
-    } else {
-        int i = find(-1, player->inventory, player->inventory_size);
+
+        return;
+    }
+
+    if (item->type == ITEM_KEY) {
+        int i = find(NULL_ENTITY, player->keys, player->keys_size);
         if (i != -1) {
-            clear_grid(player->target);
-
-            player->inventory[i] = player->target;
-            coord->parent = entity;
-            coord->position = (Vector2f) { 0.75f, 0.0f };
+            player->keys[i] = player->target;
+            coord->position = zeros();
             coord->angle = 0.0f;
-            ColliderComponent_get(player->target)->enabled = false;
-            change_layer(player->target, LAYER_WEAPONS);
-            if (player->item != i) {
-                image->alpha = 0.0f;
-            }
-            WeaponComponent* weapon = WeaponComponent_get(player->target);
-            if (weapon) {
-                image->alpha = 0.0f;
-                if (item->price != 0) {
-                    player->item = i;
-                }
-            }
-
-            add_money(entity, -item->price);
-            item->price = 0;
+            add_child(entity, player->target);
         }
+        return;
+    }
+    
+    int i = find(-1, player->inventory, player->inventory_size);
+    if (i != -1) {
+        clear_grid(player->target);
+
+        player->inventory[i] = player->target;
+        coord->parent = entity;
+        coord->position = (Vector2f) { 0.75f, 0.0f };
+        coord->angle = 0.0f;
+        ColliderComponent_get(player->target)->enabled = false;
+        change_layer(player->target, LAYER_WEAPONS);
+        if (player->item != i) {
+            image->alpha = 0.0f;
+        }
+        WeaponComponent* weapon = WeaponComponent_get(player->target);
+        if (weapon) {
+            image->alpha = 0.0f;
+            if (item->price != 0) {
+                player->item = i;
+            }
+        }
+
+        add_money(entity, -item->price);
+        item->price = 0;
     }
 }
 

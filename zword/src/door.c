@@ -64,6 +64,18 @@ void unlock_door(int entity) {
     DoorComponent* door = DoorComponent_get(player->target);
     if (!door) return;
 
+    if (door->key != -1) {
+        for (int i = 0; i < player->keys_size; i++) {
+            if (i == NULL_ENTITY) continue;
+
+            ItemComponent* key = ItemComponent_get(player->keys[i]);
+            if (key->value == door->key) {
+                door->locked = false;
+                break;
+            }
+        }
+    }
+
     if (door->price > 0 && player->money >= door->price) {
         add_money(entity, -door->price);
         door->locked = false;

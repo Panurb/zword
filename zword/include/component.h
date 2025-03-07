@@ -188,6 +188,8 @@ typedef struct {
     float money_timer;
     int money_increment;
     bool won;
+    int keys_size;
+    int keys[3];
 } PlayerComponent;
 
 typedef struct {
@@ -335,7 +337,8 @@ typedef enum ItemType {
     ITEM_STOCK,
     ITEM_BARREL,
     ITEM_GRIP,
-    ITEM_FUEL
+    ITEM_FUEL,
+    ITEM_KEY
 } ItemType;
 
 typedef struct {
@@ -431,6 +434,7 @@ typedef struct {
 typedef struct {
     bool locked;
     int price;
+    int key;
 } DoorComponent;
 
 typedef struct {

@@ -148,6 +148,21 @@ void draw_money(int camera, int entity) {
 }
 
 
+void draw_keys(Entity camera, Entity player) {
+    PlayerComponent* pco = PlayerComponent_get(player);
+    Vector2f pos = get_position_interpolated(player, app.delta);
+
+    for (int i = 0; i < pco->keys_size; i++) {
+        int key = pco->keys[i];
+        if (key == NULL_ENTITY) continue;
+
+        ImageComponent* image = ImageComponent_get(key);
+        Vector2f r = vec(0.4f * (i - 0.5 * pco->keys_size), 0.0f);
+        draw_sprite(camera, image->texture_index, image->width, image->height, 0, sum(pos, r), 0.0f, ones(), 1.0f);
+    }
+} 
+
+
 void draw_hud(int camera) {
     for (int i = 0; i < game_data->components->entities; i++) {
         if (!CoordinateComponent_get(i)) continue;
@@ -274,6 +289,7 @@ void draw_hud(int camera) {
                         }
                     }
                 }
+                draw_keys(camera, i);
 
                 break;
             case PLAYER_AMMO_MENU:
