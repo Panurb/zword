@@ -11,7 +11,7 @@
 #include "image.h"
 
 
-void create_road(ComponentData* components, Vector2f start, Vector2f end);
+void create_road(Vector2f start, Vector2f end);
 
 void create_river(ComponentData* components, Vector2f start, Vector2f end);
 

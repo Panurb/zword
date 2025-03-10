@@ -21,12 +21,14 @@
 #include "input.h"
 #include "game.h"
 #include "door.h"
+#include "road.h"
 
 
 typedef enum {
     TOOL_SELECT,
     TOOL_TILE,
-    TOOL_OBJECT
+    TOOL_OBJECT, 
+    TOOL_PATH
 } Tool;
 
 
@@ -60,8 +62,8 @@ static int tiles_window_id = -1;
 static int objects_window_id = -1;
 static int creatures_window_id = -1;
 static int weapons_window_id = -1;
+static Entity paths_window_id = NULL_ENTITY;
 static int editor_settings_window_id = -1;
-
 
 char* category_names[] = { "terrain", "floor", "decals", "walls", "objects", "waypoints" };
 bool selected_categories[] = { true, true, true, true, true, true };
@@ -203,6 +205,12 @@ void toggle_creatures(int entity) {
 void toggle_weapons(int entity) {
     UNUSED(entity);
     weapons_window_id = toggle_prefabs(weapons_window_id, "weapons", toggle_weapons, select_object);
+}
+
+
+void toggle_paths(Entity entity) {
+    UNUSED(entity);
+    paths_window_id = toggle_prefabs(paths_window_id, "paths", toggle_paths, select_object);
 }
 
 
@@ -519,6 +527,8 @@ void create_editor_menu() {
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("WEAPONS", pos, toggle_weapons);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
+    create_button("PATHS", pos, toggle_paths);
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SAVE", pos, save_current_map);
@@ -730,6 +740,32 @@ void input_tool_object(SDL_Event event) {
 }
 
 
+void input_tool_road(SDL_Event event) {
+    if (event.type == SDL_MOUSEMOTION) {
+        tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            tile_start = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+            tile_started = true;
+        }
+    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+        game_data->components->added_entities = List_create();
+        create_road(tile_start, tile_end);
+
+        ListNode* node;
+        FOREACH(node, game_data->components->added_entities) {
+            if (ColliderComponent_get(node->value)) {
+                update_grid(node->value);
+            }
+        }
+
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+        tile_started = false;
+    }
+}
+
+
 void input_editor(SDL_Event event) {
     if (input_widgets(game_data->menu_camera, event)) {
         return;
@@ -747,6 +783,9 @@ void input_editor(SDL_Event event) {
             break;
         case TOOL_OBJECT:
             input_tool_object(event);
+            break;
+        case TOOL_PATH:
+            input_tool_road(event);
             break;
     }
 
@@ -888,6 +927,11 @@ void draw_editor() {
                 selected_object_angle, 0.05f, COLOR_WHITE);
 
             draw_text(game_data->menu_camera, vec(-23.0f, -14.0f), selected_object_name, 20, COLOR_WHITE);
+            break;
+        case TOOL_PATH:
+            if (tile_started) {
+                draw_line(game_data->camera, tile_start, mouse_grid, 0.1f, COLOR_WHITE);
+            }
             break;
     }
 

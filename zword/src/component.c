@@ -54,14 +54,14 @@ ComponentData* ComponentData_create() {
 CoordinateComponent* CoordinateComponent_add(int entity, Vector2f pos, float angle) {
     CoordinateComponent* coord = malloc(sizeof(CoordinateComponent));
     coord->position = pos;
-    coord->angle = mod(angle, 2.0f * M_PI);
+    coord->angle = angle;
     coord->parent = -1;
     coord->children = List_create();
     coord->lifetime = -1.0f;
     coord->prefab[0] = '\0';
     coord->scale = ones();
     coord->previous.position = pos;
-    coord->previous.angle = angle;
+    coord->previous.angle = coord->angle;
     coord->previous.scale = ones();
 
     game_data->components->coordinate[entity] = coord;
@@ -342,7 +342,7 @@ EnemyComponent* EnemyComponent_add(int entity) {
     enemy->walk_speed = 2.0f;
     enemy->run_speed = 6.0f;
     enemy->weapon = -1;
-    enemy->desired_angle = rand_angle();
+    enemy->desired_angle = get_angle(entity);
     enemy->attack_delay = 0.1f;
     enemy->attack_timer = enemy->attack_delay;
     enemy->turn_speed = 5.0f;

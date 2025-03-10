@@ -236,6 +236,7 @@ void update_enemies(float time_step) {
 
         switch (enemy->state) {
             case ENEMY_IDLE: {
+                enemy->desired_angle = get_angle(i);
                 break;
             } case ENEMY_WANDER: {
                 Vector2f r = polar_to_cartesian(1.0f, enemy->desired_angle);

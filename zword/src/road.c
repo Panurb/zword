@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "road.h"
+#include "game.h"
 
 
 Vector2f perlin_grad(Vector2f position, Permutation perm) {
@@ -107,10 +108,11 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 }
 
 
-void create_road(ComponentData* components, Vector2f start, Vector2f end) {
+void create_road(Vector2f start, Vector2f end) {
+    LOG_INFO("Creating road from (%.2f, %.2f) to (%.2f, %.2f)", start.x, start.y, end.x, end.y);
     Vector2f r = mult(10.0f, normalized(diff(end, start)));
-    int current = create_road_curves(components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
-    create_road_segments(components, current, GROUP_ROADS);
+    int current = create_road_curves(game_data->components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
+    create_road_segments(game_data->components, current, GROUP_ROADS);
 }
 
 

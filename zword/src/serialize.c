@@ -504,6 +504,37 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
 }
 
 
+void RoadComponent_serialize(cJSON* entity_json, int entity) {
+    RoadComponent* road = RoadComponent_get(entity);
+    if (!road) return;
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddItemToObject(entity_json, "Path", json);
+    serialize_int(json, "prev", road->prev, NULL_ENTITY);
+    serialize_int(json, "next", road->next, NULL_ENTITY);
+    serialize_float(json, "curve", road->curve, 0.0f);
+    serialize_float(json, "width", road->width, 0.0f);
+    serialize_string(json, "filename", road->filename, "");
+}
+
+
+void RoadComponent_deserialize(cJSON* entity_json, int entity) {
+    cJSON* json = cJSON_GetObjectItem(entity_json, "Path");
+    if (!json) return;
+
+    int prev = deserialize_int(json, "prev", NULL_ENTITY);
+    int next = deserialize_int(json, "next", NULL_ENTITY);
+    float curve = deserialize_float(json, "curve", 0.0f);
+    float width = deserialize_float(json, "width", 0.0f);
+    String filename;
+    deserialize_string(json, "filename", filename);
+    RoadComponent* road = RoadComponent_add(entity, width, filename);
+    road->prev = prev;
+    road->next = next;
+    road->curve = curve;
+}
+
+
 void SoundComponent_serialize(cJSON* entity_json, int entity) {
     SoundComponent* sound = SoundComponent_get(entity);
     if (!sound) return;
