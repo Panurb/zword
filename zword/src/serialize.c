@@ -504,8 +504,8 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
 }
 
 
-void RoadComponent_serialize(cJSON* entity_json, int entity) {
-    RoadComponent* road = RoadComponent_get(entity);
+void PathComponent_serialize(cJSON* entity_json, int entity) {
+    PathComponent* road = PathComponent_get(entity);
     if (!road) return;
 
     cJSON* json = cJSON_CreateObject();
@@ -518,7 +518,7 @@ void RoadComponent_serialize(cJSON* entity_json, int entity) {
 }
 
 
-void RoadComponent_deserialize(cJSON* entity_json, int entity) {
+void PathComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Path");
     if (!json) return;
 
@@ -528,7 +528,7 @@ void RoadComponent_deserialize(cJSON* entity_json, int entity) {
     float width = deserialize_float(json, "width", 0.0f);
     String filename;
     deserialize_string(json, "filename", filename);
-    RoadComponent* road = RoadComponent_add(entity, width, filename);
+    PathComponent* road = PathComponent_add(entity, width, filename);
     road->prev = prev;
     road->next = next;
     road->curve = curve;

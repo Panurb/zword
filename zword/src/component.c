@@ -38,7 +38,7 @@ ComponentData* ComponentData_create() {
         components->waypoint[i] = NULL;
         components->health[i] = NULL;
         components->camera[i] = NULL;
-        components->road[i] = NULL;
+        components->path[i] = NULL;
         components->sound[i] = NULL;
         components->ammo[i] = NULL;
         components->animation[i] = NULL;
@@ -656,8 +656,8 @@ void CameraComponent_remove(int entity) {
 }
 
 
-RoadComponent* RoadComponent_add(int entity, float width, Filename filename) {
-    RoadComponent* road = malloc(sizeof(RoadComponent));
+PathComponent* PathComponent_add(int entity, float width, Filename filename) {
+    PathComponent* road = malloc(sizeof(PathComponent));
     road->prev = -1;
     road->next = -1;
     road->curve = 0.0;
@@ -665,22 +665,22 @@ RoadComponent* RoadComponent_add(int entity, float width, Filename filename) {
     strcpy(road->filename, filename);
     road->texture_changed = true;
 
-    game_data->components->road[entity] = road;
+    game_data->components->path[entity] = road;
     return road;
 }
 
 
-RoadComponent* RoadComponent_get(int entity) {
+PathComponent* PathComponent_get(int entity) {
     if (entity == -1) return NULL;
-    return game_data->components->road[entity];
+    return game_data->components->path[entity];
 }
 
 
-void RoadComponent_remove(int entity) {
-    RoadComponent* road = RoadComponent_get(entity);
+void PathComponent_remove(int entity) {
+    PathComponent* road = PathComponent_get(entity);
     if (road) {
         free(road);
-        game_data->components->road[entity] = NULL;
+        game_data->components->path[entity] = NULL;
     }
 }
 
@@ -973,7 +973,7 @@ void destroy_entity(int entity) {
     WaypointComponent_remove(entity);
     HealthComponent_remove(entity);
     CameraComponent_remove(entity);
-    RoadComponent_remove(entity);
+    PathComponent_remove(entity);
     SoundComponent_remove(entity);
     AmmoComponent_remove(entity);
     AnimationComponent_remove(entity);

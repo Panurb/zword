@@ -400,7 +400,7 @@ typedef struct {
     float curve;
     float width;
     Filename filename;
-} RoadComponent;
+} PathComponent;
 
 typedef struct {
     bool loop;
@@ -506,7 +506,7 @@ struct ComponentData {
     WaypointComponent* waypoint[MAX_ENTITIES];
     HealthComponent* health[MAX_ENTITIES];
     CameraComponent* camera[MAX_ENTITIES];
-    RoadComponent* road[MAX_ENTITIES];
+    PathComponent* path[MAX_ENTITIES];
     SoundComponent* sound[MAX_ENTITIES];
     AmmoComponent* ammo[MAX_ENTITIES];
     AnimationComponent* animation[MAX_ENTITIES];
@@ -575,9 +575,9 @@ CameraComponent* CameraComponent_add(int entity, Resolution resolution, float zo
 CameraComponent* CameraComponent_get(int entity);
 void CameraComponent_remove(int entity);
 
-RoadComponent* RoadComponent_add(int entity, float width, Filename filename);
-RoadComponent* RoadComponent_get(int entity);
-void RoadComponent_remove(int entity);
+PathComponent* PathComponent_add(int entity, float width, Filename filename);
+PathComponent* PathComponent_get(int entity);
+void PathComponent_remove(int entity);
 
 SoundComponent* SoundComponent_add(int entity, Filename hit_sound);
 SoundComponent* SoundComponent_get(int entity);

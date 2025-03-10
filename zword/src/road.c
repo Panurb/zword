@@ -33,12 +33,12 @@ int create_road_curves(ComponentData* components, Vector2f start, Vector2f end, 
         Vector2f pos = diff(position, mult(curviness, grad));
 
         CoordinateComponent_add(current, pos, 0.0);
-        RoadComponent* road = RoadComponent_add(current, width, filename);
+        PathComponent* road = PathComponent_add(current, width, filename);
         road->next = next;
         ImageComponent_add(current, "", 1.0, 1.0, LAYER_ROADS);
 
         if (next != -1) {
-            RoadComponent* next_road = RoadComponent_get(next);
+            PathComponent* next_road = PathComponent_get(next);
             next_road->prev = current;
 
             if (next_road->next != -1) {
@@ -63,11 +63,11 @@ int create_road_curves(ComponentData* components, Vector2f start, Vector2f end, 
 
 void create_road_segments(ComponentData* components, int current, ColliderGroup group) {
     while (true) {
-        RoadComponent* road = RoadComponent_get(current);
+        PathComponent* road = PathComponent_get(current);
         if (road->next == -1) {
             break;
         }
-        RoadComponent* next_road = RoadComponent_get(road->next);
+        PathComponent* next_road = PathComponent_get(road->next);
 
         int i = create_entity();
 
@@ -103,7 +103,7 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
             ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
         }
 
-        current = RoadComponent_get(current)->next;
+        current = PathComponent_get(current)->next;
     }
 }
 
@@ -123,7 +123,7 @@ void create_river(ComponentData* components, Vector2f start, Vector2f end) {
 
 
 void draw_road(int camera, int entity) {
-    // RoadComponent* road = RoadComponent_get(entity);
+    // PathComponent* road = PathComponent_get(entity);
     // if (!road) return;
 
     // float angle = get_angle(entity);
