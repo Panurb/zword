@@ -21,7 +21,7 @@
 #include "input.h"
 #include "game.h"
 #include "door.h"
-#include "road.h"
+#include "path.h"
 
 
 typedef enum {
@@ -208,9 +208,26 @@ void toggle_weapons(int entity) {
 }
 
 
+void select_road(int entity) {
+    UNUSED(entity);
+    tool = TOOL_PATH;
+}
+
+
 void toggle_paths(Entity entity) {
     UNUSED(entity);
-    paths_window_id = toggle_prefabs(paths_window_id, "paths", toggle_paths, select_object);
+    if (paths_window_id != -1) {
+        destroy_entity_recursive(paths_window_id);
+        return;
+    }
+
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    paths_window_id = create_window(pos, "Paths", 1, toggle_paths);
+
+    int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 1, 5);
+    add_child(paths_window_id, container);
+    add_button_to_container(container, "Road", select_road);
+    add_scrollbar_to_container(container);
 }
 
 

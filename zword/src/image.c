@@ -12,7 +12,7 @@
 #include "component.h"
 #include "perlin.h"
 #include "particle.h"
-#include "road.h"
+#include "path.h"
 #include "animation.h"
 #include "game.h"
 #include "list.h"

@@ -45,11 +45,11 @@ set(SOURCES
     zword/src/navigation.c
     zword/src/object.c
     zword/src/particle.c
+    zword/src/path.c
     zword/src/perlin.c
     zword/src/physics.c
     zword/src/player.c
     zword/src/raycast.c
-    zword/src/road.c
     zword/src/serialize.c
     zword/src/settings.c
     zword/src/sound.c

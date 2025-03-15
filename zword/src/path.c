@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "road.h"
+#include "path.h"
 #include "game.h"
 
 
@@ -110,9 +110,43 @@ void create_road_segments(ComponentData* components, int current, ColliderGroup 
 
 void create_road(Vector2f start, Vector2f end) {
     LOG_INFO("Creating road from (%.2f, %.2f) to (%.2f, %.2f)", start.x, start.y, end.x, end.y);
-    Vector2f r = mult(10.0f, normalized(diff(end, start)));
-    int current = create_road_curves(game_data->components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
-    create_road_segments(game_data->components, current, GROUP_ROADS);
+    Vector2f dir = normalized(diff(end, start));
+    float length = dist(start, end);
+
+    int n = length / 5.0f;
+
+    float angle = polar_angle(dir);
+    
+    // Vector2f r = mult(10.0f, normalized(diff(end, start)));
+    // int current = create_road_curves(game_data->components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
+    
+    Entity previous = NULL_ENTITY;
+    for (int i = 0; i < n; i++) {
+        float x = i / (float)(n - 1);
+        Vector2f pos = lin_comb(1.0f - x, start, x, end);
+        Entity current = create_entity();
+
+        if (i == n - 1) {
+            pos = end;
+            angle += M_PI;
+        }
+        
+        CoordinateComponent_add(current, pos, angle);
+        PathComponent* path = PathComponent_add(current, 1.0, "road");
+        if (previous != NULL_ENTITY) {
+            path->prev = previous;
+            PathComponent_get(previous)->next = current;
+        }
+        previous = current;
+
+        if (i == 0 || i == n - 1) {
+            ImageComponent_add(current, "road_end", 0.0f, 0.0f, LAYER_ROADS);
+        } else {
+            ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS);
+        }
+    }
+    
+    // create_road_segments(game_data->components, current, GROUP_ROADS);
 }
 
 

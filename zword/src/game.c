@@ -21,7 +21,7 @@
 #include "navigation.h"
 #include "perlin.h"
 #include "weapon.h"
-#include "road.h"
+#include "path.h"
 #include "sound.h"
 #include "hud.h"
 #include "animation.h"
