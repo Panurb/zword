@@ -132,7 +132,7 @@ void create_road(Vector2f start, Vector2f end) {
         }
         
         CoordinateComponent_add(current, pos, angle);
-        PathComponent* path = PathComponent_add(current, 1.0, "road");
+        PathComponent* path = PathComponent_add(current, 1.0f, "road");
         if (previous != NULL_ENTITY) {
             path->prev = previous;
             PathComponent_get(previous)->next = current;
@@ -157,6 +157,31 @@ void create_river(ComponentData* components, Vector2f start, Vector2f end) {
 
 
 void draw_road(int camera, int entity) {
+    PathComponent* path = PathComponent_get(entity);
+    if (!path) return;
+    if (path->next == NULL_ENTITY) return;
+
+    PathComponent* next = PathComponent_get(path->next);
+    
+    Vector2f p0;
+    Vector2f p1 = get_position(entity);
+    Vector2f p2 = get_position(path->next);
+    Vector2f p3;
+
+    if (path->prev != NULL_ENTITY) {
+        p0 = get_position(path->prev);
+    } else {
+        p0 = sum(p1, diff(p1, p2));
+    }
+
+    if (next->next != NULL_ENTITY) {
+        p3 = get_position(next->next);
+    } else {
+        p3 = sum(p2, diff(p2, p1));
+    }
+
+    draw_spline(camera, p0, p1, p2, p3, path->width, COLOR_WHITE);
+
     // PathComponent* road = PathComponent_get(entity);
     // if (!road) return;
 

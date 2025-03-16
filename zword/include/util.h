@@ -46,6 +46,13 @@ typedef struct {
 } Vector3;
 
 typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} Vector4;
+
+typedef struct {
     float a;
     float b;
     float c;
@@ -63,6 +70,25 @@ typedef struct {
     float h;
     float i;
 } Matrix3;
+
+typedef struct {
+    float a;
+    float b;
+    float c;
+    float d;
+    float e;
+    float f;
+    float g;
+    float h;
+    float i;
+    float j;
+    float k;
+    float l;
+    float m;
+    float n;
+    float o;
+    float p;
+} Matrix4;
 
 typedef struct {
     int w;
@@ -113,6 +139,8 @@ Vector2f normalized(Vector2f v);
 double to_degrees(double radians);
 
 float dot(Vector2f a, Vector2f b);
+
+float dot4(Vector4 a, Vector4 b);
 
 float signed_angle(Vector2f a, Vector2f b);
 
@@ -179,6 +207,8 @@ Matrix2f matrix_inverse(Matrix2f m);
 Matrix3 matrix3_mult(Matrix3 m, Matrix3 n);
 
 Matrix3 transform_matrix(Vector2f position, float angle, Vector2f scale);
+
+Vector4 matrix4_map(Matrix4 m, Vector4 v);
 
 Vector2f position_from_transform(Matrix3 m);
 

@@ -57,6 +57,10 @@ float dot(Vector2f a, Vector2f b) {
     return a.x * b.x + a.y * b.y;
 }
 
+float dot4(Vector4 a, Vector4 b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
+
 float signed_angle(Vector2f a, Vector2f b) {
     // https://stackoverflow.com/questions/2150050/finding-signed-angle-between-vectors
     return atan2f(a.x * b.y - a.y * b.x, a.x * b.x + a.y * b.y);
@@ -263,6 +267,14 @@ Matrix3 transform_matrix(Vector2f position, float angle, Vector2f scale) {
     return (Matrix3) { scale.x * c, -scale.y * s, position.x, scale.x * s, scale.y * c, position.y, 0.0f, 0.0f, 1.0f };
 }
 
+Vector4 matrix4_map(Matrix4 m, Vector4 v) {
+    Vector4 result;
+    result.x = m.a * v.x + m.b * v.y + m.c * v.z + m.d * v.w;
+    result.y = m.e * v.x + m.f * v.y + m.g * v.z + m.h * v.w;
+    result.z = m.i * v.x + m.j * v.y + m.k * v.z + m.l * v.w;
+    result.w = m.m * v.x + m.n * v.y + m.o * v.z + m.p * v.w;
+    return result;
+}
 
 Vector2f position_from_transform(Matrix3 m) {
     return (Vector2f) { m.c, m.f };

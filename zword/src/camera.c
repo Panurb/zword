@@ -466,6 +466,39 @@ void draw_text(int camera, Vector2f position, char string[100], int size, Color 
 }
 
 
+void draw_spline(Entity camera, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, Color color) {
+    static Matrix4 CATMULL_ROM = { 
+        0.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, 0.0f, 0.5f, 0.0f,
+        1.0f, -2.5f, 2.0f, -0.5f,
+        -0.5f, 1.5f, -1.5f, 0.5f
+    };
+
+    int points_size = 100;
+    Vector2f* vertices = malloc(points_size * sizeof(Vector2f));
+
+    Vector4 x = { p0.x, p1.x, p2.x, p3.x };
+    Vector4 y = { p0.y, p1.y, p2.y, p3.y };
+
+    Vector4 mx = matrix4_map(CATMULL_ROM, x);
+    Vector4 my = matrix4_map(CATMULL_ROM, y);
+
+    for (int i = 0; i < points_size; i++) {
+        float t = i / (float) (points_size - 1);
+
+        Vector4 ts = { 1.0f, t, t * t, t * t * t };
+
+        Vector2f pos = { dot4(ts, mx), dot4(ts, my) };
+        vertices[i] = pos;
+    }
+
+    for (int i = 0; i < points_size - 1; i++) {
+        draw_line(camera, vertices[i], vertices[i + 1], width, color);
+    }
+    free(vertices);
+}
+
+
 void update_camera(int camera, float time_step, bool follow_players) {
     CoordinateComponent* coord = CoordinateComponent_get(camera);
     CameraComponent* cam = CameraComponent_get(camera);
