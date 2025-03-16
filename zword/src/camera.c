@@ -466,7 +466,29 @@ void draw_text(int camera, Vector2f position, char string[100], int size, Color 
 }
 
 
-void draw_spline(Entity camera, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, Color color) {
+void draw_skewed(int camera, int texture_index, Vector2f corners[4]) {
+    SDL_Vertex vertices[4];
+    for (int i = 0; i < 4; i++) {
+        Vector2f v = world_to_screen(camera, corners[i]);
+        vertices[i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[i].color = (SDL_Color) { 255, 255, 255, 255 };
+    }
+    vertices[0].tex_coord = (SDL_FPoint) { 0.0f, 0.0f };
+    vertices[1].tex_coord = (SDL_FPoint) { 1.0f, 0.0f };
+    vertices[2].tex_coord = (SDL_FPoint) { 1.0f, 1.0f };
+    vertices[3].tex_coord = (SDL_FPoint) { 0.0f, 1.0f };
+
+    int indices[6] = { 0, 1, 2, 2, 3, 0 };
+
+    SDL_Texture* texture = resources.textures[texture_index];
+    int err = SDL_RenderGeometry(app.renderer, texture, vertices, 4, indices, 6);
+    if (err != 0) {
+        LOG_ERROR("Error drawing skewed texture: %s", SDL_GetError());
+    } 
+}
+
+
+void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width) {
     static Matrix4 CATMULL_ROM = { 
         0.0f, 1.0f, 0.0f, 0.0f,
         -0.5f, 0.0f, 0.5f, 0.0f,
@@ -474,8 +496,10 @@ void draw_spline(Entity camera, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f 
         -0.5f, 1.5f, -1.5f, 0.5f
     };
 
-    int points_size = 100;
-    Vector2f* vertices = malloc(points_size * sizeof(Vector2f));
+    int points_size = 10;
+    Vector2f* points = malloc(points_size * sizeof(Vector2f));
+    Vector2f* left_points = malloc(points_size * sizeof(Vector2f));
+    Vector2f* right_points = malloc(points_size * sizeof(Vector2f));
 
     Vector4 x = { p0.x, p1.x, p2.x, p3.x };
     Vector4 y = { p0.y, p1.y, p2.y, p3.y };
@@ -487,15 +511,28 @@ void draw_spline(Entity camera, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f 
         float t = i / (float) (points_size - 1);
 
         Vector4 ts = { 1.0f, t, t * t, t * t * t };
-
         Vector2f pos = { dot4(ts, mx), dot4(ts, my) };
-        vertices[i] = pos;
+
+        Vector4 dts = { 0.0f, 1.0f, 2.0f * t, 3.0f * t * t };
+        Vector2f dir = { dot4(dts, mx), dot4(dts, my) };
+        Vector2f normal = mult(0.5f * width, normalized(perp(dir)));
+
+        left_points[i] = sum(pos, normal);
+        right_points[i] = diff(pos, normal);
+
+        draw_circle(camera, sum(pos, normal), 0.1f, COLOR_RED);
+        draw_circle(camera, diff(pos, normal), 0.1f, COLOR_GREEN);
+
+        points[i] = pos;
     }
 
     for (int i = 0; i < points_size - 1; i++) {
-        draw_line(camera, vertices[i], vertices[i + 1], width, color);
+        draw_line(camera, points[i], points[i + 1], 0.1f, COLOR_WHITE);
+
+        Vector2f points[4] = { left_points[i], left_points[i + 1], right_points[i + 1], right_points[i] };
+        draw_skewed(camera, texture_index, points);
     }
-    free(vertices);
+    free(points);
 }
 
 

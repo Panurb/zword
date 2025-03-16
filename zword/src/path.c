@@ -140,9 +140,9 @@ void create_road(Vector2f start, Vector2f end) {
         previous = current;
 
         if (i == 0 || i == n - 1) {
-            ImageComponent_add(current, "road_end", 0.0f, 0.0f, LAYER_ROADS);
+            ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
         } else {
-            ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS);
+            ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
         }
     }
     
@@ -157,6 +157,7 @@ void create_river(ComponentData* components, Vector2f start, Vector2f end) {
 
 
 void draw_road(int camera, int entity) {
+    ImageComponent* image = ImageComponent_get(entity);
     PathComponent* path = PathComponent_get(entity);
     if (!path) return;
     if (path->next == NULL_ENTITY) return;
@@ -180,7 +181,7 @@ void draw_road(int camera, int entity) {
         p3 = sum(p2, diff(p2, p1));
     }
 
-    draw_spline(camera, p0, p1, p2, p3, path->width, COLOR_WHITE);
+    draw_spline(camera, image->texture_index, p0, p1, p2, p3, image->height);
 
     // PathComponent* road = PathComponent_get(entity);
     // if (!road) return;
