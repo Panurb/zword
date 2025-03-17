@@ -80,14 +80,20 @@ void draw_triangle_fan(int camera, SDL_Vertex* vertices, int verts_size) {
 }
 
 
-void draw_triangle_strip(int camera, SDL_Vertex* vertices, int verts_size) {
+void draw_triangle_strip(int camera, int texture_index, SDL_Vertex* vertices, int verts_size) {
     int* indices = malloc(3 * (verts_size - 2) * sizeof(int));
     for (int i = 0; i < verts_size - 2; i++) {
         indices[3 * i] = i;
         indices[3 * i + 1] = i + 1;
         indices[3 * i + 2] = i + 2;
     }
-    SDL_RenderGeometry(app.renderer, NULL, vertices, verts_size, indices, 3 * (verts_size - 2));
+
+    SDL_Texture* texture = NULL;
+    if (texture_index != -1) {
+        texture = resources.textures[texture_index];
+    }
+
+    SDL_RenderGeometry(app.renderer, texture, vertices, verts_size, indices, 3 * (verts_size - 2));
     free(indices);
 }
 
@@ -230,7 +236,7 @@ void draw_slice(int camera, Vector2f position, float min_range, float max_range,
         start = matrix_mult(rot, start);
         end = matrix_mult(rot, end);
     }
-    draw_triangle_strip(camera, vertices, points);
+    draw_triangle_strip(camera, -1, vertices, points);
     free(vertices);
 }
 
@@ -528,22 +534,9 @@ void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vec
         vertices[2 * i + 1].tex_coord = (SDL_FPoint) { t, 1.0f };
     }
 
-    int indices_size = 6 * (points_size - 1);
-    int* indices = malloc(indices_size * sizeof(int));
-    for (int i = 0; i < points_size - 1; i++) {
-        indices[6 * i] = 2 * i;
-        indices[6 * i + 1] = 2 * i + 1;
-        indices[6 * i + 2] = 2 * i + 2;
-        indices[6 * i + 3] = 2 * i + 2;
-        indices[6 * i + 4] = 2 * i + 1;
-        indices[6 * i + 5] = 2 * i + 3;
-    }
+    draw_triangle_strip(camera, texture_index, vertices, vertices_size);
 
-    SDL_Texture* texture = resources.textures[texture_index];
-    int err = SDL_RenderGeometry(app.renderer, texture, vertices, vertices_size, indices, indices_size);
-    if (err != 0) {
-        LOG_ERROR("Error drawing spline: %s", SDL_GetError());
-    } 
+    free(vertices);
 }
 
 
