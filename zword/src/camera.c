@@ -494,7 +494,8 @@ void draw_skewed(int camera, int texture_index, Vector2f corners[4]) {
 }
 
 
-void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, bool flip) {
+void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, 
+        bool flip, Color color) {
     // https://www.youtube.com/watch?v=jvPPXbo87ds
     static Matrix4 CATMULL_ROM = { 
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -530,12 +531,12 @@ void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vec
 
         Vector2f v = world_to_screen(camera, sum(pos, normal));
         vertices[2 * i].position = (SDL_FPoint) { v.x, v.y };
-        vertices[2 * i].color = (SDL_Color) { 255, 255, 255, 255 };
+        vertices[2 * i].color = (SDL_Color) { color.r, color.g, color.b, color.a };
         vertices[2 * i].tex_coord = (SDL_FPoint) { t, 0.0f };
 
         v = world_to_screen(camera, diff(pos, normal));
         vertices[2 * i + 1].position = (SDL_FPoint) { v.x, v.y };
-        vertices[2 * i + 1].color = (SDL_Color) { 255, 255, 255, 255 };
+        vertices[2 * i + 1].color = (SDL_Color) { color.r, color.g, color.b, color.a };
         vertices[2 * i + 1].tex_coord = (SDL_FPoint) { t, 1.0f };
     }
 

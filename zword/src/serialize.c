@@ -510,11 +510,9 @@ void PathComponent_serialize(cJSON* entity_json, int entity) {
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Path", json);
-    serialize_int(json, "prev", road->prev, NULL_ENTITY);
-    serialize_int(json, "next", road->next, NULL_ENTITY);
-    serialize_float(json, "curve", road->curve, 0.0f);
+    serialize_id(json, "prev", road->prev);
+    serialize_id(json, "next", road->next);
     serialize_float(json, "width", road->width, 0.0f);
-    serialize_string(json, "filename", road->filename, "");
 }
 
 
@@ -522,16 +520,11 @@ void PathComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Path");
     if (!json) return;
 
-    int prev = deserialize_int(json, "prev", NULL_ENTITY);
-    int next = deserialize_int(json, "next", NULL_ENTITY);
     float curve = deserialize_float(json, "curve", 0.0f);
     float width = deserialize_float(json, "width", 0.0f);
-    String filename;
-    deserialize_string(json, "filename", filename);
-    PathComponent* road = PathComponent_add(entity, width, filename);
-    road->prev = prev;
-    road->next = next;
-    road->curve = curve;
+    PathComponent* road = PathComponent_add(entity, width);
+    deserialize_id(json, "prev", &road->prev);
+    deserialize_id(json, "next", &road->next);
 }
 
 
@@ -814,7 +807,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id,
     ItemComponent_serialize(json, entity);
     WaypointComponent_serialize(json, entity);
     HealthComponent_serialize(json, entity);
-    // TODO: road
+    PathComponent_serialize(json, entity);
     SoundComponent_serialize(json, entity);
     AmmoComponent_serialize(json, entity);
     AnimationComponent_serialize(json, entity);
@@ -868,6 +861,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
     LightComponent_deserialize(entity_json, entity);
     EnemyComponent_deserialize(entity_json, entity);
     ParticleComponent_deserialize(entity_json, entity);
+    PathComponent_deserialize(entity_json, entity);
     WeaponComponent_deserialize(entity_json, entity);
     ItemComponent_deserialize(entity_json, entity);
     WaypointComponent_deserialize(entity_json, entity);

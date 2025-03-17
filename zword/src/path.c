@@ -17,109 +17,14 @@ Vector2f perlin_grad(Vector2f position, Permutation perm) {
 }
 
 
-int create_road_curves(ComponentData* components, Vector2f start, Vector2f end, float curviness, float width, Filename filename) {
-    int n = dist(start, end) / 5.0;
-
-    Vector2f position = end;
-    Vector2f delta = mult(1.0 / n, diff(start, end));
-
-    int next = -1;
-    int current = -1;
-
-    for (int i = 0; i < n; i++) {
-        current = create_entity();
-
-        Vector2f grad = rand_vector();
-        Vector2f pos = diff(position, mult(curviness, grad));
-
-        CoordinateComponent_add(current, pos, 0.0);
-        PathComponent* road = PathComponent_add(current, width, filename);
-        road->next = next;
-        ImageComponent_add(current, "", 1.0, 1.0, LAYER_ROADS);
-
-        if (next != -1) {
-            PathComponent* next_road = PathComponent_get(next);
-            next_road->prev = current;
-
-            if (next_road->next != -1) {
-                Vector2f next_pos = get_position(road->next);
-                Vector2f next_next_pos = get_position(next_road->next);
-                Vector2f r1 = diff(next_pos, pos);
-                Vector2f r2 = diff(next_next_pos, next_pos);
-                next_road->curve = signed_angle(r1, r2);
-
-                Vector2f v = rotate(bisector(r1, r2), -0.5 * M_PI * sign(next_road->curve));
-                CoordinateComponent_get(next)->angle = polar_angle(v);
-            }
-        }
-
-        next = current;
-        position = sum(position, delta);
-    }
-
-    return current;
-}
-
-
-void create_road_segments(ComponentData* components, int current, ColliderGroup group) {
-    while (true) {
-        PathComponent* road = PathComponent_get(current);
-        if (road->next == -1) {
-            break;
-        }
-        PathComponent* next_road = PathComponent_get(road->next);
-
-        int i = create_entity();
-
-        Vector2f pos = get_position(current);
-        Vector2f next_pos = get_position(road->next);
-
-        float margin_1 = 0.5 * road->width * tanf(0.5 * fabs(road->curve));
-        float margin_2 = 0.5 * road->width * tanf(0.5 * fabs(next_road->curve));
-
-        float d = dist(next_pos, pos);
-        float length = d - margin_1 - margin_2;
-
-        Vector2f r = sum(pos, mult((0.5 * length + margin_1) / d, diff(next_pos, pos)));
-
-        float angle = polar_angle(diff(next_pos, pos));
-        CoordinateComponent_add(i, r, angle);
-        Filename filename;
-        snprintf(filename, 20, "%s%s", road->filename, "_tile");
-        ImageComponent_add(i, filename, length + 0.25, road->width, LAYER_ROADS);
-        ColliderComponent_add_rectangle(i, d, road->width, group);
-
-        snprintf(filename, 20, "%s%s", road->filename, "_end");
-
-        if (road->prev == -1) {
-            i = create_entity();
-            CoordinateComponent_add(i, pos, angle);
-            ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
-        }
-
-        if (next_road->next == -1) {
-            i = create_entity();
-            CoordinateComponent_add(i, next_pos, angle + M_PI);
-            ImageComponent_add(i, filename, road->width, road->width, LAYER_ROADS);
-        }
-
-        current = PathComponent_get(current)->next;
-    }
-}
-
-
-void create_road(Vector2f start, Vector2f end) {
-    LOG_INFO("Creating road from (%.2f, %.2f) to (%.2f, %.2f)", start.x, start.y, end.x, end.y);
+void create_path(Vector2f start, Vector2f end, String filename, String end_filename, float width) {
     Vector2f dir = normalized(diff(end, start));
     float length = dist(start, end);
 
     int n = length / 5.0f;
 
     float angle = polar_angle(dir);
-    
-    // Vector2f r = mult(10.0f, normalized(diff(end, start)));
-    // int current = create_road_curves(game_data->components, sum(start, r), diff(end, mult(2.0f, r)), 2.0f, 4.0f, "road");
-    
+
     Entity previous = NULL_ENTITY;
     for (int i = 0; i < n; i++) {
         float x = i / (float)(n - 1);
@@ -127,7 +32,7 @@ void create_road(Vector2f start, Vector2f end) {
         Entity current = create_entity();
         
         CoordinateComponent_add(current, pos, angle);
-        PathComponent* path = PathComponent_add(current, 1.0f, "road");
+        PathComponent* path = PathComponent_add(current, width);
         if (previous != NULL_ENTITY) {
             path->prev = previous;
             PathComponent_get(previous)->next = current;
@@ -135,19 +40,21 @@ void create_road(Vector2f start, Vector2f end) {
         previous = current;
 
         if (i == 0 || i == n - 2) {
-            ImageComponent_add(current, "road_end", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
+            ImageComponent_add(current, end_filename, 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
         } else {
-            ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
+            ImageComponent_add(current, filename, 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
         }
     }
-    
-    // create_road_segments(game_data->components, current, GROUP_ROADS);
 }
 
 
-void create_river(ComponentData* components, Vector2f start, Vector2f end) {
-    int current = create_road_curves(components, start, end, 1.0, 8.0, "river");
-    create_road_segments(components, current, GROUP_BARRIERS);
+void create_road(Vector2f start, Vector2f end) {
+    create_path(start, end, "road_tile", "road_end", 1.0f);
+}
+
+
+void create_river(Vector2f start, Vector2f end) {
+    create_path(start, end, "river_tile", "river_end", 1.0f);
 }
 
 
@@ -178,7 +85,7 @@ void draw_path(int camera, int entity) {
 
     // TODO: check if on-screen
     bool flip = next->next == NULL_ENTITY;
-    draw_spline(camera, image->texture_index, p0, p1, p2, p3, image->height, flip);
+    draw_spline(camera, image->texture_index, p0, p1, p2, p3, image->height, flip, COLOR_WHITE);
 }
 
 
@@ -188,5 +95,39 @@ void resize_roads(ComponentData* components) {
         if (col && col->group == GROUP_ROADS) {
             col->height = 1.0;
         }
+    }
+}
+
+
+void debug_draw_paths(Entity camera) {
+    Color color = get_color(1.0f, 1.0f, 0.0f, 0.5f);
+
+    for (Entity i = 0; i < game_data->components->entities; i++) {
+        PathComponent* path = PathComponent_get(i);
+        if (!path) continue;
+
+        draw_circle(camera, get_position(i), 0.5f, color);
+
+        if (path->next == NULL_ENTITY) continue;
+
+        PathComponent* next = PathComponent_get(path->next);
+    
+        Vector2f p0;
+        Vector2f p1 = get_position(i);
+        Vector2f p2 = get_position(path->next);
+        Vector2f p3;
+
+        if (path->prev != NULL_ENTITY) {
+            p0 = get_position(path->prev);
+        } else {
+            p0 = sum(p1, diff(p1, p2));
+        }
+    
+        if (next->next != NULL_ENTITY) {
+            p3 = get_position(next->next);
+        } else {
+            p3 = sum(p2, diff(p2, p1));
+        }
+        // draw_spline(game_data->camera, -1, p0, p1, p2, p3, path->width, false, color);
     }
 }

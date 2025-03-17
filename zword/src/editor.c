@@ -995,6 +995,7 @@ void draw_editor() {
     draw_barriers();
     draw_tutorials();
     draw_widgets(game_data->menu_camera);
+    debug_draw_paths(game_data->camera);
 
     draw_circle(game_data->camera, mouse_pos, 0.1f, COLOR_WHITE);
     String buffer;

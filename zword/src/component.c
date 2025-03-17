@@ -656,14 +656,11 @@ void CameraComponent_remove(int entity) {
 }
 
 
-PathComponent* PathComponent_add(int entity, float width, Filename filename) {
+PathComponent* PathComponent_add(int entity, float width) {
     PathComponent* road = malloc(sizeof(PathComponent));
     road->prev = -1;
     road->next = -1;
-    road->curve = 0.0;
     road->width = width;
-    strcpy(road->filename, filename);
-    road->texture_changed = true;
 
     game_data->components->path[entity] = road;
     return road;
@@ -679,6 +676,12 @@ PathComponent* PathComponent_get(int entity) {
 void PathComponent_remove(int entity) {
     PathComponent* road = PathComponent_get(entity);
     if (road) {
+        if (road->prev != NULL_ENTITY) {
+            PathComponent_get(road->prev)->next = road->next;
+        }
+        if (road->next != NULL_ENTITY) {
+            PathComponent_get(road->next)->prev = road->prev;
+        }
         free(road);
         game_data->components->path[entity] = NULL;
     }

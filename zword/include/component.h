@@ -394,12 +394,9 @@ typedef struct {
 } CameraComponent;
 
 typedef struct {
-    bool texture_changed;
     int prev;
     int next;
-    float curve;
     float width;
-    Filename filename;
 } PathComponent;
 
 typedef struct {
@@ -575,7 +572,7 @@ CameraComponent* CameraComponent_add(int entity, Resolution resolution, float zo
 CameraComponent* CameraComponent_get(int entity);
 void CameraComponent_remove(int entity);
 
-PathComponent* PathComponent_add(int entity, float width, Filename filename);
+PathComponent* PathComponent_add(int entity, float width);
 PathComponent* PathComponent_get(int entity);
 void PathComponent_remove(int entity);
 
