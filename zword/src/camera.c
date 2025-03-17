@@ -497,9 +497,9 @@ void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vec
     };
 
     int points_size = 10;
-    Vector2f* points = malloc(points_size * sizeof(Vector2f));
-    Vector2f* left_points = malloc(points_size * sizeof(Vector2f));
-    Vector2f* right_points = malloc(points_size * sizeof(Vector2f));
+
+    int vertices_size = 2 * points_size;
+    SDL_Vertex* vertices = malloc(vertices_size * sizeof(SDL_Vertex));
 
     Vector4 x = { p0.x, p1.x, p2.x, p3.x };
     Vector4 y = { p0.y, p1.y, p2.y, p3.y };
@@ -517,22 +517,33 @@ void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vec
         Vector2f dir = { dot4(dts, mx), dot4(dts, my) };
         Vector2f normal = mult(0.5f * width, normalized(perp(dir)));
 
-        left_points[i] = sum(pos, normal);
-        right_points[i] = diff(pos, normal);
+        Vector2f v = world_to_screen(camera, sum(pos, normal));
+        vertices[2 * i].position = (SDL_FPoint) { v.x, v.y };
+        vertices[2 * i].color = (SDL_Color) { 255, 255, 255, 255 };
+        vertices[2 * i].tex_coord = (SDL_FPoint) { t, 0.0f };
 
-        draw_circle(camera, sum(pos, normal), 0.1f, COLOR_RED);
-        draw_circle(camera, diff(pos, normal), 0.1f, COLOR_GREEN);
-
-        points[i] = pos;
+        v = world_to_screen(camera, diff(pos, normal));
+        vertices[2 * i + 1].position = (SDL_FPoint) { v.x, v.y };
+        vertices[2 * i + 1].color = (SDL_Color) { 255, 255, 255, 255 };
+        vertices[2 * i + 1].tex_coord = (SDL_FPoint) { t, 1.0f };
     }
 
+    int indices_size = 6 * (points_size - 1);
+    int* indices = malloc(indices_size * sizeof(int));
     for (int i = 0; i < points_size - 1; i++) {
-        draw_line(camera, points[i], points[i + 1], 0.1f, COLOR_WHITE);
-
-        Vector2f points[4] = { left_points[i], left_points[i + 1], right_points[i + 1], right_points[i] };
-        draw_skewed(camera, texture_index, points);
+        indices[6 * i] = 2 * i;
+        indices[6 * i + 1] = 2 * i + 1;
+        indices[6 * i + 2] = 2 * i + 2;
+        indices[6 * i + 3] = 2 * i + 2;
+        indices[6 * i + 4] = 2 * i + 1;
+        indices[6 * i + 5] = 2 * i + 3;
     }
-    free(points);
+
+    SDL_Texture* texture = resources.textures[texture_index];
+    int err = SDL_RenderGeometry(app.renderer, texture, vertices, vertices_size, indices, indices_size);
+    if (err != 0) {
+        LOG_ERROR("Error drawing spline: %s", SDL_GetError());
+    } 
 }
 
 
