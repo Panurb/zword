@@ -46,14 +46,14 @@ void create_water(Vector2f position, float width, float height) {
 void create_beach(Vector2f position, float length, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
-    ImageComponent_add(i, "beach_tile", 16.0f, length, LAYER_ROADS);
+    ImageComponent_add(i, "beach_tile", 16.0f, length, LAYER_PATHS);
 }
 
 
 void create_beach_corner(Vector2f position, float angle) {
     int i = create_entity();
     CoordinateComponent_add(i, position, angle);
-    ImageComponent_add(i, "beach_corner", 0, 0, LAYER_ROADS);
+    ImageComponent_add(i, "beach_corner", 0, 0, LAYER_PATHS);
 }
 
 

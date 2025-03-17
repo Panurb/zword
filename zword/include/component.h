@@ -29,8 +29,8 @@ typedef struct {
 
 typedef enum {
     LAYER_GROUND,
-    LAYER_ROADS,
     LAYER_FLOOR,
+    LAYER_PATHS,
     LAYER_DECALS,
     LAYER_SHADOWS,
     LAYER_WALLS,

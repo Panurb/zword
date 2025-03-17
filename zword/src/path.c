@@ -40,9 +40,9 @@ void create_path(Vector2f start, Vector2f end, String filename, String end_filen
         previous = current;
 
         if (i == 0 || i == n - 2) {
-            ImageComponent_add(current, end_filename, 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
+            ImageComponent_add(current, end_filename, 0.0f, 0.0f, LAYER_PATHS)->alpha = 0.0f;
         } else {
-            ImageComponent_add(current, filename, 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
+            ImageComponent_add(current, filename, 0.0f, 0.0f, LAYER_PATHS)->alpha = 0.0f;
         }
     }
 }
@@ -55,6 +55,11 @@ void create_road(Vector2f start, Vector2f end) {
 
 void create_river(Vector2f start, Vector2f end) {
     create_path(start, end, "river_tile", "river_end", 1.0f);
+}
+
+
+void create_footpath(Vector2f start, Vector2f end) {
+    create_path(start, end, "footpath_tile", "footpath_end", 0.5f);
 }
 
 

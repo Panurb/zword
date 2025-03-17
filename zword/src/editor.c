@@ -83,6 +83,7 @@ void reset_editor_ids() {
     editor_settings_window_id = -1;
     entity_settings_id = -1;
     entity_settings_entity = -1;
+    paths_window_id = NULL_ENTITY;
 }
 
 
@@ -96,7 +97,7 @@ bool category_selected(int entity) {
         switch (image->layer) {
         case LAYER_GROUND:
             return selected_categories[CATEGORY_TERRAIN];
-        case LAYER_ROADS:
+        case LAYER_PATHS:
         case LAYER_FLOOR:
             return selected_categories[CATEGORY_FLOOR];
         case LAYER_DECALS:
@@ -216,8 +217,9 @@ void select_road(int entity) {
 
 void toggle_paths(Entity entity) {
     UNUSED(entity);
-    if (paths_window_id != -1) {
+    if (paths_window_id != NULL_ENTITY) {
         destroy_entity_recursive(paths_window_id);
+        paths_window_id = NULL_ENTITY;
         return;
     }
 
@@ -228,7 +230,8 @@ void toggle_paths(Entity entity) {
     add_child(paths_window_id, container);
 
     add_button_to_container(container, "road", select_road);
-    add_button_to_container(container, "river", select_road);    
+    add_button_to_container(container, "river", select_road);  
+    add_button_to_container(container, "footpath", select_road);  
 
     add_scrollbar_to_container(container);
 }
@@ -771,10 +774,13 @@ void input_tool_path(SDL_Event event) {
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         game_data->components->added_entities = List_create();
 
+        // TODO: better system for this
         if (strcmp(selected_object_name, "road") == 0) {
             create_road(tile_start, tile_end);
         } else if (strcmp(selected_object_name, "river") == 0) {
             create_river(tile_start, tile_end);
+        } else if (strcmp(selected_object_name, "footpath") == 0) {
+            create_footpath(tile_start, tile_end);
         }
 
         ListNode* node;
@@ -957,6 +963,8 @@ void draw_editor() {
             if (tile_started) {
                 draw_line(game_data->camera, tile_start, mouse_grid, 0.1f, COLOR_WHITE);
             }
+
+            draw_text(game_data->menu_camera, vec(-23.0f, -14.0f), selected_object_name, 20, COLOR_WHITE);
             break;
     }
 

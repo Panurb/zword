@@ -776,8 +776,7 @@ bool is_prefab_child(int entity) {
 }
 
 
-bool serialize_entity(cJSON* entities_json, int entity, int id,
-        Vector2f offset) {
+bool serialize_entity(cJSON* entities_json, int entity, int id, Vector2f offset) {
     if (!CoordinateComponent_get(entity)) return false;
     if (WidgetComponent_get(entity)) return false;
     if (CameraComponent_get(entity)) return false;
