@@ -209,7 +209,7 @@ void toggle_weapons(int entity) {
 
 
 void select_road(int entity) {
-    UNUSED(entity);
+    strcpy(selected_object_name, WidgetComponent_get(entity)->string);
     tool = TOOL_PATH;
 }
 
@@ -226,7 +226,10 @@ void toggle_paths(Entity entity) {
 
     int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 1, 5);
     add_child(paths_window_id, container);
-    add_button_to_container(container, "Road", select_road);
+
+    add_button_to_container(container, "road", select_road);
+    add_button_to_container(container, "river", select_road);    
+
     add_scrollbar_to_container(container);
 }
 
@@ -757,7 +760,7 @@ void input_tool_object(SDL_Event event) {
 }
 
 
-void input_tool_road(SDL_Event event) {
+void input_tool_path(SDL_Event event) {
     if (event.type == SDL_MOUSEMOTION) {
         tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -767,7 +770,12 @@ void input_tool_road(SDL_Event event) {
         }
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         game_data->components->added_entities = List_create();
-        create_road(tile_start, tile_end);
+
+        if (strcmp(selected_object_name, "road") == 0) {
+            create_road(tile_start, tile_end);
+        } else if (strcmp(selected_object_name, "river") == 0) {
+            create_river(tile_start, tile_end);
+        }
 
         ListNode* node;
         FOREACH(node, game_data->components->added_entities) {
@@ -802,7 +810,7 @@ void input_editor(SDL_Event event) {
             input_tool_object(event);
             break;
         case TOOL_PATH:
-            input_tool_road(event);
+            input_tool_path(event);
             break;
     }
 

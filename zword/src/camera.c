@@ -496,7 +496,7 @@ void draw_skewed(int camera, int texture_index, Vector2f corners[4]) {
 
 void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, 
         bool flip, Color color) {
-    // https://www.youtube.com/watch?v=jvPPXbo87ds
+    // https://www.mvps.org/directx/articles/catmull/
     static Matrix4 CATMULL_ROM = { 
         0.0f, 1.0f, 0.0f, 0.0f,
         -0.5f, 0.0f, 0.5f, 0.0f,
