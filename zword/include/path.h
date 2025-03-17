@@ -15,6 +15,6 @@ void create_road(Vector2f start, Vector2f end);
 
 void create_river(ComponentData* components, Vector2f start, Vector2f end);
 
-void draw_road(int camera, int entity);
+void draw_path(int camera, int entity);
 
 void resize_roads(ComponentData* components);

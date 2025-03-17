@@ -125,11 +125,6 @@ void create_road(Vector2f start, Vector2f end) {
         float x = i / (float)(n - 1);
         Vector2f pos = lin_comb(1.0f - x, start, x, end);
         Entity current = create_entity();
-
-        if (i == n - 1) {
-            pos = end;
-            angle += M_PI;
-        }
         
         CoordinateComponent_add(current, pos, angle);
         PathComponent* path = PathComponent_add(current, 1.0f, "road");
@@ -139,8 +134,8 @@ void create_road(Vector2f start, Vector2f end) {
         }
         previous = current;
 
-        if (i == 0 || i == n - 1) {
-            ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
+        if (i == 0 || i == n - 2) {
+            ImageComponent_add(current, "road_end", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
         } else {
             ImageComponent_add(current, "road_tile", 0.0f, 0.0f, LAYER_ROADS)->alpha = 0.0f;
         }
@@ -156,7 +151,7 @@ void create_river(ComponentData* components, Vector2f start, Vector2f end) {
 }
 
 
-void draw_road(int camera, int entity) {
+void draw_path(int camera, int entity) {
     ImageComponent* image = ImageComponent_get(entity);
     PathComponent* path = PathComponent_get(entity);
     if (!path) return;
@@ -181,48 +176,9 @@ void draw_road(int camera, int entity) {
         p3 = sum(p2, diff(p2, p1));
     }
 
-    draw_spline(camera, image->texture_index, p0, p1, p2, p3, image->height);
-
-    // PathComponent* road = PathComponent_get(entity);
-    // if (!road) return;
-
-    // float angle = get_angle(entity);
-    // float spread = fabs(road->curve);
-
-    // if (road->texture_changed) {
-    //     Filename filename;
-    //     snprintf(filename, 20, "%s%s", road->filename, "_curve");
-    //     int i = get_texture_index(filename);
-
-    //     sfConvexShape_setTexture(road->shape, textures[i], false);
-    //     float w = PIXELS_PER_UNIT * road->width;
-    //     float h = PIXELS_PER_UNIT * road->width * sinf(fabs(road->curve));
-    //     sfConvexShape_setTextureRect(road->shape, (sfIntRect) { 0, 0, w, h });
-
-    //     sfConvexShape_setPoint(road->shape, 0, (sfVector2f) { 0.0f, 0.0f });
-    //     sfConvexShape_setPoint(road->shape, road->points - 1, (sfVector2f) { 0.0f, 0.0f });
-
-    //     float ang = 0.0;
-    //     for (int i = 1; i < road->points - 1; i++) {
-    //         Vector2f point = polar_to_cartesian(road->width, ang);
-    //         sfConvexShape_setPoint(road->shape, i, (sfVector2f) { point.x, point.y });
-    //         ang += fabs(road->curve) / (road->points - 3);
-    //     }
-
-    //     sfConvexShape_setRotation(road->shape, -to_degrees(angle + 0.5 * spread));
-    //     road->texture_changed = false;
-    // }
-
-    // Vector2f pos = get_position(entity);
-    // float margin = 0.5 * road->width * tanf(0.5 * spread);
-    // pos = diff(pos, polar_to_cartesian(sqrtf(margin * margin + 0.25 * road->width * road->width), angle));
-
-    // CameraComponent* cam = CameraComponent_get(camera);
-
-    // sfConvexShape_setPosition(road->shape, world_to_screen(camera, pos));
-    // sfConvexShape_setScale(road->shape, (sfVector2f) { cam->zoom, cam->zoom });
-
-    // sfRenderWindow_drawConvexShape(window, road->shape, NULL);
+    // TODO: check if on-screen
+    bool flip = next->next == NULL_ENTITY;
+    draw_spline(camera, image->texture_index, p0, p1, p2, p3, image->height, flip);
 }
 
 

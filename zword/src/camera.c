@@ -494,7 +494,8 @@ void draw_skewed(int camera, int texture_index, Vector2f corners[4]) {
 }
 
 
-void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width) {
+void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, bool flip) {
+    // https://www.youtube.com/watch?v=jvPPXbo87ds
     static Matrix4 CATMULL_ROM = { 
         0.0f, 1.0f, 0.0f, 0.0f,
         -0.5f, 0.0f, 0.5f, 0.0f,
@@ -522,6 +523,10 @@ void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vec
         Vector4 dts = { 0.0f, 1.0f, 2.0f * t, 3.0f * t * t };
         Vector2f dir = { dot4(dts, mx), dot4(dts, my) };
         Vector2f normal = mult(0.5f * width, normalized(perp(dir)));
+
+        if (flip) {
+            t = 1.0f - t;
+        }
 
         Vector2f v = world_to_screen(camera, sum(pos, normal));
         vertices[2 * i].position = (SDL_FPoint) { v.x, v.y };

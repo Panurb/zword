@@ -222,7 +222,7 @@ void draw_ground(int camera) {
         draw_image(i, camera);
 
         // TODO: check if on screen
-        draw_road(camera, i);
+        draw_path(camera, i);
     }
 }
 

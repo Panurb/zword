@@ -55,7 +55,7 @@ void draw_sprite_outline(int camera, int texture_index, float width, float heigh
 
 void draw_text(int camera, Vector2f position, char string[100], int size, Color color);
 
-void draw_spline(int camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width);
+void draw_spline(int camera, int texture_index, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3, float width, bool flip);
 
 void update_camera(int camera, float time_step, bool follow_players);
 
