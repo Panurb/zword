@@ -656,14 +656,14 @@ void CameraComponent_remove(int entity) {
 }
 
 
-PathComponent* PathComponent_add(int entity, float width) {
-    PathComponent* road = malloc(sizeof(PathComponent));
-    road->prev = -1;
-    road->next = -1;
-    road->width = width;
+PathComponent* PathComponent_add(int entity) {
+    PathComponent* path = malloc(sizeof(PathComponent));
+    path->prev = -1;
+    path->next = -1;
+    path->width = 0.0f;
 
-    game_data->components->path[entity] = road;
-    return road;
+    game_data->components->path[entity] = path;
+    return path;
 }
 
 

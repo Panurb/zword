@@ -505,14 +505,14 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
 
 
 void PathComponent_serialize(cJSON* entity_json, int entity) {
-    PathComponent* road = PathComponent_get(entity);
-    if (!road) return;
+    PathComponent* path = PathComponent_get(entity);
+    if (!path) return;
 
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Path", json);
-    serialize_id(json, "prev", road->prev);
-    serialize_id(json, "next", road->next);
-    serialize_float(json, "width", road->width, 0.0f);
+    serialize_id(json, "prev", path->prev);
+    serialize_id(json, "next", path->next);
+    serialize_float(json, "width", path->width, 0.0f);
 }
 
 
@@ -520,11 +520,14 @@ void PathComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Path");
     if (!json) return;
 
-    float curve = deserialize_float(json, "curve", 0.0f);
-    float width = deserialize_float(json, "width", 0.0f);
-    PathComponent* road = PathComponent_add(entity, width);
-    deserialize_id(json, "prev", &road->prev);
-    deserialize_id(json, "next", &road->next);
+    PathComponent* path = PathComponent_get(entity);
+    if (!path) {
+        path = PathComponent_add(entity);
+    }
+
+    path->width = deserialize_float(json, "width", path->width);
+    deserialize_id(json, "prev", &path->prev);
+    deserialize_id(json, "next", &path->next);
 }
 
 
@@ -790,6 +793,7 @@ bool serialize_entity(cJSON* entities_json, int entity, int id, Vector2f offset)
     cJSON_AddNumberToObject(json, "id", id);
 
     CoordinateComponent_serialize(json, entity, offset);
+    PathComponent_serialize(json, entity);
     if (is_prefab(entity)) {
         return true;
     }
@@ -806,7 +810,6 @@ bool serialize_entity(cJSON* entities_json, int entity, int id, Vector2f offset)
     ItemComponent_serialize(json, entity);
     WaypointComponent_serialize(json, entity);
     HealthComponent_serialize(json, entity);
-    PathComponent_serialize(json, entity);
     SoundComponent_serialize(json, entity);
     AmmoComponent_serialize(json, entity);
     AnimationComponent_serialize(json, entity);
@@ -837,7 +840,9 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
             LOG_ERROR("Cannot preserve id for prefabs");
             return -1;
         } else {
-            return load_prefab(prefab, pos, angle, scale);
+            int i = load_prefab(prefab, pos, angle, scale);
+            PathComponent_deserialize(entity_json, i);
+            return i;
         }
     }
 
@@ -882,7 +887,6 @@ void update_serialized_ids(int ids[MAX_ENTITIES]) {
         if (!id_json) {
             break;
         }
-        printf("%d -> %d\n", id_json->valueint, updated_id(id_json->valueint, ids));
         cJSON_SetNumberValue(id_json, updated_id(id_json->valueint, ids));
     }
     memset(serialized_ids, 0, sizeof(serialized_ids));
@@ -893,7 +897,6 @@ void update_deserialized_ids(int ids[MAX_ENTITIES]) {
     for (int i = 0; i < LENGTH(deserialized_ids); i++) {
         int* id_ptr = deserialized_ids[i];
         if (!id_ptr) break;
-        LOG_DEBUG("%d -> %d", *id_ptr, updated_id(*id_ptr, ids));
         *id_ptr = updated_id(*id_ptr, ids);
     }
     memset(deserialized_ids, 0, sizeof(deserialized_ids));

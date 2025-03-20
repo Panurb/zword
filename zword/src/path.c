@@ -2,6 +2,7 @@
 
 #include "path.h"
 #include "game.h"
+#include "serialize.h"
 
 
 Vector2f perlin_grad(Vector2f position, Permutation perm) {
@@ -29,37 +30,37 @@ void create_path(Vector2f start, Vector2f end, String filename, String end_filen
     for (int i = 0; i < n; i++) {
         float x = i / (float)(n - 1);
         Vector2f pos = lin_comb(1.0f - x, start, x, end);
-        Entity current = create_entity();
-        
-        CoordinateComponent_add(current, pos, angle);
-        PathComponent* path = PathComponent_add(current, width);
+
+        String filepath;
+        if (i == 0 || i == n - 2) {
+            snprintf(filepath, sizeof(filepath), "paths/%s", end_filename);
+        } else {
+            snprintf(filepath, sizeof(filepath), "paths/%s", filename);
+        }
+
+        Entity current = load_prefab(filepath, pos, angle, ones());
+        PathComponent* path = PathComponent_get(current);
         if (previous != NULL_ENTITY) {
             path->prev = previous;
             PathComponent_get(previous)->next = current;
         }
         previous = current;
-
-        if (i == 0 || i == n - 2) {
-            ImageComponent_add(current, end_filename, 0.0f, 0.0f, LAYER_PATHS)->alpha = 0.0f;
-        } else {
-            ImageComponent_add(current, filename, 0.0f, 0.0f, LAYER_PATHS)->alpha = 0.0f;
-        }
     }
 }
 
 
 void create_road(Vector2f start, Vector2f end) {
-    create_path(start, end, "road_tile", "road_end", 1.0f);
+    create_path(start, end, "road", "road_end", 1.0f);
 }
 
 
 void create_river(Vector2f start, Vector2f end) {
-    create_path(start, end, "river_tile", "river_end", 1.0f);
+    create_path(start, end, "river", "river_end", 1.0f);
 }
 
 
 void create_footpath(Vector2f start, Vector2f end) {
-    create_path(start, end, "footpath_tile", "footpath_end", 0.5f);
+    create_path(start, end, "footpath", "footpath_end", 0.5f);
 }
 
 

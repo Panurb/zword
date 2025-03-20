@@ -572,7 +572,7 @@ CameraComponent* CameraComponent_add(int entity, Resolution resolution, float zo
 CameraComponent* CameraComponent_get(int entity);
 void CameraComponent_remove(int entity);
 
-PathComponent* PathComponent_add(int entity, float width);
+PathComponent* PathComponent_add(int entity);
 PathComponent* PathComponent_get(int entity);
 void PathComponent_remove(int entity);
 

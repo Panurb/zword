@@ -1,0 +1,18 @@
+{
+    "entities":	[{
+        "id":	0,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0,
+            "angle":	0
+        },
+        "Image":	{
+            "filename":	"road_tile",
+            "layer":	2,
+            "alpha":	0
+        },
+        "Path":	{
+            "width":	1
+        }
+    }]
+}
