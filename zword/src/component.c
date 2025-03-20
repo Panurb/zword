@@ -336,7 +336,7 @@ EnemyComponent* EnemyComponent_add(int entity) {
     enemy->acceleration = 15.0f;
     enemy->target = -1;
     enemy->path = List_create();
-    enemy->fov = 0.5f * M_PI;
+    enemy->fov = M_PI_2;
     enemy->vision_range = 15.0f;
     enemy->idle_speed = 1.0f;
     enemy->walk_speed = 2.0f;

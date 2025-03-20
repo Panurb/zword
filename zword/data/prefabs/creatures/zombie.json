@@ -43,7 +43,8 @@
 				"group":	4
 			},
 			"Enemy":	{
-				"weapon":	0
+				"weapon":	0,
+				"fov": 3.141
 			},
 			"Particle":	{
 				"type":	2,
