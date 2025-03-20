@@ -120,6 +120,8 @@ typedef char Filename[128];
 #define BUTTON_TEXT_SIZE 128
 typedef char ButtonText[BUTTON_TEXT_SIZE];
 
+void fill(int* array, int value, int size);
+
 bool close_enough(float a, float b, float epsilon);
 
 Vector2f zeros();

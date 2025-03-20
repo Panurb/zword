@@ -59,16 +59,17 @@ void update_doors() {
 
 void unlock_door(int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    if (player->target == -1) return;
+    if (player->target == NULL_ENTITY) return;
 
     DoorComponent* door = DoorComponent_get(player->target);
     if (!door) return;
 
-    if (door->key != -1) {
+    if (door->key != NULL_ENTITY) {
         for (int i = 0; i < player->keys_size; i++) {
-            if (i == NULL_ENTITY) continue;
+            int j = player->keys[i];
+            if (j == NULL_ENTITY) continue;
 
-            ItemComponent* key = ItemComponent_get(player->keys[i]);
+            ItemComponent* key = ItemComponent_get(j);
             if (key->value == door->key) {
                 door->locked = false;
                 break;

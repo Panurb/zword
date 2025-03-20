@@ -28,7 +28,8 @@ typedef enum {
     TOOL_SELECT,
     TOOL_TILE,
     TOOL_OBJECT, 
-    TOOL_PATH
+    TOOL_PATH,
+    TOOL_FOREST
 } Tool;
 
 
@@ -50,7 +51,7 @@ static Vector2f tile_start = { 0.0f, 0.0f };
 static Vector2f tile_end = { 0.0f, 0.0f };
 static bool tile_started = false;
 static List* selections = NULL;
-static Tool tool = TOOL_TILE;
+static Tool tool = TOOL_SELECT;
 static Vector2f mouse_world = { 0.0f, 0.0f };
 static float grid_sizes[] = { 0.0f, 0.25f, 0.5f, 1.0f };
 static int grid_size_index = 3;
@@ -525,6 +526,12 @@ void update_selections() {
 }
 
 
+void set_tool_forest(int entity) {
+    UNUSED(entity);
+    tool = TOOL_FOREST;
+}
+
+
 void save_current_map(int entity) {
     UNUSED(entity);
     save_map(game_data->map_name);
@@ -551,6 +558,8 @@ void create_editor_menu() {
     create_button("WEAPONS", pos, toggle_weapons);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("PATHS", pos, toggle_paths);
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
+    create_button("FOREST", pos, set_tool_forest);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
@@ -797,6 +806,55 @@ void input_tool_path(SDL_Event event) {
 }
 
 
+void input_tool_forest(SDL_Event event) {
+    static float probs[4] = {0.3f, 0.3f, 0.3f, 0.1f};
+    static String trees[4] = {"tree", "birch", "spruce", "rock"};
+
+    if (event.type == SDL_MOUSEMOTION) {
+        tile_end = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            tile_start = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+            tile_started = true;
+        }
+    } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+        float width = fabsf(tile_end.x - tile_start.x);
+        float height = fabsf(tile_end.y - tile_start.y);
+        Vector2f pos = mult(0.5f, sum(tile_end, tile_start));
+
+        game_data->components->added_entities = List_create();
+
+        float density = 0.4f;
+        int nx = width * density;
+        int ny = height * density;
+        
+        for (int i = -nx / 2; i < nx / 2 + 1; i++) {
+            for (int j = -ny / 2; j < ny / 2 + 1; j++) {
+                String prefab;
+                int k = rand_choice(probs, LENGTH(probs));
+                snprintf(prefab, STRING_SIZE, "objects/%s", trees[k]);
+
+                Vector2f p = sum(pos, vec(i / density, j/ density));
+                p = sum(p, mult(0.5f, rand_vector()));
+                float scale = randf(0.8f, 1.2f);
+                int e = load_prefab(prefab, p, rand_angle(), vec(scale, scale));
+                List_add(game_data->components->added_entities, e);
+            }
+        }
+
+        ListNode* node;
+        FOREACH(node, game_data->components->added_entities) {
+            if (ColliderComponent_get(node->value)) {
+                update_grid(node->value);
+            }
+        }
+        List_delete(game_data->components->added_entities);
+        game_data->components->added_entities = NULL;
+        tile_started = false;
+    }
+}
+
+
 void input_editor(SDL_Event event) {
     if (input_widgets(game_data->menu_camera, event)) {
         return;
@@ -817,6 +875,9 @@ void input_editor(SDL_Event event) {
             break;
         case TOOL_PATH:
             input_tool_path(event);
+            break;
+        case TOOL_FOREST:
+            input_tool_forest(event);
             break;
     }
 
@@ -965,6 +1026,19 @@ void draw_editor() {
             }
 
             draw_text(game_data->menu_camera, vec(-23.0f, -14.0f), selected_object_name, 20, COLOR_WHITE);
+            break;
+        case TOOL_FOREST:
+            if (tile_started) {
+                float width = fabsf(mouse_grid.x - tile_start.x);
+                float height = fabsf(mouse_grid.y - tile_start.y);
+                Vector2f pos = mult(0.5f, sum(mouse_grid, tile_start));
+                draw_rectangle_outline(game_data->camera, pos, width, height, 0.0f, 0.05f, 
+                    COLOR_GREEN);
+            } else {
+                Vector2f pos = mouse_grid;
+                draw_line(game_data->camera, vec(pos.x - 0.2f, pos.y), vec(pos.x + 0.2f, pos.y), 0.05f, COLOR_GREEN);
+                draw_line(game_data->camera, vec(pos.x, pos.y - 0.2f), vec(pos.x, pos.y + 0.2f), 0.05f, COLOR_GREEN);
+            }
             break;
     }
 

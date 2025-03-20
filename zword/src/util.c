@@ -10,10 +10,15 @@
 #include "util.h"
 
 
+void fill(int* array, int value, int size) {
+    for (int i = 0; i < size; i++) {
+        array[i] = value;
+    }
+}
+
 bool close_enough(float a, float b, float epsilon) {
     return fabs(a - b) < epsilon;
 }
-
 
 Vector2f zeros() {
     return (Vector2f) { 0.0f, 0.0f };
