@@ -441,7 +441,7 @@ void create_menu() {
     String files[128];
     int files_count = list_files_alphabetically("save", files);
 
-    if (files_count > 0) {
+    if (strcmp(files[0], "Campaign") == 0) {
         add_button_to_container(container, "CONTINUE", load_campaign);
     }
 

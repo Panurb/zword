@@ -787,6 +787,7 @@ DoorComponent* DoorComponent_add(int entity, int price) {
     DoorComponent* door = malloc(sizeof(DoorComponent));
     door->locked = price > 0;
     door->price = price;
+    door->key = KEY_NONE;
 
     game_data->components->door[entity] = door;
     return door;

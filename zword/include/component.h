@@ -338,7 +338,8 @@ typedef enum ItemType {
     ITEM_BARREL,
     ITEM_GRIP,
     ITEM_FUEL,
-    ITEM_KEY
+    ITEM_KEY,
+    ITEM_SAVE,
 } ItemType;
 
 typedef struct {
@@ -427,6 +428,20 @@ typedef struct {
     bool play_once;
     float wind_factor;
 } AnimationComponent;
+
+static const String DOOR_KEY_NAMES[] = {
+    "None",
+    "Bronze Key",
+    "Silver Key",
+    "Gold Key"
+};
+
+typedef enum {
+    KEY_NONE,
+    KEY_BRONZE,
+    KEY_SILVER,
+    KEY_GOLD
+} DoorKey;
 
 typedef struct {
     bool locked;

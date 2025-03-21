@@ -1,0 +1,35 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0
+			},
+			"Image":	{
+				"filename":	"save_point",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	0,
+				"width": 1,
+                "height": 1,
+				"group":	2
+			},
+			"Item":	{
+				"name": "Save game",
+				"size":	0,
+				"type":	13
+			},
+            "Light":	{
+				"range":	2,
+				"angle":	6.2831854820251465,
+				"color_r":	127,
+				"color_g":	255,
+				"color_b":	0,
+				"brightness":	0.5,
+				"speed":	1,
+				"flicker":	0.25
+			}
+		}]
+}

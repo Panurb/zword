@@ -18,7 +18,7 @@
 				"angle":	0
 			},
 			"Image":	{
-				"filename":	"door_bronze",
+				"filename":	"door_gold",
 				"layer":	7
 			},
 			"Physics":	{
@@ -46,8 +46,8 @@
 			},
 			"Door":	{
 				"locked":	true,
-				"price": 500,
-				"key": 1
+				"price": 2000,
+				"key": 3
 			}
 		}]
 }

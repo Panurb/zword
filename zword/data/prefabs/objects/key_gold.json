@@ -7,7 +7,7 @@
 				"angle":	0.0
 			},
 			"Image":	{
-				"filename":	"key_bronze",
+				"filename":	"key_gold",
 				"layer":	7
 			},
 			"Physics":	{
@@ -20,10 +20,10 @@
 				"group":	2
 			},
 			"Item":	{
-				"name": "Bronze key",
+				"name": "Gold key",
 				"size":	0,
 				"type":	12,
-				"value": 1
+				"value": 3
 			}
 		}]
 }

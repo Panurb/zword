@@ -380,32 +380,7 @@ void alert_enemies(int player, float range) {
 }
 
 
-void enemy_die(int entity) {
-    CoordinateComponent* coord = CoordinateComponent_get(entity);
-    EnemyComponent* enemy = EnemyComponent_get(entity);
-    HealthComponent* health = HealthComponent_get(entity);
-    ParticleComponent* particle = ParticleComponent_get(entity);
-
-    coord->lifetime = 30.0f;
-
-    enemy->state = ENEMY_DEAD;
-    List_clear(enemy->path);
-    LightComponent_remove(entity);
-    destroy_entity(enemy->weapon);
-    List_remove(coord->children, enemy->weapon);
-    enemy->weapon = -1;
-
-    // Overkill
-    if (health->health < -health->max_health) {
-        ImageComponent_remove(entity);
-        if (particle) {
-            particle->origin = zeros();
-            add_particles(entity, 100);
-        }
-    }
-
-    WaypointComponent_remove(entity);
-
+void drop_loot(int entity) {
     float probs[5] = { 0.1f, 0.1f, 0.1f, 0.1f, 1.0f };
 
     ListNode* node;
@@ -464,6 +439,38 @@ void enemy_die(int entity) {
     }
     if (j != -1) {
         add_child(entity, j);
+    }
+}
+
+
+void enemy_die(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    EnemyComponent* enemy = EnemyComponent_get(entity);
+    HealthComponent* health = HealthComponent_get(entity);
+    ParticleComponent* particle = ParticleComponent_get(entity);
+
+    coord->lifetime = 30.0f;
+
+    enemy->state = ENEMY_DEAD;
+    List_clear(enemy->path);
+    LightComponent_remove(entity);
+    destroy_entity(enemy->weapon);
+    List_remove(coord->children, enemy->weapon);
+    enemy->weapon = -1;
+
+    // Overkill
+    if (health->health < -health->max_health) {
+        ImageComponent_remove(entity);
+        if (particle) {
+            particle->origin = zeros();
+            add_particles(entity, 100);
+        }
+    }
+
+    WaypointComponent_remove(entity);
+
+    if (game_data->game_mode == MODE_SURVIVAL) {
+        drop_loot(entity);
     }
 }
 

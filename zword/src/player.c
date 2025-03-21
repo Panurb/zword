@@ -166,7 +166,11 @@ void update_players(float time_step) {
                 break;
             case PLAYER_INTERACT:
                 if (ItemComponent_get(player->target)) {
-                    pick_up_item(i);
+                    if (ItemComponent_get(player->target)->type == ITEM_SAVE) {
+                        game_state = STATE_SAVE;
+                    } else {
+                        pick_up_item(i);
+                    }
                 } else if (DoorComponent_get(player->target)) {
                     unlock_door(i);
                 }

@@ -231,6 +231,8 @@ void input() {
 void update(float time_step) {
     static GameState previous_state = STATE_MENU;
 
+    GameState state = game_state;
+
     switch (game_state) {
         case STATE_MENU:
             update_menu();
@@ -295,9 +297,12 @@ void update(float time_step) {
             return;
     }
 
+    if (state != game_state) {
+        previous_state = state;
+    }
+
     float time = SDL_GetTicks() / 1000.0f;
     title_scale = 2.5f + 0.1f * sinf(2.0f * time);
-    previous_state = game_state;
 }
 
 

@@ -101,7 +101,7 @@ int deserialize_int(cJSON* json, char* name, int value) {
 
 
 void serialize_float(cJSON* json, char* name, float value, float default_value) {
-    if (value != default_value) {
+    if (!close_enough(value, default_value, 0.001f)) {
         cJSON_AddNumberToObject(json, name, value);
     }
 }
@@ -188,7 +188,9 @@ void ImageComponent_deserialize(cJSON* entity_json, int entity) {
 
     char* filename = cJSON_GetObjectItem(json, "filename")->valuestring;
     float layer = cJSON_GetObjectItem(json, "layer")->valueint;
-    ImageComponent* image = ImageComponent_add(entity, filename, 0.0f, 0.0f, layer);
+    float width = deserialize_float(json, "width", 0.0f);
+    float height = deserialize_float(json, "height", 0.0f);
+    ImageComponent* image = ImageComponent_add(entity, filename, width, height, layer);
     image->alpha = deserialize_float(json, "alpha", 1.0f);
 }
 

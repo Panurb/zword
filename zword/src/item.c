@@ -298,9 +298,15 @@ void draw_player_targets() {
 
         if (door) {
             pos = sum(pos, vec(0.0f, 1.0f));
-            char buffer[256];
-            snprintf(buffer, 256, "%d", door->price);
-            draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
+            String buffer = "";
+            if (door->key != KEY_NONE) {
+                snprintf(buffer, LENGTH(buffer), "Locked with %s", DOOR_KEY_NAMES[door->key]);
+                draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
+                pos = sum(pos, vec(0.0f, 1.0f));
+            } else if (door->price > 0) {
+                snprintf(buffer, LENGTH(buffer), "Locked, price %d", door->price);
+                draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
+            }
         }
     }
 }

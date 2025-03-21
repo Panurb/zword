@@ -27,11 +27,13 @@
 			"Coordinate":	{
 				"x":	0,
 				"y":	0,
-				"angle":	2.374290943145752
+				"angle":	0
 			},
 			"Image":	{
 				"filename":	"big_boy",
-				"layer":	9
+				"layer":	9,
+				"width": 4,
+				"height": 2
 			},
 			"Physics":	{
 				"mass":	10

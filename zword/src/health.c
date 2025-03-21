@@ -98,6 +98,9 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
     HealthComponent* health = HealthComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     if (health) {
+        // Entity can no longer be stored as prefab
+        CoordinateComponent_get(entity)->prefab[0] = '\0';
+
         int prev_health = health->health;
         health->health = health->health - dmg;
 
