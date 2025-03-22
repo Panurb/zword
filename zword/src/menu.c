@@ -416,6 +416,7 @@ void load_campaign(int entity) {
     UNUSED(entity);
     strcpy(game_data->map_name, "Campaign");
     change_state_load(entity);
+    reset_ids();
 }
 
 
@@ -439,9 +440,9 @@ void create_menu() {
     WidgetComponent_get(container)->enabled = false;
 
     String files[128];
-    int files_count = list_files_alphabetically("save", files);
+    int files_count = list_files_alphabetically("save/*.json", files);
 
-    if (strcmp(files[0], "Campaign") == 0) {
+    if (files_count > 0 && strcmp(files[0], "Campaign") == 0) {
         add_button_to_container(container, "CONTINUE", load_campaign);
     }
 

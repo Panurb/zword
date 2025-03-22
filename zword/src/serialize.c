@@ -488,9 +488,9 @@ void HealthComponent_serialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Health", json);
     serialize_int(json, "health", health->health, 0);
-    cJSON_AddStringToObject(json, "dead_image", health->dead_image);
-    cJSON_AddStringToObject(json, "decal", health->decal);
-    cJSON_AddStringToObject(json, "die_sound", health->die_sound);
+    serialize_string(json, "dead_image", health->dead_image, "");
+    serialize_string(json, "decal", health->decal, "");
+    serialize_string(json, "die_sound", health->die_sound, "");
 }
 
 
@@ -499,10 +499,10 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
     if (!json) return;
 
     int hp = deserialize_int(json, "health", 0);
-    char* dead_image = cJSON_GetObjectItem(json, "dead_image")->valuestring;
-    char* decal = cJSON_GetObjectItem(json, "decal")->valuestring;
-    char* die_sound = cJSON_GetObjectItem(json, "die_sound")->valuestring;
-    HealthComponent_add(entity, hp, dead_image, decal, die_sound);
+    HealthComponent* health = HealthComponent_add(entity, hp, "", "", "");
+    deserialize_string(json, "dead_image", health->dead_image);
+    deserialize_string(json, "decal", health->decal);
+    deserialize_string(json, "die_sound", health->die_sound);
 }
 
 
@@ -843,6 +843,7 @@ int deserialize_entity(cJSON* entity_json, bool preserve_id) {
             return -1;
         } else {
             int i = load_prefab(prefab, pos, angle, scale);
+            deserialize_id(coord_json, "parent", &CoordinateComponent_get(i)->parent);
             PathComponent_deserialize(entity_json, i);
             return i;
         }
@@ -1123,7 +1124,28 @@ cJSON* load_json(Filename directory, Filename filename) {
 
 
 void save_state(ButtonText map_name) {
-    LOG_INFO("Saving map %s", map_name);
+    for (Entity i = 0; i < game_data->components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!coord) continue;
+
+        PlayerComponent* player = PlayerComponent_get(i);
+        if (player) {
+            remove_prefab(i);
+            continue;
+        }
+
+        HealthComponent* health = HealthComponent_get(i);
+        if (health && health->health < health->max_health) {
+            remove_prefab(i);
+            continue;
+        }
+
+        ItemComponent* item = ItemComponent_get(i);
+        if (item) {
+            remove_prefab(i);
+            continue;
+        }
+    }
 
     cJSON* json = serialize_game(false);
     save_json(json, "save", map_name);

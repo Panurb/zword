@@ -238,7 +238,7 @@ void update(float time_step) {
             update_menu();
             break;
         case STATE_START:
-            start_game(game_data->map_name);
+            start_game(game_data->map_name, false);
             game_state = STATE_GAME;
             break;
         case STATE_END:
@@ -266,7 +266,7 @@ void update(float time_step) {
         case STATE_LOAD:
             end_game();
             clear_all_sounds();
-            load_state(game_data->map_name);
+            start_game(game_data->map_name, true);
             game_state = STATE_GAME;
             break;
         case STATE_APPLY:

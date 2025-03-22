@@ -13,7 +13,7 @@ float run_benchmark() {
 
     srand(0);
 
-    start_game("Survival");
+    start_game("Survival", false);
 
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {

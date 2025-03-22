@@ -627,6 +627,7 @@ int get_root(int entity);
 void add_child(int parent, int child);
 void remove_children(int parent);
 void remove_parent(int child);
+void remove_prefab(int entity);
 
 void ComponentData_clear();
 

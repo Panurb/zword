@@ -591,7 +591,7 @@ void WaypointComponent_remove(int entity) {
 
 HealthComponent* HealthComponent_add(int entity, int health, Filename dead_image, Filename decal, Filename die_sound) {
     HealthComponent* comp = malloc(sizeof(HealthComponent));
-    comp->dead = false;
+    comp->dead = health <= 0;
     comp->health = health;
     comp->max_health = health;
     strcpy(comp->dead_image, dead_image);
@@ -958,6 +958,12 @@ void remove_parent(int child) {
 }
 
 
+void remove_prefab(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    coord->prefab[0] = '\0';
+}
+
+
 void destroy_entity(int entity) {
     if (entity == -1) return;
 
@@ -1085,9 +1091,9 @@ Vector2f get_scale_interpolated(int entity, float delta) {
 bool entity_exists(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord) {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 

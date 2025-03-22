@@ -166,7 +166,7 @@ void init_tutorial() {
 }
 
 
-void start_game(Filename map_name) {
+void start_game(Filename map_name, bool load_save) {
     ColliderGrid_clear(game_data->grid);
     ComponentData_clear();
     game_data->camera = create_camera();
@@ -175,7 +175,12 @@ void start_game(Filename map_name) {
     // create_level(data.components, data.grid, data.seed);
     // test(data->components);
     create_pause_menu();
-    load_map(map_name);
+
+    if (load_save) {
+        load_state(map_name);
+    } else {
+        load_map(map_name);
+    }
 
     int i = 0;
     ListNode* node;
@@ -495,8 +500,15 @@ void draw_game() {
 void draw_parents() {
     for (int i = 0; i < game_data->components->entities; i++) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
-        if (coord && coord->parent != -1) {
-            Vector2f start = get_position(i);
+        if (!coord) continue;
+        
+        Vector2f start = get_position(i);
+
+        String buffer;
+        snprintf(buffer, sizeof(buffer), "%d", coord->parent);
+        draw_text(game_data->camera, sum(start, vec(0.0f, 1.0f)), buffer, 20, COLOR_RED);
+        
+        if (coord->parent != -1) {
             Vector2f end = get_position(coord->parent);
             draw_line(game_data->camera, start, end, 0.05f, get_color(0.0f, 1.0f, 1.0f, 0.5f));
         }

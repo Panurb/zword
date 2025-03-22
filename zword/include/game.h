@@ -95,7 +95,7 @@ void create_game();
 
 void resize_game();
 
-void start_game(Filename map_name);
+void start_game(Filename map_name, bool load_save);
 
 void end_game();
 

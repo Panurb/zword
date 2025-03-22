@@ -12,9 +12,9 @@
 			},
 			"Collider":	{
 				"type":	0,
-				"width": 1,
-                "height": 1,
-				"group":	2
+				"width": 1.5,
+                "height": 1.5,
+				"group":	1
 			},
 			"Item":	{
 				"name": "Save game",
@@ -22,7 +22,7 @@
 				"type":	13
 			},
             "Light":	{
-				"range":	2,
+				"range":	5,
 				"angle":	6.2831854820251465,
 				"color_r":	127,
 				"color_g":	255,
