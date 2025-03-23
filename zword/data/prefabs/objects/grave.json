@@ -1,0 +1,27 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0
+			},
+			"Image":	{
+				"filename":	"grave",
+				"layer":	12
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1,
+				"height":	0.5,
+				"group":	1
+			},
+			"Particle":	{
+				"type":	5,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit"
+			}
+		}]
+}

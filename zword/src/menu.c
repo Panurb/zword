@@ -428,9 +428,9 @@ void start_tutorial(int entity) {
 
 void create_menu() {
     #ifdef __EMSCRIPTEN__
-        int height = 5;
+        int height = 8;
     #else
-        int height = 6;
+        int height = 9;
     #endif
 
     if (game_settings.debug) {
