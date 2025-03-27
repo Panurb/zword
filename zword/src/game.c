@@ -121,6 +121,7 @@ void create_game() {
 
     game_data->game_mode = MODE_SURVIVAL;
     game_data->testing = false;
+    game_data->start_position = zeros();
 }
 
 

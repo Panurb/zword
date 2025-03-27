@@ -898,6 +898,7 @@ void input_tool_test(SDL_Event event) {
             init_game();
 
             game_data->testing = true;
+            game_data->start_position = pos;
             game_state = STATE_GAME;
         }
     }

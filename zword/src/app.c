@@ -287,6 +287,7 @@ void update(float time_step) {
         case STATE_LOAD_EDITOR:
             game_data->testing = false;
             end_game();
+            CoordinateComponent_get(game_data->camera)->position = game_data->start_position;
             create_editor_menu();
             load_map(game_data->map_name);
             game_state = STATE_EDITOR;
