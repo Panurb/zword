@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "app.h"
 #include "editor.h"
 #include "widget.h"
 #include "component.h"
@@ -29,7 +30,8 @@ typedef enum {
     TOOL_TILE,
     TOOL_OBJECT, 
     TOOL_PATH,
-    TOOL_FOREST
+    TOOL_FOREST,
+    TOOL_TEST
 } Tool;
 
 
@@ -532,6 +534,12 @@ void set_tool_forest(int entity) {
 }
 
 
+void set_tool_test(int entity) {
+    UNUSED(entity);
+    tool = TOOL_TEST;
+}
+
+
 void save_current_map(int entity) {
     UNUSED(entity);
     save_map(game_data->map_name);
@@ -564,6 +572,8 @@ void create_editor_menu() {
     create_button("SETTINGS", pos, toggle_editor_settings);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("SAVE", pos, save_current_map);
+    pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
+    create_button("TEST", pos, set_tool_test);
     pos = sum(pos, vec(0.0f, -BUTTON_HEIGHT));
     create_button("QUIT", pos, quit_editor);
 }
@@ -746,21 +756,30 @@ void input_tool_tile(SDL_Event event) {
 }
 
 
+void load_object_from_prefab(String name, Vector2f pos, Vector2f scale) {
+    LOG_INFO("Loading object %s", name);
+    game_data->components->added_entities = List_create();
+
+    load_prefab(name, pos, selected_object_angle, scale);
+    
+    ListNode* node;
+    FOREACH(node, game_data->components->added_entities) {
+        if (ColliderComponent_get(node->value)) {
+            update_grid(node->value);
+        }
+    }
+    List_delete(game_data->components->added_entities);
+    game_data->components->added_entities = NULL;
+}
+
+
 void input_tool_object(SDL_Event event) {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
-            game_data->components->added_entities = List_create();
             Vector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
             Vector2f scale = vec(selected_object_scale, selected_object_scale);
-            load_prefab(selected_object_name, pos, selected_object_angle, scale);
-            ListNode* node;
-            FOREACH(node, game_data->components->added_entities) {
-                if (ColliderComponent_get(node->value)) {
-                   update_grid(node->value);
-                }
-            }
-            List_delete(game_data->components->added_entities);
-            game_data->components->added_entities = NULL;
+
+            load_object_from_prefab(selected_object_name, pos, scale);
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
         if (shift_down) {
@@ -807,7 +826,7 @@ void input_tool_path(SDL_Event event) {
 
 
 void input_tool_forest(SDL_Event event) {
-    static float probs[4] = {0.3f, 0.3f, 0.3f, 0.1f};
+    static float probs[4] = {0.35f, 0.3f, 0.3f, 0.05f};
     static String trees[4] = {"tree", "birch", "spruce", "rock"};
 
     if (event.type == SDL_MOUSEMOTION) {
@@ -855,6 +874,36 @@ void input_tool_forest(SDL_Event event) {
 }
 
 
+void input_tool_test(SDL_Event event) {
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            // TODO: save temporary version of map
+            save_current_map(NULL_ENTITY);
+
+            Vector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
+
+            Entity i = NULL_ENTITY;
+            ListNode* node = game_data->components->player.order->head;
+            if (node) {
+                i = node->value;
+            }
+
+            if (i == NULL_ENTITY) {
+                load_object_from_prefab("creatures/player", pos, ones());
+            } else {
+                CoordinateComponent_get(i)->position = pos;
+            }
+
+            reset_editor_ids();
+            init_game();
+
+            game_data->testing = true;
+            game_state = STATE_GAME;
+        }
+    }
+}
+
+
 void input_editor(SDL_Event event) {
     if (input_widgets(game_data->menu_camera, event)) {
         return;
@@ -878,6 +927,9 @@ void input_editor(SDL_Event event) {
             break;
         case TOOL_FOREST:
             input_tool_forest(event);
+            break;
+        case TOOL_TEST:
+            input_tool_test(event);
             break;
     }
 

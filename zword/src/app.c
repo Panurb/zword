@@ -193,7 +193,11 @@ void input() {
                 if (game_state == STATE_GAME) {
                     if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
                         if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                            game_state = STATE_PAUSE;
+                            if (game_data->testing) {
+                                game_state = STATE_LOAD_EDITOR;
+                            } else {
+                                game_state = STATE_PAUSE;
+                            }
                         } else if (sdl_event.key.keysym.sym == SDLK_F1) {
                             if (game_settings.debug) {
                                 debug_level = (debug_level + 1) % 4;
@@ -281,7 +285,8 @@ void update(float time_step) {
             game_state = STATE_EDITOR;
             break;
         case STATE_LOAD_EDITOR:
-            destroy_menu();
+            game_data->testing = false;
+            end_game();
             create_editor_menu();
             load_map(game_data->map_name);
             game_state = STATE_EDITOR;

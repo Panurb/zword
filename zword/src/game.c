@@ -120,6 +120,7 @@ void create_game() {
     game_data->menu_camera = menu_camera;
 
     game_data->game_mode = MODE_SURVIVAL;
+    game_data->testing = false;
 }
 
 
@@ -166,33 +167,18 @@ void init_tutorial() {
 }
 
 
-void start_game(Filename map_name, bool load_save) {
-    ColliderGrid_clear(game_data->grid);
-    ComponentData_clear();
-    game_data->camera = create_camera();
-    game_data->menu_camera = create_menu_camera();
-    game_data->ambient_light = 0.5f;
-    // create_level(data.components, data.grid, data.seed);
-    // test(data->components);
-    create_pause_menu();
-
-    if (load_save) {
-        load_state(map_name);
-    } else {
-        load_map(map_name);
-    }
-
+void init_game() {
     int i = 0;
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         if (app.player_controllers[i] == CONTROLLER_NONE) {
             destroy_entity_recursive(node->value);
-            continue;
+        } else {
+            PlayerComponent* player = PlayerComponent_get(node->value);
+            player->controller.joystick = app.player_controllers[i];
+            LOG_DEBUG("Player %d: %d\n", i, player->controller.joystick);
         }
 
-        PlayerComponent* player = PlayerComponent_get(node->value);
-        player->controller.joystick = app.player_controllers[i];
-        LOG_DEBUG("Player %d: %d\n", i, player->controller.joystick);
         i++;
     }
 
@@ -211,6 +197,26 @@ void start_game(Filename map_name, bool load_save) {
     }
 
     init_weather();
+}
+
+
+void start_game(Filename map_name, bool load_save) {
+    ColliderGrid_clear(game_data->grid);
+    ComponentData_clear();
+    game_data->camera = create_camera();
+    game_data->menu_camera = create_menu_camera();
+    game_data->ambient_light = 0.5f;
+    // create_level(data.components, data.grid, data.seed);
+    // test(data->components);
+    create_pause_menu();
+
+    if (load_save) {
+        load_state(map_name);
+    } else {
+        load_map(map_name);
+    }
+
+    init_game();
 }
 
 

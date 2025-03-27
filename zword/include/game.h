@@ -77,6 +77,7 @@ typedef struct {
     int menu_camera;
     ButtonText map_name;
     GameMode game_mode;
+    bool testing;
 } GameData;
 
 
@@ -94,6 +95,8 @@ void load_resources();
 void create_game();
 
 void resize_game();
+
+void init_game();
 
 void start_game(Filename map_name, bool load_save);
 
