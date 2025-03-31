@@ -23,6 +23,7 @@
 #include "game.h"
 #include "door.h"
 #include "path.h"
+#include "item.h"
 
 
 typedef enum {
@@ -756,20 +757,24 @@ void input_tool_tile(SDL_Event event) {
 }
 
 
-void load_object_from_prefab(String name, Vector2f pos, Vector2f scale) {
+Entity load_object_from_prefab(String name, Vector2f pos, Vector2f scale) {
     LOG_INFO("Loading object %s", name);
     game_data->components->added_entities = List_create();
 
     load_prefab(name, pos, selected_object_angle, scale);
     
+    Entity root = NULL_ENTITY;
     ListNode* node;
     FOREACH(node, game_data->components->added_entities) {
+        root = node->value;
         if (ColliderComponent_get(node->value)) {
             update_grid(node->value);
         }
     }
     List_delete(game_data->components->added_entities);
     game_data->components->added_entities = NULL;
+
+    return get_root(root);
 }
 
 
@@ -894,8 +899,13 @@ void input_tool_test(SDL_Event event) {
                 CoordinateComponent_get(i)->position = pos;
             }
 
+            // Entity pistol = load_object_from_prefab("weapons/pistol", pos, ones());
+            // add_item_to_inventory(i, pistol);
+
             reset_editor_ids();
             init_game();
+
+            CameraComponent_get(game_data->camera)->zoom_target = 40.0f;
 
             game_data->testing = true;
             game_data->start_position = pos;
@@ -1012,16 +1022,36 @@ void draw_barriers() {
     for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
-        if (collider->group != GROUP_BARRIERS) continue;
 
         ImageComponent* image = ImageComponent_get(i);
         if (image) continue;
+
+        WidgetComponent* widget = WidgetComponent_get(i);
+        if (widget) continue;
         
-        Color color = get_color(1.0f, 0.0f, 0.0f, 0.25f);
+        Color color = COLOR_WHITE;
+        Color text_color = COLOR_WHITE;
+        String text = "";
+
+        switch (collider->group) {
+            case GROUP_WALLS:
+                color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
+                text_color = COLOR_GREEN;
+                strcpy(text, "wall");
+                break;
+            case GROUP_BARRIERS:
+                color = get_color(1.0f, 0.0f, 0.0f, 0.25f);
+                text_color = COLOR_RED;
+                strcpy(text, "barrier");
+                break;
+            default:
+                continue;
+        }
+
         Vector2f pos = get_position(i);
         float angle = get_angle(i);
         draw_rectangle(game_data->camera, pos, collider_width(i), collider_height(i), angle, color);
-        draw_text(game_data->camera, pos, "barrier", 20, COLOR_RED);
+        draw_text(game_data->camera, pos, text, 20, text_color);
     }
 }
 

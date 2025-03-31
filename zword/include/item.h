@@ -15,6 +15,8 @@ int create_bandage(Vector2f position);
 
 void create_item(Vector2f position, int tier);
 
+void add_item_to_inventory(Entity player_entity, Entity item_entity);
+
 void pick_up_item(int entity);
 
 void drop_item(int entity);

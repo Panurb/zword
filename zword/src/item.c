@@ -113,6 +113,72 @@ void create_item(Vector2f position, int tier) {
 }
 
 
+void add_item_to_inventory(Entity player_entity, Entity item_entity) {
+    PlayerComponent* player = PlayerComponent_get(player_entity);
+
+    CoordinateComponent* coord = CoordinateComponent_get(item_entity);
+    ImageComponent* image = ImageComponent_get(item_entity);
+    ItemComponent* item = ItemComponent_get(item_entity);
+    AmmoComponent* ammo = AmmoComponent_get(item_entity);
+
+    if (ammo) {
+        clear_grid(item_entity);
+
+        int i = player->ammo[ammo->type];
+        if (i == -1) {
+            coord->parent = player_entity;
+            coord->position = zeros();
+            coord->angle = 0.0f;
+            player->ammo[ammo->type] = item_entity;
+            image->alpha = 0.0f;
+            ColliderComponent_get(item_entity)->enabled = false;
+        } else {
+            AmmoComponent_get(i)->size += ammo->size;
+            destroy_entity(item_entity);
+            player->target = -1;
+        }
+
+        return;
+    }
+
+    if (item->type == ITEM_KEY) {
+        int i = find(NULL_ENTITY, player->keys, player->keys_size);
+        if (i != -1) {
+            player->keys[i] = item_entity;
+            coord->position = zeros();
+            coord->angle = 0.0f;
+            add_child(player_entity, item_entity);
+        }
+        return;
+    }
+
+    int i = find(-1, player->inventory, player->inventory_size);
+    if (i != -1) {
+        clear_grid(item_entity);
+
+        player->inventory[i] = item_entity;
+        coord->parent = player_entity;
+        coord->position = (Vector2f) { 0.75f, 0.0f };
+        coord->angle = 0.0f;
+        ColliderComponent_get(item_entity)->enabled = false;
+        change_layer(item_entity, LAYER_WEAPONS);
+        if (player->item != i) {
+            image->alpha = 0.0f;
+        }
+        WeaponComponent* weapon = WeaponComponent_get(item_entity);
+        if (weapon) {
+            image->alpha = 0.0f;
+            if (item->price != 0) {
+                player->item = i;
+            }
+        }
+
+        add_money(player_entity, -item->price);
+        item->price = 0;
+    }
+}
+
+
 void pick_up_item(int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
 
@@ -125,64 +191,7 @@ void pick_up_item(int entity) {
         return;
     }
 
-    CoordinateComponent* coord = CoordinateComponent_get(player->target);
-    ImageComponent* image = ImageComponent_get(player->target);
-    AmmoComponent* ammo = AmmoComponent_get(player->target);
-    if (ammo) {
-        clear_grid(player->target);
-
-        int i = player->ammo[ammo->type];
-        if (i == -1) {
-            coord->parent = entity;
-            coord->position = zeros();
-            coord->angle = 0.0f;
-            player->ammo[ammo->type] = player->target;
-            image->alpha = 0.0f;
-            ColliderComponent_get(player->target)->enabled = false;
-        } else {
-            AmmoComponent_get(i)->size += ammo->size;
-            destroy_entity(player->target);
-            player->target = -1;
-        }
-
-        return;
-    }
-
-    if (item->type == ITEM_KEY) {
-        int i = find(NULL_ENTITY, player->keys, player->keys_size);
-        if (i != -1) {
-            player->keys[i] = player->target;
-            coord->position = zeros();
-            coord->angle = 0.0f;
-            add_child(entity, player->target);
-        }
-        return;
-    }
-    
-    int i = find(-1, player->inventory, player->inventory_size);
-    if (i != -1) {
-        clear_grid(player->target);
-
-        player->inventory[i] = player->target;
-        coord->parent = entity;
-        coord->position = (Vector2f) { 0.75f, 0.0f };
-        coord->angle = 0.0f;
-        ColliderComponent_get(player->target)->enabled = false;
-        change_layer(player->target, LAYER_WEAPONS);
-        if (player->item != i) {
-            image->alpha = 0.0f;
-        }
-        WeaponComponent* weapon = WeaponComponent_get(player->target);
-        if (weapon) {
-            image->alpha = 0.0f;
-            if (item->price != 0) {
-                player->item = i;
-            }
-        }
-
-        add_money(entity, -item->price);
-        item->price = 0;
-    }
+    add_item_to_inventory(entity, player->target);
 }
 
 

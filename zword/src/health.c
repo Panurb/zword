@@ -266,9 +266,9 @@ void update_health(float time_step) {
                 }
                 break;
             default:
-                if (physics) {
-                    physics->slowed = false;
-                }
+                // if (physics) {
+                //     physics->slowed = false;
+                // }
                 break;
         }
 

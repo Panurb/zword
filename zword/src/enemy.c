@@ -358,7 +358,7 @@ void draw_enemies(int camera) {
         HealthComponent* health = HealthComponent_get(i);
         if (health) {
             String buffer;
-            snprintf(buffer, sizeof(buffer), "%d", health->status);
+            snprintf(buffer, sizeof(buffer), "%d", health->status.type);
             draw_text(camera, get_position(i), buffer, 20, COLOR_WHITE);
         }
     }
