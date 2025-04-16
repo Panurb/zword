@@ -66,6 +66,11 @@ static float spawn_delay = 2.0f;
 
 
 void change_state_game_over() {
+    if (game_data->testing) {
+        game_state = STATE_LOAD_EDITOR;
+        return;
+    }
+    
     game_over_timer = 2.0f;
     game_state = STATE_GAME_OVER;
     level_won = false;
