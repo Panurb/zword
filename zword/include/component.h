@@ -127,7 +127,8 @@ typedef enum {
     TRIGGER_DAMAGE,
     TRIGGER_BURN,
     TRIGGER_FREEZE,
-    TRIGGER_WET
+    TRIGGER_WET,
+    TRIGGER_TRAP
 } TriggerType;
 
 typedef struct {

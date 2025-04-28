@@ -496,3 +496,32 @@ void draw_spawners() {
         }
     }
 }
+
+
+int spawn_enemy(Vector2f position, float probs[4]) {
+    int j = -1;
+    float angle = rand_angle();
+    switch (rand_choice(probs, 4)) {
+        case 0:
+            j = create_zombie(position, angle);
+            break;
+        case 1:
+            j = create_farmer(position, angle);
+            break;
+        case 2:
+            j = create_big_boy(position, angle);
+            break;
+        case 3:
+            j = create_priest(position, angle);
+            break;
+    }
+    int p = game_data->components->player.order->head->value;
+    EnemyComponent* enemy = EnemyComponent_get(j);
+    if (enemy) {
+        enemy->target = p;
+        enemy->state = ENEMY_CHASE;
+        // TODO: update grid?
+    }
+
+    return j;
+}

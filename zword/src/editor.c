@@ -1048,6 +1048,12 @@ void draw_barriers() {
                 continue;
         }
 
+        if (collider->trigger_type == TRIGGER_TRAP) {
+            color = get_color(1.0f, 1.0f, 0.0f, 0.25f);
+            text_color = COLOR_YELLOW;
+            strcpy(text, "trap");
+        }
+
         Vector2f pos = get_position(i);
         float angle = get_angle(i);
         draw_rectangle(game_data->camera, pos, collider_width(i), collider_height(i), angle, color);

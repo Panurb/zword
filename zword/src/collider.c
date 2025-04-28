@@ -17,6 +17,7 @@
 #include "image.h"
 #include "health.h"
 #include "game.h"
+#include "enemy.h"
 
 
 float collider_width(int i) {
@@ -310,6 +311,21 @@ bool collides_with(int i, List* entities) {
 }
 
 
+void spawn_enemies_in_range(Vector2f position, float radius) {
+    float probs[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+
+    for (Entity i = 0; i < game_data->components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(i);
+        if (enemy && enemy->spawner) {
+            Vector2f pos = get_position(i);
+            if (dist(position, pos) < radius) {
+                spawn_enemy(get_position(i), probs);
+            }
+        }
+    }
+}
+
+
 void apply_trigger(int trigger, int target) {
     CoordinateComponent* coord = CoordinateComponent_get(trigger);
     ColliderComponent* collider = ColliderComponent_get(trigger);
@@ -350,6 +366,12 @@ void apply_trigger(int trigger, int target) {
             break;
         case TRIGGER_WET:
             coord->lifetime = 0.0f;
+            break;
+        case TRIGGER_TRAP:
+            if (player) {
+                spawn_enemies_in_range(get_position(trigger), 30.0f);
+                coord->lifetime = 0.0f;
+            }
             break;
     }
 }

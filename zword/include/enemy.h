@@ -27,3 +27,5 @@ void enemy_die(int entity);
 void create_spawner(Vector2f position, float angle, float width, float height);
 
 void draw_spawners();
+
+int spawn_enemy(Vector2f position, float probs[4]);

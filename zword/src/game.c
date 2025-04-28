@@ -235,36 +235,6 @@ void end_game() {
 }
 
 
-int spawn_enemy(Vector2f position, float probs[4]) {
-    int j = -1;
-    float angle = rand_angle();
-    switch (rand_choice(probs, 4)) {
-        case 0:
-            j = create_zombie(position, angle);
-            break;
-        case 1:
-            j = create_farmer(position, angle);
-            break;
-        case 2:
-            j = create_big_boy(position, angle);
-            break;
-        case 3:
-            j = create_priest(position, angle);
-            break;
-    }
-    int p = game_data->components->player.order->head->value;
-    EnemyComponent* enemy = EnemyComponent_get(j);
-    if (enemy) {
-        enemy->target = p;
-        enemy->state = ENEMY_CHASE;
-        spawn_delay = 2.0f;
-        // TODO: update grid?
-    }
-
-    return j;
-}
-
-
 float spawn_prob(float min_wave, float max_prob, float rate) {
     if (wave + rate - min_wave == 0.0f) return 0.0f;
     return fmaxf(0.0f, max_prob * (1 - rate / (wave + rate - min_wave)));
@@ -358,6 +328,37 @@ void update_survival(float time_step) {
 }
 
 
+void update_campaign(float time_step) {
+    UNUSED(time_step);
+
+    bool players_alive = false;
+    bool players_won = true;
+
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        if (player->state != PLAYER_DEAD) {
+            players_alive = true;
+            
+            if (!player->won) {
+                players_won = false;
+            }
+        }
+        player->won = false;
+    }
+
+    if (!players_alive) {
+        change_state_game_over();
+        return;
+    }
+
+    if (players_won) {
+        change_state_win();
+        return;
+    }
+}
+
+
 void update_tutorial(float time_step) {
     UNUSED(time_step);
 
@@ -393,6 +394,9 @@ void update_game_mode(float time_step) {
     switch (game_data->game_mode) {
         case MODE_SURVIVAL:
             update_survival(time_step);
+            break;
+        case MODE_CAMPAIGN:
+            update_campaign(time_step);
             break;
         case MODE_TUTORIAL:
             update_tutorial(time_step);
