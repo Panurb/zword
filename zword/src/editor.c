@@ -728,7 +728,7 @@ void input_tool_tile(SDL_Event event) {
             ColliderComponent* collider = ColliderComponent_get(entity);
             ImageComponent* image = ImageComponent_get(entity);
             
-            if (height > width) {
+            if (height > width && strcmp(selected_object_name, "water_tile") != 0) {
                 coord->angle = M_PI_2;
                 float temp = width;
                 width = height;

@@ -118,6 +118,22 @@ void ParticleComponent_add_water(int entity, float size) {
 }
 
 
+void ParticleCompoenent_add_radiation(int entity) {
+    ParticleComponent* part = ParticleComponent_add(entity, 0.0, 2.0f * M_PI, 0.1, 0.05, 2.0, 5.0, COLOR_ENERGY, COLOR_NONE);
+    part->enabled = true;
+    part->loop = true;
+    part->wind_factor = 0.0f;
+}
+
+
+void ParticleCompoenent_add_push(int entity) {
+    ParticleComponent* part = ParticleComponent_add(entity, M_PI_2, 0.0f, 0.2, 0.05, 2.0f, 20.0f, COLOR_ENERGY, COLOR_NONE);
+    part->enabled = true;
+    part->loop = true;
+    part->wind_factor = 0.0f;
+}
+
+
 ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, float size) {
     switch (type) {
         case PARTICLE_NONE:
@@ -161,6 +177,12 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
         case PARTICLE_WATER:
             ParticleComponent_add_water(entity, size);
             break;
+        case PARTICLE_RADIATION:
+            ParticleCompoenent_add_radiation(entity);
+            break;
+        case PARTICLE_PUSH:
+            ParticleCompoenent_add_push(entity);
+            break;
     }
     ParticleComponent* particle = ParticleComponent_get(entity);
     particle->type = type;
@@ -169,18 +191,21 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
 
 
 void add_particles(int entity, int n) {
+    Vector2f scale = get_scale(entity);
     ParticleComponent* part = ParticleComponent_get(entity);
 
     for (int i = 0; i < n; i++) {
         int next = (part->first + part->particles) % part->max_particles;
 
         if (part->width > 0.0f && part->height > 0.0f) {
+            float dx = 0.5f * part->width * scale.x;
+            float dy = 0.5f * part->height * scale.y;
             part->origin = (Vector2f) { 
-                randf(-0.5f * part->width, 0.5f * part->width), 
-                randf(-0.5f * part->height, 0.5f * part->height) 
+                randf(-dx, dx), 
+                randf(-dy, dy)
             };
         }
-        part->position[next] = sum(get_position(entity), part->origin);
+        part->position[next] = sum(get_position(entity), rotate(part->origin, get_angle(entity)));
         float r = part->speed * randf(1.0 - part->speed_spread, 1.0 + part->speed_spread);
         float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
         part->velocity[next] = polar_to_cartesian(r, get_angle(entity) + angle);
@@ -224,7 +249,7 @@ void update_particles(int camera, float time_step) {
             int p = (part->first + j) % part->max_particles;
             part->position[p] = sum(part->position[p], mult(time_step, part->velocity[p]));
             part->time[p] = fmax(0.0f, part->time[p] - time_step);
-            part->velocity[p] = sum(part->velocity[p], mult(time_step, game_data->wind));
+            part->velocity[p] = sum(part->velocity[p], mult(time_step * part->wind_factor, game_data->wind));
         }
 
         if (part->particles > 0 && part->time[part->first] == 0.0f) {

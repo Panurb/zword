@@ -128,7 +128,8 @@ typedef enum {
     TRIGGER_BURN,
     TRIGGER_FREEZE,
     TRIGGER_WET,
-    TRIGGER_TRAP
+    TRIGGER_TRAP,
+    TRIGGER_PUSH,
 } TriggerType;
 
 typedef struct {
@@ -250,7 +251,9 @@ typedef enum ParticleType {
     PARTICLE_SNOW,
     PARTICLE_RAIN,
     PARTICLE_STEAM,
-    PARTICLE_WATER
+    PARTICLE_WATER,
+    PARTICLE_RADIATION,
+    PARTICLE_PUSH
 } ParticleType;
 
 typedef struct {
@@ -278,6 +281,7 @@ typedef struct {
     float width;
     float height;
     float stretch;
+    float wind_factor;
 } ParticleComponent;
 
 typedef struct {

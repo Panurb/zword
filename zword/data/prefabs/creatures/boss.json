@@ -2,212 +2,6 @@
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
-				"x":	-15,
-				"y":	0
-			},
-			"Image":	{
-				"filename":	"boss_body",
-				"layer":	9,
-				"width":	6,
-				"height":	4
-			},
-			"Physics":	{
-				"mass":	10
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	1.5,
-				"group":	4
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			},
-			"Animation":	{
-				"frames":	4
-			},
-			"Joint":	{
-				"parent":	1,
-				"min_length":	3,
-				"max_length":	3,
-				"strength":	1
-			}
-		}, {
-			"id":	1,
-			"Coordinate":	{
-				"x":	-12,
-				"y":	0
-			},
-			"Image":	{
-				"filename":	"boss_body",
-				"layer":	9,
-				"width":	6,
-				"height":	4
-			},
-			"Physics":	{
-				"mass":	10
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	1.5,
-				"group":	4
-			},
-			"Particle":	{
-				"type":	3,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			},
-			"Animation":	{
-				"frames":	4,
-				"current_frame":	2
-			},
-			"Joint":	{
-				"parent":	2,
-				"min_length":	3,
-				"max_length":	3,
-				"strength":	1
-			}
-		}, {
-			"id":	2,
-			"Coordinate":	{
-				"x":	-9,
-				"y":	0
-			},
-			"Image":	{
-				"filename":	"boss_body",
-				"layer":	9,
-				"width":	6,
-				"height":	4
-			},
-			"Physics":	{
-				"mass":	10
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	1.5,
-				"group":	4
-			},
-			"Particle":	{
-				"type":	3,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			},
-			"Animation":	{
-				"frames":	4
-			},
-			"Joint":	{
-				"parent":	3,
-				"min_length":	3,
-				"max_length":	3,
-				"strength":	1
-			}
-		}, {
-			"id":	3,
-			"Coordinate":	{
-				"x":	-6,
-				"y":	0
-			},
-			"Image":	{
-				"filename":	"boss_body",
-				"layer":	9,
-				"width":	6,
-				"height":	4
-			},
-			"Physics":	{
-				"mass":	10
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	1.5,
-				"group":	4
-			},
-			"Particle":	{
-				"type":	3,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			},
-			"Animation":	{
-				"frames":	4,
-				"current_frame":	2
-			},
-			"Joint":	{
-				"parent":	4,
-				"min_length":	3,
-				"max_length":	3,
-				"strength":	1
-			}
-		}, {
-			"id":	4,
-			"Coordinate":	{
-				"x":	-3,
-				"y":	0
-			},
-			"Image":	{
-				"filename":	"boss_body",
-				"layer":	9,
-				"width":	6,
-				"height":	4
-			},
-			"Physics":	{
-				"mass":	10
-			},
-			"Collider":	{
-				"type":	1,
-				"width":	3,
-				"height":	1.5,
-				"group":	4
-			},
-			"Particle":	{
-				"type":	3,
-				"start_size":	0.15000000596046448
-			},
-			"Sound":	{
-				"hit_sound":	"stone_hit"
-			},
-			"Animation":	{
-				"frames":	4
-			},
-			"Joint":	{
-				"parent":	6,
-				"min_length":	3,
-				"max_length":	3,
-				"strength":	1
-			}
-		}, {
-			"id":	5,
-			"Coordinate":	{
-				"x":	0.5,
-				"y":	0,
-				"parent":	6
-			},
-			"Weapon":	{
-				"fire_rate":	5,
-				"recoil":	0,
-				"damage":	50,
-				"max_magazine":	-1,
-				"magazine":	1,
-				"max_recoil":	0,
-				"reload_time":	0,
-				"range":	3,
-				"sound_range":	3,
-				"spread":	3.1415927410125732,
-				"shots":	7,
-				"ammo_type":	0,
-				"sound":	"axe",
-				"automatic":	false
-			}
-		}, {
-			"id":	6,
-			"Coordinate":	{
 				"x":	0,
 				"y":	0
 			},
@@ -259,6 +53,212 @@
 			},
 			"Animation":	{
 				"frames":	1
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	-3,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"boss_body",
+				"layer":	9,
+				"width":	6,
+				"height":	4
+			},
+			"Physics":	{
+				"mass":	10
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	3,
+				"height":	1.5,
+				"group":	4
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit"
+			},
+			"Animation":	{
+				"frames":	4
+			},
+			"Joint":	{
+				"parent":	0,
+				"min_length":	3,
+				"max_length":	3,
+				"strength":	1
+			}
+		}, {
+			"id":	2,
+			"Coordinate":	{
+				"x":	-6,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"boss_body",
+				"layer":	9,
+				"width":	6,
+				"height":	4
+			},
+			"Physics":	{
+				"mass":	10
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	3,
+				"height":	1.5,
+				"group":	4
+			},
+			"Particle":	{
+				"type":	3,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit"
+			},
+			"Animation":	{
+				"frames":	4,
+				"current_frame":	2
+			},
+			"Joint":	{
+				"parent":	1,
+				"min_length":	3,
+				"max_length":	3,
+				"strength":	1
+			}
+		}, {
+			"id":	3,
+			"Coordinate":	{
+				"x":	-9,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"boss_body",
+				"layer":	9,
+				"width":	6,
+				"height":	4
+			},
+			"Physics":	{
+				"mass":	10
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	3,
+				"height":	1.5,
+				"group":	4
+			},
+			"Particle":	{
+				"type":	3,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit"
+			},
+			"Animation":	{
+				"frames":	4
+			},
+			"Joint":	{
+				"parent":	2,
+				"min_length":	3,
+				"max_length":	3,
+				"strength":	1
+			}
+		}, {
+			"id":	4,
+			"Coordinate":	{
+				"x":	-12,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"boss_body",
+				"layer":	9,
+				"width":	6,
+				"height":	4
+			},
+			"Physics":	{
+				"mass":	10
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	3,
+				"height":	1.5,
+				"group":	4
+			},
+			"Particle":	{
+				"type":	3,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit"
+			},
+			"Animation":	{
+				"frames":	4,
+				"current_frame":	2
+			},
+			"Joint":	{
+				"parent":	3,
+				"min_length":	3,
+				"max_length":	3,
+				"strength":	1
+			}
+		}, {
+			"id":	5,
+			"Coordinate":	{
+				"x":	-15,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"boss_body",
+				"layer":	9,
+				"width":	6,
+				"height":	4
+			},
+			"Physics":	{
+				"mass":	10
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	3,
+				"height":	1.5,
+				"group":	4
+			},
+			"Particle":	{
+				"type":	3,
+				"start_size":	0.15000000596046448
+			},
+			"Sound":	{
+				"hit_sound":	"stone_hit"
+			},
+			"Animation":	{
+				"frames":	4
+			},
+			"Joint":	{
+				"parent":	4,
+				"min_length":	3,
+				"max_length":	3,
+				"strength":	1
+			}
+		}, {
+			"id":	6,
+			"Coordinate":	{
+				"x":	0.5,
+				"y":	0,
+				"parent":	0
+			},
+			"Weapon":	{
+				"fire_rate":	5,
+				"recoil":	0,
+				"damage":	50,
+				"max_magazine":	-1,
+				"magazine":	1,
+				"max_recoil":	0,
+				"reload_time":	0,
+				"range":	3,
+				"sound_range":	3,
+				"spread":	3.1415927410125732,
+				"shots":	7,
+				"ammo_type":	0,
+				"sound":	"axe",
+				"automatic":	false
 			}
 		}]
 }

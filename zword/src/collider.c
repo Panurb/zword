@@ -373,6 +373,12 @@ void apply_trigger(int trigger, int target) {
                 coord->lifetime = 0.0f;
             }
             break;
+        case TRIGGER_PUSH:
+            if (physics) {
+                Vector2f ol = overlap_collider_collider(trigger, target);
+                apply_force(target, mult(50.0f * norm(ol), normalized(half_height(trigger))));
+            }
+            break;
     }
 }
 

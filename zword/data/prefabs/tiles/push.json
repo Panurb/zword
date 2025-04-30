@@ -1,0 +1,23 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1,
+				"height":	1,
+				"group":	1,
+                "trigger_type": 9
+			},
+			"Particle":	{
+				"type": 15,
+				"start_size":	0.1,
+				"loop":	1,
+                "width": 1,
+                "height": 1
+			}
+		}]
+}

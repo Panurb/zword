@@ -27,18 +27,8 @@
 				"flicker":	0.25
 			},
 			"Particle":	{
-				"angle":	0,
-				"spread":	6.2831854820251465,
-				"start_size":	0.10000000149011612,
-				"end_size":	0.05000000074505806,
-				"speed":	2,
-				"rate":	5,
-				"outer_r":	127,
-				"outer_g":	255,
-				"outer_b":	0,
-				"inner_r":	127,
-				"inner_g":	255,
-				"inner_b":	0,
+				"type": 14,
+				"start_size":	0.1,
 				"loop":	1
 			},
 			"Sound":	{

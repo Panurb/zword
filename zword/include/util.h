@@ -28,8 +28,6 @@
 
 #define PRINT(x) printf("%d\n", x);
 
-#define COLOR_ENERGY get_color(0.5f, 1.0f, 0.0f, 1.0f)
-
 #define UNUSED(x) (void)(x)
 
 #define LENGTH(x) (int)(sizeof(x)/sizeof(x[0]))
@@ -111,6 +109,7 @@ typedef struct {
 #define COLOR_BLOOD get_color(0.78f, 0.0f, 0.0f, 1.0f)
 #define COLOR_ORANGE get_color(1.0f, 0.6f, 0.0f, 1.0f)
 #define COLOR_BLUE get_color(0.0f, 0.0f, 1.0f, 1.0f)
+#define COLOR_ENERGY get_color(0.5f, 1.0f, 0.0f, 1.0f)
 
 #define STRING_SIZE 1024
 typedef char String[STRING_SIZE];
