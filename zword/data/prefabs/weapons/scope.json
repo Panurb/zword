@@ -22,7 +22,7 @@
 			"Item":	{
 				"name":	"Scope",
 				"size":	0,
-				"type":	5, 
+				"type":	6, 
                 "price": 1000
 			},
 			"Sound":	{

@@ -64,7 +64,7 @@ void unlock_door(int entity) {
     DoorComponent* door = DoorComponent_get(player->target);
     if (!door) return;
 
-    if (door->key != NULL_ENTITY) {
+    if (door->key != -1) {
         for (int i = 0; i < player->keys_size; i++) {
             int j = player->keys[i];
             if (j == NULL_ENTITY) continue;
@@ -77,7 +77,7 @@ void unlock_door(int entity) {
         }
     }
 
-    if (door->price > 0 && player->money >= door->price) {
+    if (game_data->game_mode == MODE_SURVIVAL && door->price > 0 && player->money >= door->price) {
         add_money(entity, -door->price);
         door->locked = false;
         door->price = 0;

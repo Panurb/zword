@@ -312,7 +312,7 @@ void draw_player_targets() {
                 snprintf(buffer, LENGTH(buffer), "Locked with %s", DOOR_KEY_NAMES[door->key]);
                 draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
                 pos = sum(pos, vec(0.0f, 1.0f));
-            } else if (door->price > 0) {
+            } else if (game_data->game_mode == MODE_SURVIVAL && door->price > 0) {
                 snprintf(buffer, LENGTH(buffer), "Locked, price %d", door->price);
                 draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
             }

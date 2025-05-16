@@ -22,7 +22,7 @@
 			"Item":	{
 				"name":	"Hollow point",
 				"size":	0,
-				"type":	4, 
+				"type":	5, 
                 "price": 1000
 			},
 			"Sound":	{

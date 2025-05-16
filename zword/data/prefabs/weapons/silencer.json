@@ -22,7 +22,7 @@
 			"Item":	{
 				"name":	"Silencer",
 				"size":	0,
-				"type":	3
+				"type":	4
 			},
 			"Sound":	{
 				"hit_sound":	"metal"

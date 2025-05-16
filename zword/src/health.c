@@ -125,7 +125,8 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
     }
     
     if (enemy) {
-        enemy->desired_angle = polar_angle(mult(-1.0f, dir));
+        enemy->target = dealer;
+        enemy->state = ENEMY_CHASE;
     }
     
     PhysicsComponent* physics = PhysicsComponent_get(entity);

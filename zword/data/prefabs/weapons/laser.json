@@ -32,7 +32,7 @@
 			"Item":	{
 				"name":	"Laser",
 				"size":	0,
-				"type":	2, 
+				"type":	3, 
                 "price": 1000
 			},
 			"Sound":	{

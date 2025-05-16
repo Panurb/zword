@@ -222,7 +222,9 @@ void draw_hud(int camera) {
                 draw_slice(camera, position, 0.5f, 0.6f, M_PI_2 - 0.5f * x, x, COLOR_RED);
             }
 
-            draw_money(camera, i);
+            if (game_data->game_mode == MODE_SURVIVAL) {
+                draw_money(camera, i);
+            }
         }
 
         char buffer[128];
