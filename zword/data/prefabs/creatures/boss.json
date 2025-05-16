@@ -32,9 +32,10 @@
 				"fov":	6.2831854820251465,
 				"idle_speed":	0,
 				"walk_speed":	2.5,
-				"weapon":	5,
+				"weapon":	6,
 				"attack_delay":	0,
-				"turn_speed":	2.5
+				"turn_speed":	2.5,
+				"boss": true
 			},
 			"Particle":	{
 				"type":	3,

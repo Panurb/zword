@@ -460,6 +460,7 @@ void EnemyComponent_serialize(cJSON* entity_json, int entity) {
     serialize_float(json, "attack_delay", enemy->attack_delay, 0.1f);
     serialize_float(json, "turn_speed", enemy->turn_speed, 5.0f);
     serialize_int(json, "spawner", enemy->spawner, false);
+    serialize_int(json, "boss", enemy->boss, false);
 }
 
 
@@ -478,6 +479,7 @@ void EnemyComponent_deserialize(cJSON* entity_json, int entity) {
     enemy->attack_delay = deserialize_float(json, "attack_delay", enemy->attack_delay);
     enemy->turn_speed = deserialize_float(json, "turn_speed", enemy->turn_speed);
     enemy->spawner = deserialize_int(json, "spawner", enemy->spawner);
+    enemy->boss = deserialize_int(json, "boss", enemy->boss);
 }
 
 

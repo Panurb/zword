@@ -23,6 +23,15 @@ static float title_scale = 2.0f;
 
 static int debug_level = 0;
 
+typedef struct {
+    int page;
+    int panel;
+    Vector2f position;
+    float scale;
+} Intro;
+
+static Intro intro = {1, 0, {0.0f, 0.0f}, 3.0f};
+
 
 void create_screen_textures() {
     app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
@@ -157,6 +166,68 @@ void quit() {
 }
 
 
+void input_game(SDL_Event sdl_event) {
+    switch (game_state) {
+        case STATE_GAME:
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
+                if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                    if (game_data->testing) {
+                        game_state = STATE_LOAD_EDITOR;
+                    } else {
+                        game_state = STATE_PAUSE;
+                    }
+                } else if (sdl_event.key.keysym.sym == SDLK_F1) {
+                    if (game_settings.debug) {
+                        debug_level = (debug_level + 1) % 4;
+                    }
+                }
+            }
+
+            if (game_settings.debug) {
+                if (sdl_event.type == SDL_MOUSEWHEEL) {
+                    CameraComponent* camera = CameraComponent_get(game_data->camera);
+                    if (sdl_event.wheel.y > 0) {
+                        camera->zoom_target = fminf(camera->zoom_target * 1.1f, 100.0f);
+                    } else if (sdl_event.wheel.y < 0) {
+                        camera->zoom_target = fmaxf(camera->zoom_target / 1.1f, 10.0f);
+                    }
+                }
+            }
+            break;
+        case STATE_PAUSE:
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                game_state = STATE_GAME;
+            }
+            input_menu(game_data->menu_camera, sdl_event);
+            break;
+        case STATE_EDITOR:
+            input_editor(sdl_event);
+            break;
+        case STATE_MENU:
+        case STATE_GAME_OVER:
+            input_menu(game_data->menu_camera, sdl_event);
+            break;
+        case STATE_INTRO:
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                game_state = STATE_START;
+            } else if (sdl_event.type == SDL_MOUSEBUTTONDOWN) {
+                intro.panel++;
+                if (intro.panel >= 6) {
+                    intro.panel = 0;
+                    intro.page++;
+                    if (intro.page > 4) {
+                        game_state = STATE_START;
+                    }
+                }
+            }
+            break;
+    default:
+        break;
+    }
+
+}
+
+
 void input() {
     SDL_Event sdl_event;
     while (SDL_PollEvent(&sdl_event))
@@ -190,42 +261,7 @@ void input() {
                 }
                 break;
             default:
-                if (game_state == STATE_GAME) {
-                    if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
-                        if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                            if (game_data->testing) {
-                                game_state = STATE_LOAD_EDITOR;
-                            } else {
-                                game_state = STATE_PAUSE;
-                            }
-                        } else if (sdl_event.key.keysym.sym == SDLK_F1) {
-                            if (game_settings.debug) {
-                                debug_level = (debug_level + 1) % 4;
-                            }
-                        }
-                    }
-
-                    if (game_settings.debug) {
-                        if (sdl_event.type == SDL_MOUSEWHEEL) {
-                            CameraComponent* camera = CameraComponent_get(game_data->camera);
-                            if (sdl_event.wheel.y > 0) {
-                                camera->zoom_target = fminf(camera->zoom_target * 1.1f, 100.0f);
-                            } else if (sdl_event.wheel.y < 0) {
-                                camera->zoom_target = fmaxf(camera->zoom_target / 1.1f, 10.0f);
-                            }
-                        }
-                    }
-                } else if (game_state == STATE_PAUSE) {
-                    if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                        game_state = STATE_GAME;
-                    }
-                }
-                if (game_state == STATE_EDITOR) {
-                    input_editor(sdl_event);
-                }
-                if (game_state == STATE_MENU || game_state == STATE_PAUSE || game_state == STATE_GAME_OVER) {
-                    input_menu(game_data->menu_camera, sdl_event);
-                }
+                input_game(sdl_event);
                 break;
         }
     }
@@ -239,6 +275,8 @@ void update(float time_step) {
 
     switch (game_state) {
         case STATE_MENU:
+            intro.page = 1;
+            intro.panel = 0;
             update_menu();
             break;
         case STATE_START:
@@ -301,6 +339,10 @@ void update(float time_step) {
         case STATE_QUIT:
             app.quit = true;
             return;
+        case STATE_INTRO:
+            Vector2f target = mult(intro.scale * 9.0f, vec(0.5f - intro.panel % 2, intro.panel / 2 - 1));
+            intro.position = sum(intro.position, mult(0.1f, diff(target, intro.position)));
+            break;
     }
 
     if (state != game_state) {
@@ -353,6 +395,14 @@ void draw() {
             break;
         case STATE_GAME_OVER:
             draw_game_over();
+            break;
+        case STATE_INTRO:
+            String filename;
+            snprintf(filename, STRING_SIZE, "intro_%d", intro.page);
+            draw_sprite(game_data->menu_camera, get_texture_index(filename), 0, 0, 0, intro.position, 0.0f, mult(intro.scale, ones()), 1.0f);
+
+            Vector2f pos = get_mouse_position(game_data->menu_camera);
+            draw_circle(game_data->menu_camera, pos, 0.1f, COLOR_WHITE);
             break;
         default:
             break;

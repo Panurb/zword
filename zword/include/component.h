@@ -235,6 +235,7 @@ typedef struct {
     float turn_speed;
     int bounty;
     Vector2f start_position;
+    bool boss;
 } EnemyComponent;
 
 typedef enum ParticleType {

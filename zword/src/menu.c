@@ -407,7 +407,7 @@ void update_benchmark(int entity) {
 void start_campaign(int entity) {
     UNUSED(entity);
     strcpy(game_data->map_name, "Campaign");
-    game_state = STATE_START;
+    game_state = STATE_INTRO;
     reset_ids();
 }
 

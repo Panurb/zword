@@ -349,6 +349,7 @@ EnemyComponent* EnemyComponent_add(int entity) {
     enemy->spawner = false;
     enemy->bounty = 100;
     enemy->start_position = get_position(entity);
+    enemy->boss = false;
 
     game_data->components->enemy[entity] = enemy;
 

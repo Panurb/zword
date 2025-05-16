@@ -353,8 +353,19 @@ void update_campaign(float time_step) {
     }
 
     if (players_won) {
-        change_state_win();
-        return;
+        bool boss_alive = false;
+        for (Entity i = 0; i < game_data->components->entities; i++) {
+            EnemyComponent* enemy = EnemyComponent_get(i);
+            if (enemy && enemy->boss) {
+                boss_alive = true;
+                break;
+            }
+        }
+
+        if (!boss_alive) {
+            change_state_win();
+            return;
+        }
     }
 }
 
