@@ -5,7 +5,9 @@
 #include <time.h>
 #include <string.h>
 #define NOMINMAX
-#include <windows.h>
+#ifndef __EMSCRIPTEN__
+    #include <windows.h>
+#endif
 
 #include "util.h"
 
@@ -330,29 +332,31 @@ float smoothstep(float x, float mu, float nu) {
 }
 
 int list_files_alphabetically(String path, String* files) {
-    WIN32_FIND_DATA file;
-    HANDLE handle = FindFirstFile(path, &file);
-
-    if (handle == INVALID_HANDLE_VALUE) {
-        printf("Path not found: %s\n", path);
-        return 0;
-    }
-
     int files_size = 0;
 
-    do {
-        if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
-            continue;
-        }
-        char* dot = strchr(file.cFileName, '.');
-        if (dot) {
-            *dot = '\0';
-        }
-        strcpy(files[files_size], file.cFileName);
-        files_size++;
-    } while (FindNextFile(handle, &file));
+    #ifndef __EMSCRIPTEN__
+        WIN32_FIND_DATA file;
+        HANDLE handle = FindFirstFile(path, &file);
 
-    qsort(files, files_size, sizeof(String), strcmp);
+        if (handle == INVALID_HANDLE_VALUE) {
+            printf("Path not found: %s\n", path);
+            return 0;
+        }
+
+        do {
+            if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
+                continue;
+            }
+            char* dot = strchr(file.cFileName, '.');
+            if (dot) {
+                *dot = '\0';
+            }
+            strcpy(files[files_size], file.cFileName);
+            files_size++;
+        } while (FindNextFile(handle, &file));
+
+        qsort(files, files_size, sizeof(String), strcmp);
+    #endif
 
     return files_size;
 }

@@ -17,4 +17,6 @@ void blunt_damage(int entity, Vector2f vel);
 
 void burn(int entity);
 
+void freeze(Entity entity);
+
 void update_health(float time_step);

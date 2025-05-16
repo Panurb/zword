@@ -340,6 +340,7 @@ void update(float time_step) {
             app.quit = true;
             return;
         case STATE_INTRO:
+            ;
             Vector2f target = mult(intro.scale * 9.0f, vec(0.5f - intro.panel % 2, intro.panel / 2 - 1));
             intro.position = sum(intro.position, mult(0.1f, diff(target, intro.position)));
             break;
@@ -397,6 +398,7 @@ void draw() {
             draw_game_over();
             break;
         case STATE_INTRO:
+            ;
             String filename;
             snprintf(filename, STRING_SIZE, "intro_%d", intro.page);
             draw_sprite(game_data->menu_camera, get_texture_index(filename), 0, 0, 0, intro.position, 0.0f, mult(intro.scale, ones()), 1.0f);

@@ -212,6 +212,7 @@ void freeze(Entity entity) {
 
     switch (health->status.type) {
         case STATUS_NONE:
+            ;
             int i = create_entity();
             CoordinateComponent_add(i, zeros(), 0.0f);
             ParticleComponent_add_type(i, PARTICLE_STEAM, 0.3f);

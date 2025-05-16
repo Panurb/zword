@@ -13,9 +13,6 @@
 #include "game.h"
 
 
-#define INFINITY 10000.0
-
-
 static int counter = 0;
 
 
