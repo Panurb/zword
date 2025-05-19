@@ -7,6 +7,9 @@
 #define NOMINMAX
 #ifndef __EMSCRIPTEN__
     #include <windows.h>
+#else 
+    #include <stdio.h>
+    #include <dirent.h>
 #endif
 
 #include "util.h"
@@ -331,6 +334,10 @@ float smoothstep(float x, float mu, float nu) {
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
 }
 
+int cmp(const void* a, const void* b) {
+    return strcmp(*(const char**) a, *(const char**) b);
+}
+
 int list_files_alphabetically(String path, String* files) {
     int files_size = 0;
 
@@ -339,7 +346,7 @@ int list_files_alphabetically(String path, String* files) {
         HANDLE handle = FindFirstFile(path, &file);
 
         if (handle == INVALID_HANDLE_VALUE) {
-            printf("Path not found: %s\n", path);
+            LOG_WARNING("Path not found: %s", path);
             return 0;
         }
 
@@ -354,10 +361,33 @@ int list_files_alphabetically(String path, String* files) {
             strcpy(files[files_size], file.cFileName);
             files_size++;
         } while (FindNextFile(handle, &file));
-
-        qsort(files, files_size, sizeof(String), strcmp);
+    #else
+        DIR* dir = opendir(path);
+        if (dir == NULL) {
+            LOG_WARNING("Path not found: %s", path);
+            return 0;
+        }
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != NULL) {
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+                continue;
+            }
+            char* dot = strchr(entry->d_name, '.');
+            if (dot) {
+                *dot = '\0';
+            }
+            LOG_INFO("Found file: %s", entry->d_name);
+            strcpy(files[files_size], entry->d_name);
+            files_size++;
+        }
+        closedir(dir);
     #endif
 
+    LOG_INFO("Found %d files in %s", files_size, path);
+
+    // qsort(files, files_size, sizeof(String), cmp);
+
+    LOG_INFO("Sorted %d files in %s", files_size, path);
     return files_size;
 }
 

@@ -428,7 +428,7 @@ void start_tutorial(int entity) {
 
 bool save_exists() {
     String files[128];
-    int files_count = list_files_alphabetically("save/*.json", files);
+    int files_count = list_files_alphabetically("save", files);
     return files_count > 0 && strcmp(files[0], "Campaign") == 0;
 }
 
@@ -446,9 +446,11 @@ void create_menu() {
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     WidgetComponent_get(container)->enabled = false;
 
-    if (save_exists()) {
-        add_button_to_container(container, "CONTINUE", load_campaign);
-    }
+    #ifndef __EMSCRIPTEN__
+        if (save_exists()) {
+            add_button_to_container(container, "CONTINUE", load_campaign);
+        }
+    #endif
 
     add_button_to_container(container, "NEW GAME", start_campaign);
     add_button_to_container(container, "TUTORIAL", start_tutorial);

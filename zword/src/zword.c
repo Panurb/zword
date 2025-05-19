@@ -68,11 +68,15 @@ int main(int argc, char* argv[]) {
     init();
 
     load_resources();
+    LOG_INFO("Resources loaded");
     create_game();
+    LOG_INFO("Game created");
     create_menu();
+    LOG_INFO("Menu created");
 
     #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop(main_loop, 0, true);
+        LOG_INFO("Emscripten main loop started");
     #else
         while (!app.quit) {
             main_loop();
