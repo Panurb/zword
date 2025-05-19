@@ -334,10 +334,6 @@ float smoothstep(float x, float mu, float nu) {
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
 }
 
-int cmp(const void* a, const void* b) {
-    return strcmp(*(const char**) a, *(const char**) b);
-}
-
 int list_files_alphabetically(String path, String* files) {
     int files_size = 0;
 
@@ -361,7 +357,13 @@ int list_files_alphabetically(String path, String* files) {
             strcpy(files[files_size], file.cFileName);
             files_size++;
         } while (FindNextFile(handle, &file));
+
+        qsort(files, files_size, sizeof(String), strcmp);
     #else
+        char* last_slash = strrchr(path, '/');
+        if (last_slash) {
+            *last_slash = '\0';
+        }
         DIR* dir = opendir(path);
         if (dir == NULL) {
             LOG_WARNING("Path not found: %s", path);
@@ -383,11 +385,6 @@ int list_files_alphabetically(String path, String* files) {
         closedir(dir);
     #endif
 
-    LOG_INFO("Found %d files in %s", files_size, path);
-
-    // qsort(files, files_size, sizeof(String), cmp);
-
-    LOG_INFO("Sorted %d files in %s", files_size, path);
     return files_size;
 }
 

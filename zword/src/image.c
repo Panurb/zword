@@ -136,7 +136,7 @@ SDL_Texture* create_blood_particle_texture() {
 void load_textures() {
     LOG_INFO("Loading textures");
 
-    resources.textures_size = list_files_alphabetically("data/images", resources.texture_names);
+    resources.textures_size = list_files_alphabetically("data/images/*.png", resources.texture_names);
     LOG_INFO("Found %d textures", resources.textures_size);
 
     for (int i = 0; i < resources.textures_size; i++) {

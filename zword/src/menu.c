@@ -428,7 +428,7 @@ void start_tutorial(int entity) {
 
 bool save_exists() {
     String files[128];
-    int files_count = list_files_alphabetically("save", files);
+    int files_count = list_files_alphabetically("save/*.json", files);
     return files_count > 0 && strcmp(files[0], "Campaign") == 0;
 }
 

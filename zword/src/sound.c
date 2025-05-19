@@ -17,7 +17,7 @@
 void load_sounds() {
     LOG_INFO("Loading sounds");
 
-    resources.sounds_size = list_files_alphabetically("data/sfx", resources.sound_names); 
+    resources.sounds_size = list_files_alphabetically("data/sfx/*.wav", resources.sound_names); 
 
     for (int i = 0; i < resources.sounds_size; i++) {
         String path;

@@ -136,7 +136,7 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
 
     ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
-        particle->origin = diff(pos, get_position(entity));
+        particle->origin = rotate(diff(pos, get_position(entity)), -get_angle(entity));
         add_particles(entity, particle->rate / 50.0f * dmg);
     }
 
