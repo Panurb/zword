@@ -423,11 +423,41 @@ void draw() {
 void play_audio() {
     static bool music_playing = false;
     static float music_fade = 0.0f;
+    static int current_music = -1;
 
-    music_fade = fminf(1.0f, music_fade + 0.01f);
+    switch(game_state) {
+        case STATE_MENU:
+            game_data->music = 0;
+            break;
+        case STATE_GAME:
+        case STATE_INTRO:
+        case STATE_PAUSE:
+            game_data->music = 1;
+            break;
+        default:
+            game_data->music = -1;
+            break;
+    }
+
+    if (game_data->music != current_music) {
+        music_fade = fmaxf(0.0f, music_fade - 0.01f);
+
+        if (music_fade == 0.0f) {
+            current_music = game_data->music;
+
+            Mix_HaltMusic();
+            if (game_data->music != -1) {
+                Mix_PlayMusic(resources.music[game_data->music], -1);
+            }
+        }
+    } else {
+        music_fade = fminf(1.0f, music_fade + 0.01f);
+    }
 
     play_sounds(game_data->camera);
+
     Mix_VolumeMusic(0.5f * game_settings.music * music_fade);
+
     if (!music_playing) {
         Mix_VolumeMusic(0);
         Mix_PlayMusic(resources.music[0], -1);

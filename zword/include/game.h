@@ -80,6 +80,7 @@ typedef struct {
     GameMode game_mode;
     bool testing;
     Vector2f start_position;
+    int music;
 } GameData;
 
 

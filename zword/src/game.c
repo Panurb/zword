@@ -90,6 +90,7 @@ void change_state_win() {
 
 void load_resources() {
     load_textures();
+    LOG_INFO("Loaded %d textures", resources.textures_size);
     resources.fonts[0] = NULL;
     for (int size = 1; size <= 300; size++) {
         resources.fonts[size] = TTF_OpenFont("data/Helvetica.ttf", size);
@@ -98,8 +99,10 @@ void load_resources() {
             exit(1);
         }
     }
+    LOG_INFO("Loaded %d fonts", 300);
     load_sounds();
     resources.music[0] = Mix_LoadMUS("data/music/zsong.ogg");
+    resources.music[1] = Mix_LoadMUS("data/music/zsong2.ogg");
 }
 
 
@@ -127,6 +130,8 @@ void create_game() {
     game_data->game_mode = MODE_SURVIVAL;
     game_data->testing = false;
     game_data->start_position = zeros();
+
+    game_data->music = 0;
 }
 
 
