@@ -180,7 +180,6 @@ void draw_image(int entity, int camera) {
     }
 
     Vector2f scale = get_scale_interpolated(entity, app.delta);
-    // TODO: use delta
     float stretch_extrapolated = image->stretch + app.delta * app.time_step * image->stretch_speed;
 
     scale.x *= 1.0f - stretch_extrapolated;

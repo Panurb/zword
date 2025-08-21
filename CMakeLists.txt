@@ -60,7 +60,6 @@ set(SOURCES
     zword/src/weapon.c
     zword/src/weather.c
     zword/src/widget.c
-    zword/src/outline.frag
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")  
