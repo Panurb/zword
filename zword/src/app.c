@@ -34,20 +34,22 @@ static Intro intro = {1, 0, {0.0f, 0.0f}, 3.0f};
 
 
 void create_screen_textures() {
-    app.shadow_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
+    SDL_PixelFormatEnum pixel_format = SDL_PIXELFORMAT_ABGR8888;
+
+    app.shadow_texture = SDL_CreateTexture(app.renderer, pixel_format, SDL_TEXTUREACCESS_TARGET, 
         game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.shadow_texture, SDL_BLENDMODE_BLEND);
 
-    app.light_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 
+    app.light_texture = SDL_CreateTexture(app.renderer, pixel_format, SDL_TEXTUREACCESS_TARGET, 
         game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.light_texture, SDL_BLENDMODE_MUL);
 
-    app.blood_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+    app.blood_texture = SDL_CreateTexture(app.renderer, pixel_format, SDL_TEXTUREACCESS_TARGET,
         game_settings.width, game_settings.height);
     SDL_SetTextureBlendMode(app.blood_texture, SDL_BLENDMODE_BLEND);
 
     int threshold = 32;
-    app.blood_threshold_texture = SDL_CreateTexture(app.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+    app.blood_threshold_texture = SDL_CreateTexture(app.renderer, pixel_format, SDL_TEXTUREACCESS_TARGET,
         game_settings.width, game_settings.height);
     SDL_SetRenderTarget(app.renderer, app.blood_threshold_texture);
     SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255 - threshold);
