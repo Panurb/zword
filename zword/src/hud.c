@@ -136,6 +136,16 @@ void draw_item_use(int camera, int entity) {
 
 void draw_money(int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
+    Vector2f position = sum(get_position_interpolated(entity, app.delta), vec(0.0f, 1.0f));
+
+    char buffer[256];
+    snprintf(buffer, 128, "%d", player->money);
+    draw_text(camera, position, buffer, 20, COLOR_YELLOW);
+}
+
+
+void draw_money_increment(int camera, int entity) {
+    PlayerComponent* player = PlayerComponent_get(entity);
     Vector2f position = sum(get_position_interpolated(entity, app.delta), 
         vec(0.0f, (1.0f - player->money_timer) * sign(player->money_increment)));
 
@@ -223,7 +233,7 @@ void draw_hud(int camera) {
             }
 
             if (game_data->game_mode == MODE_SURVIVAL) {
-                draw_money(camera, i);
+                draw_money_increment(camera, i);
             }
         }
 
@@ -256,8 +266,9 @@ void draw_hud(int camera) {
             case PLAYER_MENU:
             case PLAYER_MENU_DROP:
             case PLAYER_MENU_GRAB:
-                snprintf(buffer, 128, "%d", player->money);
-                draw_text(camera, position, buffer, 20, COLOR_YELLOW);
+                if (game_data->game_mode == MODE_SURVIVAL) {
+                    draw_money(camera, i);
+                }
 
                 for (int j = 0; j < player->inventory_size; j++) {
                     float offset = 0.0;
@@ -295,8 +306,9 @@ void draw_hud(int camera) {
 
                 break;
             case PLAYER_AMMO_MENU:
-                snprintf(buffer, 128, "%d", player->money);
-                draw_text(camera, position, buffer, 20, COLOR_YELLOW);
+                if (game_data->game_mode == MODE_SURVIVAL) {
+                    draw_money(camera, i);
+                }
                 
                 draw_ammo_menu(camera, i);
                 break;

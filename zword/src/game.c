@@ -201,6 +201,7 @@ void init_game() {
             init_survival();
             break;
         case MODE_TUTORIAL:
+        case MODE_CAMPAIGN:
             init_tutorial();
             break;
         default:

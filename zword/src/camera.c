@@ -455,7 +455,7 @@ void draw_text(int camera, Vector2f position, char string[100], int size, Color 
     }
 
     CameraComponent* cam = CameraComponent_get(camera);
-    int font_size = size * cam->zoom / 40.0f;
+    int font_size = mini(size * cam->zoom / 40.0f, 300);
     TTF_Font* font = resources.fonts[font_size];
     if (!font) {
         return;

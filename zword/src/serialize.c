@@ -490,6 +490,7 @@ void HealthComponent_serialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_CreateObject();
     cJSON_AddItemToObject(entity_json, "Health", json);
     serialize_int(json, "health", health->health, 0);
+    serialize_int(json, "max_health", health->max_health, 0);
     serialize_string(json, "dead_image", health->dead_image, "");
     serialize_string(json, "decal", health->decal, "");
     serialize_string(json, "die_sound", health->die_sound, "");
@@ -500,8 +501,12 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
     cJSON* json = cJSON_GetObjectItem(entity_json, "Health");
     if (!json) return;
 
+    // If max_health is not stored, the entity is at full health.
+    // Then we can use the health as the max_health as well.
     int hp = deserialize_int(json, "health", 0);
-    HealthComponent* health = HealthComponent_add(entity, hp, "", "", "");
+    int max_hp = deserialize_int(json, "max_health", hp);
+    HealthComponent* health = HealthComponent_add(entity, max_hp, "", "", "");
+    health->health = hp;
     deserialize_string(json, "dead_image", health->dead_image);
     deserialize_string(json, "decal", health->decal);
     deserialize_string(json, "die_sound", health->die_sound);
@@ -1079,6 +1084,8 @@ void deserialize_game(cJSON* json, bool preserve_id) {
 
 
 void save_json(cJSON* json, Filename directory, Filename filename) {
+    create_directory(directory);
+
     Filename path;
     snprintf(path, 128, "%s/%s%s", directory, filename, ".json");
     FILE* file = fopen(path, "w");

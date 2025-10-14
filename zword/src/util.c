@@ -14,6 +14,8 @@
 
 #include "util.h"
 
+#include <stdio.h>
+
 
 void fill(int* array, int value, int size) {
     for (int i = 0; i < size; i++) {
@@ -386,6 +388,33 @@ int list_files_alphabetically(String path, String* files) {
     #endif
 
     return files_size;
+}
+
+void create_directory(String path) {
+    // Create directory if it doesn't exist
+
+    #ifndef __EMSCRIPTEN__
+        CreateDirectory(path, NULL);
+    #else
+        struct stat st;
+
+        if (stat(path, &st) == 0) {
+            if (S_ISDIR(st.st_mode)) {
+                // Directory already exists
+                return 0;
+            } else {
+                // Exists but not a directory
+                fprintf(stderr, "Path exists but is not a directory: %s\n", path);
+                return -1;
+            }
+        }
+
+        // Directory doesn't exist — try to create it
+        if (mkdir(path, 0777) != 0) {
+            perror("mkdir failed");
+            return -1;
+        }
+    #endif
 }
 
 int binary_search_filename(String filename, String* array, int size) {

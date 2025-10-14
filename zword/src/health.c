@@ -40,7 +40,6 @@ void die(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
-    ParticleComponent* particle = ParticleComponent_get(entity);
 
     if (player) {
         player_die(entity);

@@ -449,7 +449,9 @@ void enemy_die(int entity) {
     HealthComponent* health = HealthComponent_get(entity);
     ParticleComponent* particle = ParticleComponent_get(entity);
 
-    coord->lifetime = 30.0f;
+    if (game_data->game_mode == MODE_SURVIVAL) {
+        coord->lifetime = 30.0f;
+    }
 
     enemy->state = ENEMY_DEAD;
     List_clear(enemy->path);

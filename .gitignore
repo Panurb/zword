@@ -360,3 +360,6 @@ build/
 .VSCodeCounter/
 *.bak
 *.a
+
+# Ableton Live project files
+*.asd
