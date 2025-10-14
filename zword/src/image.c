@@ -150,8 +150,20 @@ void load_textures() {
 
         SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
 
+        // Animated texture names have format "name=[frames].png"
+        int frames = 1;
+        char* equals = strchr(resources.texture_names[i], '=');
+        if (equals && *(equals + 1) != '\0') {
+            LOG_DEBUG("Found animated texture: %s", resources.texture_names[i]);
+            frames = atoi(equals + 1);
+            LOG_DEBUG("Number of frames: %d", frames);
+            *equals = '\0';
+            LOG_DEBUG("Renamed texture: %s", resources.texture_names[i]);
+        }
+
         resources.textures[i] = texture;
         resources.outline_textures[i] = create_outline_texture(path);
+        resources.animation_frames[i] = frames;
     }
 
     for (int i = 0; i < resources.textures_size; i++) {
@@ -282,7 +294,7 @@ void change_texture(int entity, Filename filename, float width, float height) {
 
     AnimationComponent* animation = AnimationComponent_get(entity);
     if (animation) {
-        animation->frames = animation_frames(filename);
+        animation->frames = resources.animation_frames[image->texture_index];
     }
 }
 

@@ -7,21 +7,6 @@
 #include "game.h"
 
 
-int animation_frames(Filename image) {
-    if (strcmp(image, "arms_axe") == 0) {
-        return 6;
-    }  else if (strcmp(image, "arms_sword") == 0) {
-        return 8;
-    } else if (strcmp(image, "big_boy") == 0) {
-        return 2;
-    } else if (strcmp(image, "boss_body") == 0) {
-        return 4;
-    }
-
-    return 1;
-}
-
-
 void animate(float time_step) {
     for (int i = 0; i < game_data->components->entities; i++) {
         ImageComponent* image = ImageComponent_get(i);

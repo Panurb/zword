@@ -50,6 +50,7 @@ typedef struct {
     SDL_Texture* textures[MAX_TEXTURES];
     SDL_Texture* outline_textures[MAX_TEXTURES];
     Resolution texture_sizes[MAX_TEXTURES];
+    int animation_frames[MAX_TEXTURES];
     TTF_Font* fonts[301];
     String sound_names[MAX_SOUNDS];
     int sounds_size;
