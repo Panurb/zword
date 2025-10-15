@@ -3,6 +3,9 @@
 #include <math.h>
 
 #include "weapon.h"
+
+#include <stdio.h>
+
 #include "component.h"
 #include "grid.h"
 #include "raycast.h"

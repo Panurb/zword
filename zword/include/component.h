@@ -5,7 +5,7 @@
 #include "util.h"
 #include "list.h"
 
-#define MAX_ENTITIES 2000
+#define MAX_ENTITIES 4000
 
 
 typedef int Entity;

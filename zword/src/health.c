@@ -4,6 +4,9 @@
 #include "component.h"
 #include "physics.h"
 #include "health.h"
+
+#include <stdio.h>
+
 #include "image.h"
 #include "animation.h"
 #include "particle.h"
@@ -102,13 +105,13 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
 
         if (health->decal[0] != '\0') {
             Vector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
-            int i = -1;
+            int i;
             if (type == DAMAGE_BULLET) {
                 if (dmg < 40) {
                     i = create_decal(pos, health->decal, 60.0f);
                 } else {
                     Filename buffer;
-                    snprintf(buffer, sizeof(buffer), "%s_large", health->decal);
+                    sprintf(buffer, "%s_large", health->decal);
                     i = create_decal(pos, buffer, 60.0f);
                 }
                 ImageComponent_get(i)->alpha = 0.8f;
@@ -124,10 +127,12 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
     }
     
     if (enemy) {
-        enemy->target = dealer;
-        enemy->state = ENEMY_CHASE;
+        if (dealer != NULL_ENTITY) {
+            enemy->target = dealer;
+            enemy->state = ENEMY_CHASE;
+        }
     }
-    
+
     PhysicsComponent* physics = PhysicsComponent_get(entity);
     if (physics) {
         apply_force(entity, mult(clamp(10.0f * dmg, 100.0f, 500.0f), normalized(dir)));

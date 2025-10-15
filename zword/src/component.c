@@ -7,6 +7,9 @@
 
 #include "app.h"
 #include "component.h"
+
+#include <stdio.h>
+
 #include "image.h"
 #include "util.h"
 #include "grid.h"
@@ -913,6 +916,11 @@ int create_entity() {
             }
             return i;
         }
+    }
+
+    if (game_data->components->entities >= MAX_ENTITIES) {
+        LOG_ERROR("Maximum number of entities reached (%d)", MAX_ENTITIES);
+        return NULL_ENTITY;
     }
 
     game_data->components->entities++;

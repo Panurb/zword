@@ -504,9 +504,8 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
     // If max_health is not stored, the entity is at full health.
     // Then we can use the health as the max_health as well.
     int hp = deserialize_int(json, "health", 0);
-    int max_hp = deserialize_int(json, "max_health", hp);
-    HealthComponent* health = HealthComponent_add(entity, max_hp, "", "", "");
-    health->health = hp;
+    HealthComponent* health = HealthComponent_add(entity, hp, "", "", "");
+    health->max_health = deserialize_int(json, "max_health", hp);
     deserialize_string(json, "dead_image", health->dead_image);
     deserialize_string(json, "decal", health->decal);
     deserialize_string(json, "die_sound", health->die_sound);

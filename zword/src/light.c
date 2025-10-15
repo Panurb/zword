@@ -265,7 +265,55 @@ bool probe(Vector2f start, float angle, float range, int target_entity, float mi
 }
 
 
-void draw_light(int camera, Vector2f start, float angle, float light_angle, float range, int rays, Color color, 
+void draw_light(int camera, Vector2f start, float angle, float light_angle, float range, int rays, Color color,
+        float brightness, int bounces) {
+
+    SDL_Vertex* vertices = malloc((rays + 1) * sizeof(SDL_Vertex));
+    Vector2f pos = world_to_screen(camera, start);
+
+    color.a = 255 * brightness;
+    vertices[0] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+
+    Vector2f velocity = polar_to_cartesian(1.0, angle - 0.5 * light_angle);
+
+    float delta_angle = light_angle / (rays - 1);
+    Matrix2f rot = rotation_matrix(delta_angle);
+
+    for (int j = 1; j < rays + 1; j++) {
+        HitInfo info = raycast(start, velocity, range, GROUP_LIGHTS);
+        Vector2f end = info.position;
+
+        if (bounces > 0 && info.entity != -1) {
+            Vector2f normal = info.normal;
+            float a = polar_angle(normal);
+            draw_light(camera, end, a, M_PI, 0.5f * range, 10, color, 0.1f * brightness, bounces - 1);
+        }
+
+        end = sum(end, mult(0.25, velocity));
+
+        color.a = 255 * brightness * (1.0 - dist(start, end) / (range + 0.25));
+
+        pos = world_to_screen(camera, end);
+        vertices[j] = (SDL_Vertex) { pos.x, pos.y, color.r, color.g, color.b, color.a };
+
+        velocity = matrix_mult(rot, velocity);
+    }
+
+    int* indices = malloc(3 * (rays + 1) * sizeof(int));
+    for (int j = 0; j < rays + 1; j++) {
+        indices[3 * j] = 0;
+        indices[3 * j + 1] = j;
+        indices[3 * j + 2] = (j + 1)  % (rays + 1);
+    }
+
+    SDL_RenderGeometry(app.renderer, NULL, vertices, rays + 1, indices, 3 * (rays + 1));
+
+    free(vertices);
+    free(indices);
+}
+
+
+void draw_light2(int camera, Vector2f start, float angle, float light_angle, float range, int rays, Color color,
         float brightness, int bounces) {
     Edge points[1000];
     int points_size = 0;
