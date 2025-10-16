@@ -147,6 +147,7 @@ void add_item_to_inventory(Entity player_entity, Entity item_entity) {
             player->keys[i] = item_entity;
             coord->position = zeros();
             coord->angle = 0.0f;
+            image->alpha = 0.0f;
             add_child(player_entity, item_entity);
         }
         return;

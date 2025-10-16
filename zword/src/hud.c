@@ -170,7 +170,44 @@ void draw_keys(Entity camera, Entity player) {
         Vector2f r = vec(0.4f * (i - 0.5 * pco->keys_size), 0.0f);
         draw_sprite(camera, image->texture_index, image->width, image->height, 0, sum(pos, r), 0.0f, ones(), 1.0f);
     }
-} 
+}
+
+
+void draw_boss_health(int camera) {
+    for (Entity i = 0; i < game_data->components->entities; i++) {
+        EnemyComponent* enemy = EnemyComponent_get(i);
+        if (!enemy || !enemy->boss) continue;
+        if (enemy->state == ENEMY_DEAD) continue;
+        if (enemy->state == ENEMY_IDLE) continue;
+
+        HealthComponent* health = HealthComponent_get(i);
+
+        Vector2f position = get_position_interpolated(camera, app.delta);
+
+        float width = 10.0f;
+        float height = 0.5f;
+        float x = width * health->health / health->max_health;
+        draw_rectangle(
+            camera,
+            sum(position, vec(0.5f * (x - width), -8.5f)),
+            x,
+            height,
+            0.0f,
+            get_color(1.0f, 0.0f, 0.0f, 0.5f)
+        );
+        draw_rectangle_outline(
+            camera,
+            sum(position, vec(0.0f, -8.5f)),
+            width,
+            height,
+            0.0f,
+            0.1f,
+            get_color(1.0f, 1.0f, 1.0f, 0.5f)
+        );
+
+        break;
+    }
+}
 
 
 void draw_hud(int camera) {
@@ -316,4 +353,6 @@ void draw_hud(int camera) {
                 break;
         }
     }
+
+    draw_boss_health(camera);
 }

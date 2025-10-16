@@ -1022,6 +1022,7 @@ void draw_barriers() {
     for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
+        if (collider->trigger_type != TRIGGER_NONE) continue;
 
         ImageComponent* image = ImageComponent_get(i);
         if (image) continue;

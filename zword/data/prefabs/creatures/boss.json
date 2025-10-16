@@ -32,19 +32,20 @@
 				"fov":	6.2831854820251465,
 				"idle_speed":	0,
 				"walk_speed":	2.5,
+				"run_speed": 5.5,
 				"weapon":	6,
 				"attack_delay":	0,
 				"turn_speed":	2.5,
 				"boss": true
 			},
 			"Particle":	{
-				"type":	3,
+				"type":	2,
 				"start_size":	0.15000000596046448
 			},
 			"Waypoint":	{
 			},
 			"Health":	{
-				"health":	5000,
+				"health":	3000,
 				"dead_image":	"boss_dead",
 				"decal":	"blood",
 				"die_sound":	"stone_hit"

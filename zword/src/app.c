@@ -336,6 +336,7 @@ void update(float time_step) {
             update_editor(time_step);
             break;
         case STATE_GAME_OVER:
+            input_players(game_data->camera);
             update_game_over(time_step);
             break;
         case STATE_QUIT:
