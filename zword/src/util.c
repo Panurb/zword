@@ -338,6 +338,7 @@ float smoothstep(float x, float mu, float nu) {
 }
 
 int list_files_alphabetically(String path, String* files) {
+    LOG_INFO("Listing files in path: %s", path);
     int files_size = 0;
 
     #ifndef __EMSCRIPTEN__
@@ -396,24 +397,6 @@ void create_directory(String path) {
 
     #ifndef __EMSCRIPTEN__
         CreateDirectory(path, NULL);
-    #else
-        struct stat st;
-
-        if (stat(path, &st) == 0) {
-            if (S_ISDIR(st.st_mode)) {
-                // Directory already exists
-                return;
-            } else {
-                // Exists but not a directory
-                LOG_ERROR(stderr, "Path exists but is not a directory: %s\n", path);
-                return;
-            }
-        }
-
-        // Directory doesn't exist — try to create it
-        if (mkdir(path, 0777) != 0) {
-            LOG_ERROR("mkdir failed");
-        }
     #endif
 }
 

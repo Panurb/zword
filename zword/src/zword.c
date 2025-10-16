@@ -71,13 +71,26 @@ int main(int argc, char* argv[]) {
     LOG_INFO("Resources loaded");
     create_game();
     LOG_INFO("Game created");
-    create_menu();
-    LOG_INFO("Menu created");
 
     #ifdef __EMSCRIPTEN__
+        // Initialize filesystem, this is an async operation so need to create menu in the callback
+        EM_ASM(
+            FS.mkdir('/save');
+            FS.mount(IDBFS, {}, '/save');
+            FS.syncfs(true, function(err) {
+                if (err) {
+                    console.error('syncfs error:', err);
+                } else {
+                    console.log('syncfs complete');
+                    ccall('create_menu', 'void', [], []);
+                }
+            });
+        );
         emscripten_set_main_loop(main_loop, 0, true);
-        LOG_INFO("Emscripten main loop started");
     #else
+        create_menu();
+        LOG_INFO("Menu created");
+
         while (!app.quit) {
             main_loop();
         }

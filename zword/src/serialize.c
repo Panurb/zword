@@ -12,6 +12,9 @@
 #include "component.h"
 #include "particle.h"
 #include "list.h"
+#ifdef __EMSCRIPTEN__
+    #include <emscripten.h>
+#endif
 
 
 static cJSON* serialized_ids[MAX_ENTITIES] = { 0 };
@@ -1089,7 +1092,7 @@ void save_json(cJSON* json, Filename directory, Filename filename) {
     snprintf(path, 128, "%s/%s%s", directory, filename, ".json");
     FILE* file = fopen(path, "w");
     if (!file) {
-        printf("Could not open file: %s\n", path);
+        LOG_WARNING("Could not open file: %s\n", path);
         return;
     }
 
@@ -1098,6 +1101,15 @@ void save_json(cJSON* json, Filename directory, Filename filename) {
 
     fclose(file);
     free(string);
+
+#ifdef __EMSCRIPTEN__
+    EM_ASM({
+        FS.syncfs(false, function(err) {
+            if (err) console.error('syncfs error:', err);
+            else console.log('syncfs complete');
+        });
+    });
+#endif
 }
 
 

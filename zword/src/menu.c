@@ -427,12 +427,17 @@ void start_tutorial(int entity) {
 
 
 bool save_exists() {
-    String files[128];
+    // Make static to prevent stack overflow in Emscripten
+    static String files[128];
     int files_count = list_files_alphabetically("save/*.json", files);
     return files_count > 0 && strcmp(files[0], "Campaign") == 0;
 }
 
 
+#ifdef __EMSCRIPTEN__
+    #include <emscripten/emscripten.h>
+    EMSCRIPTEN_KEEPALIVE
+#endif
 void create_menu() {
     #ifdef __EMSCRIPTEN__
         int height = 8;
@@ -446,11 +451,9 @@ void create_menu() {
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     WidgetComponent_get(container)->enabled = false;
 
-    #ifndef __EMSCRIPTEN__
-        if (save_exists()) {
-            add_button_to_container(container, "CONTINUE", load_campaign);
-        }
-    #endif
+    if (save_exists()) {
+        add_button_to_container(container, "CONTINUE", load_campaign);
+    }
 
     add_button_to_container(container, "NEW GAME", start_campaign);
     add_button_to_container(container, "TUTORIAL", start_tutorial);
