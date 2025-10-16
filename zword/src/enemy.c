@@ -310,8 +310,9 @@ void update_enemies(float time_step) {
                     }
                 }
 
-                if (PlayerComponent_get(enemy->target)->state == PLAYER_DEAD) {
-                    enemy->target = -1;
+                PlayerComponent* player = PlayerComponent_get(enemy->target);
+                if (player && player->state == PLAYER_DEAD) {
+                    enemy->target = NULL_ENTITY;
                     enemy->state = ENEMY_IDLE;
                 }
 

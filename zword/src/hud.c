@@ -136,7 +136,7 @@ void draw_item_use(int camera, int entity) {
 
 void draw_money(int camera, int entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    Vector2f position = sum(get_position_interpolated(entity, app.delta), vec(0.0f, 1.0f));
+    Vector2f position = get_position_interpolated(entity, app.delta);
 
     char buffer[256];
     snprintf(buffer, 128, "%d", player->money);

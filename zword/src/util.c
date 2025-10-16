@@ -2,7 +2,6 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
 #define NOMINMAX
 #ifndef __EMSCRIPTEN__
@@ -10,6 +9,8 @@
 #else 
     #include <stdio.h>
     #include <dirent.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
 #endif
 
 #include "util.h"
@@ -401,18 +402,17 @@ void create_directory(String path) {
         if (stat(path, &st) == 0) {
             if (S_ISDIR(st.st_mode)) {
                 // Directory already exists
-                return 0;
+                return;
             } else {
                 // Exists but not a directory
-                fprintf(stderr, "Path exists but is not a directory: %s\n", path);
-                return -1;
+                LOG_ERROR(stderr, "Path exists but is not a directory: %s\n", path);
+                return;
             }
         }
 
         // Directory doesn't exist — try to create it
         if (mkdir(path, 0777) != 0) {
-            perror("mkdir failed");
-            return -1;
+            LOG_ERROR("mkdir failed");
         }
     #endif
 }

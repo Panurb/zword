@@ -64,7 +64,7 @@ set(SOURCES
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")  
     add_executable(notk ${SOURCES})
-    set_target_properties(notk PROPERTIES LINK_FLAGS "--preload-file=data -s ALLOW_MEMORY_GROWTH=1 --shell-file ../shell.html")
+    set_target_properties(notk PROPERTIES LINK_FLAGS "--preload-file=data -s ALLOW_MEMORY_GROWTH=1 -sSTACK_SIZE=131072 --shell-file ../shell.html")
 
     file(COPY zword/data
         DESTINATION ${CMAKE_BINARY_DIR}
