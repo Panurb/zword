@@ -13,6 +13,9 @@
 #include "hud.h"
 #include "input.h"
 #include "serialize.h"
+#ifdef __EMSCRIPTEN__
+    #include <emscripten/html5.h>
+#endif
 
 
 App app;
@@ -105,6 +108,15 @@ void resize_game_window() {
     SDL_GetWindowSize(app.window, &w, &h);
     if (game_settings.width != w || game_settings.height != h) {
         SDL_SetWindowSize(app.window, game_settings.width, game_settings.height);
+
+        #ifdef __EMSCRIPTEN__
+            emscripten_set_canvas_element_size("#canvas", game_settings.width, game_settings.height);
+            // EM_ASM({
+            //     var canvas = document.getElementById('canvas');
+            //     canvas.style.width = $0 + "px";
+            //     canvas.style.height = $1 + "px";
+            // }, game_settings.width, game_settings.height);
+        #endif
         
         SDL_DestroyTexture(app.shadow_texture);
         SDL_DestroyTexture(app.light_texture);
@@ -115,7 +127,15 @@ void resize_game_window() {
         create_screen_textures();
     }
 
-    SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+    #ifndef __EMSCRIPTEN__
+        SDL_SetWindowFullscreen(app.window, game_settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+    #else
+        if (game_settings.fullscreen) {
+            emscripten_request_fullscreen("#canvas", EM_FALSE);
+        } else {
+            emscripten_exit_fullscreen();
+        }
+    #endif
 }
 
 

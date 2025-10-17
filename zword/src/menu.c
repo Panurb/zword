@@ -230,16 +230,14 @@ void toggle_settings(int entity) {
     add_child(window_settings, container);
 
     int label = -1;
-    #ifndef __EMSCRIPTEN__
-        label = create_label("Resolution", zeros());
-        RESOLUTION_ID = create_dropdown(zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
-        WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
-        add_row_to_container(container, label, RESOLUTION_ID);
+    label = create_label("Resolution", zeros());
+    RESOLUTION_ID = create_dropdown(zeros(), RESOLUTIONS, sizeof(RESOLUTIONS) / sizeof(RESOLUTIONS[0]));
+    WidgetComponent_get(RESOLUTION_ID)->value = get_resolution_index();
+    add_row_to_container(container, label, RESOLUTION_ID);
 
-        label = create_label("Fullscreen", zeros());
-        fullscreen_id = create_checkbox(zeros(), game_settings.fullscreen, NULL);
-        add_row_to_container(container, label, fullscreen_id);
-    #endif
+    label = create_label("Fullscreen", zeros());
+    fullscreen_id = create_checkbox(zeros(), game_settings.fullscreen, NULL);
+    add_row_to_container(container, label, fullscreen_id);
 
     label = create_label("Sound", zeros());
     int slider = create_slider(zeros(), 0, 100, game_settings.volume, set_volume);
@@ -249,9 +247,7 @@ void toggle_settings(int entity) {
     slider = create_slider(zeros(), 0, 100, game_settings.music, set_music);
     add_row_to_container(container, label, slider);
 
-    #ifndef __EMSCRIPTEN__
-        add_button_to_container(container, "Apply", apply);
-    #endif
+    add_button_to_container(container, "Apply", apply);
 }
 
 
