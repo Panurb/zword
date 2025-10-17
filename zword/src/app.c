@@ -192,7 +192,7 @@ void input_game(SDL_Event sdl_event) {
     switch (game_state) {
         case STATE_GAME:
             if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
-                if (sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
                     if (game_data->testing) {
                         game_state = STATE_LOAD_EDITOR;
                     } else {
@@ -217,8 +217,10 @@ void input_game(SDL_Event sdl_event) {
             }
             break;
         case STATE_PAUSE:
-            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                game_state = STATE_GAME;
+            if (sdl_event.type == SDL_KEYDOWN) {
+                if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                    game_state = STATE_GAME;
+                }
             }
             input_menu(game_data->menu_camera, sdl_event);
             break;
@@ -230,8 +232,10 @@ void input_game(SDL_Event sdl_event) {
             input_menu(game_data->menu_camera, sdl_event);
             break;
         case STATE_INTRO:
-            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                game_state = STATE_START;
+            if (sdl_event.type == SDL_KEYDOWN) {
+                if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                    game_state = STATE_START;
+                }
             } else if (sdl_event.type == SDL_MOUSEBUTTONDOWN) {
                 intro.panel++;
                 if (intro.panel >= 6) {
