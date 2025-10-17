@@ -436,13 +436,13 @@ bool save_exists() {
 #endif
 void create_menu() {
     #ifdef __EMSCRIPTEN__
-        int height = 8;
+        int height = 7;
     #else
-        int height = 9;
+        int height = 8;
     #endif
 
     if (game_settings.debug) {
-        height++;
+        height += 2;
     }
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     WidgetComponent_get(container)->enabled = false;
@@ -460,7 +460,9 @@ void create_menu() {
     add_button_to_container(container, "SETTINGS", toggle_settings);
     add_button_to_container(container, "CONTROLS", toggle_controls);
     add_button_to_container(container, "CREDITS", toggle_credits);
-    button_benchmark = add_button_to_container(container, "BENCHMARK", update_benchmark);
+    if (game_settings.debug) {
+        button_benchmark = add_button_to_container(container, "BENCHMARK", update_benchmark);
+    }
     #ifndef __EMSCRIPTEN__
         add_button_to_container(container, "QUIT", change_state_quit);
     #endif

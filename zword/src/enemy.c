@@ -403,7 +403,7 @@ void drop_loot(int entity) {
         for (int j = 0; j < player->inventory_size; j++) {
             WeaponComponent* weapon = WeaponComponent_get(player->inventory[j]);
             if (weapon && weapon->ammo_type != AMMO_MELEE) {
-                int ammo = ammos[weapon->ammo_type - 1];
+                int ammo = ammos[weapon->ammo_type];
 
                 if (ammo < 2 * weapon->max_magazine) {
                     probs[weapon->ammo_type] += 1.0f;
