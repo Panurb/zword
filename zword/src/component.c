@@ -1027,8 +1027,8 @@ void do_destroy_entity_recursive(int entity) {
 
 
 void destroy_entity_recursive(int entity) {
+    // remove_parent(entity);
     do_destroy_entity_recursive(entity);
-    remove_parent(entity);
 }
 
 
