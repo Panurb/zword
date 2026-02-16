@@ -99,15 +99,18 @@ void die(int entity) {
 void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageType type) {
     HealthComponent* health = HealthComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
+    int final_dmg = dmg;
+
     if (health) {
         int prev_health = health->health;
-        health->health = health->health - dmg;
+        final_dmg *= health->damage_factor[type];
+        health->health = health->health - final_dmg;
 
         if (health->decal[0] != '\0') {
             Vector2f pos = sum(get_position(entity), mult(0.5f, rand_vector()));
             int i;
             if (type == DAMAGE_BULLET) {
-                if (dmg < 40) {
+                if (final_dmg < 40) {
                     i = create_decal(pos, health->decal, 60.0f);
                 } else {
                     Filename buffer;
@@ -135,7 +138,7 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
 
     PhysicsComponent* physics = PhysicsComponent_get(entity);
     if (physics) {
-        apply_force(entity, mult(clamp(10.0f * dmg, 100.0f, 500.0f), normalized(dir)));
+        apply_force(entity, mult(clamp(10.0f * final_dmg, 100.0f, 500.0f), normalized(dir)));
     }
 
     ParticleComponent* particle = ParticleComponent_get(entity);

@@ -31,6 +31,6 @@ void change_texture(int entity, Filename filename, float width, float height);
 
 void change_layer(int entity, Layer layer);
 
-// void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p);
+void create_noise(SDL_Surface* surface, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p);
 
 bool point_inside_image(int entity, Vector2f point);

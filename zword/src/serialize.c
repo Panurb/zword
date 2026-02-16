@@ -34,6 +34,23 @@ void serialize_id(cJSON* json, char* name, int id) {
 }
 
 
+void deserialize_id(cJSON* json, char* name, int* id_ptr) {
+    cJSON* id_json = cJSON_GetObjectItem(json, name);
+    if (id_json) {
+        int value = id_json->valueint;
+        for (int i = 0; i < MAX_ENTITIES; i++) {
+            if (!deserialized_ids[i]) {
+                deserialized_ids[i] = id_ptr;
+                break;
+            }
+        }
+        *id_ptr = value;
+    } else {
+        *id_ptr = -1;
+    }
+}
+
+
 void serialize_id_array(cJSON* json, char* name, int* array, int size) {
     if (size == 0) return;
 
@@ -66,23 +83,6 @@ void deserialize_id_array(cJSON* json, char* name, int* array) {
             }
         }
         i++;
-    }
-}
-
-
-void deserialize_id(cJSON* json, char* name, int* id_ptr) {
-    cJSON* id_json = cJSON_GetObjectItem(json, name);
-    if (id_json) {
-        int value = id_json->valueint;
-        for (int i = 0; i < MAX_ENTITIES; i++) {
-            if (!deserialized_ids[i]) {
-                deserialized_ids[i] = id_ptr;
-                break;
-            }
-        }
-        *id_ptr = value;
-    } else {
-        *id_ptr = -1;
     }
 }
 
@@ -211,6 +211,7 @@ void PhysicsComponent_serialize(cJSON* entity_json, int entity) {
     serialize_float(json, "ay", physics->acceleration.y, 0.0f);
     serialize_float(json, "av", physics->angular_velocity, 0.0f);
     serialize_float(json, "aa", physics->angular_acceleration, 0.0f);
+    serialize_float(json, "angular_drag", physics->angular_drag, 20.0f);
     serialize_float(json, "bounce", physics->bounce, 0.5f);
     serialize_float(json, "max_speed", physics->max_speed, 20.0f);
 }
@@ -228,6 +229,7 @@ void PhysicsComponent_deserialize(cJSON* entity_json, int entity) {
     physics->acceleration.y = deserialize_float(json, "ay", physics->acceleration.y);
     physics->angular_velocity = deserialize_float(json, "av", physics->angular_velocity);
     physics->angular_acceleration = deserialize_float(json, "aa", physics->angular_acceleration);
+    physics->angular_drag = deserialize_float(json, "angular_drag", physics->angular_drag);
     physics->bounce = deserialize_float(json, "bounce", physics->bounce);
     physics->max_speed = deserialize_float(json, "max_speed", physics->max_speed);
 }
@@ -497,6 +499,9 @@ void HealthComponent_serialize(cJSON* entity_json, int entity) {
     serialize_string(json, "dead_image", health->dead_image, "");
     serialize_string(json, "decal", health->decal, "");
     serialize_string(json, "die_sound", health->die_sound, "");
+    serialize_float(json, "damage_factor_blunt", health->damage_factor[DAMAGE_BLUNT], 1.0f);
+    serialize_float(json, "damage_factor_bullet", health->damage_factor[DAMAGE_BULLET], 1.0f);
+    serialize_float(json, "damage_factor_burn", health->damage_factor[DAMAGE_BURN], 1.0f);
 }
 
 
@@ -512,6 +517,9 @@ void HealthComponent_deserialize(cJSON* entity_json, int entity) {
     deserialize_string(json, "dead_image", health->dead_image);
     deserialize_string(json, "decal", health->decal);
     deserialize_string(json, "die_sound", health->die_sound);
+    health->damage_factor[DAMAGE_BLUNT] = deserialize_float(json, "damage_factor_blunt", health->damage_factor[DAMAGE_BLUNT]);
+    health->damage_factor[DAMAGE_BULLET] = deserialize_float(json, "damage_factor_bullet", health->damage_factor[DAMAGE_BULLET]);
+    health->damage_factor[DAMAGE_BURN] = deserialize_float(json, "damage_factor_burn", health->damage_factor[DAMAGE_BURN]);
 }
 
 

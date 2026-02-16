@@ -953,7 +953,7 @@ void input_editor(SDL_Event event) {
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
         if (!shift_down && !ctrl_down) {
-            cam->zoom_target = clamp(cam->zoom_target * powf(1.5f, event.wheel.y), 10.0f, 100.0f);
+            cam->zoom_target = clamp(cam->zoom_target * powf(1.2f, event.wheel.y), 10.0f, 100.0f);
         }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_RIGHT) {

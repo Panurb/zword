@@ -373,6 +373,13 @@ typedef enum {
     STATUS_FROZEN
 } StatusEffect;
 
+typedef enum {
+    DAMAGE_BLUNT,
+    DAMAGE_BULLET,
+    DAMAGE_BURN,
+    DAMAGE_COUNT
+} DamageType;
+
 typedef struct {
     bool dead;
     int health;
@@ -386,6 +393,7 @@ typedef struct {
         Entity entity;
         float timer;
     } status;
+    float damage_factor[DAMAGE_COUNT];
 } HealthComponent;
 
 typedef struct {

@@ -86,6 +86,7 @@ void ParticleComponent_add_snow(int entity) {
     part->enabled = true;
     part->loop = true;
     part->max_time = 20.0f;
+    part->wind_factor = 0.5f;
 }
 
 

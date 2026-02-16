@@ -606,6 +606,7 @@ HealthComponent* HealthComponent_add(int entity, int health, Filename dead_image
     comp->status.lifetime = 0.0f;
     comp->status.entity = NULL_ENTITY;
     comp->status.timer = 0.0f;
+    memset(comp->damage_factor, 1.0f, DAMAGE_COUNT);
 
     game_data->components->health[entity] = comp;
 

@@ -133,22 +133,47 @@ SDL_Texture* create_blood_particle_texture() {
 }
 
 
+SDL_Texture* create_snow_texture(Permutation p) {
+    int width = PIXELS_PER_UNIT * 8;
+    int height = PIXELS_PER_UNIT * 8;
+
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32,
+        0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
+    if (!surface) {
+        LOG_ERROR("Failed to create snow surface: %s", SDL_GetError());
+        return NULL;
+    }
+
+    create_noise(surface, width, height, vec(0.0f, 0.0f), COLOR_SNOW, 5.0f, p);
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(app.renderer, surface);
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+
 void load_textures() {
     LOG_INFO("Loading textures");
 
     resources.textures_size = list_files_alphabetically("data/images/*.png", resources.texture_names);
     LOG_INFO("Found %d textures", resources.textures_size);
 
-    for (int i = 0; i < resources.textures_size; i++) {
-        // if (strcmp(files[i], "blood_particle") == 0) {
-        //     resources.blood_particle = create_blood_particle_texture();
-        //     continue;
-        // }
+    Permutation p;
+    init_perlin(p);
 
+    for (int i = 0; i < resources.textures_size; i++) {
         String path;
         snprintf(path, sizeof(path), "%s%s%s", "data/images/", resources.texture_names[i], ".png");
 
-        SDL_Texture* texture = IMG_LoadTexture(app.renderer, path);
+        SDL_Texture* texture;
+
+        if (strcmp(resources.texture_names[i], "snow_tile") == 0) {
+            texture = create_snow_texture(p);
+        } else {
+            texture = IMG_LoadTexture(app.renderer, path);
+        }
 
         // Animated texture names have format "name=[frames].png"
         int frames = 1;
@@ -319,31 +344,29 @@ void change_layer(int entity, Layer layer) {
 }
 
 
-// void color_pixel(sfUint8* pixels, int width, int x, int y, Color color, float alpha) {
-//     int k = (x + y * width) * 4;
+void create_noise(SDL_Surface* surface, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p) {
+    Uint32* pixels = surface->pixels;
 
-//     pixels[k] = color.r;
-//     pixels[k + 1] = color.g;
-//     pixels[k + 2] = color.b;
-//     pixels[k + 3] = color.a * alpha;
-// }
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            float x = origin.x + 4.0f * i / (float)width * 4.0f;
+            float y = origin.y + 4.0f * (height - j) / (float)height * 4.0f;
+            float a = octave_perlin(x, y, 0.0f, p, 8, 4, 0.5f);
 
+            if (sharpness != 0.0f) {
+                a = smoothstep(a, 0.45f, 100.0f * sharpness);
+            }
 
-// void create_noise(sfUint8* pixels, int width, int height, Vector2f origin, Color color, float sharpness, Permutation p) {
-//     for (int i = 0; i < width; i++) {
-//         for (int j = 0; j < height; j++) {
-//             float x = origin.x + 4.0 * i / (float) PIXELS_PER_UNIT;
-//             float y = origin.y + 4.0 * (height - j) / (float) PIXELS_PER_UNIT;
-//             float a = octave_perlin(x, y, 0.0, p, 8, 4, 0.5);
-
-//             if (sharpness != 0.0f) {
-//                 a = smoothstep(a, 0.5f, 100.0f * sharpness);
-//             }
-
-//             color_pixel(pixels, width, i, j, color, a);
-//         }
-//     }
-// }
+            pixels[j * width + i] = SDL_MapRGBA(
+                surface->format,
+                color.r,
+                color.g,
+                color.b,
+                (Uint8)(a * color.a)
+            );
+        }
+    }
+}
 
 
 bool point_inside_image(int entity, Vector2f point) {

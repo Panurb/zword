@@ -1,0 +1,26 @@
+{
+    "entities":	[{
+        "id":	0,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0
+        },
+        "Image":	{
+            "filename":	"concrete_tile",
+            "layer":	5
+        },
+        "Collider":	{
+            "type":	1,
+            "width":	1,
+            "height":	1,
+            "group":	1
+        },
+        "Particle":	{
+            "type":	5,
+            "start_size":	0.300000011920929
+        },
+        "Sound":	{
+            "hit_sound":	"stone_hit"
+        }
+    }]
+}

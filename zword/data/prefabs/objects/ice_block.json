@@ -1,0 +1,82 @@
+{
+    "entities":	[{
+        "id":	0,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0
+        },
+        "Image":	{
+            "filename":	"ice_block",
+            "layer":	7
+        },
+        "Collider":	{
+            "type":	1,
+            "width":	1.5,
+            "height":	1.5,
+            "group":	11
+        },
+        "Particle":	{
+            "type":	6,
+            "start_size":	0.15000000596046448
+        },
+        "Health":	{
+            "health":	1,
+            "dead_image":	"",
+            "decal":	"",
+            "die_sound":	"wood_destroy",
+            "damage_factor_blunt": 0,
+            "damage_factor_bullet": 0
+        },
+        "Sound":	{
+            "hit_sound":	"wood_hit"
+        },
+        "Physics": {
+            "mass":	10
+        }
+    }, {
+        "id":	1,
+        "Coordinate":	{
+            "x":	-0.5,
+            "y":	-0.5,
+            "parent":	0
+        },
+        "Image":	{
+            "filename":	"ice_debris",
+            "layer":	6,
+            "alpha":	0
+        },
+        "Collider":	{
+            "type":	0,
+            "width":	0.5,
+            "height":	0.5,
+            "group":	15,
+            "enabled":	0
+        },
+        "Physics": {
+            "mass":	1
+        }
+    }, {
+        "id":	2,
+        "Coordinate":	{
+            "x":	0.5,
+            "y":	0.5,
+            "angle": 1.0,
+            "parent":	0
+        },
+        "Image":	{
+            "filename":	"ice_debris",
+            "layer":	6,
+            "alpha":	0
+        },
+        "Collider":	{
+            "type":	0,
+            "width":	0.5,
+            "height":	0.5,
+            "group":	15,
+            "enabled":	0
+        },
+        "Physics": {
+            "mass":	1
+        }
+    }]
+}
