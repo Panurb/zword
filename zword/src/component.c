@@ -192,6 +192,7 @@ ColliderComponent* ColliderComponent_add_circle(int entity, float radius, Collid
     col->radius = radius;
     col->width = 2 * radius;
     col->height = 2 * radius;
+    col->trigger_dealer = NULL_ENTITY;
 
     game_data->components->collider[entity] = col;
 
@@ -606,7 +607,9 @@ HealthComponent* HealthComponent_add(int entity, int health, Filename dead_image
     comp->status.lifetime = 0.0f;
     comp->status.entity = NULL_ENTITY;
     comp->status.timer = 0.0f;
-    memset(comp->damage_factor, 1.0f, DAMAGE_COUNT);
+    for (int i = 0; i < DAMAGE_COUNT; i++) {
+        comp->damage_factor[i] = 1.0f;
+    }
 
     game_data->components->health[entity] = comp;
 

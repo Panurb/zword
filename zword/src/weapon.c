@@ -298,7 +298,7 @@ int rope_root(int rope) {
 }
 
 
-int create_flame(Vector2f position, Vector2f velocity) {
+int create_flame(Vector2f position, Vector2f velocity, Entity dealer) {
     int i = create_entity();
 
     CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
@@ -318,6 +318,7 @@ int create_flame(Vector2f position, Vector2f velocity) {
     particle->angle = polar_angle(velocity);
     ColliderComponent* collider = ColliderComponent_add_circle(i, 0.35, GROUP_BULLETS);
     collider->trigger_type = TRIGGER_BURN;
+    collider->trigger_dealer = dealer;
 
     return i;
 }
@@ -470,13 +471,22 @@ void attack(int entity) {
 
             break;
         } case AMMO_FLAME: {
-            create_flame(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+            create_flame(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)), parent);
+            if (PlayerComponent_get(parent)) {
+                alert_enemies(parent, weapon->sound_range);
+            }
             break;
         } case AMMO_WATER: {
             create_splash(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+            if (PlayerComponent_get(parent)) {
+                alert_enemies(parent, weapon->sound_range);
+            }
             break;
         } case AMMO_FREEZE: {
             create_freeze(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+            if (PlayerComponent_get(parent)) {
+                alert_enemies(parent, weapon->sound_range);
+            }
             break;
         } default: {
             ParticleComponent* particle = ParticleComponent_get(entity);

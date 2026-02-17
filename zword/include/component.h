@@ -141,6 +141,7 @@ typedef struct {
     float width;
     float height;
     TriggerType trigger_type;
+    Entity trigger_dealer;
 } ColliderComponent;
 
 typedef enum {
@@ -254,7 +255,8 @@ typedef enum ParticleType {
     PARTICLE_STEAM,
     PARTICLE_WATER,
     PARTICLE_RADIATION,
-    PARTICLE_PUSH
+    PARTICLE_PUSH,
+    PARTICLE_ICE
 } ParticleType;
 
 typedef struct {

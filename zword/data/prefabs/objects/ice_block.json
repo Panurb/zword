@@ -16,12 +16,12 @@
             "group":	11
         },
         "Particle":	{
-            "type":	6,
+            "type":	16,
             "start_size":	0.15000000596046448
         },
         "Health":	{
-            "health":	1,
-            "dead_image":	"",
+            "health":	20,
+            "dead_image":	"puddle",
             "decal":	"",
             "die_sound":	"wood_destroy",
             "damage_factor_blunt": 0,
@@ -29,9 +29,6 @@
         },
         "Sound":	{
             "hit_sound":	"wood_hit"
-        },
-        "Physics": {
-            "mass":	10
         }
     }, {
         "id":	1,
@@ -42,7 +39,7 @@
         },
         "Image":	{
             "filename":	"ice_debris",
-            "layer":	6,
+            "layer":	7,
             "alpha":	0
         },
         "Collider":	{
@@ -65,7 +62,7 @@
         },
         "Image":	{
             "filename":	"ice_debris",
-            "layer":	6,
+            "layer":	7,
             "alpha":	0
         },
         "Collider":	{

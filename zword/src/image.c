@@ -145,7 +145,7 @@ SDL_Texture* create_snow_texture(Permutation p) {
         return NULL;
     }
 
-    create_noise(surface, width, height, vec(0.0f, 0.0f), COLOR_SNOW, 5.0f, p);
+    create_noise(surface, width, height, vec(0.0f, 0.0f), COLOR_SNOW, 0.5f, p);
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app.renderer, surface);
     SDL_FreeSurface(surface);

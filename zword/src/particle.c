@@ -127,11 +127,18 @@ void ParticleCompoenent_add_radiation(int entity) {
 }
 
 
-void ParticleCompoenent_add_push(int entity) {
+void ParticleComponent_add_push(int entity) {
     ParticleComponent* part = ParticleComponent_add(entity, M_PI_2, 0.0f, 0.2, 0.05, 2.0f, 20.0f, COLOR_ENERGY, COLOR_NONE);
     part->enabled = true;
     part->loop = true;
     part->wind_factor = 0.0f;
+}
+
+
+void ParticleComponent_add_ice(int entity) {
+    Color inner_color = COLOR_WHITE;
+    Color color = get_color(0.576f, 0.827f, 0.784f, 1.0f);
+    ParticleComponent_add(entity, 0.0f, 2.0f * M_PI, 0.3f, 0.0f, 1.5f, 5.0f, color, inner_color);
 }
 
 
@@ -182,7 +189,10 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
             ParticleCompoenent_add_radiation(entity);
             break;
         case PARTICLE_PUSH:
-            ParticleCompoenent_add_push(entity);
+            ParticleComponent_add_push(entity);
+            break;
+        case PARTICLE_ICE:
+            ParticleComponent_add_ice(entity);
             break;
     }
     ParticleComponent* particle = ParticleComponent_get(entity);

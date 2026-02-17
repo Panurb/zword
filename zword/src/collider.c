@@ -331,7 +331,6 @@ void apply_trigger(int trigger, int target) {
     ColliderComponent* collider = ColliderComponent_get(trigger);
     PlayerComponent* player = PlayerComponent_get(target);
     PhysicsComponent* physics = PhysicsComponent_get(target);
-    HealthComponent* health = HealthComponent_get(target);
 
     switch (collider->trigger_type) {
         case TRIGGER_NONE:
@@ -418,6 +417,12 @@ void collide(int entity) {
                         return;
                     }
                     continue;
+                }
+
+                if (!PhysicsComponent_get(n)) {
+                    if (collider->trigger_type != TRIGGER_NONE) {
+                        apply_trigger(entity, n);
+                    }
                 }
 
                 Vector2f dv = physics->velocity;

@@ -96,14 +96,14 @@ void die(int entity) {
 }
 
 
-void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageType type) {
+void damage(Entity entity, Vector2f pos, Vector2f dir, int dmg, Entity dealer, DamageType type) {
     HealthComponent* health = HealthComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     int final_dmg = dmg;
 
     if (health) {
         int prev_health = health->health;
-        final_dmg *= health->damage_factor[type];
+        final_dmg = (float)dmg * health->damage_factor[type];
         health->health = health->health - final_dmg;
 
         if (health->decal[0] != '\0') {
@@ -130,9 +130,11 @@ void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageT
     }
     
     if (enemy) {
-        if (dealer != NULL_ENTITY) {
+        if (dealer != NULL_ENTITY && PlayerComponent_get(dealer)) {
             enemy->target = dealer;
             enemy->state = ENEMY_CHASE;
+        } else {
+            enemy->state = ENEMY_WANDER;
         }
     }
 
@@ -192,9 +194,15 @@ void burn(Entity entity) {
     if (!health) return;
     
     if (health->status.type == STATUS_NONE) {
+        float size = 0.3f;
+        ColliderComponent* collider = ColliderComponent_get(entity);
+        if (collider) {
+            size = 0.5f * collider_radius(entity);
+        }
+
         int i = create_entity();
         CoordinateComponent_add(i, zeros(), 0.0f);
-        ParticleComponent_add_type(i, PARTICLE_FIRE, 0.3f);
+        ParticleComponent_add_type(i, PARTICLE_FIRE, size);
         LightComponent_add(i, 4.0f, 2.0f * M_PI, COLOR_ORANGE, 0.8f, 10.0f);
         SoundComponent* sound = SoundComponent_add(i, "");
         strcpy(sound->loop_sound, "fire");
