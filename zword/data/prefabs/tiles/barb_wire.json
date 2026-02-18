@@ -1,0 +1,20 @@
+{
+    "entities":	[{
+        "id":	0,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0
+        },
+        "Image":	{
+            "filename":	"barb_wire_tile",
+            "layer":	5
+        },
+        "Collider":	{
+            "type":	1,
+            "width":	2,
+            "height":	1,
+            "group":	8,
+            "trigger_type": 4
+        }
+    }]
+}

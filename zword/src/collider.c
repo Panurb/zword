@@ -332,6 +332,7 @@ void apply_trigger(int trigger, int target) {
     PlayerComponent* player = PlayerComponent_get(target);
     PhysicsComponent* physics = PhysicsComponent_get(target);
 
+    Vector2f dir;
     switch (collider->trigger_type) {
         case TRIGGER_NONE:
             break;
@@ -351,7 +352,8 @@ void apply_trigger(int trigger, int target) {
             }
             break;
         case TRIGGER_DAMAGE:
-            damage(target, get_position(trigger), diff(get_position(target), get_position(trigger)), 10, trigger, DAMAGE_BLUNT);
+            dir = mult(-1.0f, overlap_collider_collider(trigger, target));
+            damage(target, get_position(target), dir, 1, trigger, DAMAGE_BLUNT);
             break;
         case TRIGGER_BURN:
             burn(target);

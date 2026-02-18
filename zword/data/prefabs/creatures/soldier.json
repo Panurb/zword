@@ -85,7 +85,8 @@
             "fov":	0.78539818525314331,
             "walk_speed":	3,
             "run_speed":	5,
-            "weapon":	0
+            "weapon":	0,
+            "attack_angle": 2.0
         },
         "Particle":	{
             "type":	2,

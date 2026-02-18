@@ -288,11 +288,18 @@ void update_enemies(float time_step) {
                 enemy->desired_angle = polar_angle(v);
 
                 r = polar_to_cartesian(1.0f, get_angle(i));
+                float delta_angle = 0.0f;
+                if (enemy->attack_angle > 0.0f) {
+                    r = diff(get_position(enemy->target), pos);
+                    delta_angle = angle_diff(enemy->desired_angle, coord->angle);
+                }
                 info = raycast(pos, r, fminf(weapon->range, enemy->vision_range), GROUP_BULLETS);
-                if (info.entity == enemy->target) {
+
+                if (info.entity == enemy->target && fabsf(delta_angle) <= enemy->attack_angle) {
                     enemy->attack_timer = enemy->attack_delay;
                     enemy->state = ENEMY_ATTACK;
                 } else {
+                    // Destroy obstacles in the way
                     for (int j = 0; j < weapon->shots; j++) {
                         float angle = j * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread;
                         Vector2f dir = polar_to_cartesian(1.0, get_angle(i) + angle);

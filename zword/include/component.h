@@ -233,6 +233,7 @@ typedef struct {
     float desired_angle;
     float attack_delay;
     float attack_timer;
+    float attack_angle;
     float turn_speed;
     int bounty;
     Vector2f start_position;

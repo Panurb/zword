@@ -349,6 +349,7 @@ EnemyComponent* EnemyComponent_add(int entity) {
     enemy->desired_angle = get_angle(entity);
     enemy->attack_delay = 0.1f;
     enemy->attack_timer = enemy->attack_delay;
+    enemy->attack_angle = 0.0f;
     enemy->turn_speed = 5.0f;
     enemy->spawner = false;
     enemy->bounty = 100;
