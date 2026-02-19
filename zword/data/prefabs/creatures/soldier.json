@@ -31,11 +31,11 @@
             "fire_rate":	5.0,
             "recoil":	0.05000000074505806,
             "damage":	5,
-            "max_magazine":	-1,
-            "magazine":	1,
+            "max_magazine":	10,
+            "magazine":	10,
             "max_recoil":	0.15707963705062866,
             "reload_time":	3,
-            "range":	30,
+            "range":	20,
             "sound_range":	30,
             "spread":	0,
             "shots":	1,
@@ -95,8 +95,8 @@
         "Waypoint":	{
         },
         "Health":	{
-            "health":	100,
-            "dead_image":	"farmer_dead",
+            "health":	200,
+            "dead_image":	"soldier_dead",
             "decal":	"blood",
             "die_sound":	""
         },

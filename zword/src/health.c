@@ -230,7 +230,9 @@ void freeze(Entity entity) {
             ;
             int i = create_entity();
             CoordinateComponent_add(i, zeros(), 0.0f);
-            ParticleComponent_add_type(i, PARTICLE_STEAM, 0.3f);
+            ParticleComponent* particle = ParticleComponent_add_type(i, PARTICLE_ICE, 0.3f);
+            particle->enabled = true;
+            particle->loop = true;
             add_child(entity, i);
 
             health->status.entity = i;

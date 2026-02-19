@@ -366,6 +366,9 @@ void apply_trigger(int trigger, int target) {
             coord->lifetime = 0.0f;
             break;
         case TRIGGER_WET:
+            if (game_data->weather == WEATHER_SNOW) {
+                freeze(target);
+            }
             coord->lifetime = 0.0f;
             break;
         case TRIGGER_TRAP:

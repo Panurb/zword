@@ -196,18 +196,25 @@ void reload(int i) {
     }
 
     PlayerComponent* player = PlayerComponent_get(CoordinateComponent_get(i)->parent);
-    AmmoComponent* ammo = AmmoComponent_get(player->ammo[weapon->ammo_type]);
-    if (!ammo || ammo->size == 0) {
-        return;
+    AmmoComponent* ammo = NULL;
+    if (player) {
+        ammo = AmmoComponent_get(player->ammo[weapon->ammo_type]);
+        if (!ammo || ammo->size == 0) {
+            return;
+        }
     }
 
     int akimbo = get_akimbo(i);
 
     if (weapon->reloading) {
         if (weapon->cooldown == 0.0f) {
-            int a = fminf(ammo->size, (1 + akimbo) * (weapon->max_magazine - weapon->magazine));
-            weapon->magazine += a;
-            ammo->size -= a;
+            if (ammo) {
+                int a = fminf(ammo->size, (1 + akimbo) * (weapon->max_magazine - weapon->magazine));
+                weapon->magazine += a;
+                ammo->size -= a;
+            } else {
+                weapon->magazine = weapon->max_magazine;
+            }
             weapon->reloading = false;
         }
     } else {
