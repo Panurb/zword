@@ -61,6 +61,7 @@ static int grid_size_index = 3;
 static float double_click_time = 0.0f;
 static int entity_settings_id = -1;
 static int entity_settings_entity = -1;
+static Vector2f camera_target_position = { 0.0f, 0.0f };
 
 static int tiles_window_id = -1;
 static int objects_window_id = -1;
@@ -590,6 +591,9 @@ void update_editor(float time_step) {
     update_particles(game_data->camera, time_step);
     update_lights(time_step);
     update_camera(game_data->camera, time_step, false);
+    CoordinateComponent* coord = CoordinateComponent_get(game_data->camera);
+    coord->position = sum(coord->position, mult(10.0f * time_step, diff(camera_target_position, coord->position)));
+    mouse_world = get_mouse_position(game_data->camera);
 
     draw_shadows(game_data->camera);
     draw_lights(game_data->camera, game_data->ambient_light);
@@ -950,10 +954,13 @@ void input_editor(SDL_Event event) {
 
         if (event.button.button == SDL_BUTTON_MIDDLE) {
             cam_coord->position = sum(cam_coord->position, mult(-1.0f / cam->zoom, mouse_delta));
+            camera_target_position = cam_coord->position;
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
         if (!shift_down && !ctrl_down) {
+            float cam_zoom = cam->zoom_target;
             cam->zoom_target = clamp(cam->zoom_target * powf(1.2f, event.wheel.y), 10.0f, 100.0f);
+            camera_target_position = sum(mouse_world, mult(cam_zoom / cam->zoom_target, diff(camera_target_position, mouse_world)));
         }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_RIGHT) {
