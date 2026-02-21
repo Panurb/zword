@@ -1,0 +1,48 @@
+{
+    "entities":	[{
+        "id":	0,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0,
+            "angle":	0
+        },
+        "Image":	{
+            "filename":	"railroad_end",
+            "layer":	2,
+            "alpha":	0
+        },
+        "Path":	{
+            "width":	1
+        }
+    }, {
+        "id":	1,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0,
+            "angle":	0,
+            "parent":	0
+        },
+        "Collider":	{
+            "type":	0,
+            "width":	0.5,
+            "height":	0.5,
+            "group":	13
+        },
+        "Waypoint":	{
+        }
+    }, {
+        "id":	2,
+        "Coordinate":	{
+            "x":	3.1,
+            "y":	0,
+            "angle":	0,
+            "parent":	0
+        },
+        "Collider": {
+            "type":	1,
+            "width":	0.8,
+            "height":	3.4,
+            "group":	1
+        }
+    }]
+}

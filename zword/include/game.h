@@ -10,7 +10,7 @@
 #include "sound.h"
 
 
-#define MAX_TEXTURES 128
+#define MAX_TEXTURES 256
 #define MAX_SOUNDS 128
 
 

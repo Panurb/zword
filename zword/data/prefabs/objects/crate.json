@@ -1,0 +1,58 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"crate",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1.8,
+				"height":	1.8,
+				"group":	1
+			},
+			"Particle":	{
+				"type":	6,
+				"start_size":	0.15
+			},
+			"Sound":	{
+				"hit_sound":	"wood_hit"
+			},
+			"Health":	{
+				"health":	200,
+				"dead_image":	"crate_destroyed",
+				"decal":	"",
+				"die_sound":	"wood_destroy"
+			},
+			"Physics":	{
+				"mass":	2
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	3.1415927410125732,
+				"parent":	0
+			},
+			"Image":	{
+				"filename":	"crate_destroyed",
+				"layer":	7,
+				"alpha":	0
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	1.8,
+				"height":	1.8,
+				"group":	15,
+				"enabled":	0
+			},
+			"Physics":	{
+				"mass": 2
+			}
+	}]
+}

@@ -1,15 +1,9 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
-
-#include <stdlib.h>
-#include <math.h>
-
 #include "component.h"
-#include "perlin.h"
-#include "camera.h"
-#include "image.h"
 
+
+void create_path(Vector2f start, Vector2f end, String filename, String end_filename);
 
 void create_road(Vector2f start, Vector2f end);
 

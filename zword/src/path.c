@@ -18,7 +18,7 @@ Vector2f perlin_grad(Vector2f position, Permutation perm) {
 }
 
 
-void create_path(Vector2f start, Vector2f end, String filename, String end_filename, float width) {
+void create_path(Vector2f start, Vector2f end, String filename, String end_filename) {
     Vector2f dir = normalized(diff(end, start));
     float length = dist(start, end);
 
@@ -50,17 +50,17 @@ void create_path(Vector2f start, Vector2f end, String filename, String end_filen
 
 
 void create_road(Vector2f start, Vector2f end) {
-    create_path(start, end, "road", "road_end", 1.0f);
+    create_path(start, end, "road", "road_end");
 }
 
 
 void create_river(Vector2f start, Vector2f end) {
-    create_path(start, end, "river", "river_end", 1.0f);
+    create_path(start, end, "river", "river_end");
 }
 
 
 void create_footpath(Vector2f start, Vector2f end) {
-    create_path(start, end, "footpath", "footpath_end", 0.5f);
+    create_path(start, end, "footpath", "footpath_end");
 }
 
 

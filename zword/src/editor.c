@@ -214,7 +214,7 @@ void toggle_weapons(int entity) {
 }
 
 
-void select_road(int entity) {
+void select_path(int entity) {
     strcpy(selected_object_name, WidgetComponent_get(entity)->string);
     tool = TOOL_PATH;
 }
@@ -234,9 +234,10 @@ void toggle_paths(Entity entity) {
     int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 1, 5);
     add_child(paths_window_id, container);
 
-    add_button_to_container(container, "road", select_road);
-    add_button_to_container(container, "river", select_road);  
-    add_button_to_container(container, "footpath", select_road);  
+    add_button_to_container(container, "road", select_path);
+    add_button_to_container(container, "river", select_path);
+    add_button_to_container(container, "footpath", select_path);
+    add_button_to_container(container, "railroad", select_path);
 
     add_scrollbar_to_container(container);
 }
@@ -398,16 +399,37 @@ void move_selections(Vector2f delta_pos) {
         ListNode* node;
         FOREACH (node, selections) {
             int i = node->value;
-            CoordinateComponent* coord = CoordinateComponent_get(node->value);
-            if (ColliderComponent_get(i)) {
+            CoordinateComponent* coord = CoordinateComponent_get(i);
+            ColliderComponent* col = ColliderComponent_get(i);
+            PathComponent* path = PathComponent_get(i);
+
+            if (col) {
                 clear_grid(i);
-                coord->position = sum(coord->position, delta_pos);
+            }
+
+            coord->position = sum(coord->position, delta_pos);
+
+            if (path) {
+                Vector2f pos = coord->position;
+                CoordinateComponent* prev = CoordinateComponent_get(path->prev);
+                CoordinateComponent* next = CoordinateComponent_get(path->next);
+
+                if (next) {
+                    Vector2f next_pos = next->position;
+                    coord->angle = atan2f(next_pos.y - pos.y, next_pos.x - pos.x);
+                    // coord->scale.x = dist(pos, next_pos) / 4.0f;
+                }
+                if (prev) {
+                    Vector2f prev_pos = prev->position;
+                    prev->angle = atan2f(pos.y - prev_pos.y, pos.x - prev_pos.x);
+                    // prev->scale.x = dist(prev_pos, pos) / 4.0f;
+                }
+            }
+
+            if (col) {
                 update_grid(i);
-            } else {
-                coord->position = sum(coord->position, delta_pos);
             }
         }
-        delta_pos = zeros();
     }
 }
 
@@ -811,14 +833,9 @@ void input_tool_path(SDL_Event event) {
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         game_data->components->added_entities = List_create();
 
-        // TODO: better system for this
-        if (strcmp(selected_object_name, "road") == 0) {
-            create_road(tile_start, tile_end);
-        } else if (strcmp(selected_object_name, "river") == 0) {
-            create_river(tile_start, tile_end);
-        } else if (strcmp(selected_object_name, "footpath") == 0) {
-            create_footpath(tile_start, tile_end);
-        }
+        String path_end;
+        sprintf(path_end, "%s_end", selected_object_name);
+        create_path(tile_start, tile_end, selected_object_name, path_end);
 
         ListNode* node;
         FOREACH(node, game_data->components->added_entities) {
