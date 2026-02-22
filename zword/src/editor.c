@@ -417,12 +417,12 @@ void move_selections(Vector2f delta_pos) {
                 if (next) {
                     Vector2f next_pos = next->position;
                     coord->angle = atan2f(next_pos.y - pos.y, next_pos.x - pos.x);
-                    // coord->scale.x = dist(pos, next_pos) / 4.0f;
+                    coord->scale.x = dist(pos, next_pos) / 8.0f;
                 }
                 if (prev) {
                     Vector2f prev_pos = prev->position;
                     prev->angle = atan2f(pos.y - prev_pos.y, pos.x - prev_pos.x);
-                    // prev->scale.x = dist(prev_pos, pos) / 4.0f;
+                    prev->scale.x = dist(prev_pos, pos) / 8.0f;
                 }
             }
 
