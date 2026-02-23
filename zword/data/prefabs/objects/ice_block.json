@@ -23,12 +23,12 @@
             "health":	20,
             "dead_image":	"puddle",
             "decal":	"",
-            "die_sound":	"wood_destroy",
+            "die_sound":	"",
             "damage_factor_blunt": 0,
             "damage_factor_bullet": 0
         },
         "Sound":	{
-            "hit_sound":	"wood_hit"
+            "hit_sound":	"stone_hit"
         }
     }, {
         "id":	1,
