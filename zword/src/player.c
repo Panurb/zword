@@ -115,13 +115,10 @@ void update_players(float time_step) {
             char buffer[256];
             snprintf(buffer, 256, "arms_%s", image->filename);
 
-            if (strcmp(image->filename, "axe") == 0) {
-                change_texture(player->arms, buffer, 2.0f, 2.0f);
-            } else if (strcmp(image->filename, "sword") == 0) {
-                change_texture(player->arms, buffer, 2.0f, 3.0f);
-            } else {
-                change_texture(player->arms, buffer, 0.0f, 0.0f);
-            }
+            int texture_index = get_texture_index(buffer);
+            int frames = resources.animation_frames[texture_index];
+            Resolution res = resources.texture_sizes[texture_index];
+            change_texture(player->arms, buffer, res.w / frames, res.h);
         } else {
             if (itco) {
                 change_texture(player->arms, "arms", 0.0f, 0.0f);

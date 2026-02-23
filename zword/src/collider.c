@@ -41,9 +41,9 @@ float collider_radius(int i) {
         return 0.5f * norm(vec(col->width * scale.x, col->height * scale.y));
     }
 
-    if (!close_enough(scale.x, scale.y, 0.01f)) {
-        LOG_WARNING("Circle collider %i has non-uniform scale\n", i);
-    }
+    // if (!close_enough(scale.x, scale.y, 0.01f)) {
+    //     LOG_WARNING("Circle collider %i has non-uniform scale", i);
+    // }
     return col->radius * scale.x;
 }
 

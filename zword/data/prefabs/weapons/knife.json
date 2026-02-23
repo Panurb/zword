@@ -1,0 +1,47 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0,
+				"angle":	0.0
+			},
+			"Image":	{
+				"filename":	"knife",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	1
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	1,
+				"height":	1,
+				"group":	2
+			},
+			"Weapon":	{
+				"fire_rate":	4,
+				"recoil":	0,
+				"damage":	20,
+				"max_magazine":	-1,
+				"magazine":	1,
+				"max_recoil":	0,
+				"reload_time":	0,
+				"range":	1.5,
+				"sound_range":	2,
+				"spread":	1.0995573997497559,
+				"shots":	1,
+				"ammo_type":	0,
+				"sound":	"axe",
+				"automatic":	true
+			},
+			"Item":	{
+				"size":	0,
+				"name":	"Knife",
+				"type":	0
+			},
+			"Sound":	{
+				"hit_sound":	"metal"
+			}
+		}]
+}
