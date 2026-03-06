@@ -1,0 +1,38 @@
+{
+    "entities":	[{
+        "id":	0,
+        "Coordinate":	{
+            "x":	0,
+            "y":	0
+        },
+        "Image":	{
+            "filename":	"flames_tile",
+            "layer":	5
+        },
+        "Collider":	{
+            "type":	1,
+            "width":	2,
+            "height":	1,
+            "group":	1,
+            "trigger_type": 5
+        },
+        "Particle": {
+            "type":	7,
+            "start_size":	0.4,
+            "rate": 30,
+            "loop": true,
+            "width": 2,
+            "height": 1
+        },
+        "Light": {
+            "range":	10,
+            "angle":	6.2831854820251465,
+            "color_r":	255,
+            "color_g":	153,
+            "color_b":	0,
+            "brightness":	0.800000011920929,
+            "speed":	10,
+            "flicker":	0.10000000149011612
+        }
+    }]
+}

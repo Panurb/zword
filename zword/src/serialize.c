@@ -369,6 +369,7 @@ void ParticleComponent_deserialize(cJSON* entity_json, int entity) {
         }
         particle->width = deserialize_float(json, "width", particle->width);
         particle->height = deserialize_float(json, "height", particle->height);
+        particle->rate = deserialize_float(json, "rate", particle->rate);
     }
 }
 

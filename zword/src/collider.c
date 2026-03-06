@@ -326,13 +326,32 @@ void spawn_enemies_in_range(Vector2f position, float radius) {
 }
 
 
+void extinguish(Entity entity) {
+    ColliderComponent* collider = ColliderComponent_get(entity);
+    if (collider && collider->trigger_type == TRIGGER_BURN) {
+        collider->enabled = false;
+    }
+
+    ParticleComponent* particle = ParticleComponent_get(entity);
+    if (particle && particle->type == PARTICLE_FIRE) {
+        particle->enabled = false;
+    }
+
+    LightComponent* light = LightComponent_get(entity);
+    if (light) {
+        light->enabled = false;
+    }
+}
+
+
 void apply_trigger(int trigger, int target) {
     CoordinateComponent* coord = CoordinateComponent_get(trigger);
     ColliderComponent* collider = ColliderComponent_get(trigger);
     PlayerComponent* player = PlayerComponent_get(target);
     PhysicsComponent* physics = PhysicsComponent_get(target);
 
-    Vector2f dir;
+    Vector2f dir = mult(-1.0f, overlap_collider_collider(trigger, target));
+
     switch (collider->trigger_type) {
         case TRIGGER_NONE:
             break;
@@ -352,13 +371,15 @@ void apply_trigger(int trigger, int target) {
             }
             break;
         case TRIGGER_DAMAGE:
-            dir = mult(-1.0f, overlap_collider_collider(trigger, target));
             damage(target, get_position(target), dir, 1, trigger, DAMAGE_BLUNT);
             break;
         case TRIGGER_BURN:
             burn(target);
             if (PhysicsComponent_get(trigger)) {
                 coord->lifetime = 0.0f;
+            }
+            if (PhysicsComponent_get(target)) {
+                apply_force(target, mult(100.0f, dir));
             }
             break;
         case TRIGGER_FREEZE:
@@ -369,6 +390,7 @@ void apply_trigger(int trigger, int target) {
             if (game_data->weather == WEATHER_SNOW) {
                 freeze(target);
             }
+            extinguish(target);
             coord->lifetime = 0.0f;
             break;
         case TRIGGER_TRAP:
@@ -414,6 +436,8 @@ void collide(int entity) {
 
                 if (!non_zero(ol)) continue;
 
+                bool triggered = false;
+
                 if (collider_other->trigger_type != TRIGGER_NONE) {
                     apply_trigger(n, entity);
 
@@ -421,13 +445,18 @@ void collide(int entity) {
                     if (!ColliderComponent_get(entity)) {
                         return;
                     }
-                    continue;
+                    triggered = true;
                 }
 
                 if (!PhysicsComponent_get(n)) {
                     if (collider->trigger_type != TRIGGER_NONE) {
                         apply_trigger(entity, n);
+                        triggered = true;
                     }
+                }
+
+                if (triggered) {
+                    continue;
                 }
 
                 Vector2f dv = physics->velocity;

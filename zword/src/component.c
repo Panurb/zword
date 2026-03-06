@@ -720,6 +720,7 @@ SoundComponent* SoundComponent_get(int entity) {
 void SoundComponent_remove(int entity) {
     SoundComponent* sound = SoundComponent_get(entity);
     if (sound) {
+        clear_sounds(entity);
         free(sound);
         game_data->components->sound[entity] = NULL;
     }
