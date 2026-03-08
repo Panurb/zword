@@ -32,7 +32,7 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
 
         ImageComponent* image = ImageComponent_get(i);
 
-        Vector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice / (item->size + 1));
+        Vector2f r = polar_to_cartesian(1.5 + offset, slot * slice - 0.5 * slice + 0.5 * slice);
         float angle = (slot - 1) * 0.5f * M_PI;
 
         if (i == player->grabbed_item) {
@@ -40,7 +40,14 @@ void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha)
             angle = polar_angle(r) - 0.5f * M_PI;
         }
 
-        draw_sprite(camera, image->texture_index, image->width, image->height, 0, sum(pos, r), angle, ones(), 1.0f);
+        Vector2f scale = ones();
+        float max_width = 2.0f;
+        if (image->width > max_width) {
+            float s = max_width / image->width;
+            scale.x = s;
+            scale.y = s;
+        }
+        draw_sprite(camera, image->texture_index, 0.0f, 0.0f, 0, sum(pos, r), angle, scale, 1.0f);
     }
 }
 

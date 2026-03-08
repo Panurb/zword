@@ -22,7 +22,7 @@
 			"Weapon":	{
 				"fire_rate":	4,
 				"recoil":	0,
-				"damage":	20,
+				"damage":	30,
 				"max_magazine":	-1,
 				"magazine":	1,
 				"max_recoil":	0,

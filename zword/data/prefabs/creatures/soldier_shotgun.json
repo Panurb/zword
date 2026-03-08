@@ -7,7 +7,7 @@
             "parent":	1
         },
         "Image":	{
-            "filename":	"arms_assault_rifle",
+            "filename":	"arms_combat_shotgun",
             "layer":	7
         },
         "Physics":	{
@@ -28,20 +28,20 @@
             "start_size":	0.15000000596046448
         },
         "Weapon":	{
-            "fire_rate":	10.0,
-            "recoil":	0.15,
-            "damage":	5,
-            "max_magazine":	10,
-            "magazine":	10,
-            "max_recoil":	0.15,
+            "fire_rate":	0.800000011920929,
+            "recoil":	0.25,
+            "damage":	12,
+            "max_magazine":	6,
+            "magazine":	6,
+            "max_recoil":	0.78539818525314331,
             "reload_time":	2,
-            "range":	10,
-            "sound_range":	30,
-            "spread":	0,
-            "shots":	1,
-            "ammo_type":	2,
-            "sound":	"assault_rifle",
-            "automatic":	true
+            "range":	5,
+            "sound_range":	15,
+            "spread":	0.15707963705062866,
+            "shots":	8,
+            "ammo_type":	3,
+            "sound":	"shotgun",
+            "automatic":	false
         },
         "Item":	{
             "size":	1,

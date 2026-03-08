@@ -274,7 +274,7 @@ void draw_slice_outline(int camera, Vector2f position, float min_range, float ma
 }
 
 
-void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle, 
+void draw_sprite(int camera, int texture_index, float width, float height, int offset, Vector2f position, float angle,
         Vector2f scale, float alpha) {
     if (texture_index == -1) {
         return;
@@ -282,22 +282,12 @@ void draw_sprite(int camera, int texture_index, float width, float height, int o
 
     CameraComponent* cam = CameraComponent_get(camera);
 
-    Vector2f scaling = mult(cam->zoom / PIXELS_PER_UNIT, scale);
-
     SDL_Texture* texture = resources.textures[texture_index];
     SDL_SetTextureAlphaMod(texture, 255 * alpha);
 
     SDL_Rect src = { 0, 0, width * PIXELS_PER_UNIT, height * PIXELS_PER_UNIT };
     if (offset != 0) {
         src.x = offset * width * PIXELS_PER_UNIT;
-    }
-
-    bool tile = false;
-    int texture_width;
-    int texture_height;
-    SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
-    if (texture_width < width * PIXELS_PER_UNIT || texture_height < height * PIXELS_PER_UNIT) {
-        tile = true;
     }
 
     if (width == 0.0f || height == 0.0f) {
@@ -309,17 +299,18 @@ void draw_sprite(int camera, int texture_index, float width, float height, int o
     Vector2f pos = world_to_screen(camera, position);
 
     SDL_FRect dest;
-    dest.w = width * scaling.x * PIXELS_PER_UNIT;
-    dest.h = height * scaling.y * PIXELS_PER_UNIT;
+    dest.w = width * scale.x * cam->zoom;
+    dest.h = height * scale.y * cam->zoom;
     dest.x = pos.x - 0.5f * dest.w;
     dest.y = pos.y - 0.5f * dest.h;
 
     SDL_Rect* psrc = &src;
     if (width == 0.0f || height == 0.0f) {
-        SDL_Rect* psrc = NULL;
+        psrc = NULL;
     }
     SDL_RenderCopyExF(app.renderer, texture, psrc, &dest, -to_degrees(angle), NULL, SDL_FLIP_NONE);
 }
+
 
 
 void draw_tiles(int camera, int texture_index, float width, float height, Vector2f offset, Vector2f position, 
