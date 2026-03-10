@@ -1,0 +1,58 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"chair",
+				"layer":	7
+			},
+			"Physics":	{
+				"mass":	2
+			},
+			"Collider":	{
+				"type":	0,
+				"width":	0.8,
+				"group":	11
+			},
+			"Particle":	{
+				"type":	3,
+				"start_size":	0.15
+			},
+			"Health":	{
+				"health":	1,
+				"dead_image":	"",
+				"decal":	"",
+				"die_sound":	""
+			},
+			"Sound":	{
+				"hit_sound":	"metal_hit"
+			}
+		}, {
+		"id":	1,
+		"Coordinate":	{
+			"x":	0,
+			"y":	0,
+			"parent":	0
+		},
+		"Image":	{
+			"filename":	"chair_down",
+			"layer":	6,
+			"alpha":	0
+		},
+		"Physics":	{
+			"mass":	1
+		},
+		"Collider":	{
+			"type":	0,
+			"width":	0.8,
+			"group":	11,
+			"enabled":	0
+		},
+		"Sound":	{
+			"hit_sound":	"metal_hit"
+		}
+	}]
+}

@@ -256,12 +256,12 @@ void ColliderComponent_deserialize(cJSON* entity_json, int entity) {
 
     int type = cJSON_GetObjectItem(json, "type")->valueint;
     float width = cJSON_GetObjectItem(json, "width")->valuedouble;
-    float height = cJSON_GetObjectItem(json, "height")->valuedouble;
     int group = cJSON_GetObjectItem(json, "group")->valueint;
     ColliderComponent* collider;
     if (type == COLLIDER_CIRCLE) {
         collider = ColliderComponent_add_circle(entity, 0.5f * width, group);
     } else {
+        float height = cJSON_GetObjectItem(json, "height")->valuedouble;
         collider = ColliderComponent_add_rectangle(entity, width, height, group);
     }
     collider->enabled = deserialize_int(json, "enabled", collider->enabled);
