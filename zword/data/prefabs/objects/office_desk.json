@@ -1,0 +1,26 @@
+{
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	0
+			},
+			"Image":	{
+				"filename":	"office_desk",
+				"layer":	7
+			},
+			"Collider":	{
+				"type":	1,
+				"width":	2.8,
+				"height":	1.5,
+				"group":	1
+			},
+			"Particle":	{
+				"type":	6,
+				"start_size":	0.15
+			},
+			"Sound":	{
+				"hit_sound":	"wood_hit"
+			}
+		}]
+}
