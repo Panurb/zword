@@ -14,6 +14,10 @@
 			"Text":	{
 				"source_string":	"",
 				"size":	30
+			},
+			"Image":	{
+				"filename":	"note",
+				"layer":	7
 			}
 		}]
 }

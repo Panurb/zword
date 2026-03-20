@@ -924,6 +924,7 @@ void input_tool_test(SDL_Event event) {
             // add_item_to_inventory(i, pistol);
 
             reset_editor_ids();
+            ColliderGrid_clear(game_data->grid);
             init_game();
 
             CameraComponent_get(game_data->camera)->zoom_target = 40.0f;
@@ -1046,7 +1047,6 @@ void draw_barriers() {
     for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(i);
         if (!collider) continue;
-        if (collider->trigger_type != TRIGGER_NONE) continue;
 
         ImageComponent* image = ImageComponent_get(i);
         if (image) continue;

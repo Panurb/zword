@@ -446,17 +446,25 @@ void draw_text(int camera, Vector2f position, char string[100], int size, Color 
     }
 
     CameraComponent* cam = CameraComponent_get(camera);
-    int font_size = mini(size * cam->zoom / 40.0f, 300);
+    float actual_size = size * cam->zoom / 40.0f;
+    int font_size = mini(actual_size, 300);
     TTF_Font* font = resources.fonts[font_size];
     if (!font) {
         return;
     }
 
+    float scale = actual_size / (float)font_size;
+
     Vector2f pos = world_to_screen(camera, position);
     SDL_Color c = { color.r, color.g, color.b, color.a };
     SDL_Surface* surface = TTF_RenderText_Blended(font, string, c);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app.renderer, surface);
-    SDL_FRect dest = { pos.x - 0.5f * surface->w, pos.y - 0.5f * surface->h, surface->w, surface->h };
+    SDL_FRect dest = {
+        pos.x - 0.5f * surface->w * scale,
+        pos.y - 0.5f * surface->h * scale,
+        surface->w * scale,
+        surface->h * scale
+    };
     SDL_RenderCopyF(app.renderer, texture, NULL, &dest);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
