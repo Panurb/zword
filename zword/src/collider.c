@@ -381,10 +381,14 @@ void apply_trigger(int trigger, int target) {
             if (PhysicsComponent_get(target)) {
                 apply_force(target, mult(100.0f, dir));
             }
+            collider->enabled = false;
+            clear_grid(trigger);
             break;
         case TRIGGER_FREEZE:
             freeze(target);
             coord->lifetime = 0.0f;
+            collider->enabled = false;
+            clear_grid(trigger);
             break;
         case TRIGGER_WET:
             if (game_data->weather == WEATHER_SNOW) {
@@ -392,6 +396,8 @@ void apply_trigger(int trigger, int target) {
             }
             extinguish(target);
             coord->lifetime = 0.0f;
+            collider->enabled = false;
+            clear_grid(trigger);
             break;
         case TRIGGER_TRAP:
             if (player) {
