@@ -134,6 +134,9 @@ void select_object(int entity) {
 
     tool = TOOL_OBJECT;
 
+    selected_object_angle = 0.0f;
+    selected_object_scale = 1.0f;
+
     game_data->components->added_entities = List_create();
 
     int i = load_prefab(selected_object_name, zeros(), 0.0f, ones());

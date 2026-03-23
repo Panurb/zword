@@ -15,7 +15,7 @@
 				"max_recoil":	0,
 				"reload_time":	0,
 				"range":	15,
-				"sound_range":	15,
+				"sound_range":	10,
 				"spread":	0.78539818525314331,
 				"shots":	5,
 				"ammo_type":	4,
