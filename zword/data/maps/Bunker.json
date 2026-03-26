@@ -125,7 +125,7 @@
 			"Coordinate":	{
 				"x":	-3.5,
 				"y":	-6.5,
-				"angle":	1.641695499420166,
+				"angle":	-0.31589159369468689,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -670,7 +670,7 @@
 			"Coordinate":	{
 				"x":	-27,
 				"y":	-19,
-				"angle":	-0.68593889474868774,
+				"angle":	1.6956348419189453,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -1265,7 +1265,7 @@
 			"Coordinate":	{
 				"x":	28,
 				"y":	-62,
-				"angle":	-0.380468636751175,
+				"angle":	2.0011055469512939,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -1344,7 +1344,7 @@
 			"Coordinate":	{
 				"x":	29.5,
 				"y":	-61.5,
-				"angle":	0.88876193761825562,
+				"angle":	-1.0688251256942749,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -1352,20 +1352,20 @@
 			"Coordinate":	{
 				"x":	27,
 				"y":	-59,
-				"angle":	1.67415988445282,
+				"angle":	-0.28342726826667786,
 				"prefab":	"objects/blood",
-				"scale_x":	1.330994725227356,
-				"scale_y":	1.330994725227356
+				"scale_x":	1.3309938907623291,
+				"scale_y":	1.3309938907623291
 			}
 		}, {
 			"id":	142,
 			"Coordinate":	{
 				"x":	28.5,
 				"y":	-57.5,
-				"angle":	0.103364035487175,
+				"angle":	-1.854246973991394,
 				"prefab":	"objects/blood",
-				"scale_x":	1.6105037927627563,
-				"scale_y":	1.6105037927627563
+				"scale_x":	1.6105023622512817,
+				"scale_y":	1.6105023622512817
 			}
 		}, {
 			"id":	143,
@@ -1381,7 +1381,7 @@
 			"Coordinate":	{
 				"x":	19,
 				"y":	-29,
-				"angle":	1.5833100080490112,
+				"angle":	2.5643210411071777,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -2220,7 +2220,7 @@
 			"Coordinate":	{
 				"x":	1,
 				"y":	-35,
-				"angle":	1.8012708425521851,
+				"angle":	-2.1003406047821045,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -2287,7 +2287,7 @@
 			"Coordinate":	{
 				"x":	-15.5,
 				"y":	-42,
-				"angle":	2.1533701419830322,
+				"angle":	-1.9612815380096436,
 				"prefab":	"objects/gas"
 			}
 		}, {
@@ -2402,7 +2402,7 @@
 			"Coordinate":	{
 				"x":	-47.5,
 				"y":	-64.5,
-				"angle":	1.7470186948776245,
+				"angle":	2.728029727935791,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -2410,7 +2410,7 @@
 			"Coordinate":	{
 				"x":	-46.5,
 				"y":	-64.5,
-				"angle":	2.5324165821075439,
+				"angle":	-2.7697577476501465,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -2479,7 +2479,7 @@
 			"Coordinate":	{
 				"x":	-2.25,
 				"y":	-33.75,
-				"angle":	0.0099825132638216,
+				"angle":	-0.3251979649066925,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2534,7 +2534,7 @@
 			"Coordinate":	{
 				"x":	13,
 				"y":	-90,
-				"angle":	-2.9115948677062988,
+				"angle":	-0.74306094646453857,
 				"prefab":	"objects/gas"
 			}
 		}, {
@@ -2667,7 +2667,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-76,
-				"angle":	-0.3351801335811615,
+				"angle":	-0.67036020755767822,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2675,7 +2675,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-88,
-				"angle":	-0.3351801335811615,
+				"angle":	-0.67036020755767822,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2683,7 +2683,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-92,
-				"angle":	-0.3351801335811615,
+				"angle":	-0.67036020755767822,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2759,7 +2759,7 @@
 			"Coordinate":	{
 				"x":	-10,
 				"y":	-84,
-				"angle":	-1.4467834234237671,
+				"angle":	2.878814697265625,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2767,7 +2767,7 @@
 			"Coordinate":	{
 				"x":	-8,
 				"y":	-81,
-				"angle":	0.12401289492845535,
+				"angle":	-1.8335741758346558,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2933,7 +2933,7 @@
 			"Coordinate":	{
 				"x":	5,
 				"y":	-108,
-				"angle":	-3.0559651851654053,
+				"angle":	1.2696331739425659,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2941,7 +2941,7 @@
 			"Coordinate":	{
 				"x":	11.5,
 				"y":	-100.5,
-				"angle":	2.441821813583374,
+				"angle":	0.4842345118522644,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2949,7 +2949,7 @@
 			"Coordinate":	{
 				"x":	9,
 				"y":	-110,
-				"angle":	1.656423807144165,
+				"angle":	-0.30116355419158936,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2965,7 +2965,7 @@
 			"Coordinate":	{
 				"x":	-4.5,
 				"y":	-68.5,
-				"angle":	-3.0852208137512207,
+				"angle":	-2.916104793548584,
 				"prefab":	"objects/table"
 			}
 		}, {
@@ -2989,7 +2989,7 @@
 			"Coordinate":	{
 				"x":	-1.5,
 				"y":	-65.5,
-				"angle":	-0.72036844491958618,
+				"angle":	-1.0555485486984253,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -3163,6 +3163,999 @@
 				"x":	-7,
 				"y":	-64.5,
 				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	349,
+			"Coordinate":	{
+				"x":	48.5,
+				"y":	-35,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	6
+			}
+		}, {
+			"id":	350,
+			"Coordinate":	{
+				"x":	48.5,
+				"y":	-44,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	351,
+			"Coordinate":	{
+				"x":	48.5,
+				"y":	-38,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	352,
+			"Coordinate":	{
+				"x":	66.5,
+				"y":	-39.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	3
+			}
+		}, {
+			"id":	353,
+			"Coordinate":	{
+				"x":	72.5,
+				"y":	-47.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	15
+			}
+		}, {
+			"id":	354,
+			"Coordinate":	{
+				"x":	67.5,
+				"y":	-42.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	5
+			}
+		}, {
+			"id":	355,
+			"Coordinate":	{
+				"x":	60,
+				"y":	-32.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	356,
+			"Coordinate":	{
+				"x":	60,
+				"y":	-47.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	357,
+			"Coordinate":	{
+				"x":	62,
+				"y":	-34,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/bed"
+			}
+		}, {
+			"id":	358,
+			"Coordinate":	{
+				"x":	58,
+				"y":	-38,
+				"angle":	1.570796012878418,
+				"prefab":	"objects/sink"
+			}
+		}, {
+			"id":	359,
+			"Coordinate":	{
+				"x":	63,
+				"y":	-38,
+				"angle":	-3.1415925025939941,
+				"prefab":	"objects/toilet"
+			}
+		}, {
+			"id":	360,
+			"Coordinate":	{
+				"x":	60,
+				"y":	-39.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	361,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-33,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	362,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-38.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	363,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-37.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	364,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-36.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	365,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-35.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	366,
+			"Coordinate":	{
+				"x":	57.5,
+				"y":	-38,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/candle"
+			}
+		}, {
+			"id":	367,
+			"Coordinate":	{
+				"x":	56,
+				"y":	-40,
+				"prefab":	"tiles/floor",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	368,
+			"Coordinate":	{
+				"x":	62,
+				"y":	-46,
+				"angle":	-3.1415925025939941,
+				"prefab":	"objects/bed"
+			}
+		}, {
+			"id":	369,
+			"Coordinate":	{
+				"x":	64.5,
+				"y":	-36,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	370,
+			"Coordinate":	{
+				"x":	64.5,
+				"y":	-45,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	6
+			}
+		}, {
+			"id":	371,
+			"Coordinate":	{
+				"x":	63,
+				"y":	-43,
+				"angle":	-2.3561944961547852,
+				"prefab":	"objects/toilet"
+			}
+		}, {
+			"id":	372,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-40.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	373,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-41.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	374,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-42.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	375,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-43.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	376,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-44.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	377,
+			"Coordinate":	{
+				"x":	58,
+				"y":	-43,
+				"prefab":	"objects/fire"
+			}
+		}, {
+			"id":	378,
+			"Coordinate":	{
+				"x":	72.5,
+				"y":	-44.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	9
+			}
+		}, {
+			"id":	379,
+			"Coordinate":	{
+				"x":	79.5,
+				"y":	-39.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	15
+			}
+		}, {
+			"id":	380,
+			"Coordinate":	{
+				"x":	76.5,
+				"y":	-38.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	11
+			}
+		}, {
+			"id":	381,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-47,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/door_locked"
+			}
+		}, {
+			"id":	382,
+			"Coordinate":	{
+				"x":	72,
+				"y":	-24,
+				"prefab":	"tiles/snow",
+				"scale_x":	2,
+				"scale_y":	2
+			}
+		}, {
+			"id":	383,
+			"Coordinate":	{
+				"x":	48.5,
+				"y":	-56,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	16
+			}
+		}, {
+			"id":	384,
+			"Coordinate":	{
+				"x":	56.5,
+				"y":	-63.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	15
+			}
+		}, {
+			"id":	385,
+			"Coordinate":	{
+				"x":	72,
+				"y":	-63.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	16
+			}
+		}, {
+			"id":	386,
+			"Coordinate":	{
+				"x":	79.5,
+				"y":	-55.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	15
+			}
+		}, {
+			"id":	387,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-48.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	388,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-49.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	389,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-50.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	390,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-51.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	391,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-52.75,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	392,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-55,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	393,
+			"Coordinate":	{
+				"x":	60,
+				"y":	-55.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	394,
+			"Coordinate":	{
+				"x":	64.5,
+				"y":	-52,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	395,
+			"Coordinate":	{
+				"x":	63,
+				"y":	-49,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/toilet"
+			}
+		}, {
+			"id":	396,
+			"Coordinate":	{
+				"x":	62,
+				"y":	-54,
+				"angle":	-3.1415925025939941,
+				"prefab":	"objects/bed"
+			}
+		}, {
+			"id":	397,
+			"Coordinate":	{
+				"x":	58,
+				"y":	-41,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/sink"
+			}
+		}, {
+			"id":	398,
+			"Coordinate":	{
+				"x":	58,
+				"y":	-49,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/sink"
+			}
+		}, {
+			"id":	399,
+			"Coordinate":	{
+				"x":	56,
+				"y":	-56,
+				"prefab":	"tiles/floor",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	400,
+			"Coordinate":	{
+				"x":	72,
+				"y":	-56,
+				"prefab":	"tiles/grating",
+				"scale_x":	2,
+				"scale_y":	2
+			}
+		}, {
+			"id":	401,
+			"Coordinate":	{
+				"x":	77.25,
+				"y":	-55.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/snow",
+				"scale_x":	1.875,
+				"scale_y":	0.4375
+			}
+		}, {
+			"id":	402,
+			"Coordinate":	{
+				"x":	70,
+				"y":	-51.5,
+				"prefab":	"tiles/tiles",
+				"scale_x":	10,
+				"scale_y":	7
+			}
+		}, {
+			"id":	403,
+			"Coordinate":	{
+				"x":	67.5,
+				"y":	-56,
+				"prefab":	"tiles/tiles",
+				"scale_x":	7,
+				"scale_y":	2
+			}
+		}, {
+			"id":	404,
+			"Coordinate":	{
+				"x":	69.5,
+				"y":	-60,
+				"prefab":	"tiles/tiles",
+				"scale_x":	11,
+				"scale_y":	6
+			}
+		}, {
+			"id":	405,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-54,
+				"prefab":	"objects/stove"
+			}
+		}, {
+			"id":	406,
+			"Coordinate":	{
+				"x":	71,
+				"y":	-49,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/stove"
+			}
+		}, {
+			"id":	407,
+			"Coordinate":	{
+				"x":	68.5,
+				"y":	-49,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/sink"
+			}
+		}, {
+			"id":	408,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-51.5,
+				"prefab":	"objects/sink"
+			}
+		}, {
+			"id":	409,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-31.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	410,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-30.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	411,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-29.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	412,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-28.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	413,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-27.25,
+				"prefab":	"tiles/concrete",
+				"scale_x":	0.5,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	414,
+			"Coordinate":	{
+				"x":	56,
+				"y":	-24,
+				"prefab":	"tiles/floor",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	415,
+			"Coordinate":	{
+				"x":	48.5,
+				"y":	-24,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	16
+			}
+		}, {
+			"id":	416,
+			"Coordinate":	{
+				"x":	56.5,
+				"y":	-16.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	15
+			}
+		}, {
+			"id":	417,
+			"Coordinate":	{
+				"x":	64.5,
+				"y":	-26.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	11
+			}
+		}, {
+			"id":	418,
+			"Coordinate":	{
+				"x":	56.25,
+				"y":	-25,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door_silver"
+			}
+		}, {
+			"id":	419,
+			"Coordinate":	{
+				"x":	60,
+				"y":	-24.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	8
+			}
+		}, {
+			"id":	420,
+			"Coordinate":	{
+				"x":	64.5,
+				"y":	-17.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	3
+			}
+		}, {
+			"id":	421,
+			"Coordinate":	{
+				"x":	64.5,
+				"y":	-19,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	422,
+			"Coordinate":	{
+				"x":	72,
+				"y":	-24,
+				"prefab":	"tiles/grass",
+				"scale_x":	16,
+				"scale_y":	16
+			}
+		}, {
+			"id":	423,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-20,
+				"angle":	0.33029761910438538,
+				"prefab":	"paths/footpath_end",
+				"scale_x":	0.77083271741867065
+			},
+			"Path":	{
+				"next":	424,
+				"width":	0.5
+			}
+		}, {
+			"id":	424,
+			"Coordinate":	{
+				"x":	71.8333282470703,
+				"y":	-18,
+				"angle":	-0.39233994483947754,
+				"prefab":	"paths/footpath",
+				"scale_x":	0.65384840965271
+			},
+			"Path":	{
+				"prev":	423,
+				"next":	425,
+				"width":	0.5
+			}
+		}, {
+			"id":	425,
+			"Coordinate":	{
+				"x":	76.666664123535156,
+				"y":	-20,
+				"angle":	-1.3654003143310547,
+				"prefab":	"paths/footpath",
+				"scale_x":	0.510735511779785
+			},
+			"Path":	{
+				"prev":	424,
+				"next":	426,
+				"width":	0.5
+			}
+		}, {
+			"id":	426,
+			"Coordinate":	{
+				"x":	77.5,
+				"y":	-24,
+				"angle":	-1.9797049760818481,
+				"prefab":	"paths/footpath",
+				"scale_x":	0.68115782737731934
+			},
+			"Path":	{
+				"prev":	425,
+				"next":	427,
+				"width":	0.5
+			}
+		}, {
+			"id":	427,
+			"Coordinate":	{
+				"x":	75.3333282470703,
+				"y":	-29,
+				"angle":	2.98082971572876,
+				"prefab":	"paths/footpath",
+				"scale_x":	0.78090143203735352
+			},
+			"Path":	{
+				"prev":	426,
+				"next":	428,
+				"width":	0.5
+			}
+		}, {
+			"id":	428,
+			"Coordinate":	{
+				"x":	69.1666717529297,
+				"y":	-28,
+				"angle":	2.1353664398193359,
+				"prefab":	"paths/footpath_end",
+				"scale_x":	0.73980379104614258
+			},
+			"Path":	{
+				"prev":	427,
+				"next":	429,
+				"width":	0.5
+			}
+		}, {
+			"id":	429,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-23,
+				"prefab":	"paths/footpath"
+			},
+			"Path":	{
+				"prev":	428,
+				"width":	0.5
+			}
+		}, {
+			"id":	430,
+			"Coordinate":	{
+				"x":	72.5,
+				"y":	-16.5,
+				"prefab":	"tiles/barb_wire",
+				"scale_x":	7.5
+			}
+		}, {
+			"id":	431,
+			"Coordinate":	{
+				"x":	79.5,
+				"y":	-24.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/barb_wire",
+				"scale_x":	7.5
+			}
+		}, {
+			"id":	432,
+			"Coordinate":	{
+				"x":	62,
+				"y":	-26,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/bed"
+			}
+		}, {
+			"id":	433,
+			"Coordinate":	{
+				"x":	63,
+				"y":	-31,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/toilet"
+			}
+		}, {
+			"id":	434,
+			"Coordinate":	{
+				"x":	58,
+				"y":	-30,
+				"angle":	0.785398304462433,
+				"prefab":	"objects/sink"
+			}
+		}, {
+			"id":	435,
+			"Coordinate":	{
+				"x":	49.5,
+				"y":	-62.5,
+				"prefab":	"objects/alarm"
+			}
+		}, {
+			"id":	436,
+			"Coordinate":	{
+				"x":	49.5,
+				"y":	-17.5,
+				"prefab":	"objects/alarm"
+			}
+		}, {
+			"id":	437,
+			"Coordinate":	{
+				"x":	58,
+				"y":	-51.5,
+				"angle":	-2.3561944961547852,
+				"prefab":	"objects/corpse"
+			}
+		}, {
+			"id":	438,
+			"Coordinate":	{
+				"x":	58.5,
+				"y":	-51,
+				"angle":	0.549189329147339,
+				"prefab":	"objects/blood"
+			}
+		}, {
+			"id":	439,
+			"Coordinate":	{
+				"x":	71,
+				"y":	-32.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	12
+			}
+		}, {
+			"id":	440,
+			"Coordinate":	{
+				"x":	75.25,
+				"y":	-56.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	13,
+				"scale_y":	0.5
+			}
+		}, {
+			"id":	441,
+			"Coordinate":	{
+				"x":	65.5,
+				"y":	-41,
+				"prefab":	"tiles/board",
+				"scale_x":	3,
+				"scale_y":	2
+			}
+		}, {
+			"id":	442,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-44.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/board",
+				"scale_x":	5,
+				"scale_y":	2
+			}
+		}, {
+			"id":	443,
+			"Coordinate":	{
+				"x":	73,
+				"y":	-46,
+				"prefab":	"tiles/board",
+				"scale_x":	12,
+				"scale_y":	2
+			}
+		}, {
+			"id":	444,
+			"Coordinate":	{
+				"x":	78,
+				"y":	-38.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/board",
+				"scale_x":	13,
+				"scale_y":	2
+			}
+		}, {
+			"id":	445,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-49,
+				"prefab":	"tiles/wood",
+				"scale_x":	2,
+				"scale_y":	2
+			}
+		}, {
+			"id":	446,
+			"Coordinate":	{
+				"x":	75.25,
+				"y":	-48,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	447,
+			"Coordinate":	{
+				"x":	74,
+				"y":	-56,
+				"prefab":	"tiles/tiles",
+				"scale_x":	2,
+				"scale_y":	2
+			}
+		}, {
+			"id":	448,
+			"Coordinate":	{
+				"x":	78,
+				"y":	-62.5,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/corpse"
+			}
+		}, {
+			"id":	449,
+			"Coordinate":	{
+				"x":	76.5,
+				"y":	-60.5,
+				"prefab":	"objects/corpse"
+			}
+		}, {
+			"id":	450,
+			"Coordinate":	{
+				"x":	78,
+				"y":	-59,
+				"angle":	2.3561944961547852,
+				"prefab":	"objects/corpse"
+			}
+		}, {
+			"id":	451,
+			"Coordinate":	{
+				"x":	77,
+				"y":	-58,
+				"angle":	-0.78539806604385376,
+				"prefab":	"creatures/big boy"
+			}
+		}, {
+			"id":	452,
+			"Coordinate":	{
+				"x":	76.5,
+				"y":	-56,
+				"prefab":	"objects/blood_large"
+			}
+		}, {
+			"id":	453,
+			"Coordinate":	{
+				"x":	78.5,
+				"y":	-52.5,
+				"angle":	0.78539818525314331,
+				"prefab":	"objects/blood_large"
+			}
+		}, {
+			"id":	454,
+			"Coordinate":	{
+				"x":	78.5,
+				"y":	-48.5,
+				"prefab":	"objects/blood_large"
+			}
+		}, {
+			"id":	455,
+			"Coordinate":	{
+				"x":	77,
+				"y":	-62.5,
+				"angle":	-0.78539806604385376,
+				"prefab":	"objects/blood_large",
+				"scale_x":	1.2100000381469727,
+				"scale_y":	1.2100000381469727
+			}
+		}, {
+			"id":	456,
+			"Coordinate":	{
+				"x":	79,
+				"y":	-58,
+				"angle":	-2.3561944961547852,
+				"prefab":	"objects/blood_large",
+				"scale_x":	0.75131481885910034,
+				"scale_y":	0.75131481885910034
+			}
+		}, {
+			"id":	457,
+			"Coordinate":	{
+				"x":	75.5,
+				"y":	-49.5,
+				"angle":	-2.3561944961547852,
+				"prefab":	"objects/blood_large",
+				"scale_x":	0.75131481885910034,
+				"scale_y":	0.75131481885910034
+			}
+		}, {
+			"id":	458,
+			"Coordinate":	{
+				"x":	72.5,
+				"y":	-61.5,
+				"angle":	2.8764922618865967,
+				"prefab":	"objects/table"
+			}
+		}, {
+			"id":	459,
+			"Coordinate":	{
+				"x":	74.5,
+				"y":	-61.5,
+				"angle":	3.1415925025939941,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	460,
+			"Coordinate":	{
+				"x":	66,
+				"y":	-49,
+				"angle":	-2.88646411895752,
+				"prefab":	"objects/lamp"
+			}
+		}, {
+			"id":	461,
+			"Coordinate":	{
+				"x":	52,
+				"y":	-53,
+				"prefab":	"objects/door_locked"
 			}
 		}]
 }
