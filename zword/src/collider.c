@@ -471,7 +471,7 @@ void collide(int entity) {
                 float m = 1.0f;
 
                 PhysicsComponent* physics_other = PhysicsComponent_get(n);
-                if (physics_other) {
+                if (physics_other && physics_other->lock != AXIS_ALL) {
                     dv = diff(dv, physics_other->velocity);
                     m = physics_other->mass / (physics->mass + physics_other->mass);
                 }
