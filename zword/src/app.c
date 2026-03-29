@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -13,6 +14,12 @@
 #include "hud.h"
 #include "input.h"
 #include "serialize.h"
+#include "list.h"
+#include "camera.h"
+#ifndef __EMSCRIPTEN__
+    #include "network.h"
+    #include "netgame.h"
+#endif
 #ifdef __EMSCRIPTEN__
     #include <emscripten/html5.h>
 #endif
@@ -174,12 +181,49 @@ void init() {
     app.focus = true;
     app.time_step = 1.0f / 60.0f;
     app.delta = 0.0f;
+
+#ifndef __EMSCRIPTEN__
+    // Parse CLI args and init networking
+    network_init();
+    for (int i = 1; i < app.argc; i++) {
+        if (strcmp(app.argv[i], "--host") == 0) {
+            int port = NET_DEFAULT_PORT;
+            if (i + 1 < app.argc && app.argv[i + 1][0] != '-') {
+                port = atoi(app.argv[i + 1]);
+                i++;
+            }
+            if (!network_host_start(port)) {
+                LOG_ERROR("Failed to start host");
+            }
+            // Host is player 0 with MKB
+            app.player_controllers[0] = CONTROLLER_MKB;
+        } else if (strcmp(app.argv[i], "--join") == 0) {
+            const char* ip = "127.0.0.1";
+            int port = NET_DEFAULT_PORT;
+            if (i + 1 < app.argc && app.argv[i + 1][0] != '-') {
+                ip = app.argv[i + 1];
+                i++;
+            }
+            if (i + 1 < app.argc && app.argv[i + 1][0] != '-') {
+                port = atoi(app.argv[i + 1]);
+                i++;
+            }
+            if (!network_client_connect(ip, port)) {
+                LOG_ERROR("Failed to connect to host");
+            }
+        }
+    }
+#endif
 }
 
 
 void quit() {
     free(app.fps);
     destroy_game_window();
+
+#ifndef __EMSCRIPTEN__
+    network_shutdown();
+#endif
 
     Mix_CloseAudio();
     TTF_Quit();
@@ -303,15 +347,85 @@ void update(float time_step) {
         case STATE_MENU:
             intro.page = 1;
             intro.panel = 0;
+#ifndef __EMSCRIPTEN__
+            // Host: accept incoming client connections while in menu
+            if (network.mode == NET_MODE_HOST) {
+                network_host_accept_clients();
+                // Assign controllers for connected clients
+                for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+                    if (network.clients[i].connected) {
+                        int slot = network.clients[i].player_slot;
+                        if (slot >= 0 && slot < 4) {
+                            app.player_controllers[slot] = CONTROLLER_MKB;  // placeholder, remote
+                        }
+                    }
+                }
+            }
+            // Client: check for JOIN_ACK or START_GAME
+            if (network.mode == NET_MODE_CLIENT) {
+                struct sockaddr_in from;
+                int received;
+                while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+                    if (received < (int)sizeof(PacketHeader)) continue;
+                    PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+                    if (hdr->type == PACKET_JOIN_ACK && received >= (int)sizeof(JoinAckPacket)) {
+                        JoinAckPacket* ack = (JoinAckPacket*)network.recv_buf;
+                        network.local_player_slot = ack->player_slot;
+                        LOG_INFO("Joined as player %d", network.local_player_slot);
+                    } else if (hdr->type == PACKET_START_GAME && received >= (int)sizeof(StartGamePacket)) {
+                        StartGamePacket* start = (StartGamePacket*)network.recv_buf;
+                        strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
+                        game_data->game_mode = (GameMode)start->game_mode;
+                        // Set up controllers: only our slot is local, mark others as active
+                        for (int i = 0; i < 4; i++) {
+                            app.player_controllers[i] = CONTROLLER_NONE;
+                        }
+                        for (int i = 0; i < (int)start->num_players; i++) {
+                            app.player_controllers[i] = CONTROLLER_MKB;  // all active
+                        }
+                        network.game_started = true;
+                        game_state = STATE_START;
+                    }
+                }
+            }
+#endif
             update_menu();
             break;
         case STATE_START:
             start_game(game_data->map_name, false);
+#ifndef __EMSCRIPTEN__
+            if (network.mode == NET_MODE_HOST) {
+                // Count total players (host + connected clients)
+                int num_players = 1;
+                for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+                    if (network.clients[i].connected) num_players++;
+                }
+                // Broadcast START_GAME to clients
+                StartGamePacket start_pkt;
+                memset(&start_pkt, 0, sizeof(start_pkt));
+                start_pkt.header.type = PACKET_START_GAME;
+                start_pkt.header.tick = network.tick;
+                start_pkt.header.size = sizeof(StartGamePacket);
+                strncpy(start_pkt.map_name, game_data->map_name, sizeof(start_pkt.map_name) - 1);
+                start_pkt.game_mode = (uint8_t)game_data->game_mode;
+                start_pkt.num_players = (uint8_t)num_players;
+                network_broadcast(&start_pkt, sizeof(start_pkt));
+                network.game_started = true;
+            }
+            // Initialize net_entity_seen for both host and client
+            if (network.mode != NET_MODE_NONE) {
+                memset(net_entity_seen, 0, sizeof(net_entity_seen));
+                net_map_max_entity = game_data->components->entities;
+            }
+#endif
             game_state = STATE_GAME;
             break;
         case STATE_END:
             end_game();
             clear_all_sounds();
+#ifndef __EMSCRIPTEN__
+            network.game_started = false;
+#endif
             game_state = STATE_MENU;
             break;
         case STATE_RESET:
@@ -320,9 +434,108 @@ void update(float time_step) {
             game_state = STATE_START;
             break;
         case STATE_GAME:
-            input_players(game_data->camera);
-            update_game(time_step);
-            update_game_mode(time_step);
+#ifndef __EMSCRIPTEN__
+            if (network.mode == NET_MODE_HOST) {
+                // Host: receive remote inputs FIRST so all controllers are fresh,
+                // then read local input + run state machines, then simulate.
+
+                // 1. Receive and apply remote inputs
+                {
+                    struct sockaddr_in from;
+                    int received;
+                    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+                        if (received < (int)sizeof(PacketHeader)) continue;
+                        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+                        if (hdr->type == PACKET_INPUT && received >= (int)sizeof(InputPacket)) {
+                            InputPacket* input_pkt = (InputPacket*)network.recv_buf;
+                            // Find the player entity for this slot
+                            int slot_idx = 0;
+                            ListNode* pnode;
+                            FOREACH(pnode, game_data->components->player.order) {
+                                if (slot_idx == (int)input_pkt->player_slot) {
+                                    netgame_unpack_input(input_pkt, pnode->value);
+                                    break;
+                                }
+                                slot_idx++;
+                            }
+                        }
+                        // Also accept new clients during game (re-sends JOIN_ACK)
+                        if (hdr->type == PACKET_JOIN) {
+                            network_host_accept_clients();
+                        }
+                    }
+                }
+
+                // 2. Read local input + run state machines for all players
+                // (remote players now have fresh controller data from step 1)
+                input_players(game_data->camera);
+
+                // 3. Simulate
+                update_game(time_step);
+                update_game_mode(time_step);
+
+                // 4. Build and broadcast snapshot
+                {
+                    int snap_size = netgame_build_snapshot(network.send_buf, NET_MAX_PACKET_SIZE, network.tick);
+                    network_broadcast(network.send_buf, snap_size);
+                    network.tick++;
+                }
+            } else if (network.mode == NET_MODE_CLIENT) {
+                // Client: only read local controller (no state machine -- host is authoritative),
+                // send input to host, receive and apply snapshots.
+
+                // 1. Update local player's controller only (no state machine)
+                {
+                    int slot_idx = 0;
+                    ListNode* pnode;
+                    FOREACH(pnode, game_data->components->player.order) {
+                        if (slot_idx == network.local_player_slot) {
+                            update_controller(game_data->camera, pnode->value);
+                            break;
+                        }
+                        slot_idx++;
+                    }
+                }
+
+                // 2. Pack and send our input to host
+                {
+                    int slot_idx = 0;
+                    ListNode* pnode;
+                    FOREACH(pnode, game_data->components->player.order) {
+                        if (slot_idx == network.local_player_slot) {
+                            InputPacket input_pkt;
+                            netgame_pack_input(&input_pkt, pnode->value, (uint8_t)network.local_player_slot, network.tick);
+                            network_send_to_host(&input_pkt, sizeof(input_pkt));
+                            break;
+                        }
+                        slot_idx++;
+                    }
+                }
+
+                // 3. Receive and apply snapshots
+                {
+                    struct sockaddr_in from;
+                    int received;
+                    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+                        if (received < (int)sizeof(PacketHeader)) continue;
+                        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+                        if (hdr->type == PACKET_SNAPSHOT) {
+                            netgame_apply_snapshot(network.recv_buf, received);
+                        }
+                    }
+                }
+
+                // 4. Client still needs to update coordinates for interpolation
+                update_coordinates();
+                update_camera(game_data->camera, time_step, true);
+            } else
+#endif
+            {
+                // Single player (no network)
+                input_players(game_data->camera);
+                update_game(time_step);
+                update_game_mode(time_step);
+            }
             break;
         case STATE_PAUSE:
             update_menu();

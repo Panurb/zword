@@ -24,6 +24,8 @@ typedef struct {
     FpsCounter* fps;
     float time_step;
     float delta;
+    int argc;
+    char** argv;
 } App;
 
 extern App app;

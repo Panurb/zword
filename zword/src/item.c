@@ -8,6 +8,7 @@
 #include "game.h" 
 #include "player.h"
 #include "door.h"
+#include "netgame.h"
 
 
 bool is_attachment(int entity) {
@@ -62,7 +63,7 @@ int create_bandage(Vector2f position) {
     int i = create_entity();
 
     float angle = rand_angle();
-    CoordinateComponent_add(i, position, angle);
+    CoordinateComponent_add(i, position, angle)->net_type = NET_ENTITY_BANDAGE;
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     PhysicsComponent_add(i, 0.5f);
     ImageComponent_add(i, "bandage", 1.0, 1.0, LAYER_ITEMS);

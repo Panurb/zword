@@ -17,13 +17,15 @@
 #include "game.h"
 #include "list.h"
 #include "item.h"
+#include "netgame.h"
 
 
 int create_zombie(Vector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
-    CoordinateComponent_add(i, pos, angle);
+    CoordinateComponent* coord = CoordinateComponent_add(i, pos, angle);
+    coord->net_type = NET_ENTITY_ZOMBIE;
     ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
     ImageComponent_add(i, "zombie", 1.0, 1.0, LAYER_ENEMIES);
@@ -49,7 +51,8 @@ int create_farmer(Vector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
-    CoordinateComponent_add(i, pos, angle);
+    CoordinateComponent* coord = CoordinateComponent_add(i, pos, angle);
+    coord->net_type = NET_ENTITY_FARMER;
     ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
     ImageComponent_add(i, "farmer", 1.0, 1.0, LAYER_ENEMIES);
@@ -80,7 +83,8 @@ int create_priest(Vector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
-    CoordinateComponent_add(i, pos, angle);
+    CoordinateComponent* coord = CoordinateComponent_add(i, pos, angle);
+    coord->net_type = NET_ENTITY_PRIEST;
     ColliderComponent_add_circle(i, 0.5, GROUP_ENEMIES);
 
     ImageComponent_add(i, "priest", 1.0, 1.0, LAYER_ENEMIES);
@@ -113,7 +117,8 @@ int create_big_boy(Vector2f pos, float angle) {
     int i = create_entity();
     
     angle = rand_angle();
-    CoordinateComponent_add(i, pos, angle);
+    CoordinateComponent* coord = CoordinateComponent_add(i, pos, angle);
+    coord->net_type = NET_ENTITY_BIG_BOY;
     ColliderComponent_add_circle(i, 0.9f, GROUP_ENEMIES);
 
     ImageComponent_add(i, "big_boy", 4.0f, 2.0f, LAYER_ENEMIES);
@@ -144,7 +149,8 @@ int create_big_boy(Vector2f pos, float angle) {
 int create_boss(Vector2f pos, float angle) {
     int i = create_entity();
     
-    CoordinateComponent_add(i, pos, angle);
+    CoordinateComponent* coord = CoordinateComponent_add(i, pos, angle);
+    coord->net_type = NET_ENTITY_BOSS;
     ColliderComponent_add_circle(i, 1.0f, GROUP_ENEMIES);
     ImageComponent_add(i, "boss_head", 6.0f, 4.0f, LAYER_ENEMIES);
     AnimationComponent_add(i, 1);

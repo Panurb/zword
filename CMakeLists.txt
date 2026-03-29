@@ -43,6 +43,8 @@ set(SOURCES
     zword/src/list.c
     zword/src/menu.c
     zword/src/navigation.c
+    zword/src/network.c
+    zword/src/netgame.c
     zword/src/object.c
     zword/src/particle.c
     zword/src/path.c
@@ -93,6 +95,11 @@ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     )
 
     target_link_libraries(notk ${LIBS})
+
+    # Link ws2_32 for Winsock2 (networking)
+    if (WIN32)
+        target_link_libraries(notk ws2_32)
+    endif()
 
     set(DLLS
         ${CMAKE_SOURCE_DIR}/SDL/lib/x64/SDL2.dll

@@ -1,0 +1,106 @@
+#pragma once
+
+#include <stdbool.h>
+#include <stdint.h>
+#include "util.h"
+
+#ifndef __EMSCRIPTEN__
+
+#ifdef _WIN32
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    typedef SOCKET NetSocket;
+    #define NET_INVALID_SOCKET INVALID_SOCKET
+#else
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+    #include <unistd.h>
+    #include <fcntl.h>
+    typedef int NetSocket;
+    #define NET_INVALID_SOCKET -1
+#endif
+
+#define NET_DEFAULT_PORT 12345
+#define NET_MAX_PACKET_SIZE 65000
+#define NET_MAX_CLIENTS 3
+
+typedef enum {
+    NET_MODE_NONE,
+    NET_MODE_HOST,
+    NET_MODE_CLIENT
+} NetMode;
+
+typedef enum {
+    PACKET_JOIN,
+    PACKET_JOIN_ACK,
+    PACKET_INPUT,
+    PACKET_SNAPSHOT,
+    PACKET_START_GAME
+} PacketType;
+
+#pragma pack(push, 1)
+
+typedef struct {
+    uint8_t type;
+    uint32_t tick;
+    uint16_t size;
+} PacketHeader;
+
+typedef struct {
+    PacketHeader header;
+    uint8_t player_slot;
+} JoinAckPacket;
+
+typedef struct {
+    PacketHeader header;
+    char map_name[128];
+    uint8_t game_mode;
+    uint8_t num_players;
+} StartGamePacket;
+
+#pragma pack(pop)
+
+typedef struct {
+    bool connected;
+    struct sockaddr_in addr;
+    int player_slot;  // 0-3
+} ClientInfo;
+
+typedef struct {
+    NetMode mode;
+    NetSocket sock;
+    struct sockaddr_in host_addr;
+    int local_player_slot;
+    int num_clients;
+    ClientInfo clients[NET_MAX_CLIENTS];
+    uint32_t tick;
+    uint8_t recv_buf[NET_MAX_PACKET_SIZE];
+    uint8_t send_buf[NET_MAX_PACKET_SIZE];
+    bool game_started;
+} Network;
+
+extern Network network;
+
+bool network_init();
+void network_shutdown();
+
+bool network_host_start(int port);
+bool network_client_connect(const char* host_ip, int port);
+
+// Send raw data to a specific address
+bool network_send_to(struct sockaddr_in* addr, const void* data, int size);
+
+// Send to all connected clients (host only)
+void network_broadcast(const void* data, int size);
+
+// Send to host (client only)
+bool network_send_to_host(const void* data, int size);
+
+// Non-blocking receive. Returns bytes received, 0 if nothing, -1 on error.
+int network_receive(void* buf, int buf_size, struct sockaddr_in* from_addr);
+
+// Host: check for new client connections (JOIN packets)
+void network_host_accept_clients();
+
+#endif // __EMSCRIPTEN__

@@ -57,3 +57,5 @@ char* action_to_keybind(char* action);
 void replace_actions(String output, String input);
 
 void input_players(int camera);
+
+void update_controller(int camera, int entity);

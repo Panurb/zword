@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "util.h"
 #include "list.h"
@@ -20,6 +21,7 @@ typedef struct {
     float lifetime;
     Filename prefab;
     Vector2f scale;
+    uint8_t net_type;  // NetEntityType for runtime-created entities (0 = map entity)
     struct {
         Vector2f position;
         float angle;

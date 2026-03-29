@@ -11,6 +11,9 @@
 #include "vehicle.h"
 #include "item.h"
 #include "settings.h"
+#ifndef __EMSCRIPTEN__
+    #include "network.h"
+#endif
 
 
 char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", 
@@ -310,11 +313,37 @@ void update_controller(int camera, int i) {
 
 
 void input_players(int camera) {
+    int slot_idx = 0;
     for (int i = 0; i < game_data->components->entities; i++) {
         PlayerComponent* player = PlayerComponent_get(i);
         if (!player) continue;
 
-        update_controller(camera, i);
+        bool skip_controller_update = false;
+
+#ifndef __EMSCRIPTEN__
+        // In multiplayer, only update controller for local players
+        if (network.mode == NET_MODE_HOST) {
+            // Host: skip controller update for remote players (their input comes from network)
+            for (int c = 0; c < NET_MAX_CLIENTS; c++) {
+                if (network.clients[c].connected && network.clients[c].player_slot == slot_idx) {
+                    skip_controller_update = true;
+                    break;
+                }
+            }
+        } else if (network.mode == NET_MODE_CLIENT) {
+            // Client: only update our local player's controller, skip remote players entirely
+            if (slot_idx != network.local_player_slot) {
+                slot_idx++;
+                continue;
+            }
+        }
+#endif
+
+        if (!skip_controller_update) {
+            update_controller(camera, i);
+        }
+
+        {
         Controller controller = player->controller;
 
         WeaponComponent* weapon = WeaponComponent_get(player->inventory[player->item]);
@@ -435,5 +464,7 @@ void input_players(int camera) {
             case PLAYER_DEAD:
                 break;
         }
+        } // end block for controller scope
+        slot_idx++;
     }
 }

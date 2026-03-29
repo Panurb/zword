@@ -63,6 +63,7 @@ CoordinateComponent* CoordinateComponent_add(int entity, Vector2f pos, float ang
     coord->lifetime = -1.0f;
     coord->prefab[0] = '\0';
     coord->scale = ones();
+    coord->net_type = 0;
     coord->previous.position = pos;
     coord->previous.angle = coord->angle;
     coord->previous.scale = ones();

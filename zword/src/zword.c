@@ -17,6 +17,9 @@
 #include "menu.h"
 #include "interface.h"
 #include "editor.h"
+#ifndef __EMSCRIPTEN__
+    #include "network.h"
+#endif
 
 
 static float elapsed_time = 0.0f;
@@ -41,7 +44,12 @@ void main_loop() {
 
     input();
 
-    if (app.focus) {
+    bool should_update = app.focus;
+#ifndef __EMSCRIPTEN__
+    if (network.mode != NET_MODE_NONE) should_update = true;
+#endif
+
+    if (should_update) {
         while (elapsed_time > app.time_step) {
             elapsed_time -= app.time_step;
             time_since_last_update = 0.0f;
@@ -64,6 +72,9 @@ void main_loop() {
 
 int main(int argc, char* argv[]) {
     load_settings();
+
+    app.argc = argc;
+    app.argv = argv;
 
     init();
 
