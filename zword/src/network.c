@@ -23,6 +23,7 @@ bool network_init() {
     for (int i = 0; i < NET_MAX_CLIENTS; i++) {
         network.clients[i].connected = false;
         network.clients[i].player_slot = -1;
+        network.clients[i].last_recv_time = 0.0f;
     }
 
 #ifdef _WIN32
@@ -240,6 +241,7 @@ void network_host_accept_clients() {
                 network.clients[slot].connected = true;
                 network.clients[slot].addr = from_addr;
                 network.clients[slot].player_slot = slot + 1;  // Host is slot 0, clients are 1-3
+                network.clients[slot].last_recv_time = 0.0f;  // Will be set on first input packet
                 network.num_clients++;
 
                 JoinAckPacket ack;
@@ -253,6 +255,30 @@ void network_host_accept_clients() {
             }
         }
     }
+}
+
+
+int network_check_timeouts(float current_time) {
+    int disconnected_mask = 0;
+
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+        // Skip timeout check until first packet received (last_recv_time == 0)
+        if (network.clients[i].last_recv_time == 0.0f) continue;
+
+        float elapsed = current_time - network.clients[i].last_recv_time;
+        if (elapsed > NET_DISCONNECT_TIMEOUT) {
+            int slot = network.clients[i].player_slot;
+            LOG_WARNING("Client player %d timed out (%.1fs)", slot, elapsed);
+            network.clients[i].connected = false;
+            network.clients[i].player_slot = -1;
+            network.clients[i].last_recv_time = 0.0f;
+            network.num_clients--;
+            disconnected_mask |= (1 << slot);
+        }
+    }
+
+    return disconnected_mask;
 }
 
 #endif // __EMSCRIPTEN__

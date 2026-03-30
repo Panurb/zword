@@ -345,19 +345,6 @@ void input_players(int camera) {
             update_controller(camera, i);
         }
 
-#ifndef __EMSCRIPTEN__
-        // Debug: log controller state after update/network for remote players
-        if (network.mode == NET_MODE_HOST && skip_controller_update) {
-            static int dbg_tick = 0;
-            dbg_tick++;
-            if (dbg_tick % 60 == 0) {
-                LOG_INFO("[HOST] input_players: remote entity=%d slot=%d stick=(%.2f,%.2f) state=%d",
-                    i, slot_idx, player->controller.left_stick.x, player->controller.left_stick.y,
-                    player->state);
-            }
-        }
-#endif
-
         {
         Controller controller = player->controller;
 

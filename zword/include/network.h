@@ -24,6 +24,7 @@
 #define NET_DEFAULT_PORT 12345
 #define NET_MAX_PACKET_SIZE 65000
 #define NET_MAX_CLIENTS 3
+#define NET_DISCONNECT_TIMEOUT 5.0f  // seconds without receiving a packet before disconnect
 
 typedef enum {
     NET_MODE_NONE,
@@ -65,6 +66,7 @@ typedef struct {
     bool connected;
     struct sockaddr_in addr;
     int player_slot;  // 0-3
+    float last_recv_time;  // SDL_GetTicks() / 1000.0f when last packet received
 } ClientInfo;
 
 typedef struct {
@@ -102,5 +104,9 @@ int network_receive(void* buf, int buf_size, struct sockaddr_in* from_addr);
 
 // Host: check for new client connections (JOIN packets)
 void network_host_accept_clients();
+
+// Host: check for timed-out clients and disconnect them.
+// Returns bitmask of disconnected player slots (bit N = slot N disconnected).
+int network_check_timeouts(float current_time);
 
 #endif // __EMSCRIPTEN__
