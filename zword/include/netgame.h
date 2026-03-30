@@ -5,46 +5,11 @@
 
 #include "component.h"
 
-// Entity types for runtime-created entities that need to be synced.
-// Map-loaded entities don't need this since clients load the same map.
-// Available on all platforms so factory functions can set net_type unconditionally.
-typedef enum {
-    NET_ENTITY_NONE = 0,
-    // Enemies
-    NET_ENTITY_ZOMBIE,
-    NET_ENTITY_FARMER,
-    NET_ENTITY_PRIEST,
-    NET_ENTITY_BIG_BOY,
-    NET_ENTITY_BOSS,
-    // Projectiles
-    NET_ENTITY_ENERGY,
-    NET_ENTITY_FLAME,
-    NET_ENTITY_SPLASH,
-    NET_ENTITY_FREEZE,
-    NET_ENTITY_ROPE,
-    // Items
-    NET_ENTITY_BANDAGE,
-    NET_ENTITY_AMMO_PISTOL,
-    NET_ENTITY_AMMO_RIFLE,
-    NET_ENTITY_AMMO_SHOTGUN,
-    // Weapons
-    NET_ENTITY_PISTOL,
-    NET_ENTITY_SHOTGUN,
-    NET_ENTITY_SAWED_OFF,
-    NET_ENTITY_RIFLE,
-    NET_ENTITY_ASSAULT_RIFLE,
-    NET_ENTITY_SMG,
-    NET_ENTITY_AXE,
-    NET_ENTITY_SWORD,
-    // Decals
-    NET_ENTITY_DECAL,
-} NetEntityType;
-
 #ifndef __EMSCRIPTEN__
 
 #include "network.h"
 
-// Component flags for variable-length entity snapshots
+// Component flags for variable-length entity snapshots (delta state updates)
 #define SNAP_HAS_PHYSICS  (1 << 0)
 #define SNAP_HAS_HEALTH   (1 << 1)
 #define SNAP_HAS_PLAYER   (1 << 2)
@@ -58,14 +23,18 @@ typedef enum {
 #define SNAP_HAS_ANIM     (1 << 10)
 #define SNAP_HAS_VEHICLE  (1 << 11)
 
+// When this flag is set in comp_flags, the snapshot includes full binary
+// creation data (via serialize_binary) AFTER the normal delta sections.
+// This allows the client to create entities from scratch without factory functions.
+#define SNAP_IS_FULL      (1 << 15)
+
 // Per-entity snapshot: variable-length, base header + optional component sections.
 // Written as raw bytes into the snapshot buffer (not an array of fixed-size structs).
 #pragma pack(push, 1)
 
-// Always present for every synced entity (21 bytes)
+// Always present for every synced entity (20 bytes)
 typedef struct {
     uint16_t entity_id;
-    uint8_t net_type;       // NetEntityType
     uint16_t comp_flags;    // Bitmask of SNAP_HAS_* indicating which sections follow
     float pos_x;
     float pos_y;
@@ -117,7 +86,7 @@ typedef struct {
     int16_t target;         // target entity
 } SnapEnemy;
 
-// SNAP_HAS_WEAPON (13 bytes)
+// SNAP_HAS_WEAPON (14 bytes)
 typedef struct {
     float recoil;
     float spread;
@@ -125,7 +94,7 @@ typedef struct {
     int16_t magazine;       // current ammo in magazine
     uint8_t reloading;      // bool
     uint8_t ammo_type;      // AmmoType enum
-} SnapWeapon;              // actually 14 bytes
+} SnapWeapon;
 
 // SNAP_HAS_DOOR (6 bytes)
 typedef struct {
@@ -210,6 +179,15 @@ extern int net_map_max_entity;
 extern int net_host_to_local[MAX_ENTITIES];
 extern int net_local_to_host[MAX_ENTITIES];
 
+// Host: tracks which entities need a full binary snapshot (first time sending).
+// Set to true when an entity is first detected as dynamic.
+// Cleared after the full snapshot is written.
+extern bool net_entity_needs_full[MAX_ENTITIES];
+
+// Host: tracks which entities have been sent at least once.
+// Used to detect new dynamic entities that need a full snapshot.
+extern bool net_entity_sent[MAX_ENTITIES];
+
 // Resolve a host entity ID to the local entity ID.
 // Returns the local ID (may differ from host_id if there was a mismatch).
 int net_resolve_id(int host_id);
@@ -232,8 +210,5 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 
 // Check if an entity is "dynamic" (needs to be synced)
 bool netgame_is_dynamic(int entity);
-
-// Client: create a runtime entity from a SnapBase (uses net_type and position)
-int netgame_create_entity_from_snapshot(const SnapBase* base);
 
 #endif // __EMSCRIPTEN__

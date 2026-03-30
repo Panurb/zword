@@ -5,11 +5,9 @@
 #include "network.h"
 #include "component.h"
 #include "game.h"
-#include "enemy.h"
-#include "weapon.h"
-#include "item.h"
 #include "grid.h"
 #include "image.h"
+#include "serialize_binary.h"
 
 #ifndef __EMSCRIPTEN__
 
@@ -17,6 +15,8 @@ bool net_entity_seen[MAX_ENTITIES];
 int net_map_max_entity = 0;
 int net_host_to_local[MAX_ENTITIES];
 int net_local_to_host[MAX_ENTITIES];
+bool net_entity_needs_full[MAX_ENTITIES];
+bool net_entity_sent[MAX_ENTITIES];
 
 
 int net_resolve_id(int host_id) {
@@ -28,6 +28,8 @@ int net_resolve_id(int host_id) {
 void net_clear_id_map(void) {
     memset(net_host_to_local, -1, sizeof(net_host_to_local));
     memset(net_local_to_host, -1, sizeof(net_local_to_host));
+    memset(net_entity_needs_full, 0, sizeof(net_entity_needs_full));
+    memset(net_entity_sent, 0, sizeof(net_entity_sent));
 }
 
 
@@ -77,22 +79,28 @@ static int build_entity_snapshot(uint8_t* buf, int remaining, int entity) {
     if (anim)      flags |= SNAP_HAS_ANIM;
     if (vehicle)   flags |= SNAP_HAS_VEHICLE;
 
-    // Calculate total size needed
-    int size = (int)sizeof(SnapBase);
-    if (flags & SNAP_HAS_PHYSICS) size += (int)sizeof(SnapPhysics);
-    if (flags & SNAP_HAS_HEALTH)  size += (int)sizeof(SnapHealth);
-    if (flags & SNAP_HAS_PLAYER)  size += (int)sizeof(SnapPlayer);
-    if (flags & SNAP_HAS_ENEMY)   size += (int)sizeof(SnapEnemy);
-    if (flags & SNAP_HAS_WEAPON)  size += (int)sizeof(SnapWeapon);
-    if (flags & SNAP_HAS_DOOR)    size += (int)sizeof(SnapDoor);
-    if (flags & SNAP_HAS_ITEM)    size += (int)sizeof(SnapItem);
-    if (flags & SNAP_HAS_AMMO)    size += (int)sizeof(SnapAmmo);
-    if (flags & SNAP_HAS_LIGHT)   size += (int)sizeof(SnapLight);
-    if (flags & SNAP_HAS_IMAGE)   size += (int)sizeof(SnapImage);
-    if (flags & SNAP_HAS_ANIM)    size += (int)sizeof(SnapAnim);
-    if (flags & SNAP_HAS_VEHICLE) size += (int)sizeof(SnapVehicle);
+    // Check if this entity needs a full creation snapshot
+    bool is_full = net_entity_needs_full[entity];
+    if (is_full) {
+        flags |= SNAP_IS_FULL;
+    }
 
-    if (size > remaining) return 0;
+    // Calculate size for the delta portion (SnapBase + optional component sections)
+    int delta_size = (int)sizeof(SnapBase);
+    if (flags & SNAP_HAS_PHYSICS) delta_size += (int)sizeof(SnapPhysics);
+    if (flags & SNAP_HAS_HEALTH)  delta_size += (int)sizeof(SnapHealth);
+    if (flags & SNAP_HAS_PLAYER)  delta_size += (int)sizeof(SnapPlayer);
+    if (flags & SNAP_HAS_ENEMY)   delta_size += (int)sizeof(SnapEnemy);
+    if (flags & SNAP_HAS_WEAPON)  delta_size += (int)sizeof(SnapWeapon);
+    if (flags & SNAP_HAS_DOOR)    delta_size += (int)sizeof(SnapDoor);
+    if (flags & SNAP_HAS_ITEM)    delta_size += (int)sizeof(SnapItem);
+    if (flags & SNAP_HAS_AMMO)    delta_size += (int)sizeof(SnapAmmo);
+    if (flags & SNAP_HAS_LIGHT)   delta_size += (int)sizeof(SnapLight);
+    if (flags & SNAP_HAS_IMAGE)   delta_size += (int)sizeof(SnapImage);
+    if (flags & SNAP_HAS_ANIM)    delta_size += (int)sizeof(SnapAnim);
+    if (flags & SNAP_HAS_VEHICLE) delta_size += (int)sizeof(SnapVehicle);
+
+    if (delta_size > remaining) return 0;
 
     uint8_t* ptr = buf;
 
@@ -100,7 +108,6 @@ static int build_entity_snapshot(uint8_t* buf, int remaining, int entity) {
     {
         SnapBase base;
         base.entity_id = (uint16_t)entity;
-        base.net_type = coord->net_type;
         base.comp_flags = flags;
         base.pos_x = coord->position.x;
         base.pos_y = coord->position.y;
@@ -112,7 +119,7 @@ static int build_entity_snapshot(uint8_t* buf, int remaining, int entity) {
         ptr += sizeof(SnapBase);
     }
 
-    // Write optional sections in flag order
+    // Write optional delta sections in flag order
     if (flags & SNAP_HAS_PHYSICS) {
         SnapPhysics sp;
         sp.vel_x = phys->velocity.x;
@@ -237,6 +244,19 @@ static int build_entity_snapshot(uint8_t* buf, int remaining, int entity) {
         ptr += sizeof(SnapVehicle);
     }
 
+    // If SNAP_IS_FULL, append the binary creation data after the delta sections
+    if (is_full) {
+        int full_remaining = remaining - (int)(ptr - buf);
+        int full_written = binary_serialize_entity(ptr, full_remaining, entity);
+        if (full_written == 0) {
+            // Not enough space for full snapshot -- skip it, will retry next frame
+            return 0;
+        }
+        ptr += full_written;
+        net_entity_needs_full[entity] = false;
+        net_entity_sent[entity] = true;
+    }
+
     return (int)(ptr - buf);
 }
 
@@ -260,6 +280,11 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
 
         if (!netgame_is_dynamic(i)) continue;
 
+        // Detect newly created entities that haven't been sent yet
+        if (!net_entity_sent[i]) {
+            net_entity_needs_full[i] = true;
+        }
+
         int written = build_entity_snapshot(data, remaining, i);
         if (written == 0) {
             LOG_WARNING("Snapshot buffer full at %d entities", pkt->entity_count);
@@ -269,101 +294,15 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
         data += written;
         remaining -= written;
         pkt->entity_count++;
+
+        // Mark as sent (even if it was already sent; harmless for non-full)
+        net_entity_sent[i] = true;
     }
 
     int total_size = (int)(data - buf);
     pkt->header.size = (uint16_t)total_size;
 
     return total_size;
-}
-
-
-int netgame_create_entity_from_snapshot(const SnapBase* base) {
-    // Runtime-created entity: use factory function based on net_type,
-    // then overwrite state from snapshot.
-    // For map entities we should never get here (they already exist).
-    Vector2f pos = { base->pos_x, base->pos_y };
-    int entity = -1;
-
-    switch ((NetEntityType)base->net_type) {
-        case NET_ENTITY_ZOMBIE:
-            entity = create_zombie(pos, base->angle);
-            break;
-        case NET_ENTITY_FARMER:
-            entity = create_farmer(pos, base->angle);
-            break;
-        case NET_ENTITY_PRIEST:
-            entity = create_priest(pos, base->angle);
-            break;
-        case NET_ENTITY_BIG_BOY:
-            entity = create_big_boy(pos, base->angle);
-            break;
-        case NET_ENTITY_BOSS:
-            entity = create_boss(pos, base->angle);
-            break;
-        case NET_ENTITY_PISTOL:
-            entity = create_pistol(pos);
-            break;
-        case NET_ENTITY_SHOTGUN:
-            entity = create_shotgun(pos);
-            break;
-        case NET_ENTITY_SAWED_OFF:
-            entity = create_sawed_off(pos);
-            break;
-        case NET_ENTITY_RIFLE:
-            entity = create_rifle(pos);
-            break;
-        case NET_ENTITY_ASSAULT_RIFLE:
-            entity = create_assault_rifle(pos);
-            break;
-        case NET_ENTITY_SMG:
-            entity = create_smg(pos);
-            break;
-        case NET_ENTITY_AXE:
-            entity = create_axe(pos);
-            break;
-        case NET_ENTITY_SWORD:
-            entity = create_sword(pos);
-            break;
-        case NET_ENTITY_BANDAGE:
-            entity = create_bandage(pos);
-            break;
-        case NET_ENTITY_AMMO_PISTOL:
-            entity = create_ammo(pos, AMMO_PISTOL);
-            break;
-        case NET_ENTITY_AMMO_RIFLE:
-            entity = create_ammo(pos, AMMO_RIFLE);
-            break;
-        case NET_ENTITY_AMMO_SHOTGUN:
-            entity = create_ammo(pos, AMMO_SHOTGUN);
-            break;
-        case NET_ENTITY_ENERGY:
-            create_energy(pos, (Vector2f){ 0.0f, 0.0f });
-            // create_energy doesn't return entity id, find it
-            for (int i = game_data->components->entities - 1; i >= 0; i--) {
-                CoordinateComponent* c = CoordinateComponent_get(i);
-                if (c) { entity = i; break; }
-            }
-            break;
-        case NET_ENTITY_FLAME:
-            entity = create_flame(pos, (Vector2f){ 0.0f, 0.0f }, -1);
-            break;
-        case NET_ENTITY_SPLASH:
-            entity = create_splash(pos, (Vector2f){ 0.0f, 0.0f });
-            break;
-        case NET_ENTITY_FREEZE:
-            entity = create_freeze(pos, (Vector2f){ 0.0f, 0.0f });
-            break;
-        case NET_ENTITY_ROPE:
-            // Rope is complex (multi-entity chain). Skip for now.
-            break;
-        case NET_ENTITY_DECAL:
-        case NET_ENTITY_NONE:
-        default:
-            break;
-    }
-
-    return entity;
 }
 
 
@@ -375,41 +314,62 @@ static int apply_entity_snapshot(const uint8_t* buf, int remaining) {
     const SnapBase* base = (const SnapBase*)buf;
     uint16_t flags = base->comp_flags;
     int host_id = (int)base->entity_id;
+    bool is_full = (flags & SNAP_IS_FULL) != 0;
 
-    // Calculate expected size
-    int size = (int)sizeof(SnapBase);
-    if (flags & SNAP_HAS_PHYSICS) size += (int)sizeof(SnapPhysics);
-    if (flags & SNAP_HAS_HEALTH)  size += (int)sizeof(SnapHealth);
-    if (flags & SNAP_HAS_PLAYER)  size += (int)sizeof(SnapPlayer);
-    if (flags & SNAP_HAS_ENEMY)   size += (int)sizeof(SnapEnemy);
-    if (flags & SNAP_HAS_WEAPON)  size += (int)sizeof(SnapWeapon);
-    if (flags & SNAP_HAS_DOOR)    size += (int)sizeof(SnapDoor);
-    if (flags & SNAP_HAS_ITEM)    size += (int)sizeof(SnapItem);
-    if (flags & SNAP_HAS_AMMO)    size += (int)sizeof(SnapAmmo);
-    if (flags & SNAP_HAS_LIGHT)   size += (int)sizeof(SnapLight);
-    if (flags & SNAP_HAS_IMAGE)   size += (int)sizeof(SnapImage);
-    if (flags & SNAP_HAS_ANIM)    size += (int)sizeof(SnapAnim);
-    if (flags & SNAP_HAS_VEHICLE) size += (int)sizeof(SnapVehicle);
+    // Calculate expected size for the delta portion
+    int delta_size = (int)sizeof(SnapBase);
+    if (flags & SNAP_HAS_PHYSICS) delta_size += (int)sizeof(SnapPhysics);
+    if (flags & SNAP_HAS_HEALTH)  delta_size += (int)sizeof(SnapHealth);
+    if (flags & SNAP_HAS_PLAYER)  delta_size += (int)sizeof(SnapPlayer);
+    if (flags & SNAP_HAS_ENEMY)   delta_size += (int)sizeof(SnapEnemy);
+    if (flags & SNAP_HAS_WEAPON)  delta_size += (int)sizeof(SnapWeapon);
+    if (flags & SNAP_HAS_DOOR)    delta_size += (int)sizeof(SnapDoor);
+    if (flags & SNAP_HAS_ITEM)    delta_size += (int)sizeof(SnapItem);
+    if (flags & SNAP_HAS_AMMO)    delta_size += (int)sizeof(SnapAmmo);
+    if (flags & SNAP_HAS_LIGHT)   delta_size += (int)sizeof(SnapLight);
+    if (flags & SNAP_HAS_IMAGE)   delta_size += (int)sizeof(SnapImage);
+    if (flags & SNAP_HAS_ANIM)    delta_size += (int)sizeof(SnapAnim);
+    if (flags & SNAP_HAS_VEHICLE) delta_size += (int)sizeof(SnapVehicle);
 
-    if (size > remaining) return 0;
+    if (delta_size > remaining) return 0;
 
     // Resolve host entity ID to local entity ID
     int entity = net_resolve_id(host_id);
 
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (!coord) {
-        // Entity doesn't exist locally.
-        // If it's a map entity (net_type == NONE), it was destroyed on host. Ignore.
-        if (base->net_type == NET_ENTITY_NONE) return size;
+        // Entity doesn't exist locally. We need a full snapshot to create it.
+        if (!is_full) {
+            // No creation data. This is a map entity that was already destroyed
+            // locally, or a runtime entity whose full snapshot hasn't arrived yet.
+            // Skip it.
+            return delta_size;
+        }
 
-        // Runtime entity: create it using the factory
-        int created = netgame_create_entity_from_snapshot(base);
-        if (created == -1) return size;
+        // Create the entity from binary creation data.
+        // The binary data follows after the delta sections.
+        const uint8_t* full_data = buf + delta_size;
+        int full_remaining = remaining - delta_size;
 
-        // If created != host_id, record the ID mapping
+        // First, create a bare entity with a CoordinateComponent
+        int created = create_entity();
+        if (created == -1) return delta_size;
+
+        Vector2f pos = { base->pos_x, base->pos_y };
+        CoordinateComponent_add(created, pos, base->angle);
+
+        // Deserialize all components from the binary data
+        int full_consumed = binary_deserialize_entity(full_data, full_remaining, created);
+        if (full_consumed == 0) {
+            // Failed to deserialize -- destroy the partially created entity
+            destroy_entity(created);
+            LOG_WARNING("Failed to deserialize full entity snapshot for host_id=%d", host_id);
+            return delta_size;
+        }
+
+        // Record ID mapping if local ID differs from host ID
         if (created != host_id) {
-            LOG_WARNING("Entity ID mismatch: host=%d local=%d (net_type=%d)",
-                        host_id, created, base->net_type);
+            LOG_WARNING("Entity ID mismatch: host=%d local=%d", host_id, created);
             if (host_id >= 0 && host_id < MAX_ENTITIES &&
                 created >= 0 && created < MAX_ENTITIES) {
                 net_host_to_local[host_id] = created;
@@ -418,8 +378,25 @@ static int apply_entity_snapshot(const uint8_t* buf, int remaining) {
         }
 
         coord = CoordinateComponent_get(created);
-        if (!coord) return size;
+        if (!coord) return delta_size + full_consumed;
         entity = created;
+
+        // Mark as seen
+        net_entity_seen[entity] = true;
+
+        // Apply base fields on top of the created entity
+        coord->position.x = base->pos_x;
+        coord->position.y = base->pos_y;
+        coord->angle = base->angle;
+        coord->parent = (base->parent >= 0) ? net_resolve_id((int)base->parent) : (int)base->parent;
+        coord->scale.x = base->scale_x;
+        coord->scale.y = base->scale_y;
+
+        // Now apply the delta state sections (overwrite runtime state)
+        goto apply_delta_sections;
+
+        // Return total size = delta + full
+        // (We'll reach this via the normal flow after apply_delta_sections)
     }
 
     // Mark as seen (using local entity ID)
@@ -433,7 +410,10 @@ static int apply_entity_snapshot(const uint8_t* buf, int remaining) {
     coord->scale.x = base->scale_x;
     coord->scale.y = base->scale_y;
 
-    // Walk through optional sections
+apply_delta_sections:
+    ;  // empty statement after label required by C
+
+    // Walk through optional delta sections
     const uint8_t* ptr = buf + sizeof(SnapBase);
 
     if (flags & SNAP_HAS_PHYSICS) {
@@ -593,7 +573,39 @@ static int apply_entity_snapshot(const uint8_t* buf, int remaining) {
         ptr += sizeof(SnapVehicle);
     }
 
-    return size;
+    // If SNAP_IS_FULL was set, skip past the binary creation data too.
+    // For existing entities we already consumed it during creation above.
+    // For the case where entity already existed, we just need to skip it.
+    if (is_full) {
+        const uint8_t* full_data = ptr;
+        int full_remaining = remaining - (int)(ptr - buf);
+        int full_consumed = binary_skip_entity(full_data, full_remaining);
+        if (full_consumed > 0) {
+            return delta_size + full_consumed;
+        }
+        // If parsing failed, just return delta_size (best effort)
+        return delta_size;
+    }
+
+    return delta_size;
+}
+
+
+// Helper: recursively mark children as not-seen before destroy
+static void mark_children_unseen(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (!coord) return;
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        int child = node->value;
+        net_entity_seen[child] = false;
+        // Clean up ID mapping for child
+        int host_id = net_local_to_host[child];
+        if (host_id >= 0 && host_id < MAX_ENTITIES) {
+            net_host_to_local[host_id] = -1;
+            net_local_to_host[child] = -1;
+        }
+        mark_children_unseen(child);
+    }
 }
 
 
@@ -657,6 +669,8 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
                     if (ColliderComponent_get(i)) {
                         clear_grid(i);
                     }
+                    // Mark all children as unseen before destroying recursively
+                    mark_children_unseen(i);
                     destroy_entity_recursive(i);
                 }
             }
@@ -667,6 +681,36 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
             if (host_id >= 0 && host_id < MAX_ENTITIES) {
                 net_host_to_local[host_id] = -1;
                 net_local_to_host[i] = -1;
+            }
+        }
+    }
+
+    // Rebuild parent-child relationships for all entities in the snapshot.
+    // This ensures the parent's children list is always consistent with
+    // the child's coord->parent field (which was set during apply_entity_snapshot).
+    for (int i = 0; i < game_data->components->entities; i++) {
+        if (!in_snapshot[i]) continue;
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!coord) continue;
+
+        // Clear this entity's children list -- we'll rebuild it below
+        // (only for snapshot entities; static entities keep their lists)
+        List_clear(coord->children);
+    }
+
+    // Second pass: re-establish parent-child links
+    for (int i = 0; i < game_data->components->entities; i++) {
+        if (!in_snapshot[i]) continue;
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!coord) continue;
+
+        if (coord->parent != -1) {
+            CoordinateComponent* parent_coord = CoordinateComponent_get(coord->parent);
+            if (parent_coord) {
+                // Only add to children list if not already present
+                if (!List_find(parent_coord->children, i)) {
+                    List_append(parent_coord->children, i);
+                }
             }
         }
     }

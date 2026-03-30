@@ -18,7 +18,6 @@
 #include "health.h"
 #include "image.h"
 #include "particle.h"
-#include "netgame.h"
 
 
 AmmoType get_ammo_type(int entity) {
@@ -231,7 +230,6 @@ void create_energy(Vector2f position, Vector2f velocity) {
     int i = create_entity();
     CoordinateComponent* coord = CoordinateComponent_add(i, position, rand_angle());
     coord->lifetime = 5.0f;
-    coord->net_type = NET_ENTITY_ENERGY;
     ImageComponent_add(i, "energy", 1.0f, 1.0f, LAYER_PARTICLES);
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
     phys->velocity = velocity;
@@ -312,7 +310,6 @@ int create_flame(Vector2f position, Vector2f velocity, Entity dealer) {
 
     CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
     coord->lifetime = 0.3f;
-    coord->net_type = NET_ENTITY_FLAME;
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
     phys->velocity = velocity;
     phys->drag = 0.0f;
@@ -339,7 +336,7 @@ int create_splash(Vector2f position, Vector2f velocity) {
 
     CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
     coord->lifetime = 0.3f;
-    coord->net_type = NET_ENTITY_SPLASH;
+
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
     phys->velocity = velocity;
     phys->drag = 0.0f;
@@ -362,7 +359,7 @@ int create_freeze(Vector2f position, Vector2f velocity) {
 
     CoordinateComponent* coord = CoordinateComponent_add(i, position, 0.0);
     coord->lifetime = 0.3f;
-    coord->net_type = NET_ENTITY_FREEZE;
+
     PhysicsComponent* phys = PhysicsComponent_add(i, 0.0f);
     phys->velocity = velocity;
     phys->drag = 0.0f;
@@ -593,7 +590,7 @@ void update_weapons(float time_step) {
 int create_pistol(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_PISTOL;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "pistol", 1.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
@@ -610,7 +607,7 @@ int create_pistol(Vector2f position) {
 int create_shotgun(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_SHOTGUN;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "combat_shotgun", 3.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
@@ -627,7 +624,7 @@ int create_shotgun(Vector2f position) {
 int create_sawed_off(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_SAWED_OFF;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "shotgun", 2.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
@@ -644,7 +641,7 @@ int create_sawed_off(Vector2f position) {
 int create_rifle(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_RIFLE;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
@@ -661,7 +658,7 @@ int create_rifle(Vector2f position) {
 int create_assault_rifle(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_ASSAULT_RIFLE;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "assault_rifle", 3.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
@@ -678,7 +675,7 @@ int create_assault_rifle(Vector2f position) {
 int create_smg(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_SMG;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "smg", 2.0f, 1.0f, LAYER_ITEMS);
     PhysicsComponent_add(i, 0.5f);
@@ -695,7 +692,7 @@ int create_smg(Vector2f position) {
 int create_axe(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, rand_angle())->net_type = NET_ENTITY_AXE;
+    CoordinateComponent_add(i, position, rand_angle());
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "axe", 2.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 1.0f);
@@ -710,7 +707,7 @@ int create_axe(Vector2f position) {
 int create_sword(Vector2f position) {
     int i = create_entity();
 
-    CoordinateComponent_add(i, position, 0.0f)->net_type = NET_ENTITY_SWORD;
+    CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_circle(i, 0.5f, GROUP_ITEMS);
     ImageComponent_add(i, "sword", 3.0, 1.0, LAYER_ITEMS);
     PhysicsComponent_add(i, 1.0f);
@@ -752,20 +749,7 @@ int create_lasersight(Vector2f pos) {
 int create_ammo(Vector2f position, AmmoType type) {
     int i = create_entity();
 
-    CoordinateComponent* coord = CoordinateComponent_add(i, position, rand_angle());
-    switch (type) {
-        case AMMO_PISTOL:
-            coord->net_type = NET_ENTITY_AMMO_PISTOL;
-            break;
-        case AMMO_RIFLE:
-            coord->net_type = NET_ENTITY_AMMO_RIFLE;
-            break;
-        case AMMO_SHOTGUN:
-            coord->net_type = NET_ENTITY_AMMO_SHOTGUN;
-            break;
-        default:
-            break;
-    }
+    CoordinateComponent_add(i, position, rand_angle());
     ColliderComponent_add_circle(i, 0.25f, GROUP_ITEMS);
     switch (type) {
         case AMMO_PISTOL:
