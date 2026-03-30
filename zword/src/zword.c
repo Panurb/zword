@@ -50,13 +50,29 @@ void main_loop() {
 #endif
 
     if (should_update) {
-        while (elapsed_time > app.time_step) {
-            elapsed_time -= app.time_step;
-            time_since_last_update = 0.0f;
-            update(app.time_step);
-        }
+#ifndef __EMSCRIPTEN__
+        // Client doesn't simulate physics — it just applies snapshots.
+        // Running the accumulator 2+ times per frame destroys interpolation state
+        // (second tick has no new snapshot, so previous == current == no smoothing).
+        // Cap to 1 update per frame and clamp accumulated time.
+        if (network.mode == NET_MODE_CLIENT) {
+            if (elapsed_time > app.time_step) {
+                elapsed_time = app.time_step;  // consume exactly one tick's worth
+                time_since_last_update = 0.0f;
+                update(app.time_step);
+            }
+            elapsed_time += delta_time;
+        } else
+#endif
+        {
+            while (elapsed_time > app.time_step) {
+                elapsed_time -= app.time_step;
+                time_since_last_update = 0.0f;
+                update(app.time_step);
+            }
 
-        elapsed_time += delta_time;
+            elapsed_time += delta_time;
+        }
         FPSCounter_update(app.fps, delta_time);
     }
     

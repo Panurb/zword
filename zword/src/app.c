@@ -565,6 +565,17 @@ void update(float time_step) {
 
                 // 5. Update camera to follow players
                 update_camera(game_data->camera, time_step, true);
+
+                // Snap camera's previous state to current so interpolation doesn't
+                // fight with the exponential smoothing. The smoothing already provides
+                // continuity; interpolating on top of it causes desync with entity positions.
+                {
+                    CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
+                    cam_coord->previous.position = cam_coord->position;
+                    cam_coord->previous.angle = cam_coord->angle;
+                    cam_coord->previous.scale = cam_coord->scale;
+                }
+
                 network.tick++;
             } else
 #endif
