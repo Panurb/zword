@@ -1,0 +1,28 @@
+{
+	"game_mode":	0,
+	"ambient_light":	0.5,
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	-5,
+				"y":	2,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	4,
+				"y":	2,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	2,
+			"Coordinate":	{
+				"x":	-1.5,
+				"y":	0.5,
+				"prefab":	"tiles/grass",
+				"scale_x":	19,
+				"scale_y":	17
+			}
+		}]
+}

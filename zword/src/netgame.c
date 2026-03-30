@@ -93,6 +93,12 @@ static void build_entity_snapshot(EntitySnapshot* snap, int entity) {
 
     snap->scale_x = coord->scale.x;
     snap->scale_y = coord->scale.y;
+
+    // Debug: log player entity snapshot building
+    if (player && (network.tick % 60 == 0)) {
+        LOG_INFO("[HOST] build_snapshot: player entity=%d pos=(%.1f,%.1f) vel=(%.2f,%.2f) state=%d",
+            entity, snap->pos_x, snap->pos_y, snap->vel_x, snap->vel_y, snap->state);
+    }
 }
 
 
@@ -278,6 +284,12 @@ static void apply_entity_snapshot(const EntitySnapshot* snap) {
     EnemyComponent* enemy = EnemyComponent_get(entity);
     if (player) {
         player->state = (PlayerState)snap->state;
+
+        // Debug: log player entity snapshot application
+        if (network.mode == NET_MODE_CLIENT && (network.tick % 60 == 0)) {
+            LOG_INFO("[CLIENT] apply_snapshot: player entity=%d pos=(%.1f,%.1f) vel=(%.2f,%.2f) state=%d",
+                entity, snap->pos_x, snap->pos_y, snap->vel_x, snap->vel_y, snap->state);
+        }
     } else if (enemy) {
         enemy->state = (EnemyState)snap->state;
     }

@@ -21,6 +21,9 @@
 #include "enemy.h"
 #include "health.h"
 #include "door.h"
+#ifndef __EMSCRIPTEN__
+    #include "network.h"
+#endif
 
 
 int create_player(Vector2f pos, float angle) {
@@ -90,6 +93,20 @@ void update_players(float time_step) {
         CoordinateComponent* coord = CoordinateComponent_get(i);
         Vector2f left_stick = player->controller.left_stick;
         Vector2f right_stick = player->controller.right_stick;
+
+#ifndef __EMSCRIPTEN__
+        {
+            static int dbg_tick2 = 0;
+            dbg_tick2++;
+            if (network.mode == NET_MODE_HOST && dbg_tick2 % 60 == 0) {
+                LOG_INFO("[HOST] update_players: entity=%d stick=(%.2f,%.2f) pos=(%.1f,%.1f) vel=(%.2f,%.2f) state=%d accel=%.1f",
+                    i, left_stick.x, left_stick.y,
+                    coord->position.x, coord->position.y,
+                    phys ? phys->velocity.x : 0, phys ? phys->velocity.y : 0,
+                    player->state, player->acceleration);
+            }
+        }
+#endif
         int slot = get_slot(i, player->inventory_size);
         int atch = get_attachment(i);
 

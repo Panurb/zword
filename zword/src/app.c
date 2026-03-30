@@ -416,6 +416,8 @@ void update(float time_step) {
             if (network.mode != NET_MODE_NONE) {
                 memset(net_entity_seen, 0, sizeof(net_entity_seen));
                 net_map_max_entity = game_data->components->entities;
+
+
             }
 #endif
             game_state = STATE_GAME;
@@ -443,26 +445,44 @@ void update(float time_step) {
                 {
                     struct sockaddr_in from;
                     int received;
+                    int input_count = 0;
                     while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
                         if (received < (int)sizeof(PacketHeader)) continue;
                         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
                         if (hdr->type == PACKET_INPUT && received >= (int)sizeof(InputPacket)) {
                             InputPacket* input_pkt = (InputPacket*)network.recv_buf;
+                            input_count++;
                             // Find the player entity for this slot
                             int slot_idx = 0;
+                            bool found = false;
                             ListNode* pnode;
                             FOREACH(pnode, game_data->components->player.order) {
                                 if (slot_idx == (int)input_pkt->player_slot) {
                                     netgame_unpack_input(input_pkt, pnode->value);
+                                    if (network.tick % 60 == 0) {
+                                        PlayerComponent* dbg_p = PlayerComponent_get(pnode->value);
+                                        LOG_INFO("[HOST] Got input: slot=%d entity=%d stick=(%.2f,%.2f) state=%d",
+                                            input_pkt->player_slot, pnode->value,
+                                            input_pkt->left_stick_x, input_pkt->left_stick_y,
+                                            dbg_p ? dbg_p->state : -1);
+                                    }
+                                    found = true;
                                     break;
                                 }
                                 slot_idx++;
+                            }
+                            if (!found && network.tick % 60 == 0) {
+                                LOG_WARNING("[HOST] No player entity for input slot=%d (scanned %d entries)",
+                                    input_pkt->player_slot, slot_idx);
                             }
                         }
                         // Also accept new clients during game (re-sends JOIN_ACK)
                         if (hdr->type == PACKET_JOIN) {
                             network_host_accept_clients();
                         }
+                    }
+                    if (network.tick % 60 == 0) {
+                        LOG_INFO("[HOST] Received %d input packets this tick", input_count);
                     }
                 }
 
@@ -477,6 +497,11 @@ void update(float time_step) {
                 // 4. Build and broadcast snapshot
                 {
                     int snap_size = netgame_build_snapshot(network.send_buf, NET_MAX_PACKET_SIZE, network.tick);
+                    if (network.tick % 60 == 0) {
+                        SnapshotPacket* dbg_snap = (SnapshotPacket*)network.send_buf;
+                        LOG_INFO("[HOST] Broadcasting snapshot: %d entities, %d bytes",
+                            dbg_snap->entity_count, snap_size);
+                    }
                     network_broadcast(network.send_buf, snap_size);
                     network.tick++;
                 }
@@ -487,13 +512,27 @@ void update(float time_step) {
                 // 1. Update local player's controller only (no state machine)
                 {
                     int slot_idx = 0;
+                    bool found = false;
                     ListNode* pnode;
                     FOREACH(pnode, game_data->components->player.order) {
                         if (slot_idx == network.local_player_slot) {
                             update_controller(game_data->camera, pnode->value);
+                            PlayerComponent* dbg_player = PlayerComponent_get(pnode->value);
+                            if (dbg_player && (network.tick % 60 == 0)) {
+                                LOG_INFO("[CLIENT] update_controller entity=%d slot=%d stick=(%.2f,%.2f) joystick=%d",
+                                    pnode->value, slot_idx,
+                                    dbg_player->controller.left_stick.x,
+                                    dbg_player->controller.left_stick.y,
+                                    dbg_player->controller.joystick);
+                            }
+                            found = true;
                             break;
                         }
                         slot_idx++;
+                    }
+                    if (!found && (network.tick % 60 == 0)) {
+                        LOG_WARNING("[CLIENT] No player entity found for local_player_slot=%d (order size scanned=%d)",
+                            network.local_player_slot, slot_idx);
                     }
                 }
 
@@ -505,6 +544,12 @@ void update(float time_step) {
                         if (slot_idx == network.local_player_slot) {
                             InputPacket input_pkt;
                             netgame_pack_input(&input_pkt, pnode->value, (uint8_t)network.local_player_slot, network.tick);
+                            if (network.tick % 60 == 0) {
+                                LOG_INFO("[CLIENT] Sending input: slot=%d stick=(%.2f,%.2f) buttons_down=0x%04x",
+                                    input_pkt.player_slot,
+                                    input_pkt.left_stick_x, input_pkt.left_stick_y,
+                                    input_pkt.buttons_down);
+                            }
                             network_send_to_host(&input_pkt, sizeof(input_pkt));
                             break;
                         }
@@ -516,18 +561,24 @@ void update(float time_step) {
                 {
                     struct sockaddr_in from;
                     int received;
+                    int snap_count = 0;
                     while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
                         if (received < (int)sizeof(PacketHeader)) continue;
                         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
                         if (hdr->type == PACKET_SNAPSHOT) {
                             netgame_apply_snapshot(network.recv_buf, received);
+                            snap_count++;
                         }
+                    }
+                    if (network.tick % 60 == 0) {
+                        LOG_INFO("[CLIENT] Received %d snapshots this tick", snap_count);
                     }
                 }
 
                 // 4. Client still needs to update coordinates for interpolation
                 update_coordinates();
                 update_camera(game_data->camera, time_step, true);
+                network.tick++;
             } else
 #endif
             {
