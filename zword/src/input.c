@@ -467,6 +467,21 @@ void input_players(int camera) {
                 break;
         }
         } // end block for controller scope
+
+#ifndef __EMSCRIPTEN__
+        // Clear edge-triggered flags for remote players after the state machine
+        // has consumed them. For local players, update_controller() handles this
+        // via edge detection on the next tick. Remote players skip
+        // update_controller(), so without this clear the flags would persist
+        // and cause phantom re-fires or missed actions.
+        if (skip_controller_update) {
+            for (int b = 0; b < 12; b++) {
+                player->controller.buttons_pressed[b] = false;
+                player->controller.buttons_released[b] = false;
+            }
+        }
+#endif
+
         slot_idx++;
     }
 }

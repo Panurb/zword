@@ -36,7 +36,8 @@ typedef enum {
 typedef enum {
     MODE_SURVIVAL,
     MODE_CAMPAIGN,
-    MODE_TUTORIAL
+    MODE_TUTORIAL,
+    MODE_DEATHMATCH
 } GameMode;
 
 

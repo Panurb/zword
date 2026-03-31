@@ -387,8 +387,11 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity) {
 
     for (int i = 0; i < 12; i++) {
         ctrl->buttons_down[i]    = (pkt->buttons_down    & (1 << i)) != 0;
-        ctrl->buttons_pressed[i] = (pkt->buttons_pressed  & (1 << i)) != 0;
-        ctrl->buttons_released[i] = (pkt->buttons_released & (1 << i)) != 0;
+        // OR edge-triggered flags so that if multiple packets arrive in the
+        // same host tick, earlier press/release events are not overwritten.
+        // These flags are cleared after the state machine runs each tick.
+        ctrl->buttons_pressed[i]  = ctrl->buttons_pressed[i]  || ((pkt->buttons_pressed  & (1 << i)) != 0);
+        ctrl->buttons_released[i] = ctrl->buttons_released[i] || ((pkt->buttons_released & (1 << i)) != 0);
     }
 }
 

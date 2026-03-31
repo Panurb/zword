@@ -284,7 +284,7 @@ void toggle_editor_settings(int entity) {
     int i = create_label("Game mode", zeros());
     add_widget_to_container(container, i);
 
-    i = create_dropdown(zeros(), GAME_MODES, 3);
+    i = create_dropdown(zeros(), GAME_MODES, 4);
     add_widget_to_container(container, i);
     WidgetComponent* widget = WidgetComponent_get(i);
     widget->on_change = set_game_mode;

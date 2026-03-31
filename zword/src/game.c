@@ -47,7 +47,8 @@ Resources resources;
 ButtonText GAME_MODES[] = {
     "SURVIVAL",
     "CAMPAIGN",
-    "TUTORIAL"
+    "TUTORIAL",
+    "DEATHMATCH"
 };
 
 ButtonText WEATHERS[] = {
@@ -230,6 +231,7 @@ void init_game() {
             break;
         case MODE_TUTORIAL:
         case MODE_CAMPAIGN:
+        case MODE_DEATHMATCH:
             init_tutorial();
             break;
         default:
