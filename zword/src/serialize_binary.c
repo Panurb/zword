@@ -225,7 +225,7 @@ int binary_serialize_entity(uint8_t* buf, int buf_size, int entity) {
             if (!n) return 0; ptr += n; rem -= n;
         }
         for (int i = 0; i < 3; i++) {
-            n = write_u8(ptr, rem, (uint8_t)player->keys[i]);
+            n = write_i16(ptr, rem, (int16_t)player->keys[i]);
             if (!n) return 0; ptr += n; rem -= n;
         }
         n = write_i16(ptr, rem, (int16_t)player->arms);
@@ -664,7 +664,7 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity) {
 
     // --- Player ---
     if (flags & BFLAG_HAS_PLAYER) {
-        CHECK(1 + 4 + 1 + 4*2 + 4*2 + 3 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4);
+        CHECK(1 + 4 + 1 + 4*2 + 4*2 + 3*2 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4);
         uint8_t state = read_u8(&ptr);
         int32_t money = read_i32(&ptr);
         uint8_t item_slot = read_u8(&ptr);
@@ -672,8 +672,8 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity) {
         for (int i = 0; i < 4; i++) inventory[i] = read_i16(&ptr);
         int16_t ammo_slots[4];
         for (int i = 0; i < 4; i++) ammo_slots[i] = read_i16(&ptr);
-        uint8_t keys[3];
-        for (int i = 0; i < 3; i++) keys[i] = read_u8(&ptr);
+        int16_t keys[3];
+        for (int i = 0; i < 3; i++) keys[i] = read_i16(&ptr);
         int16_t arms = read_i16(&ptr);
         int16_t vehicle_id = read_i16(&ptr);
         int16_t target = read_i16(&ptr);
@@ -1163,9 +1163,9 @@ int binary_skip_entity(const uint8_t* buf, int buf_size) {
 
     // --- Player (runtime state) ---
     if (flags & BFLAG_HAS_PLAYER) {
-        // state(1) + money(4) + item(1) + inventory(8) + ammo(8) + keys(3) + arms(2) + vehicle(2) + target(2) + use_timer(4) + grabbed_item(2) + won(1) + money_timer(4) + money_increment(4)
-        SKIP_CHECK(1 + 4 + 1 + 8 + 8 + 3 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4);
-        ptr += 1 + 4 + 1 + 8 + 8 + 3 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4;
+        // state(1) + money(4) + item(1) + inventory(8) + ammo(8) + keys(6) + arms(2) + vehicle(2) + target(2) + use_timer(4) + grabbed_item(2) + won(1) + money_timer(4) + money_increment(4)
+        SKIP_CHECK(1 + 4 + 1 + 8 + 8 + 6 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4);
+        ptr += 1 + 4 + 1 + 8 + 8 + 6 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4;
     }
 
     // --- Enemy (creation + runtime: +5 bytes) ---

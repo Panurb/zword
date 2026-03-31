@@ -153,6 +153,9 @@ static void remap_entity_ids(int entity) {
         for (int j = 0; j < 4; j++) {
             player->ammo[j] = remap_id(player->ammo[j]);
         }
+        for (int j = 0; j < 3; j++) {
+            player->keys[j] = remap_id(player->keys[j]);
+        }
     }
 
     EnemyComponent* enemy = EnemyComponent_get(entity);
