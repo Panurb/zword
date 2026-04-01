@@ -17,6 +17,7 @@
 #include "list.h"
 #include "camera.h"
 #include "light.h"
+#include "grid.h"
 #ifndef __EMSCRIPTEN__
     #include "network.h"
     #include "netgame.h"
@@ -564,10 +565,14 @@ void update(float time_step) {
                     }
                 }
 
-                // 5. Update camera to follow players
+                // 5. Rebuild collision grid so lights raycast against correct positions
+                ColliderGrid_clear(game_data->grid);
+                init_grid();
+
+                // 6. Update camera to follow players
                 update_camera(game_data->camera, time_step, true);
 
-                // 6. Update light brightness ramp and flicker animation
+                // 7. Update light brightness ramp and flicker animation
                 update_lights(time_step);
 
                 // Snap camera's previous state to current so interpolation doesn't
