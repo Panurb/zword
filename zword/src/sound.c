@@ -12,10 +12,6 @@
 #include "component.h"
 #include "settings.h"
 #include "game.h"
-#ifndef __EMSCRIPTEN__
-    #include "network.h"
-    #include "netgame.h"
-#endif
 
 
 void load_sounds() {
@@ -48,16 +44,6 @@ void add_sound(int entity, Filename filename, float volume, float pitch) {
             event->loop = false;
             event->channel = -1;
             scomp->events[i] = event;
-
-#ifndef __EMSCRIPTEN__
-            if (network.mode == NET_MODE_HOST) {
-                Vector2f pos = get_position(entity);
-                int idx = sound_index(filename);
-                if (idx >= 0) {
-                    net_buffer_sound(pos.x, pos.y, idx, volume);
-                }
-            }
-#endif
             break;
         }
     }

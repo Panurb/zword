@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 #include "netgame.h"
 #include "network.h"
@@ -18,8 +17,6 @@ bool net_entity_seen[MAX_ENTITIES];
 int net_map_max_entity = 0;
 int net_host_to_local[MAX_ENTITIES];
 int net_local_to_host[MAX_ENTITIES];
-NetSoundEvent net_sound_events[NET_MAX_SOUND_EVENTS];
-int net_sound_event_count = 0;
 NetParticleEvent net_particle_events[NET_MAX_PARTICLE_EVENTS];
 int net_particle_event_count = 0;
 
@@ -36,16 +33,6 @@ void net_clear_id_map(void) {
 }
 
 
-void net_buffer_sound(float x, float y, int sound_idx, float volume) {
-    if (net_sound_event_count >= NET_MAX_SOUND_EVENTS) return;
-    NetSoundEvent* e = &net_sound_events[net_sound_event_count++];
-    e->x = x;
-    e->y = y;
-    e->sound_index = (uint8_t)sound_idx;
-    e->volume = (uint8_t)(fminf(1.0f, fmaxf(0.0f, volume)) * 255.0f);
-}
-
-
 void net_buffer_particles(int entity, int count) {
     if (net_particle_event_count >= NET_MAX_PARTICLE_EVENTS) return;
     NetParticleEvent* e = &net_particle_events[net_particle_event_count++];
@@ -55,7 +42,6 @@ void net_buffer_particles(int entity, int count) {
 
 
 void net_clear_events(void) {
-    net_sound_event_count = 0;
     net_particle_event_count = 0;
 }
 
@@ -134,23 +120,39 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
         pkt->entity_count++;
     }
 
-    // Append sound events
-    int sound_data_size = 1 + net_sound_event_count * (int)sizeof(NetSoundEvent);
-    if (remaining >= sound_data_size) {
-        uint8_t count = (uint8_t)net_sound_event_count;
-        memcpy(data, &count, 1);
-        data += 1;
-        if (count > 0) {
-            memcpy(data, net_sound_events, count * sizeof(NetSoundEvent));
-            data += count * sizeof(NetSoundEvent);
-        }
-        remaining -= sound_data_size;
-    } else {
-        // No room — write zero count
-        uint8_t zero = 0;
-        memcpy(data, &zero, 1);
+    // Append sound events by scanning pending one-shot SoundComponent events
+    {
+        uint8_t* count_ptr = data;
         data += 1;
         remaining -= 1;
+        uint8_t sound_count = 0;
+
+        for (int i = 0; i < game_data->components->entities; i++) {
+            SoundComponent* scomp = SoundComponent_get(i);
+            if (!scomp) continue;
+
+            for (int j = 0; j < scomp->size; j++) {
+                SoundEvent* event = scomp->events[j];
+                if (!event) continue;
+                if (event->channel != -1 || event->loop) continue;
+
+                int idx = sound_index(event->filename);
+                if (idx < 0) continue;
+                if (remaining < 5) break;
+
+                uint16_t eid = (uint16_t)i;
+                uint16_t sidx = (uint16_t)idx;
+                uint8_t vol = (uint8_t)(clamp(event->volume, 0.0f, 1.0f) * 255.0f);
+                memcpy(data, &eid, 2);
+                memcpy(data + 2, &sidx, 2);
+                data[4] = vol;
+                data += 5;
+                remaining -= 5;
+                sound_count++;
+            }
+        }
+
+        *count_ptr = sound_count;
     }
 
     // Append particle events
@@ -423,40 +425,26 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
         data += 1;
         remaining -= 1;
 
-        int sound_data_size = sound_count * (int)sizeof(NetSoundEvent);
-        if (remaining >= sound_data_size) {
-            for (int i = 0; i < sound_count; i++) {
-                NetSoundEvent ev;
-                memcpy(&ev, data + i * sizeof(NetSoundEvent), sizeof(NetSoundEvent));
+        for (int i = 0; i < sound_count; i++) {
+            if (remaining < 5) break;
 
-                // Find nearest entity at this position to attach the sound to.
-                // Sounds need a SoundComponent, so find the closest entity with one.
-                float best_dist = 1e9f;
-                int best_entity = -1;
-                float ex = ev.x;
-                float ey = ev.y;
-                for (int j = 0; j < game_data->components->entities; j++) {
-                    SoundComponent* sc = SoundComponent_get(j);
-                    if (!sc) continue;
-                    CoordinateComponent* coord = CoordinateComponent_get(j);
-                    if (!coord) continue;
-                    Vector2f pos = get_position(j);
-                    float dx = pos.x - ex;
-                    float dy = pos.y - ey;
-                    float d = dx * dx + dy * dy;
-                    if (d < best_dist) {
-                        best_dist = d;
-                        best_entity = j;
-                    }
-                }
+            uint16_t host_eid;
+            uint16_t sidx;
+            uint8_t vol;
+            memcpy(&host_eid, data, 2);
+            memcpy(&sidx, data + 2, 2);
+            vol = data[4];
+            data += 5;
+            remaining -= 5;
 
-                if (best_entity >= 0 && ev.sound_index < resources.sounds_size) {
-                    float vol = (float)ev.volume / 255.0f;
-                    add_sound(best_entity, resources.sound_names[ev.sound_index], vol, 1.0f);
+            int local_id = net_resolve_id((int)host_eid);
+            if (local_id >= 0 && local_id < MAX_ENTITIES && sidx < resources.sounds_size) {
+                SoundComponent* sc = SoundComponent_get(local_id);
+                if (sc) {
+                    float volume = (float)vol / 255.0f;
+                    add_sound(local_id, resources.sound_names[sidx], volume, 1.0f);
                 }
             }
-            data += sound_data_size;
-            remaining -= sound_data_size;
         }
     }
 

@@ -9,7 +9,6 @@
 
 #include "network.h"
 
-#define NET_MAX_SOUND_EVENTS 32
 #define NET_MAX_PARTICLE_EVENTS 32
 
 #pragma pack(push, 1)
@@ -23,14 +22,6 @@ typedef struct {
     PacketHeader header;
     uint16_t entity_count;
 } SnapshotPacket;
-
-// Sound event for network replication
-typedef struct {
-    float x;
-    float y;
-    uint8_t sound_index;
-    uint8_t volume;     // 0-255 mapped to 0.0-1.0
-} NetSoundEvent;
 
 // Particle burst event for network replication
 typedef struct {
@@ -70,8 +61,6 @@ extern int net_local_to_host[MAX_ENTITIES];
 
 // Per-tick event buffers filled by the host during simulation.
 // Appended to the snapshot and replayed on clients.
-extern NetSoundEvent net_sound_events[NET_MAX_SOUND_EVENTS];
-extern int net_sound_event_count;
 extern NetParticleEvent net_particle_events[NET_MAX_PARTICLE_EVENTS];
 extern int net_particle_event_count;
 
@@ -99,9 +88,6 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 // An entity is dynamic if it has dynamic components OR any ancestor in
 // its coord->parent chain is dynamic.
 bool netgame_is_dynamic(int entity);
-
-// Buffer a sound event for network replication (host only).
-void net_buffer_sound(float x, float y, int sound_index, float volume);
 
 // Buffer a particle burst event for network replication (host only).
 void net_buffer_particles(int entity, int count);
