@@ -141,6 +141,7 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
     }
 
     // Append particle events by scanning pending_burst on ParticleComponents
+    // Wire format per event: [u16 entity_id][u16 count][float origin_x][float origin_y][float max_time]
     {
         uint8_t* count_ptr = data;
         data += 1;
@@ -150,14 +151,17 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
         for (int i = 0; i < game_data->components->entities; i++) {
             ParticleComponent* part = ParticleComponent_get(i);
             if (!part || part->pending_burst <= 0) continue;
-            if (remaining < 4) break;
+            if (remaining < 16) break;
 
             uint16_t eid = (uint16_t)i;
             uint16_t count = (uint16_t)part->pending_burst;
             memcpy(data, &eid, 2);
             memcpy(data + 2, &count, 2);
-            data += 4;
-            remaining -= 4;
+            memcpy(data + 4, &part->origin.x, 4);
+            memcpy(data + 8, &part->origin.y, 4);
+            memcpy(data + 12, &part->max_time, 4);
+            data += 16;
+            remaining -= 16;
             part->pending_burst = 0;
             particle_count++;
         }
@@ -444,19 +448,26 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
         remaining -= 1;
 
         for (int i = 0; i < particle_count; i++) {
-            if (remaining < 4) break;
+            if (remaining < 16) break;
 
             uint16_t host_eid;
             uint16_t count;
+            float origin_x, origin_y, max_time;
             memcpy(&host_eid, data, 2);
             memcpy(&count, data + 2, 2);
-            data += 4;
-            remaining -= 4;
+            memcpy(&origin_x, data + 4, 4);
+            memcpy(&origin_y, data + 8, 4);
+            memcpy(&max_time, data + 12, 4);
+            data += 16;
+            remaining -= 16;
 
             int local_id = net_resolve_id((int)host_eid);
             if (local_id >= 0 && local_id < MAX_ENTITIES) {
                 ParticleComponent* part = ParticleComponent_get(local_id);
                 if (part) {
+                    part->origin.x = origin_x;
+                    part->origin.y = origin_y;
+                    part->max_time = max_time;
                     add_particles(local_id, (int)count);
                 }
             }
