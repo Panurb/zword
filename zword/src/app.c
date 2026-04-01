@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "light.h"
 #include "grid.h"
+#include "particle.h"
 #ifndef __EMSCRIPTEN__
     #include "network.h"
     #include "netgame.h"
@@ -574,6 +575,9 @@ void update(float time_step) {
 
                 // 7. Update light brightness ramp and flicker animation
                 update_lights(time_step);
+
+                // 8. Update particle simulation (position, lifetime, emission)
+                update_particles(game_data->camera, time_step);
 
                 // Snap camera's previous state to current so interpolation doesn't
                 // fight with the exponential smoothing. The smoothing already provides

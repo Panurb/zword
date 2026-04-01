@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "netgame.h"
 #include "network.h"
@@ -8,6 +9,8 @@
 #include "grid.h"
 #include "image.h"
 #include "serialize_binary.h"
+#include "sound.h"
+#include "particle.h"
 
 #ifndef __EMSCRIPTEN__
 
@@ -15,6 +18,10 @@ bool net_entity_seen[MAX_ENTITIES];
 int net_map_max_entity = 0;
 int net_host_to_local[MAX_ENTITIES];
 int net_local_to_host[MAX_ENTITIES];
+NetSoundEvent net_sound_events[NET_MAX_SOUND_EVENTS];
+int net_sound_event_count = 0;
+NetParticleEvent net_particle_events[NET_MAX_PARTICLE_EVENTS];
+int net_particle_event_count = 0;
 
 
 int net_resolve_id(int host_id) {
@@ -26,6 +33,30 @@ int net_resolve_id(int host_id) {
 void net_clear_id_map(void) {
     memset(net_host_to_local, -1, sizeof(net_host_to_local));
     memset(net_local_to_host, -1, sizeof(net_local_to_host));
+}
+
+
+void net_buffer_sound(float x, float y, int sound_idx, float volume) {
+    if (net_sound_event_count >= NET_MAX_SOUND_EVENTS) return;
+    NetSoundEvent* e = &net_sound_events[net_sound_event_count++];
+    e->x = x;
+    e->y = y;
+    e->sound_index = (uint8_t)sound_idx;
+    e->volume = (uint8_t)(fminf(1.0f, fmaxf(0.0f, volume)) * 255.0f);
+}
+
+
+void net_buffer_particles(int entity, int count) {
+    if (net_particle_event_count >= NET_MAX_PARTICLE_EVENTS) return;
+    NetParticleEvent* e = &net_particle_events[net_particle_event_count++];
+    e->entity = (uint16_t)entity;
+    e->count = (uint16_t)count;
+}
+
+
+void net_clear_events(void) {
+    net_sound_event_count = 0;
+    net_particle_event_count = 0;
 }
 
 
@@ -102,6 +133,46 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
         remaining -= written;
         pkt->entity_count++;
     }
+
+    // Append sound events
+    int sound_data_size = 1 + net_sound_event_count * (int)sizeof(NetSoundEvent);
+    if (remaining >= sound_data_size) {
+        uint8_t count = (uint8_t)net_sound_event_count;
+        memcpy(data, &count, 1);
+        data += 1;
+        if (count > 0) {
+            memcpy(data, net_sound_events, count * sizeof(NetSoundEvent));
+            data += count * sizeof(NetSoundEvent);
+        }
+        remaining -= sound_data_size;
+    } else {
+        // No room — write zero count
+        uint8_t zero = 0;
+        memcpy(data, &zero, 1);
+        data += 1;
+        remaining -= 1;
+    }
+
+    // Append particle events
+    int particle_data_size = 1 + net_particle_event_count * (int)sizeof(NetParticleEvent);
+    if (remaining >= particle_data_size) {
+        uint8_t count = (uint8_t)net_particle_event_count;
+        memcpy(data, &count, 1);
+        data += 1;
+        if (count > 0) {
+            memcpy(data, net_particle_events, count * sizeof(NetParticleEvent));
+            data += count * sizeof(NetParticleEvent);
+        }
+        remaining -= particle_data_size;
+    } else {
+        uint8_t zero = 0;
+        memcpy(data, &zero, 1);
+        data += 1;
+        remaining -= 1;
+    }
+
+    // Clear event buffers now that they've been written
+    net_clear_events();
 
     int total_size = (int)(data - buf);
     pkt->header.size = (uint16_t)total_size;
@@ -339,6 +410,78 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
                 net_host_to_local[host_id] = -1;
                 net_local_to_host[i] = -1;
             }
+        }
+    }
+
+    // =========================================================
+    // Pass 5: Replay sound and particle events from the snapshot
+    // =========================================================
+
+    // Sound events
+    if (remaining >= 1) {
+        uint8_t sound_count = *data;
+        data += 1;
+        remaining -= 1;
+
+        int sound_data_size = sound_count * (int)sizeof(NetSoundEvent);
+        if (remaining >= sound_data_size) {
+            for (int i = 0; i < sound_count; i++) {
+                NetSoundEvent ev;
+                memcpy(&ev, data + i * sizeof(NetSoundEvent), sizeof(NetSoundEvent));
+
+                // Find nearest entity at this position to attach the sound to.
+                // Sounds need a SoundComponent, so find the closest entity with one.
+                float best_dist = 1e9f;
+                int best_entity = -1;
+                float ex = ev.x;
+                float ey = ev.y;
+                for (int j = 0; j < game_data->components->entities; j++) {
+                    SoundComponent* sc = SoundComponent_get(j);
+                    if (!sc) continue;
+                    CoordinateComponent* coord = CoordinateComponent_get(j);
+                    if (!coord) continue;
+                    Vector2f pos = get_position(j);
+                    float dx = pos.x - ex;
+                    float dy = pos.y - ey;
+                    float d = dx * dx + dy * dy;
+                    if (d < best_dist) {
+                        best_dist = d;
+                        best_entity = j;
+                    }
+                }
+
+                if (best_entity >= 0 && ev.sound_index < resources.sounds_size) {
+                    float vol = (float)ev.volume / 255.0f;
+                    add_sound(best_entity, resources.sound_names[ev.sound_index], vol, 1.0f);
+                }
+            }
+            data += sound_data_size;
+            remaining -= sound_data_size;
+        }
+    }
+
+    // Particle events
+    if (remaining >= 1) {
+        uint8_t particle_count = *data;
+        data += 1;
+        remaining -= 1;
+
+        int particle_data_size = particle_count * (int)sizeof(NetParticleEvent);
+        if (remaining >= particle_data_size) {
+            for (int i = 0; i < particle_count; i++) {
+                NetParticleEvent ev;
+                memcpy(&ev, data + i * sizeof(NetParticleEvent), sizeof(NetParticleEvent));
+
+                int local_id = net_resolve_id((int)ev.entity);
+                if (local_id >= 0 && local_id < MAX_ENTITIES) {
+                    ParticleComponent* part = ParticleComponent_get(local_id);
+                    if (part) {
+                        add_particles(local_id, (int)ev.count);
+                    }
+                }
+            }
+            data += particle_data_size;
+            remaining -= particle_data_size;
         }
     }
 }

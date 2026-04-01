@@ -10,6 +10,10 @@
 #include "camera.h"
 #include "game.h"
 #include "settings.h"
+#ifndef __EMSCRIPTEN__
+    #include "network.h"
+    #include "netgame.h"
+#endif
 
 
 Color color_lerp(Color s, Color e, float t) {
@@ -204,6 +208,12 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
 void add_particles(int entity, int n) {
     Vector2f scale = get_scale(entity);
     ParticleComponent* part = ParticleComponent_get(entity);
+
+#ifndef __EMSCRIPTEN__
+    if (network.mode == NET_MODE_HOST) {
+        net_buffer_particles(entity, n);
+    }
+#endif
 
     for (int i = 0; i < n; i++) {
         int next = (part->first + part->particles) % part->max_particles;
