@@ -9,8 +9,6 @@
 
 #include "network.h"
 
-#define NET_MAX_PARTICLE_EVENTS 32
-
 #pragma pack(push, 1)
 
 // Snapshot packet header: sent from host to clients every tick.
@@ -22,12 +20,6 @@ typedef struct {
     PacketHeader header;
     uint16_t entity_count;
 } SnapshotPacket;
-
-// Particle burst event for network replication
-typedef struct {
-    uint16_t entity;    // host entity ID
-    uint16_t count;     // number of particles to spawn
-} NetParticleEvent;
 
 // Input packet sent from client to host
 typedef struct {
@@ -59,11 +51,6 @@ extern int net_map_max_entity;
 extern int net_host_to_local[MAX_ENTITIES];
 extern int net_local_to_host[MAX_ENTITIES];
 
-// Per-tick event buffers filled by the host during simulation.
-// Appended to the snapshot and replayed on clients.
-extern NetParticleEvent net_particle_events[NET_MAX_PARTICLE_EVENTS];
-extern int net_particle_event_count;
-
 // Resolve a host entity ID to the local entity ID.
 // Returns the local ID (may differ from host_id if there was a mismatch).
 int net_resolve_id(int host_id);
@@ -88,11 +75,5 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 // An entity is dynamic if it has dynamic components OR any ancestor in
 // its coord->parent chain is dynamic.
 bool netgame_is_dynamic(int entity);
-
-// Buffer a particle burst event for network replication (host only).
-void net_buffer_particles(int entity, int count);
-
-// Clear per-tick event buffers (called after building snapshot).
-void net_clear_events(void);
 
 #endif // __EMSCRIPTEN__

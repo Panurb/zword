@@ -287,6 +287,7 @@ typedef struct {
     float height;
     float stretch;
     float wind_factor;
+    int pending_burst;
 } ParticleComponent;
 
 typedef struct {

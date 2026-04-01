@@ -17,8 +17,6 @@ bool net_entity_seen[MAX_ENTITIES];
 int net_map_max_entity = 0;
 int net_host_to_local[MAX_ENTITIES];
 int net_local_to_host[MAX_ENTITIES];
-NetParticleEvent net_particle_events[NET_MAX_PARTICLE_EVENTS];
-int net_particle_event_count = 0;
 
 
 int net_resolve_id(int host_id) {
@@ -30,19 +28,6 @@ int net_resolve_id(int host_id) {
 void net_clear_id_map(void) {
     memset(net_host_to_local, -1, sizeof(net_host_to_local));
     memset(net_local_to_host, -1, sizeof(net_local_to_host));
-}
-
-
-void net_buffer_particles(int entity, int count) {
-    if (net_particle_event_count >= NET_MAX_PARTICLE_EVENTS) return;
-    NetParticleEvent* e = &net_particle_events[net_particle_event_count++];
-    e->entity = (uint16_t)entity;
-    e->count = (uint16_t)count;
-}
-
-
-void net_clear_events(void) {
-    net_particle_event_count = 0;
 }
 
 
@@ -155,26 +140,30 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
         *count_ptr = sound_count;
     }
 
-    // Append particle events
-    int particle_data_size = 1 + net_particle_event_count * (int)sizeof(NetParticleEvent);
-    if (remaining >= particle_data_size) {
-        uint8_t count = (uint8_t)net_particle_event_count;
-        memcpy(data, &count, 1);
-        data += 1;
-        if (count > 0) {
-            memcpy(data, net_particle_events, count * sizeof(NetParticleEvent));
-            data += count * sizeof(NetParticleEvent);
-        }
-        remaining -= particle_data_size;
-    } else {
-        uint8_t zero = 0;
-        memcpy(data, &zero, 1);
+    // Append particle events by scanning pending_burst on ParticleComponents
+    {
+        uint8_t* count_ptr = data;
         data += 1;
         remaining -= 1;
-    }
+        uint8_t particle_count = 0;
 
-    // Clear event buffers now that they've been written
-    net_clear_events();
+        for (int i = 0; i < game_data->components->entities; i++) {
+            ParticleComponent* part = ParticleComponent_get(i);
+            if (!part || part->pending_burst <= 0) continue;
+            if (remaining < 4) break;
+
+            uint16_t eid = (uint16_t)i;
+            uint16_t count = (uint16_t)part->pending_burst;
+            memcpy(data, &eid, 2);
+            memcpy(data + 2, &count, 2);
+            data += 4;
+            remaining -= 4;
+            part->pending_burst = 0;
+            particle_count++;
+        }
+
+        *count_ptr = particle_count;
+    }
 
     int total_size = (int)(data - buf);
     pkt->header.size = (uint16_t)total_size;
@@ -454,22 +443,23 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
         data += 1;
         remaining -= 1;
 
-        int particle_data_size = particle_count * (int)sizeof(NetParticleEvent);
-        if (remaining >= particle_data_size) {
-            for (int i = 0; i < particle_count; i++) {
-                NetParticleEvent ev;
-                memcpy(&ev, data + i * sizeof(NetParticleEvent), sizeof(NetParticleEvent));
+        for (int i = 0; i < particle_count; i++) {
+            if (remaining < 4) break;
 
-                int local_id = net_resolve_id((int)ev.entity);
-                if (local_id >= 0 && local_id < MAX_ENTITIES) {
-                    ParticleComponent* part = ParticleComponent_get(local_id);
-                    if (part) {
-                        add_particles(local_id, (int)ev.count);
-                    }
+            uint16_t host_eid;
+            uint16_t count;
+            memcpy(&host_eid, data, 2);
+            memcpy(&count, data + 2, 2);
+            data += 4;
+            remaining -= 4;
+
+            int local_id = net_resolve_id((int)host_eid);
+            if (local_id >= 0 && local_id < MAX_ENTITIES) {
+                ParticleComponent* part = ParticleComponent_get(local_id);
+                if (part) {
+                    add_particles(local_id, (int)count);
                 }
             }
-            data += particle_data_size;
-            remaining -= particle_data_size;
         }
     }
 }
