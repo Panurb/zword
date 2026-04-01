@@ -16,6 +16,7 @@
 #include "serialize.h"
 #include "list.h"
 #include "camera.h"
+#include "light.h"
 #ifndef __EMSCRIPTEN__
     #include "network.h"
     #include "netgame.h"
@@ -565,6 +566,9 @@ void update(float time_step) {
 
                 // 5. Update camera to follow players
                 update_camera(game_data->camera, time_step, true);
+
+                // 6. Update light brightness ramp and flicker animation
+                update_lights(time_step);
 
                 // Snap camera's previous state to current so interpolation doesn't
                 // fight with the exponential smoothing. The smoothing already provides

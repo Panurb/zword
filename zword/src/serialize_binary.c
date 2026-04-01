@@ -606,7 +606,9 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity) {
             }
             image->width = width;
             image->height = height;
-            image->layer = (Layer)layer;
+            if (image->layer != (Layer)layer) {
+                change_layer(entity, (Layer)layer);
+            }
             image->alpha = alpha;
             image->shine = shine;
         } else {
