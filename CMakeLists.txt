@@ -53,6 +53,7 @@ set(SOURCES
     zword/src/player.c
     zword/src/raycast.c
     zword/src/serialize.c
+    zword/src/serialize_binary.c
     zword/src/settings.c
     zword/src/sound.c
     zword/src/tile.c

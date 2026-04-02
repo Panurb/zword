@@ -16,6 +16,8 @@ emcmake cmake . -B build
 cmake --build build
 ```
 
+The LSP will report errors like `'SDL.h' file not found` because it doesn't know about CMake's include paths. These cascade into many false positives. Ignore them — if the build succeeds, the code is correct.
+
 ## Directory layout
 
 ```
@@ -56,7 +58,8 @@ System update order (in `game.c:update_game()`): coordinates, lifetimes, health,
 - System/utility functions: `snake_case` (`update_physics()`, `create_entity()`)
 - Constants/enums: `UPPER_SNAKE_CASE` (`MAX_ENTITIES`, `PLAYER_ON_FOOT`)
 - Project includes use `"quotes"`, SDL/system use `<angle brackets>`
-- Platform guards: only use `#ifdef` guards when a library is unavailable on a platform (e.g. Winsock2 on Emscripten). Do not guard code just to reduce web executable size.
+- Platform guards: only use `#ifdef` guards when a library is unavailable on a platform (e.g. Winsock2 on Emscripten). Do not guard code just to reduce web executable size. Format `#ifdef` blocks inline like normal `if` statements (not outdented to column 0).
+- Always use braces with `if` statements. Exceptions: short `continue` conditions in `for` loops, and functions with lots of short return paths.
 - Manual memory management (`malloc`/`free`), no tests or CI
 - Logging via macros: `LOG_DEBUG`, `LOG_INFO`, `LOG_WARNING`, `LOG_ERROR`
 
