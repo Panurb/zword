@@ -11,6 +11,10 @@ void destroy_menu();
 
 void create_pause_menu();
 
+void create_host_pause_menu();
+
+void create_client_pause_menu();
+
 void update_menu();
 
 void input_menu(int camera, SDL_Event event);

@@ -248,9 +248,6 @@ void start_game(Filename map_name, bool load_save) {
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
     game_data->ambient_light = 0.5f;
-    // create_level(data.components, data.grid, data.seed);
-    // test(data->components);
-    create_pause_menu();
 
     if (load_save) {
         load_state(map_name);

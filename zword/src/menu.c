@@ -82,6 +82,20 @@ void change_state_game(int entity) {
 }
 
 
+static void change_state_host_game(int entity) {
+    UNUSED(entity);
+    game_state = STATE_HOST;
+    reset_ids();
+}
+
+
+static void change_state_client_game(int entity) {
+    UNUSED(entity);
+    game_state = STATE_CLIENT;
+    reset_ids();
+}
+
+
 void change_state_save(int entity) {
     UNUSED(entity);
     game_state = STATE_SAVE;
@@ -487,6 +501,22 @@ void create_pause_menu() {
         add_button_to_container(container, "SAVE", change_state_save);
         add_button_to_container(container, "LOAD", change_state_load);
     }
+    add_button_to_container(container, "SETTINGS", toggle_settings);
+    add_button_to_container(container, "QUIT TO MENU", change_state_end);
+}
+
+
+void create_host_pause_menu() {
+    int container = create_container(vec(-20.0f, 0.0f), 1, 3);
+    add_button_to_container(container, "RESUME", change_state_host_game);
+    add_button_to_container(container, "SETTINGS", toggle_settings);
+    add_button_to_container(container, "QUIT TO MENU", change_state_end);
+}
+
+
+void create_client_pause_menu() {
+    int container = create_container(vec(-20.0f, 0.0f), 1, 3);
+    add_button_to_container(container, "RESUME", change_state_client_game);
     add_button_to_container(container, "SETTINGS", toggle_settings);
     add_button_to_container(container, "QUIT TO MENU", change_state_end);
 }

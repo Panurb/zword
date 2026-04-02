@@ -263,10 +263,40 @@ void input_game(SDL_Event sdl_event) {
                 }
             }
             break;
+        case STATE_HOST:
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
+                if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
+                    game_state = STATE_HOST_PAUSE;
+                }
+            }
+            break;
+        case STATE_CLIENT:
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
+                if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
+                    game_state = STATE_CLIENT_PAUSE;
+                }
+            }
+            break;
         case STATE_PAUSE:
             if (sdl_event.type == SDL_KEYDOWN) {
                 if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
                     game_state = STATE_GAME;
+                }
+            }
+            input_menu(game_data->menu_camera, sdl_event);
+            break;
+        case STATE_HOST_PAUSE:
+            if (sdl_event.type == SDL_KEYDOWN) {
+                if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                    game_state = STATE_HOST;
+                }
+            }
+            input_menu(game_data->menu_camera, sdl_event);
+            break;
+        case STATE_CLIENT_PAUSE:
+            if (sdl_event.type == SDL_KEYDOWN) {
+                if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
+                    game_state = STATE_CLIENT;
                 }
             }
             input_menu(game_data->menu_camera, sdl_event);
@@ -420,11 +450,19 @@ void update(float time_step) {
                 memset(net_entity_seen, 0, sizeof(net_entity_seen));
                 net_clear_id_map();
                 net_map_max_entity = game_data->components->entities;
-
-
             }
+            if (network.mode == NET_MODE_HOST) {
+                create_host_pause_menu();
+                game_state = STATE_HOST;
+            } else if (network.mode == NET_MODE_CLIENT) {
+                create_client_pause_menu();
+                game_state = STATE_CLIENT;
+            } else
 #endif
-            game_state = STATE_GAME;
+            {
+                create_pause_menu();
+                game_state = STATE_GAME;
+            }
             break;
         case STATE_END:
             end_game();
@@ -440,165 +478,169 @@ void update(float time_step) {
             game_state = STATE_START;
             break;
         case STATE_GAME:
+            input_players(game_data->camera);
+            update_game(time_step);
+            update_game_mode(time_step);
+            break;
 #ifndef __EMSCRIPTEN__
-            if (network.mode == NET_MODE_HOST) {
-                // Host: receive remote inputs FIRST so all controllers are fresh,
-                // then read local input + run state machines, then simulate.
+        case STATE_HOST:
+        {
+            // Host: receive remote inputs FIRST so all controllers are fresh,
+            // then read local input + run state machines, then simulate.
 
-                float current_time = SDL_GetTicks() / 1000.0f;
+            float current_time = SDL_GetTicks() / 1000.0f;
 
-                // 1. Receive and apply remote inputs
-                {
-                    struct sockaddr_in from;
-                    int received;
-                    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
-                        if (received < (int)sizeof(PacketHeader)) continue;
-                        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
-                        if (hdr->type == PACKET_INPUT && received >= (int)sizeof(InputPacket)) {
-                            InputPacket* input_pkt = (InputPacket*)network.recv_buf;
-                            // Update last_recv_time for the sending client
-                            for (int ci = 0; ci < NET_MAX_CLIENTS; ci++) {
-                                if (network.clients[ci].connected &&
-                                    from.sin_addr.s_addr == network.clients[ci].addr.sin_addr.s_addr &&
-                                    from.sin_port == network.clients[ci].addr.sin_port) {
-                                    network.clients[ci].last_recv_time = current_time;
-                                    break;
-                                }
-                            }
-                            // Find the player entity for this slot
-                            int slot_idx = 0;
-                            ListNode* pnode;
-                            FOREACH(pnode, game_data->components->player.order) {
-                                if (slot_idx == (int)input_pkt->player_slot) {
-                                    netgame_unpack_input(input_pkt, pnode->value);
-                                    break;
-                                }
-                                slot_idx++;
-                            }
-                        }
-                        // Handle late JOIN during game: re-send ACK inline
-                        // (don't call network_host_accept_clients which drains the socket)
-                        if (hdr->type == PACKET_JOIN) {
-                            // Find if this client is already connected
-                            for (int ci = 0; ci < NET_MAX_CLIENTS; ci++) {
-                                if (network.clients[ci].connected &&
-                                    from.sin_addr.s_addr == network.clients[ci].addr.sin_addr.s_addr &&
-                                    from.sin_port == network.clients[ci].addr.sin_port) {
-                                    JoinAckPacket ack;
-                                    ack.header.type = PACKET_JOIN_ACK;
-                                    ack.header.tick = 0;
-                                    ack.header.size = sizeof(JoinAckPacket);
-                                    ack.player_slot = network.clients[ci].player_slot;
-                                    network_send_to(&from, &ack, sizeof(ack));
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // 1b. Check for client timeouts
-                {
-                    int disconnected = network_check_timeouts(current_time);
-                    (void)disconnected;  // Could handle player entity cleanup here
-                }
-
-                // 2. Read local input + run state machines for all players
-                // (remote players now have fresh controller data from step 1)
-                input_players(game_data->camera);
-
-                // 3. Simulate
-                update_game(time_step);
-                update_game_mode(time_step);
-
-                // 4. Build and broadcast snapshot
-                {
-                    int snap_size = netgame_build_snapshot(network.send_buf, NET_MAX_PACKET_SIZE, network.tick);
-                    network_broadcast(network.send_buf, snap_size);
-                    network.tick++;
-                }
-            } else if (network.mode == NET_MODE_CLIENT) {
-                // Client: only read local controller (no state machine -- host is authoritative),
-                // send input to host, receive and apply snapshots.
-
-                // 1. Update local player's controller only (no state machine)
-                {
-                    int slot_idx = 0;
-                    ListNode* pnode;
-                    FOREACH(pnode, game_data->components->player.order) {
-                        if (slot_idx == network.local_player_slot) {
-                            update_controller(game_data->camera, pnode->value);
-                            break;
-                        }
-                        slot_idx++;
-                    }
-                }
-
-                // 2. Pack and send our input to host
-                {
-                    int slot_idx = 0;
-                    ListNode* pnode;
-                    FOREACH(pnode, game_data->components->player.order) {
-                        if (slot_idx == network.local_player_slot) {
-                            InputPacket input_pkt;
-                            netgame_pack_input(&input_pkt, pnode->value, (uint8_t)network.local_player_slot, network.tick);
-                            network_send_to_host(&input_pkt, sizeof(input_pkt));
-                            break;
-                        }
-                        slot_idx++;
-                    }
-                }
-
-                // 3. Save current positions as "previous" BEFORE applying new snapshot,
-                //    so the interpolation system has two distinct states to lerp between.
-                update_coordinates();
-
-                // 4. Receive and apply snapshots (overwrites current positions)
-                {
-                    struct sockaddr_in from;
-                    int received;
-                    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
-                        if (received < (int)sizeof(PacketHeader)) continue;
-                        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
-                        if (hdr->type == PACKET_SNAPSHOT) {
-                            netgame_apply_snapshot(network.recv_buf, received);
-                        }
-                    }
-                }
-
-                // 5. Rebuild collision grid so lights raycast against correct positions
-                ColliderGrid_clear(game_data->grid);
-                init_grid();
-
-                // 6. Update camera to follow players
-                update_camera(game_data->camera, time_step, true);
-
-                // 7. Update light brightness ramp and flicker animation
-                update_lights(time_step);
-
-                // 8. Update particle simulation (position, lifetime, emission)
-                update_particles(game_data->camera, time_step);
-
-                // Snap camera's previous state to current so interpolation doesn't
-                // fight with the exponential smoothing. The smoothing already provides
-                // continuity; interpolating on top of it causes desync with entity positions.
-                {
-                    CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
-                    cam_coord->previous.position = cam_coord->position;
-                    cam_coord->previous.angle = cam_coord->angle;
-                    cam_coord->previous.scale = cam_coord->scale;
-                }
-
-                network.tick++;
-            } else
-#endif
+            // 1. Receive and apply remote inputs
             {
-                // Single player (no network)
-                input_players(game_data->camera);
-                update_game(time_step);
-                update_game_mode(time_step);
+                struct sockaddr_in from;
+                int received;
+                while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+                    if (received < (int)sizeof(PacketHeader)) continue;
+                    PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+                    if (hdr->type == PACKET_INPUT && received >= (int)sizeof(InputPacket)) {
+                        InputPacket* input_pkt = (InputPacket*)network.recv_buf;
+                        // Update last_recv_time for the sending client
+                        for (int ci = 0; ci < NET_MAX_CLIENTS; ci++) {
+                            if (network.clients[ci].connected &&
+                                from.sin_addr.s_addr == network.clients[ci].addr.sin_addr.s_addr &&
+                                from.sin_port == network.clients[ci].addr.sin_port) {
+                                network.clients[ci].last_recv_time = current_time;
+                                break;
+                            }
+                        }
+                        // Find the player entity for this slot
+                        int slot_idx = 0;
+                        ListNode* pnode;
+                        FOREACH(pnode, game_data->components->player.order) {
+                            if (slot_idx == (int)input_pkt->player_slot) {
+                                netgame_unpack_input(input_pkt, pnode->value);
+                                break;
+                            }
+                            slot_idx++;
+                        }
+                    }
+                    // Handle late JOIN during game: re-send ACK inline
+                    // (don't call network_host_accept_clients which drains the socket)
+                    if (hdr->type == PACKET_JOIN) {
+                        // Find if this client is already connected
+                        for (int ci = 0; ci < NET_MAX_CLIENTS; ci++) {
+                            if (network.clients[ci].connected &&
+                                from.sin_addr.s_addr == network.clients[ci].addr.sin_addr.s_addr &&
+                                from.sin_port == network.clients[ci].addr.sin_port) {
+                                JoinAckPacket ack;
+                                ack.header.type = PACKET_JOIN_ACK;
+                                ack.header.tick = 0;
+                                ack.header.size = sizeof(JoinAckPacket);
+                                ack.player_slot = network.clients[ci].player_slot;
+                                network_send_to(&from, &ack, sizeof(ack));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 1b. Check for client timeouts
+            {
+                int disconnected = network_check_timeouts(current_time);
+                (void)disconnected;  // Could handle player entity cleanup here
+            }
+
+            // 2. Read local input + run state machines for all players
+            // (remote players now have fresh controller data from step 1)
+            input_players(game_data->camera);
+
+            // 3. Simulate
+            update_game(time_step);
+            update_game_mode(time_step);
+
+            // 4. Build and broadcast snapshot
+            {
+                int snap_size = netgame_build_snapshot(network.send_buf, NET_MAX_PACKET_SIZE, network.tick);
+                network_broadcast(network.send_buf, snap_size);
+                network.tick++;
             }
             break;
+        }
+        case STATE_CLIENT:
+        {
+            // Client: only read local controller (no state machine -- host is authoritative),
+            // send input to host, receive and apply snapshots.
+
+            // 1. Update local player's controller only (no state machine)
+            {
+                int slot_idx = 0;
+                ListNode* pnode;
+                FOREACH(pnode, game_data->components->player.order) {
+                    if (slot_idx == network.local_player_slot) {
+                        update_controller(game_data->camera, pnode->value);
+                        break;
+                    }
+                    slot_idx++;
+                }
+            }
+
+            // 2. Pack and send our input to host
+            {
+                int slot_idx = 0;
+                ListNode* pnode;
+                FOREACH(pnode, game_data->components->player.order) {
+                    if (slot_idx == network.local_player_slot) {
+                        InputPacket input_pkt;
+                        netgame_pack_input(&input_pkt, pnode->value, (uint8_t)network.local_player_slot, network.tick);
+                        network_send_to_host(&input_pkt, sizeof(input_pkt));
+                        break;
+                    }
+                    slot_idx++;
+                }
+            }
+
+            // 3. Save current positions as "previous" BEFORE applying new snapshot,
+            //    so the interpolation system has two distinct states to lerp between.
+            update_coordinates();
+
+            // 4. Receive and apply snapshots (overwrites current positions)
+            {
+                struct sockaddr_in from;
+                int received;
+                while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+                    if (received < (int)sizeof(PacketHeader)) continue;
+                    PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+                    if (hdr->type == PACKET_SNAPSHOT) {
+                        netgame_apply_snapshot(network.recv_buf, received);
+                    }
+                }
+            }
+
+            // 5. Rebuild collision grid so lights raycast against correct positions
+            ColliderGrid_clear(game_data->grid);
+            init_grid();
+
+            // 6. Update camera to follow players
+            update_camera(game_data->camera, time_step, true);
+
+            // 7. Update light brightness ramp and flicker animation
+            update_lights(time_step);
+
+            // 8. Update particle simulation (position, lifetime, emission)
+            update_particles(game_data->camera, time_step);
+
+            // Snap camera's previous state to current so interpolation doesn't
+            // fight with the exponential smoothing. The smoothing already provides
+            // continuity; interpolating on top of it causes desync with entity positions.
+            {
+                CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
+                cam_coord->previous.position = cam_coord->position;
+                cam_coord->previous.angle = cam_coord->angle;
+                cam_coord->previous.scale = cam_coord->scale;
+            }
+
+            network.tick++;
+            break;
+        }
+#endif
+        case STATE_HOST_PAUSE:
+        case STATE_CLIENT_PAUSE:
         case STATE_PAUSE:
             update_menu();
             break;
@@ -610,6 +652,7 @@ void update(float time_step) {
             end_game();
             clear_all_sounds();
             start_game(game_data->map_name, true);
+            create_pause_menu();
             game_state = STATE_GAME;
             break;
         case STATE_APPLY:
@@ -679,11 +722,15 @@ void draw() {
         case STATE_RESET:
             draw_text(game_data->menu_camera, zeros(), "LOADING", 20, COLOR_WHITE);
             break;
+        case STATE_HOST:
+        case STATE_CLIENT:
         case STATE_GAME:
             draw_game();
             draw_hud(game_data->camera);
             draw_game_mode();
             break;
+        case STATE_HOST_PAUSE:
+        case STATE_CLIENT_PAUSE:
         case STATE_PAUSE:
             app.delta = 0.0f;
             draw_game();
@@ -732,8 +779,12 @@ void play_audio() {
         case STATE_MENU:
             game_data->music = 0;
             break;
+        case STATE_HOST:
+        case STATE_CLIENT:
         case STATE_GAME:
         case STATE_INTRO:
+        case STATE_HOST_PAUSE:
+        case STATE_CLIENT_PAUSE:
         case STATE_PAUSE:
             game_data->music = 1;
             break;
