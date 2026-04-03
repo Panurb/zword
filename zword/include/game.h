@@ -16,8 +16,12 @@
 
 typedef enum {
     STATE_MENU,
+    STATE_HOST_LOBBY,
+    STATE_LOBBY,
     STATE_START,
     STATE_END,
+    STATE_CREATE_LOBBY,
+    STATE_JOIN,
     STATE_RESET,
     STATE_GAME,
     STATE_HOST,

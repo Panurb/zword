@@ -1,6 +1,6 @@
 {
-	"game_mode":	0,
-	"ambient_light":	0.5,
+	"game_mode":	3,
+	"ambient_light":	0.800000011920929,
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
@@ -23,6 +23,43 @@
 				"prefab":	"tiles/grass",
 				"scale_x":	19,
 				"scale_y":	17
+			}
+		}, {
+			"id":	3,
+			"Coordinate":	{
+				"x":	1,
+				"y":	4,
+				"prefab":	"weapons/axe"
+			}
+		}, {
+			"id":	4,
+			"Coordinate":	{
+				"x":	1,
+				"y":	-1,
+				"prefab":	"weapons/pistol"
+			}
+		}, {
+			"id":	5,
+			"Coordinate":	{
+				"x":	-1,
+				"y":	0,
+				"prefab":	"objects/fire"
+			}
+		}, {
+			"id":	6,
+			"Coordinate":	{
+				"x":	-2,
+				"y":	-2,
+				"angle":	0.78539818525314331,
+				"prefab":	"objects/bench"
+			}
+		}, {
+			"id":	7,
+			"Coordinate":	{
+				"x":	-0.5,
+				"y":	5.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	13
 			}
 		}]
 }

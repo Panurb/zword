@@ -20,6 +20,7 @@ int RESOLUTION_ID = -1;
 int fullscreen_id = -1;
 static int map_name_textbox = -1;
 static int window_play = -1;
+static Entity window_lan = NULL_ENTITY;
 static int window_new_map = -1;
 static int window_editor = -1;
 static int window_settings = -1;
@@ -34,6 +35,7 @@ void reset_ids() {
     RESOLUTION_ID = -1;
     fullscreen_id = -1;
     window_play = -1;
+    window_lan = NULL_ENTITY;
     window_new_map = -1;
     window_editor = -1;
     window_settings = -1;
@@ -82,14 +84,28 @@ void change_state_game(int entity) {
 }
 
 
-static void change_state_host_game(int entity) {
+void change_state_create_lobby(Entity entity) {
+    UNUSED(entity);
+    game_state = STATE_CREATE_LOBBY;
+    reset_ids();
+}
+
+
+void change_state_join(Entity entity) {
+    UNUSED(entity);
+    game_state = STATE_JOIN;
+    reset_ids();
+}
+
+
+void change_state_host_game(int entity) {
     UNUSED(entity);
     game_state = STATE_HOST;
     reset_ids();
 }
 
 
-static void change_state_client_game(int entity) {
+void change_state_client_game(int entity) {
     UNUSED(entity);
     game_state = STATE_CLIENT;
     reset_ids();
@@ -161,6 +177,28 @@ void toggle_survival(int entity) {
         add_button_to_container(container, "Survival", change_state_start);
         add_button_to_container(container, "Swampland", change_state_start);
     }
+}
+
+
+void toggle_lan(Entity entity) {
+    UNUSED(entity);
+    if (window_lan != NULL_ENTITY) {
+        destroy_entity_recursive(window_lan);
+        window_lan = NULL_ENTITY;
+        return;
+    }
+
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_lan = create_window(pos, "LAN", 2, toggle_lan);
+
+    Entity container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 2, 3);
+    add_child(window_lan, container);
+
+    Entity label = create_label("12345", zeros());
+    Entity join_button = create_button("JOIN", zeros(), change_state_join);
+    add_row_to_container(container, label, join_button);
+
+    add_button_to_container(container, "HOST", change_state_create_lobby);
 }
 
 
@@ -449,11 +487,7 @@ bool save_exists() {
     EMSCRIPTEN_KEEPALIVE
 #endif
 void create_menu() {
-    #ifdef __EMSCRIPTEN__
-        int height = 7;
-    #else
-        int height = 8;
-    #endif
+    int height = 8;
 
     if (game_settings.debug) {
         height += 2;
@@ -468,6 +502,9 @@ void create_menu() {
     add_button_to_container(container, "NEW GAME", start_campaign);
     add_button_to_container(container, "TUTORIAL", start_tutorial);
     add_button_to_container(container, "SURVIVAL", toggle_survival);
+    #ifndef __EMSCRIPTEN__
+        add_button_to_container(container, "LAN", toggle_lan);
+    #endif
     if (game_settings.debug) {
         add_button_to_container(container, "EDITOR", toggle_editor);
     }
@@ -510,7 +547,7 @@ void create_host_pause_menu() {
     int container = create_container(vec(-20.0f, 0.0f), 1, 3);
     add_button_to_container(container, "RESUME", change_state_host_game);
     add_button_to_container(container, "SETTINGS", toggle_settings);
-    add_button_to_container(container, "QUIT TO MENU", change_state_end);
+    add_button_to_container(container, "END GAME", change_state_end);
 }
 
 
@@ -518,7 +555,7 @@ void create_client_pause_menu() {
     int container = create_container(vec(-20.0f, 0.0f), 1, 3);
     add_button_to_container(container, "RESUME", change_state_client_game);
     add_button_to_container(container, "SETTINGS", toggle_settings);
-    add_button_to_container(container, "QUIT TO MENU", change_state_end);
+    add_button_to_container(container, "DISCONNECT", change_state_end);
 }
 
 
@@ -552,4 +589,15 @@ void create_game_over_menu() {
 
 void create_win_menu() {
     create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+}
+
+
+void create_lobby_menu() {
+    create_button("Leave", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+}
+
+
+void create_host_lobby_menu() {
+    create_button("Start Game", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_host_game);
+    create_button("Close lobby", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
 }

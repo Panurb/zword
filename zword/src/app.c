@@ -30,6 +30,8 @@
 
 App app;
 
+static GameState previous_state = STATE_MENU;
+
 static String version = "0.4.1";
 
 static float title_scale = 2.0f;
@@ -185,38 +187,9 @@ void init() {
     app.time_step = 1.0f / 60.0f;
     app.delta = 0.0f;
 
-#ifndef __EMSCRIPTEN__
-    // Parse CLI args and init networking
-    network_init();
-    for (int i = 1; i < app.argc; i++) {
-        if (strcmp(app.argv[i], "--host") == 0) {
-            int port = NET_DEFAULT_PORT;
-            if (i + 1 < app.argc && app.argv[i + 1][0] != '-') {
-                port = atoi(app.argv[i + 1]);
-                i++;
-            }
-            if (!network_host_start(port)) {
-                LOG_ERROR("Failed to start host");
-            }
-            // Host is player 0 with MKB
-            app.player_controllers[0] = CONTROLLER_MKB;
-        } else if (strcmp(app.argv[i], "--join") == 0) {
-            const char* ip = "127.0.0.1";
-            int port = NET_DEFAULT_PORT;
-            if (i + 1 < app.argc && app.argv[i + 1][0] != '-') {
-                ip = app.argv[i + 1];
-                i++;
-            }
-            if (i + 1 < app.argc && app.argv[i + 1][0] != '-') {
-                port = atoi(app.argv[i + 1]);
-                i++;
-            }
-            if (!network_client_connect(ip, port)) {
-                LOG_ERROR("Failed to connect to host");
-            }
-        }
-    }
-#endif
+    #ifndef __EMSCRIPTEN__
+        network_init();
+    #endif
 }
 
 
@@ -237,6 +210,25 @@ void quit() {
 
 void input_game(SDL_Event sdl_event) {
     switch (game_state) {
+        case STATE_CREATE_LOBBY:
+            if (!network_host_start(NET_DEFAULT_PORT)) {
+                LOG_ERROR("Failed to start host");
+                game_state = STATE_MENU;
+            } else {
+                // Host is player 0 with MKB
+                app.player_controllers[0] = CONTROLLER_MKB;
+                game_state = STATE_HOST_LOBBY;
+            }
+            break;
+        case STATE_JOIN:
+            const char* ip = "127.0.0.1";
+            if (!network_client_connect(ip, NET_DEFAULT_PORT)) {
+                LOG_ERROR("Failed to connect to host");
+                game_state = STATE_MENU;
+            } else {
+                game_state = STATE_LOBBY;
+            }
+            break;
         case STATE_GAME:
             if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
                 if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
@@ -278,25 +270,11 @@ void input_game(SDL_Event sdl_event) {
             }
             break;
         case STATE_PAUSE:
-            if (sdl_event.type == SDL_KEYDOWN) {
-                if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                    game_state = STATE_GAME;
-                }
-            }
-            input_menu(game_data->menu_camera, sdl_event);
-            break;
         case STATE_HOST_PAUSE:
-            if (sdl_event.type == SDL_KEYDOWN) {
-                if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                    game_state = STATE_HOST;
-                }
-            }
-            input_menu(game_data->menu_camera, sdl_event);
-            break;
         case STATE_CLIENT_PAUSE:
             if (sdl_event.type == SDL_KEYDOWN) {
                 if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                    game_state = STATE_CLIENT;
+                    game_state = previous_state;
                 }
             }
             input_menu(game_data->menu_camera, sdl_event);
@@ -306,6 +284,8 @@ void input_game(SDL_Event sdl_event) {
             break;
         case STATE_MENU:
         case STATE_GAME_OVER:
+        case STATE_HOST_LOBBY:
+        case STATE_LOBBY:
             input_menu(game_data->menu_camera, sdl_event);
             break;
         case STATE_INTRO:
@@ -332,6 +312,8 @@ void input_game(SDL_Event sdl_event) {
 
 
 void input() {
+    GameState state = game_state;
+
     SDL_Event sdl_event;
     while (SDL_PollEvent(&sdl_event))
     {
@@ -368,21 +350,24 @@ void input() {
                 break;
         }
     }
+
+    if (state != game_state) {
+        previous_state = state;
+    }
 }
 
 
 void update(float time_step) {
-    static GameState previous_state = STATE_MENU;
-
     GameState state = game_state;
 
     switch (game_state) {
         case STATE_MENU:
             intro.page = 1;
             intro.panel = 0;
-#ifndef __EMSCRIPTEN__
-            // Host: accept incoming client connections while in menu
-            if (network.mode == NET_MODE_HOST) {
+            update_menu();
+        case STATE_HOST_LOBBY:
+            #ifndef __EMSCRIPTEN__
+                // Host: accept incoming client connections while in lobby
                 network_host_accept_clients();
                 // Assign controllers for connected clients
                 for (int i = 0; i < NET_MAX_CLIENTS; i++) {
@@ -393,9 +378,12 @@ void update(float time_step) {
                         }
                     }
                 }
-            }
-            // Client: check for JOIN_ACK or START_GAME
-            if (network.mode == NET_MODE_CLIENT) {
+            #endif
+            update_menu();
+            break;
+        case STATE_LOBBY:
+            #ifndef __EMSCRIPTEN__
+                // Client: check for JOIN_ACK or START_GAME
                 struct sockaddr_in from;
                 int received;
                 while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
@@ -420,8 +408,7 @@ void update(float time_step) {
                         game_state = STATE_START;
                     }
                 }
-            }
-#endif
+            #endif
             update_menu();
             break;
         case STATE_START:
@@ -467,9 +454,9 @@ void update(float time_step) {
         case STATE_END:
             end_game();
             clear_all_sounds();
-#ifndef __EMSCRIPTEN__
-            network.game_started = false;
-#endif
+            #ifndef __EMSCRIPTEN__
+                network.game_started = false;
+            #endif
             game_state = STATE_MENU;
             break;
         case STATE_RESET:
