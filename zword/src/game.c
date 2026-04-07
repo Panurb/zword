@@ -243,6 +243,8 @@ void init_game() {
 
 
 void start_game(Filename map_name, bool load_save) {
+    LOG_INFO("Starting game (%s)\n", map_name);
+
     ColliderGrid_clear(game_data->grid);
     ComponentData_clear();
     game_data->camera = create_camera();

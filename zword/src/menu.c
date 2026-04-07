@@ -20,7 +20,6 @@ int RESOLUTION_ID = -1;
 int fullscreen_id = -1;
 static int map_name_textbox = -1;
 static int window_play = -1;
-static Entity window_lan = NULL_ENTITY;
 static int window_new_map = -1;
 static int window_editor = -1;
 static int window_settings = -1;
@@ -30,12 +29,14 @@ static int window_keyboard_controls = -1;
 static int window_xbox_controls = -1;
 static int button_benchmark = -1;
 
+static Entity window_lan = NULL_ENTITY;
+static Entity map_dropdown_lan = NULL_ENTITY;
+
 
 void reset_ids() {
     RESOLUTION_ID = -1;
     fullscreen_id = -1;
     window_play = -1;
-    window_lan = NULL_ENTITY;
     window_new_map = -1;
     window_editor = -1;
     window_settings = -1;
@@ -44,6 +45,9 @@ void reset_ids() {
     window_keyboard_controls = -1;
     window_xbox_controls = -1;
     button_benchmark = -1;
+
+    window_lan = NULL_ENTITY;
+    map_dropdown_lan = NULL_ENTITY;
 }
 
 
@@ -108,6 +112,14 @@ void change_state_host_game(int entity) {
 void change_state_client_game(int entity) {
     UNUSED(entity);
     game_state = STATE_CLIENT;
+    reset_ids();
+}
+
+
+void change_state_host_start(int entity) {
+    UNUSED(entity);
+    strcpy(game_data->map_name, WidgetComponent_get(map_dropdown_lan)->string);
+    game_state = STATE_HOST_START;
     reset_ids();
 }
 
@@ -598,6 +610,10 @@ void create_lobby_menu() {
 
 
 void create_host_lobby_menu() {
-    create_button("Start Game", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_host_game);
-    create_button("Close lobby", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+    static ButtonText maps[] = {
+        "mp_test"
+    };
+    map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
+    create_button("Start Game", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_host_start);
+    create_button("Close lobby", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
 }

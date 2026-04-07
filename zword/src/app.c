@@ -217,6 +217,8 @@ void input_game(SDL_Event sdl_event) {
             } else {
                 // Host is player 0 with MKB
                 app.player_controllers[0] = CONTROLLER_MKB;
+                destroy_menu();
+                create_host_lobby_menu();
                 game_state = STATE_HOST_LOBBY;
             }
             break;
@@ -226,7 +228,9 @@ void input_game(SDL_Event sdl_event) {
                 LOG_ERROR("Failed to connect to host");
                 game_state = STATE_MENU;
             } else {
-                game_state = STATE_LOBBY;
+                destroy_menu();
+                create_lobby_menu();
+                game_state = STATE_CLIENT_LOBBY;
             }
             break;
         case STATE_GAME:
@@ -285,7 +289,7 @@ void input_game(SDL_Event sdl_event) {
         case STATE_MENU:
         case STATE_GAME_OVER:
         case STATE_HOST_LOBBY:
-        case STATE_LOBBY:
+        case STATE_CLIENT_LOBBY:
             input_menu(game_data->menu_camera, sdl_event);
             break;
         case STATE_INTRO:
@@ -381,7 +385,7 @@ void update(float time_step) {
             #endif
             update_menu();
             break;
-        case STATE_LOBBY:
+        case STATE_CLIENT_LOBBY:
             #ifndef __EMSCRIPTEN__
                 // Client: check for JOIN_ACK or START_GAME
                 struct sockaddr_in from;
@@ -405,7 +409,7 @@ void update(float time_step) {
                             app.player_controllers[i] = CONTROLLER_MKB;  // all active
                         }
                         network.game_started = true;
-                        game_state = STATE_START;
+                        game_state = STATE_CLIENT_START;
                     }
                 }
             #endif
@@ -413,43 +417,47 @@ void update(float time_step) {
             break;
         case STATE_START:
             start_game(game_data->map_name, false);
-#ifndef __EMSCRIPTEN__
-            if (network.mode == NET_MODE_HOST) {
-                // Count total players (host + connected clients)
-                int num_players = 1;
-                for (int i = 0; i < NET_MAX_CLIENTS; i++) {
-                    if (network.clients[i].connected) num_players++;
-                }
-                // Broadcast START_GAME to clients
-                StartGamePacket start_pkt;
-                memset(&start_pkt, 0, sizeof(start_pkt));
-                start_pkt.header.type = PACKET_START_GAME;
-                start_pkt.header.tick = network.tick;
-                start_pkt.header.size = sizeof(StartGamePacket);
-                strncpy(start_pkt.map_name, game_data->map_name, sizeof(start_pkt.map_name) - 1);
-                start_pkt.game_mode = (uint8_t)game_data->game_mode;
-                start_pkt.num_players = (uint8_t)num_players;
-                network_broadcast(&start_pkt, sizeof(start_pkt));
-                network.game_started = true;
+            create_pause_menu();
+            game_state = STATE_GAME;
+            break;
+        case STATE_HOST_START:
+            start_game(game_data->map_name, false);
+
+            // Count total players (host + connected clients)
+            int num_players = 1;
+            for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+                if (network.clients[i].connected) num_players++;
             }
+            // Broadcast START_GAME to clients
+            StartGamePacket start_pkt;
+            memset(&start_pkt, 0, sizeof(start_pkt));
+            start_pkt.header.type = PACKET_START_GAME;
+            start_pkt.header.tick = network.tick;
+            start_pkt.header.size = sizeof(StartGamePacket);
+            strncpy(start_pkt.map_name, game_data->map_name, sizeof(start_pkt.map_name) - 1);
+            start_pkt.game_mode = (uint8_t)game_data->game_mode;
+            start_pkt.num_players = (uint8_t)num_players;
+            network_broadcast(&start_pkt, sizeof(start_pkt));
+            network.game_started = true;
+
             // Initialize net_entity_seen and ID mappings for both host and client
-            if (network.mode != NET_MODE_NONE) {
-                memset(net_entity_seen, 0, sizeof(net_entity_seen));
-                net_clear_id_map();
-                net_map_max_entity = game_data->components->entities;
-            }
-            if (network.mode == NET_MODE_HOST) {
-                create_host_pause_menu();
-                game_state = STATE_HOST;
-            } else if (network.mode == NET_MODE_CLIENT) {
-                create_client_pause_menu();
-                game_state = STATE_CLIENT;
-            } else
-#endif
-            {
-                create_pause_menu();
-                game_state = STATE_GAME;
-            }
+            memset(net_entity_seen, 0, sizeof(net_entity_seen));
+            net_clear_id_map();
+            net_map_max_entity = game_data->components->entities;
+
+            create_host_pause_menu();
+            game_state = STATE_HOST;
+            break;
+        case STATE_CLIENT_START:
+            start_game(game_data->map_name, false);
+
+            // Initialize net_entity_seen and ID mappings for both host and client
+            memset(net_entity_seen, 0, sizeof(net_entity_seen));
+            net_clear_id_map();
+            net_map_max_entity = game_data->components->entities;
+
+            create_client_pause_menu();
+            game_state = STATE_CLIENT;
             break;
         case STATE_END:
             end_game();
@@ -704,9 +712,16 @@ void draw() {
             Color color = get_color(1.0f, 1.0f, 0.0f, 0.5f);
             draw_text(game_data->menu_camera, vec(24.5f, -13.5f), buffer, 20, color);
             break;
+        case STATE_CLIENT_LOBBY:
+        case STATE_HOST_LOBBY:
+            draw_menu();
+            break;
         case STATE_START:
         case STATE_END:
         case STATE_RESET:
+        case STATE_LOAD_EDITOR:
+        case STATE_HOST_START:
+        case STATE_CLIENT_START:
             draw_text(game_data->menu_camera, zeros(), "LOADING", 20, COLOR_WHITE);
             break;
         case STATE_HOST:
@@ -723,9 +738,6 @@ void draw() {
             draw_game();
             draw_overlay(game_data->camera, 0.4f);
             draw_menu();
-            break;
-        case STATE_LOAD_EDITOR:
-            draw_text(game_data->menu_camera, zeros(), "LOADING", 20, COLOR_WHITE);
             break;
         case STATE_EDITOR:
             draw_editor();

@@ -24,3 +24,7 @@ void draw_menu();
 void create_game_over_menu();
 
 void create_win_menu();
+
+void create_lobby_menu();
+
+void create_host_lobby_menu();
