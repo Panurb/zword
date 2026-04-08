@@ -43,7 +43,9 @@ void main_loop() {
     input();
 
     bool should_update = app.focus;
-    if (network.mode != NET_MODE_NONE) should_update = true;
+    if (network.mode != NET_MODE_NONE) {
+        should_update = true;
+    }
 
     if (should_update) {
         // Client doesn't simulate physics — it just applies snapshots.
@@ -52,7 +54,8 @@ void main_loop() {
         // Cap to 1 update per frame and clamp accumulated time.
         if (network.mode == NET_MODE_CLIENT) {
             if (elapsed_time > app.time_step) {
-                elapsed_time = app.time_step;  // consume exactly one tick's worth
+                elapsed_time -= app.time_step;
+                elapsed_time = fminf(elapsed_time, app.time_step);
                 time_since_last_update = 0.0f;
                 update(app.time_step);
             }
