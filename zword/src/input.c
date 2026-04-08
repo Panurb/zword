@@ -1,7 +1,4 @@
-#include <math.h>
-#include <ctype.h>
 #include <string.h>
-#include <stdio.h>
 
 #include "app.h"
 #include "input.h"
@@ -322,30 +319,32 @@ void input_players(int camera) {
 
         bool skip_controller_update = false;
 
-#ifndef __EMSCRIPTEN__
         // In multiplayer, only update controller for local players
-        if (network.mode == NET_MODE_HOST) {
-            // Host: skip controller update for remote players (their input comes from network)
-            for (int c = 0; c < NET_MAX_CLIENTS; c++) {
-                if (network.clients[c].connected && network.clients[c].player_slot == slot_idx) {
-                    skip_controller_update = true;
-                    break;
+        switch (game_state) {
+            case STATE_HOST:
+                // Host: skip controller update for remote players (their input comes from network)
+                for (int c = 0; c < NET_MAX_CLIENTS; c++) {
+                    if (network.clients[c].connected && network.clients[c].player_slot == slot_idx) {
+                        skip_controller_update = true;
+                        break;
+                    }
                 }
-            }
-        } else if (network.mode == NET_MODE_CLIENT) {
-            // Client: only update our local player's controller, skip remote players entirely
-            if (slot_idx != network.local_player_slot) {
-                slot_idx++;
-                continue;
-            }
+                break;
+            case STATE_CLIENT:
+                // Client: only update our local player's controller, skip remote players entirely
+                if (slot_idx != network.local_player_slot) {
+                    slot_idx++;
+                    continue;
+                }
+                break;
+            default:
+                break;
         }
-#endif
 
         if (!skip_controller_update) {
             update_controller(camera, i);
         }
 
-        {
         Controller controller = player->controller;
 
         WeaponComponent* weapon = WeaponComponent_get(player->inventory[player->item]);
@@ -466,9 +465,7 @@ void input_players(int camera) {
             case PLAYER_DEAD:
                 break;
         }
-        } // end block for controller scope
 
-#ifndef __EMSCRIPTEN__
         // Clear edge-triggered flags for remote players after the state machine
         // has consumed them. For local players, update_controller() handles this
         // via edge detection on the next tick. Remote players skip
@@ -480,7 +477,6 @@ void input_players(int camera) {
                 player->controller.buttons_released[b] = false;
             }
         }
-#endif
 
         slot_idx++;
     }
