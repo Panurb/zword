@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include "util.h"
 
-#ifndef __EMSCRIPTEN__
-
 #ifdef _WIN32
     #include <winsock2.h>
     #include <ws2tcpip.h>
@@ -108,5 +106,3 @@ void network_host_accept_clients();
 // Host: check for timed-out clients and disconnect them.
 // Returns bitmask of disconnected player slots (bit N = slot N disconnected).
 int network_check_timeouts(float current_time);
-
-#endif // __EMSCRIPTEN__

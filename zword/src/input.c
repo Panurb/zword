@@ -8,9 +8,7 @@
 #include "vehicle.h"
 #include "item.h"
 #include "settings.h"
-#ifndef __EMSCRIPTEN__
-    #include "network.h"
-#endif
+#include "network.h"
 
 
 char* KEY_NAMES[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", 

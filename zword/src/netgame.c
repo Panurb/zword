@@ -11,8 +11,6 @@
 #include "sound.h"
 #include "particle.h"
 
-#ifndef __EMSCRIPTEN__
-
 bool net_entity_seen[MAX_ENTITIES];
 int net_map_max_entity = 0;
 int net_host_to_local[MAX_ENTITIES];
@@ -529,5 +527,3 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity) {
         ctrl->buttons_released[i] = ctrl->buttons_released[i] || ((pkt->buttons_released & (1 << i)) != 0);
     }
 }
-
-#endif // __EMSCRIPTEN__

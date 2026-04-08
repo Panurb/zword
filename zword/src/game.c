@@ -33,10 +33,8 @@
 #include "settings.h"
 #include "health.h"
 #include "weather.h"
-#ifndef __EMSCRIPTEN__
-    #include "network.h"
-    #include "netgame.h"
-#endif
+#include "network.h"
+#include "netgame.h"
 
 
 GameState game_state = STATE_MENU;
@@ -187,7 +185,6 @@ void init_game() {
     int i = 0;
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
-#ifndef __EMSCRIPTEN__
         // In multiplayer, don't destroy remote players (they have CONTROLLER_NONE locally
         // but are controlled by remote clients)
         bool is_network_player = false;
@@ -209,11 +206,6 @@ void init_game() {
         if (app.player_controllers[i] == CONTROLLER_NONE && !is_network_player) {
             destroy_entity_recursive(node->value);
         } else {
-#else
-        if (app.player_controllers[i] == CONTROLLER_NONE) {
-            destroy_entity_recursive(node->value);
-        } else {
-#endif
             PlayerComponent* player = PlayerComponent_get(node->value);
             player->controller.joystick = app.player_controllers[i];
             LOG_DEBUG("Player %d: %d\n", i, player->controller.joystick);

@@ -17,9 +17,7 @@
 #include "menu.h"
 #include "interface.h"
 #include "editor.h"
-#ifndef __EMSCRIPTEN__
-    #include "network.h"
-#endif
+#include "network.h"
 
 
 static float elapsed_time = 0.0f;
@@ -45,12 +43,9 @@ void main_loop() {
     input();
 
     bool should_update = app.focus;
-#ifndef __EMSCRIPTEN__
     if (network.mode != NET_MODE_NONE) should_update = true;
-#endif
 
     if (should_update) {
-#ifndef __EMSCRIPTEN__
         // Client doesn't simulate physics — it just applies snapshots.
         // Running the accumulator 2+ times per frame destroys interpolation state
         // (second tick has no new snapshot, so previous == current == no smoothing).
@@ -62,9 +57,7 @@ void main_loop() {
                 update(app.time_step);
             }
             elapsed_time += delta_time;
-        } else
-#endif
-        {
+        } else {
             while (elapsed_time > app.time_step) {
                 elapsed_time -= app.time_step;
                 time_since_last_update = 0.0f;

@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "network.h"
-
-#ifndef __EMSCRIPTEN__
 
 Network network;
 
@@ -280,5 +279,3 @@ int network_check_timeouts(float current_time) {
 
     return disconnected_mask;
 }
-
-#endif // __EMSCRIPTEN__

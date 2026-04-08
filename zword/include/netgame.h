@@ -4,9 +4,6 @@
 #include <stdint.h>
 
 #include "component.h"
-
-#ifndef __EMSCRIPTEN__
-
 #include "network.h"
 
 #pragma pack(push, 1)
@@ -75,5 +72,3 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 // An entity is dynamic if it has dynamic components OR any ancestor in
 // its coord->parent chain is dynamic.
 bool netgame_is_dynamic(int entity);
-
-#endif // __EMSCRIPTEN__

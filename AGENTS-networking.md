@@ -1,6 +1,6 @@
 # AGENTS - Networking
 
-Multiplayer is experimental. Host-authoritative client-server model over UDP. Assumes LAN environment (low latency, no packet loss). Networking libraries (Winsock2) are unavailable on Emscripten, so socket code is guarded with `#ifndef __EMSCRIPTEN__`.
+Multiplayer is experimental. Host-authoritative client-server model over UDP. Assumes LAN environment (low latency, no packet loss). Network code uses `#ifdef _WIN32` to select between Winsock2 (Windows) and POSIX sockets (other platforms including Emscripten). There are no `__EMSCRIPTEN__` guards in the network module — socket calls compile on all platforms.
 
 ## Key files
 

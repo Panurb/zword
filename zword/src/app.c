@@ -19,10 +19,8 @@
 #include "light.h"
 #include "grid.h"
 #include "particle.h"
-#ifndef __EMSCRIPTEN__
-    #include "network.h"
-    #include "netgame.h"
-#endif
+#include "network.h"
+#include "netgame.h"
 #ifdef __EMSCRIPTEN__
     #include <emscripten/html5.h>
 #endif
@@ -187,9 +185,7 @@ void init() {
     app.time_step = 1.0f / 60.0f;
     app.delta = 0.0f;
 
-    #ifndef __EMSCRIPTEN__
-        network_init();
-    #endif
+    network_init();
 }
 
 
@@ -197,9 +193,7 @@ void quit() {
     free(app.fps);
     destroy_game_window();
 
-#ifndef __EMSCRIPTEN__
     network_shutdown();
-#endif
 
     Mix_CloseAudio();
     TTF_Quit();
@@ -370,49 +364,46 @@ void update(float time_step) {
             intro.panel = 0;
             update_menu();
         case STATE_HOST_LOBBY:
-            #ifndef __EMSCRIPTEN__
-                // Host: accept incoming client connections while in lobby
-                network_host_accept_clients();
-                // Assign controllers for connected clients
-                for (int i = 0; i < NET_MAX_CLIENTS; i++) {
-                    if (network.clients[i].connected) {
-                        int slot = network.clients[i].player_slot;
-                        if (slot >= 0 && slot < 4) {
-                            app.player_controllers[slot] = CONTROLLER_MKB;  // placeholder, remote
-                        }
+            // Host: accept incoming client connections while in lobby
+            network_host_accept_clients();
+            // Assign controllers for connected clients
+            for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+                if (network.clients[i].connected) {
+                    int slot = network.clients[i].player_slot;
+                    if (slot >= 0 && slot < 4) {
+                        app.player_controllers[slot] = CONTROLLER_MKB;  // placeholder, remote
                     }
                 }
-            #endif
+            }
             update_menu();
             break;
         case STATE_CLIENT_LOBBY:
-            #ifndef __EMSCRIPTEN__
-                // Client: check for JOIN_ACK or START_GAME
-                struct sockaddr_in from;
-                int received;
-                while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
-                    if (received < (int)sizeof(PacketHeader)) continue;
-                    PacketHeader* hdr = (PacketHeader*)network.recv_buf;
-                    if (hdr->type == PACKET_JOIN_ACK && received >= (int)sizeof(JoinAckPacket)) {
-                        JoinAckPacket* ack = (JoinAckPacket*)network.recv_buf;
-                        network.local_player_slot = ack->player_slot;
-                        LOG_INFO("Joined as player %d", network.local_player_slot);
-                    } else if (hdr->type == PACKET_START_GAME && received >= (int)sizeof(StartGamePacket)) {
-                        StartGamePacket* start = (StartGamePacket*)network.recv_buf;
-                        strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
-                        game_data->game_mode = (GameMode)start->game_mode;
-                        // Set up controllers: only our slot is local, mark others as active
-                        for (int i = 0; i < 4; i++) {
-                            app.player_controllers[i] = CONTROLLER_NONE;
-                        }
-                        for (int i = 0; i < (int)start->num_players; i++) {
-                            app.player_controllers[i] = CONTROLLER_MKB;  // all active
-                        }
-                        network.game_started = true;
-                        game_state = STATE_CLIENT_START;
+            ;
+            // Client: check for JOIN_ACK or START_GAME
+            struct sockaddr_in from;
+            int received;
+            while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+                if (received < (int)sizeof(PacketHeader)) continue;
+                PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+                if (hdr->type == PACKET_JOIN_ACK && received >= (int)sizeof(JoinAckPacket)) {
+                    JoinAckPacket* ack = (JoinAckPacket*)network.recv_buf;
+                    network.local_player_slot = ack->player_slot;
+                    LOG_INFO("Joined as player %d", network.local_player_slot);
+                } else if (hdr->type == PACKET_START_GAME && received >= (int)sizeof(StartGamePacket)) {
+                    StartGamePacket* start = (StartGamePacket*)network.recv_buf;
+                    strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
+                    game_data->game_mode = (GameMode)start->game_mode;
+                    // Set up controllers: only our slot is local, mark others as active
+                    for (int i = 0; i < 4; i++) {
+                        app.player_controllers[i] = CONTROLLER_NONE;
                     }
+                    for (int i = 0; i < (int)start->num_players; i++) {
+                        app.player_controllers[i] = CONTROLLER_MKB;  // all active
+                    }
+                    network.game_started = true;
+                    game_state = STATE_CLIENT_START;
                 }
-            #endif
+            }
             update_menu();
             break;
         case STATE_START:
@@ -462,9 +453,7 @@ void update(float time_step) {
         case STATE_END:
             end_game();
             clear_all_sounds();
-            #ifndef __EMSCRIPTEN__
-                network.game_started = false;
-            #endif
+            network.game_started = false;
             game_state = STATE_MENU;
             break;
         case STATE_RESET:
@@ -477,7 +466,6 @@ void update(float time_step) {
             update_game(time_step);
             update_game_mode(time_step);
             break;
-#ifndef __EMSCRIPTEN__
         case STATE_HOST:
         {
             // Host: receive remote inputs FIRST so all controllers are fresh,
@@ -633,7 +621,6 @@ void update(float time_step) {
             network.tick++;
             break;
         }
-#endif
         case STATE_HOST_PAUSE:
         case STATE_CLIENT_PAUSE:
         case STATE_PAUSE:
