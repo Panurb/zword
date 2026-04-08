@@ -188,19 +188,13 @@ void init_game() {
         // In multiplayer, don't destroy remote players (they have CONTROLLER_NONE locally
         // but are controlled by remote clients)
         bool is_network_player = false;
-        if (network.mode != NET_MODE_NONE && i > 0 && i < 4) {
+        if (network.mode == NET_MODE_HOST && i > 0 && i < 4) {
             // On host: slots 1-3 may have connected clients
-            if (network.mode == NET_MODE_HOST) {
-                for (int c = 0; c < NET_MAX_CLIENTS; c++) {
-                    if (network.clients[c].connected && network.clients[c].player_slot == i) {
-                        is_network_player = true;
-                        break;
-                    }
+            for (int c = 0; c < NET_MAX_CLIENTS; c++) {
+                if (network.clients[c].connected && network.clients[c].player_slot == i) {
+                    is_network_player = true;
+                    break;
                 }
-            }
-            // On client: all players are kept alive (host manages them)
-            if (network.mode == NET_MODE_CLIENT) {
-                is_network_player = true;
             }
         }
         if (app.player_controllers[i] == CONTROLLER_NONE && !is_network_player) {
