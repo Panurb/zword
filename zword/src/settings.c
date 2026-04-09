@@ -32,7 +32,8 @@ Settings game_settings = {
         { DEVICE_KEYBOARD, SDL_SCANCODE_F },
         { DEVICE_KEYBOARD, SDL_SCANCODE_SPACE },
         { DEVICE_KEYBOARD, SDL_SCANCODE_LSHIFT }
-    }
+    },
+    .player_name = ""
 };
 
 
@@ -79,6 +80,8 @@ void load_settings() {
             game_settings.music = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "DEBUG") == 0) {
             game_settings.debug = strtol(line.value, NULL, 10);
+        } else if (strcmp(line.key, "PLAYER_NAME") == 0) {
+            strcpy(game_settings.player_name, line.value);
         } else {
             for (int i = 0; i < ACTIONS_SIZE; i++) {
                 if (strcmp(line.key, ACTIONS[i]) == 0) {

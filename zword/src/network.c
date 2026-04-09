@@ -4,6 +4,8 @@
 
 #include "network.h"
 
+#include "game.h"
+
 Network network;
 
 
@@ -129,10 +131,11 @@ bool network_client_connect(const char* host_ip, int port) {
     network.mode = NET_MODE_CLIENT;
 
     // Send JOIN packet
-    PacketHeader join;
-    join.type = PACKET_JOIN;
-    join.tick = 0;
-    join.size = sizeof(PacketHeader);
+    JoinPacket join;
+    join.header.type = PACKET_JOIN;
+    join.header.tick = 0;
+    join.header.size = sizeof(PacketHeader);
+    strcpy(join.player_name, game_data->player_name);
     network_send_to_host(&join, sizeof(join));
 
     LOG_INFO("Connecting to %s:%d", host_ip, port);
@@ -237,10 +240,12 @@ void network_host_accept_clients() {
             }
 
             if (slot >= 0) {
+                JoinPacket* join_pkt = (JoinPacket*)network.recv_buf;
                 network.clients[slot].connected = true;
                 network.clients[slot].addr = from_addr;
                 network.clients[slot].player_slot = slot + 1;  // Host is slot 0, clients are 1-3
                 network.clients[slot].last_recv_time = 0.0f;  // Will be set on first input packet
+                strcpy(network.clients[slot].player_name, join_pkt->player_name);
                 network.num_clients++;
 
                 JoinAckPacket ack;
@@ -250,7 +255,7 @@ void network_host_accept_clients() {
                 ack.player_slot = network.clients[slot].player_slot;
                 network_send_to(&from_addr, &ack, sizeof(ack));
 
-                LOG_INFO("Client connected as player %d", ack.player_slot);
+                LOG_INFO("Client connected as player %d, name %s", ack.player_slot, join_pkt->player_name);
             }
         }
     }

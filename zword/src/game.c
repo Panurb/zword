@@ -135,6 +135,7 @@ void create_game() {
     game_data->start_position = zeros();
 
     game_data->music = 0;
+    game_data->player_name[0] = '\0';
 }
 
 

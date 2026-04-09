@@ -95,6 +95,7 @@ typedef struct {
     bool testing;
     Vector2f start_position;
     int music;
+    String player_name;
 } GameData;
 
 

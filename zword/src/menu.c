@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
 #include <stdio.h>
 
 #include "menu.h"
@@ -29,6 +28,7 @@ static int window_keyboard_controls = -1;
 static int window_xbox_controls = -1;
 static int button_benchmark = -1;
 
+static Entity name_input_lan = NULL_ENTITY;
 static Entity window_lan = NULL_ENTITY;
 static Entity map_dropdown_lan = NULL_ENTITY;
 
@@ -46,6 +46,7 @@ void reset_ids() {
     window_xbox_controls = -1;
     button_benchmark = -1;
 
+    name_input_lan = NULL_ENTITY;
     window_lan = NULL_ENTITY;
     map_dropdown_lan = NULL_ENTITY;
 }
@@ -97,6 +98,7 @@ void change_state_create_lobby(Entity entity) {
 
 void change_state_join(Entity entity) {
     UNUSED(entity);
+    strcpy(game_data->player_name, WidgetComponent_get(name_input_lan)->string);
     game_state = STATE_JOIN;
     reset_ids();
 }
@@ -205,6 +207,11 @@ void toggle_lan(Entity entity) {
 
     Entity container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 2, 3);
     add_child(window_lan, container);
+
+    Entity name_label = create_label("Name", zeros());
+    name_input_lan = create_textbox(zeros(), 1);
+    strcpy(WidgetComponent_get(name_input_lan)->string, game_settings.player_name);
+    add_row_to_container(container, name_label, name_input_lan);
 
     Entity label = create_label("12345", zeros());
     Entity join_button = create_button("JOIN", zeros(), change_state_join);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 
 typedef enum {
     DEVICE_UNBOUND,
@@ -30,6 +32,7 @@ typedef struct {
     Quality particles;
     bool debug;
     Keybind keybinds[16];
+    String player_name;
 } Settings;
 
 typedef struct {

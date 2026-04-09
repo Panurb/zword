@@ -60,6 +60,8 @@ System update order (in `game.c:update_game()`): coordinates, lifetimes, health,
 - Project includes use `"quotes"`, SDL/system use `<angle brackets>`
 - Platform guards: only use `#ifdef` guards when a library is unavailable on a platform (e.g. Winsock2 vs POSIX sockets via `#ifdef _WIN32`). Do not use `__EMSCRIPTEN__` guards for networking code — POSIX sockets compile on Emscripten. `__EMSCRIPTEN__` guards are only for platform-specific APIs (IDBFS, canvas resize, `emscripten_set_main_loop`, etc.) and UI differences (hiding buttons that don't work on web). Do not guard code just to reduce web executable size. Format `#ifdef` blocks inline like normal `if` statements (not outdented to column 0).
 - Always use braces with `if` statements. Exceptions: short `continue` conditions in `for` loops, and functions with lots of short return paths.
+- No plain scopes — don't create blocks with braces unless preceded by `if`, `for`, `while`, `switch`, etc.
+- Always `typedef` the `struct` keyword away (e.g. `typedef struct { ... } Foo;`, not bare `struct Foo { ... };`)
 - Manual memory management (`malloc`/`free`), no tests or CI
 - Logging via macros: `LOG_DEBUG`, `LOG_INFO`, `LOG_WARNING`, `LOG_ERROR`
 

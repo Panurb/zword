@@ -48,6 +48,11 @@ typedef struct {
 
 typedef struct {
     PacketHeader header;
+    char player_name[32];
+} JoinPacket;
+
+typedef struct {
+    PacketHeader header;
     uint8_t player_slot;
 } JoinAckPacket;
 
@@ -65,6 +70,7 @@ typedef struct {
     struct sockaddr_in addr;
     int player_slot;  // 0-3
     float last_recv_time;  // SDL_GetTicks() / 1000.0f when last packet received
+    String player_name;
 } ClientInfo;
 
 typedef struct {
