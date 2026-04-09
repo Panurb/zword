@@ -61,5 +61,19 @@
 				"prefab":	"tiles/brick",
 				"scale_x":	13
 			}
+		}, {
+			"id":	8,
+			"Coordinate":	{
+				"x":	1,
+				"y":	-4,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	9,
+			"Coordinate":	{
+				"x":	-4,
+				"y":	-4,
+				"prefab":	"creatures/player"
+			}
 		}]
 }
