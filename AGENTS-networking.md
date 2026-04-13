@@ -9,7 +9,7 @@ Multiplayer is experimental. Host-authoritative client-server model over UDP. As
 | `network.c/h` | Low-level UDP sockets (Winsock2 on Windows), send/receive, client connection management, timeouts |
 | `netgame.c/h` | Game-level protocol: snapshot building/applying, input packing/unpacking, entity ID remapping, sound/particle event sync |
 | `serialize_binary.c/h` | Compact binary serialization of entities/components for snapshots |
-| `app.c` | Host loop (`STATE_HOST`, ~line 486), client loop (`STATE_CLIENT`, ~line 565) |
+| `app.c` | Host loop (`STATE_HOST`), client loop (`STATE_CLIENT`) |
 
 ## Game states
 
@@ -57,7 +57,7 @@ Sound events are discovered at snapshot-build time by scanning `SoundComponent.e
 
 ## Game loops
 
-### Host (`app.c`, `STATE_HOST`, ~line 486)
+### Host (`app.c`, `STATE_HOST`)
 
 Each tick at 60 Hz:
 1. Receive all queued input packets, apply to remote player controllers
@@ -66,7 +66,7 @@ Each tick at 60 Hz:
 4. Simulate (`update_game()`, `update_game_mode()`)
 5. Build binary snapshot (entities + sound events + particle events), broadcast to all clients
 
-### Client (`app.c`, `STATE_CLIENT`, ~line 565)
+### Client (`app.c`, `STATE_CLIENT`)
 
 Each tick:
 1. `update_controller()` for local player only (no state machine -- host is authoritative)
@@ -78,7 +78,7 @@ Each tick:
 
 ## Input handling
 
-Local players: `update_controller()` (`input.c:252-254`) computes `buttons_pressed` as a rising edge from `buttons_down`. The flag is `true` for exactly one tick, then cleared by the next call.
+Local players: `update_controller()` (`input.c`) computes `buttons_pressed` as a rising edge from `buttons_down`. The flag is `true` for exactly one tick, then cleared by the next call.
 
 Remote players on host: `update_controller()` is skipped. Flags are set by `netgame_unpack_input()` from network packets. Edge-triggered flags (`buttons_pressed`, `buttons_released`) are OR'd across packets within a tick to prevent overwrite, then explicitly cleared after the state machine runs (`input.c`, end of `input_players()`).
 

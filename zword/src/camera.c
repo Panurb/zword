@@ -9,6 +9,7 @@
 #include "app.h"
 #include "camera.h"
 #include "component.h"
+#include "network.h"
 #include "util.h"
 #include "image.h"
 #include "game.h"
@@ -553,14 +554,18 @@ void update_camera(int camera, float time_step, bool follow_players) {
 
     if (follow_players) {
         int n = 0;
+        int slot_idx = 0;
         ListNode* node;
         FOREACH (node, game_data->components->player.order) {
             int i = node->value;
             PlayerComponent* player = PlayerComponent_get(i);
             if (player->state != PLAYER_DEAD) {
-                n += 1;
-                pos = sum(pos, get_position(i));
+                if (network.mode == NET_MODE_NONE || slot_idx == network.local_player_slot) {
+                    n += 1;
+                    pos = sum(pos, get_position(i));
+                }
             }
+            slot_idx++;
         }
         if (n != 0) {
             pos = mult(1.0 / n, pos);
