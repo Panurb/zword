@@ -66,6 +66,9 @@ static float wave_delay = 5.0f;
 static List* spawners = NULL;
 static float spawn_delay = 2.0f;
 
+// Deathmatch
+static Vector2f player_spawns[8];
+static int player_spawns_count = 0;
 
 
 void change_state_game_over() {
@@ -183,9 +186,14 @@ void init_tutorial() {
 
 
 void init_game() {
+    player_spawns_count = 0;
+
     int i = 0;
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
+        player_spawns[i] = get_position(node->value);
+        player_spawns_count++;
+
         // In multiplayer, don't destroy remote players (they have CONTROLLER_NONE locally
         // but are controlled by remote clients)
         bool is_network_player = false;
@@ -230,7 +238,7 @@ void init_game() {
 
 
 void start_game(Filename map_name, bool load_save) {
-    LOG_INFO("Starting game (%s)\n", map_name);
+    LOG_INFO("Starting game (%s)", map_name);
 
     ColliderGrid_clear(game_data->grid);
     ComponentData_clear();
@@ -422,6 +430,46 @@ void update_tutorial(float time_step) {
 }
 
 
+float get_nearest_player_distance(Vector2f position) {
+    float min_dist = INFINITY;
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        if (player->state != PLAYER_DEAD) {
+            Vector2f player_pos = get_position(node->value);
+            float d = dist(position, player_pos);
+            if (d < min_dist) {
+                min_dist = d;
+            }
+        }
+    }
+    return min_dist;
+}
+
+
+void update_deathmatch(float time_step) {
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+
+        if (player->state == PLAYER_DEAD && player->respawn_timer == 0.0f) {
+            float max_dist = 0.0f;
+            Vector2f spawn_pos = zeros();
+
+            for (int i = 0; i < player_spawns_count; i++) {
+                float d = get_nearest_player_distance(player_spawns[i]);
+                if (d > max_dist) {
+                    max_dist = d;
+                    spawn_pos = player_spawns[i];
+                }
+            }
+
+            respawn_player(node->value, spawn_pos);
+        }
+    }
+}
+
+
 void update_game_mode(float time_step) {
     switch (game_data->game_mode) {
         case MODE_SURVIVAL:
@@ -432,6 +480,9 @@ void update_game_mode(float time_step) {
             break;
         case MODE_TUTORIAL:
             update_tutorial(time_step);
+            break;
+        case MODE_DEATHMATCH:
+            update_deathmatch(time_step);
             break;
         default:
             break;

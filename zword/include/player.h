@@ -1,7 +1,5 @@
 #pragma once
 
-#include "grid.h"
-#include "camera.h"
 #include "component.h"
 
 
@@ -16,3 +14,5 @@ void update_players(float time_step);
 void player_die(int entity);
 
 void add_money(int entity, int amount);
+
+void respawn_player(Entity entity, Vector2f position);

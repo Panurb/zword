@@ -330,6 +330,9 @@ void update_players(float time_step) {
                         // ColliderComponent_remove(i);
                     }
                 }
+                if (player->respawn_timer > 0.0f) {
+                    player->respawn_timer = fmaxf(player->respawn_timer - time_step, 0.0f);
+                }
 
                 break;
         }
@@ -364,6 +367,10 @@ void player_die(int entity) {
 
     player->state = PLAYER_DEAD;
     WaypointComponent_remove(entity);
+
+    if (game_data->game_mode == MODE_DEATHMATCH) {
+        player->respawn_timer = 10.0f;
+    }
 }
 
 
@@ -374,4 +381,32 @@ void add_money(int entity, int amount) {
     player->money += amount;
     player->money_increment = amount;
     player->money_timer = 1.0f;
+}
+
+
+void respawn_player(Entity entity, Vector2f position) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    clear_grid(entity);
+    coord->position = position;
+    update_grid(entity);
+
+    PlayerComponent* player = PlayerComponent_get(entity);
+    player->state = PLAYER_ON_FOOT;
+    player->respawn_timer = -1.0f;
+
+    HealthComponent* health = HealthComponent_get(entity);
+    health->health = health->max_health;
+
+    ColliderComponent* col = ColliderComponent_get(entity);
+    col->group = GROUP_PLAYERS;
+
+    change_texture(entity, "player", 1.0f, 1.0f);
+    change_layer(entity, LAYER_PLAYERS);
+
+     for (int j = 0; j < player->inventory_size; j++) {
+        if (player->inventory[j] != -1) {
+            CoordinateComponent* item_coord = CoordinateComponent_get(player->inventory[j]);
+            item_coord->parent = entity;
+        }
+    }
 }

@@ -83,6 +83,38 @@ static bool create_udp_socket() {
 }
 
 
+void get_server_ip(char ip_str[INET_ADDRSTRLEN]) {
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) != 0) {
+        perror("gethostname");
+        return;
+    }
+
+    struct addrinfo hints, *info, *p;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;  // IPv4
+    hints.ai_socktype = SOCK_STREAM;
+
+    if (getaddrinfo(hostname, NULL, &hints, &info) != 0) {
+        perror("getaddrinfo");
+        return;
+    }
+
+    for (p = info; p != NULL; p = p->ai_next) {
+        struct sockaddr_in *addr = (struct sockaddr_in *)p->ai_addr;
+
+        if (addr->sin_addr.s_addr == htonl(INADDR_LOOPBACK)) {
+            continue;  // Skip loopback address
+        }
+
+        inet_ntop(AF_INET, &addr->sin_addr, ip_str, INET_ADDRSTRLEN);
+        break;
+    }
+
+    freeaddrinfo(info);
+}
+
+
 bool network_host_start(int port) {
     if (!create_udp_socket()) return false;
 
@@ -101,7 +133,10 @@ bool network_host_start(int port) {
     network.mode = NET_MODE_HOST;
     network.local_player_slot = 0;  // Host is always player 0
 
-    LOG_INFO("Hosting on port %d", port);
+    char host_ip[INET_ADDRSTRLEN];
+    get_server_ip(host_ip);
+    LOG_INFO("Hosting on %s:%d", host_ip, port);
+
     return true;
 }
 

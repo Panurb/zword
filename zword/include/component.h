@@ -194,6 +194,7 @@ typedef struct {
     bool won;
     int keys_size;
     int keys[3];
+    float respawn_timer;
 } PlayerComponent;
 
 typedef struct {
