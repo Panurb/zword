@@ -283,6 +283,7 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
 
         // Check if entity exists locally
         CoordinateComponent* coord = CoordinateComponent_get(entity);
+        bool is_new = !coord;
         if (!coord) {
             // Entity doesn't exist — create it
             int created = create_entity();
@@ -313,7 +314,7 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
         }
 
         // Deserialize all component data (updates in place if exists, creates if not)
-        int consumed = binary_deserialize_entity(data, remaining, entity);
+        int consumed = binary_deserialize_entity(data, remaining, entity, !is_new);
         if (consumed == 0) {
             LOG_WARNING("Failed to deserialize entity snapshot for host_id=%d", host_id);
             // Try to skip

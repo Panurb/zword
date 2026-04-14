@@ -120,7 +120,8 @@ void change_state_client_game(int entity) {
 
 void change_state_host_start(int entity) {
     UNUSED(entity);
-    strcpy(game_data->map_name, WidgetComponent_get(map_dropdown_lan)->string);
+    WidgetComponent* widget = WidgetComponent_get(map_dropdown_lan);
+    strcpy(game_data->map_name, widget->strings[widget->value]);
     game_state = STATE_HOST_START;
     reset_ids();
 }
@@ -618,7 +619,8 @@ void create_lobby_menu() {
 
 void create_host_lobby_menu() {
     static ButtonText maps[] = {
-        "mp_test"
+        "mp_test",
+        "Campaign"
     };
     map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
     create_button("Start Game", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_host_start);

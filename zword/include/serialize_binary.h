@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 
 // Binary component flags (which optional components an entity has).
@@ -33,8 +34,10 @@ int binary_serialize_entity(uint8_t* buf, int buf_size, int entity);
 // Uses "get-or-add" pattern: for each component, checks if it already exists
 // (via *_get()) and updates in place, or creates it (via *_add()) if missing.
 // The entity must already exist (have a CoordinateComponent).
+// When smooth is true, position and angle are blended toward the snapshot
+// values instead of hard-snapped (used for client-side network smoothing).
 // Returns number of bytes consumed, or 0 on error.
-int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity);
+int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool smooth);
 
 // Skip past binary entity data without creating anything.
 // Parses the data to determine its size.

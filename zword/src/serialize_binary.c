@@ -550,7 +550,7 @@ int binary_serialize_entity(uint8_t* buf, int buf_size, int entity) {
 // Deserialize (get-or-add pattern: update in place if exists, create if not)
 // ============================================================
 
-int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity) {
+int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool smooth) {
     const uint8_t* ptr = buf;
     const uint8_t* end = buf + buf_size;
 
@@ -569,9 +569,16 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity) {
 
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord) {
-        coord->position.x = pos_x;
-        coord->position.y = pos_y;
-        coord->angle = angle;
+        if (smooth) {
+            float t = 0.5f;
+            coord->position.x = lerp(coord->position.x, pos_x, t);
+            coord->position.y = lerp(coord->position.y, pos_y, t);
+            coord->angle = lerp_angle(coord->angle, angle, t);
+        } else {
+            coord->position.x = pos_x;
+            coord->position.y = pos_y;
+            coord->angle = angle;
+        }
         coord->parent = (int)parent;  // raw host ID; remapped by netgame.c post-pass
         coord->scale.x = scale_x;
         coord->scale.y = scale_y;
