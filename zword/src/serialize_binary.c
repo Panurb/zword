@@ -570,7 +570,7 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     if (coord) {
         if (smooth) {
-            float t = 0.5f;
+            float t = 0.3f;
             coord->position.x = lerp(coord->position.x, pos_x, t);
             coord->position.y = lerp(coord->position.y, pos_y, t);
             coord->angle = lerp_angle(coord->angle, angle, t);

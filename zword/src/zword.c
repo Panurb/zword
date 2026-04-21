@@ -21,7 +21,6 @@
 
 
 static float elapsed_time = 0.0f;
-static float time_since_last_update = 0.0f;
 
 
 float get_delta_time() {
@@ -38,7 +37,6 @@ float get_delta_time() {
 
 void main_loop() {
     float delta_time = get_delta_time();
-    time_since_last_update += delta_time;
 
     input();
 
@@ -48,34 +46,28 @@ void main_loop() {
     }
 
     if (should_update) {
+        elapsed_time += delta_time;
+
         // Client doesn't simulate physics — it just applies snapshots.
         // Running the accumulator 2+ times per frame destroys interpolation state
         // (second tick has no new snapshot, so previous == current == no smoothing).
         // Cap to 1 update per frame and clamp accumulated time.
         if (network.mode == NET_MODE_CLIENT) {
-            if (elapsed_time > app.time_step) {
+            elapsed_time = fminf(elapsed_time, 2.0f * app.time_step);
+            if (elapsed_time >= app.time_step) {
                 elapsed_time -= app.time_step;
-                elapsed_time = fminf(elapsed_time, app.time_step);
-                time_since_last_update = 0.0f;
                 update(app.time_step);
             }
-            elapsed_time += delta_time;
         } else {
-            while (elapsed_time > app.time_step) {
+            while (elapsed_time >= app.time_step) {
                 elapsed_time -= app.time_step;
-                time_since_last_update = 0.0f;
                 update(app.time_step);
             }
-
-            elapsed_time += delta_time;
         }
         FPSCounter_update(app.fps, delta_time);
     }
-    
-    // 0 means only interpolate, 1 means only extrapolate
-    float extrapolation_factor = 0.5f;
 
-    app.delta = fminf(time_since_last_update / app.time_step, 1.0f) + extrapolation_factor;
+    app.delta = fminf(elapsed_time / app.time_step, 1.0f);
 
     draw();
     play_audio();
