@@ -395,6 +395,7 @@ void respawn_player(Entity entity, Vector2f position) {
     player->respawn_timer = -1.0f;
 
     HealthComponent* health = HealthComponent_get(entity);
+    health->dead = false;
     health->health = health->max_health;
 
     ColliderComponent* col = ColliderComponent_get(entity);

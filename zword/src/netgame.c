@@ -31,6 +31,7 @@ void net_clear_id_map(void) {
 
 // Check if an entity has dynamic components (not counting parent chain).
 static bool has_dynamic_components(int entity) {
+    if (CoordinateComponent_get(entity)->lifetime > 0.0f) return true;
     if (PhysicsComponent_get(entity)) return true;
     if (HealthComponent_get(entity)) return true;
     if (PlayerComponent_get(entity)) return true;
