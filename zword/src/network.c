@@ -27,18 +27,20 @@ bool network_init() {
         network.clients[i].connected = false;
         network.clients[i].player_slot = -1;
         network.clients[i].last_recv_time = 0.0f;
+        network.clients[i].ip[0] = '\0';
+        network.clients[i].player_name[0] = '\0';
     }
 
-#ifdef _WIN32
-    if (!winsock_initialized) {
-        WSADATA wsa_data;
-        if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
-            LOG_ERROR("WSAStartup failed: %d", WSAGetLastError());
-            return false;
+    #ifdef _WIN32
+        if (!winsock_initialized) {
+            WSADATA wsa_data;
+            if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
+                LOG_ERROR("WSAStartup failed: %d", WSAGetLastError());
+                return false;
+            }
+            winsock_initialized = true;
         }
-        winsock_initialized = true;
-    }
-#endif
+    #endif
 
     return true;
 }
@@ -46,20 +48,20 @@ bool network_init() {
 
 void network_shutdown() {
     if (network.sock != NET_INVALID_SOCKET) {
-#ifdef _WIN32
-        closesocket(network.sock);
-#else
-        close(network.sock);
-#endif
+        #ifdef _WIN32
+            closesocket(network.sock);
+        #else
+            close(network.sock);
+        #endif
         network.sock = NET_INVALID_SOCKET;
     }
 
-#ifdef _WIN32
-    if (winsock_initialized) {
-        WSACleanup();
-        winsock_initialized = false;
-    }
-#endif
+    #ifdef _WIN32
+        if (winsock_initialized) {
+            WSACleanup();
+            winsock_initialized = false;
+        }
+    #endif
 
     network.mode = NET_MODE_NONE;
 }
@@ -73,13 +75,13 @@ static bool create_udp_socket() {
     }
 
     // Set non-blocking
-#ifdef _WIN32
-    u_long nonblocking = 1;
-    ioctlsocket(network.sock, FIONBIO, &nonblocking);
-#else
-    int flags = fcntl(network.sock, F_GETFL, 0);
-    fcntl(network.sock, F_SETFL, flags | O_NONBLOCK);
-#endif
+    #ifdef _WIN32
+        u_long nonblocking = 1;
+        ioctlsocket(network.sock, FIONBIO, &nonblocking);
+    #else
+        int flags = fcntl(network.sock, F_GETFL, 0);
+        fcntl(network.sock, F_SETFL, flags | O_NONBLOCK);
+    #endif
 
     return true;
 }
@@ -282,6 +284,7 @@ void network_host_accept_clients() {
                 network.clients[slot].player_slot = slot + 1;  // Host is slot 0, clients are 1-3
                 network.clients[slot].last_recv_time = 0.0f;  // Will be set on first input packet
                 strcpy(network.clients[slot].player_name, join_pkt->player_name);
+                strcpy(network.clients[slot].ip, inet_ntoa(from_addr.sin_addr));
                 network.num_clients++;
 
                 JoinAckPacket ack;

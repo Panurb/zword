@@ -68,6 +68,7 @@ typedef struct {
 typedef struct {
     bool connected;
     struct sockaddr_in addr;
+    String ip;
     int player_slot;  // 0-3
     float last_recv_time;  // SDL_GetTicks() / 1000.0f when last packet received
     String player_name;

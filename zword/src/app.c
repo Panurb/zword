@@ -692,7 +692,7 @@ void draw() {
             for (int i = 0; i < NET_MAX_CLIENTS; i++) {
                 if (network.clients[i].connected) {
                     String buffer;
-                    snprintf(buffer, STRING_SIZE, "Player %d: %s", network.clients[i].player_slot + 1, network.clients[i].player_name);
+                    snprintf(buffer, STRING_SIZE, "%s - %s", network.clients[i].player_name,  network.clients[i].ip);
                     draw_text(game_data->menu_camera, vec(0.0f, -5.0f + i * 2.0f), buffer, 20, COLOR_WHITE);
                 }
             }

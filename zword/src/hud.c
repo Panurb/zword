@@ -281,7 +281,6 @@ void draw_hud(int camera) {
             }
         }
 
-        char buffer[128];
         switch (player->state) {
             case PLAYER_ON_FOOT:
                 break;
