@@ -499,6 +499,7 @@ typedef struct {
     bool enabled;
     WidgetType type;
     bool selected;
+    bool editable;
     ButtonText string;
     OnClick on_click;
     OnChange on_change;

@@ -11,6 +11,7 @@
 #include "input.h"
 #include "app.h"
 #include "benchmark.h"
+#include "network.h"
 #include "util.h"
 
 
@@ -29,6 +30,7 @@ static int window_xbox_controls = -1;
 static int button_benchmark = -1;
 
 static Entity name_input_lan = NULL_ENTITY;
+static Entity ip_input_lan = NULL_ENTITY;
 static Entity window_lan = NULL_ENTITY;
 static Entity map_dropdown_lan = NULL_ENTITY;
 
@@ -47,6 +49,7 @@ void reset_ids() {
     button_benchmark = -1;
 
     name_input_lan = NULL_ENTITY;
+    ip_input_lan = NULL_ENTITY;
     window_lan = NULL_ENTITY;
     map_dropdown_lan = NULL_ENTITY;
 }
@@ -99,6 +102,7 @@ void change_state_create_lobby(Entity entity) {
 void change_state_join(Entity entity) {
     UNUSED(entity);
     strcpy(game_data->player_name, WidgetComponent_get(name_input_lan)->string);
+    strcpy(network.host_ip, WidgetComponent_get(ip_input_lan)->string);
     game_state = STATE_JOIN;
     reset_ids();
 }
@@ -214,9 +218,10 @@ void toggle_lan(Entity entity) {
     strcpy(WidgetComponent_get(name_input_lan)->string, game_settings.player_name);
     add_row_to_container(container, name_label, name_input_lan);
 
-    Entity label = create_label("12345", zeros());
+    ip_input_lan = create_textbox(zeros(), 1);
+    strcpy(WidgetComponent_get(ip_input_lan)->string, "127.0.0.1");
     Entity join_button = create_button("JOIN", zeros(), change_state_join);
-    add_row_to_container(container, label, join_button);
+    add_row_to_container(container, ip_input_lan, join_button);
 
     add_button_to_container(container, "HOST", change_state_create_lobby);
 }
@@ -613,7 +618,11 @@ void create_win_menu() {
 
 
 void create_lobby_menu() {
-    create_button("Leave", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+    int height = 1;
+    int container = create_container(vec(-18.0f, -2.0f), 1, height);
+    WidgetComponent_get(container)->enabled = false;
+
+    add_button_to_container(container, "Leave", change_state_end);
 }
 
 
@@ -622,7 +631,13 @@ void create_host_lobby_menu() {
         "mp_test",
         "Campaign"
     };
+
+    int height = 3;
+    int container = create_container(vec(-18.0f, -2.0f), 1, height);
+    WidgetComponent_get(container)->enabled = false;
+
     map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
-    create_button("Start Game", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_host_start);
-    create_button("Close lobby", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+    add_widget_to_container(container, map_dropdown_lan);
+    add_button_to_container(container, "Start Game", change_state_host_start);
+    add_button_to_container(container, "Close lobby", change_state_end);
 }

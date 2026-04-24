@@ -505,6 +505,9 @@ void draw_widgets(int camera) {
             break;
         case WIDGET_TEXTBOX:
             draw_rectangle(camera, pos, w, h, 0.0f, COLOR_SHADOW);
+            if (widget->editable) {
+                draw_rectangle(camera, pos, w - MARGIN, h - MARGIN, 0.0f, COLOR_SELECTED);
+            }
             draw_text(camera, pos, widget->string, 20, COLOR_WHITE);
             break;
         case WIDGET_CHECKBOX:
@@ -518,6 +521,16 @@ void draw_widgets(int camera) {
             draw_text(camera, pos, widget->strings[widget->value], 20, COLOR_TEXT);
         } else {
             draw_text(camera, pos, widget->string, 20, COLOR_TEXT);
+        }
+    }
+}
+
+
+void unedit_textboxes() {
+    for (Entity i = 0; i < game_data->components->entities; i++) {
+        WidgetComponent* widget = WidgetComponent_get(i);
+        if (widget && widget->type == WIDGET_TEXTBOX) {
+            widget->editable = false;
         }
     }
 }
@@ -540,12 +553,12 @@ bool input_widgets(int camera, SDL_Event event) {
     }
 
     bool input_detected = false;
-    int top_textbox = -1;
+    int editable_textbox = -1;
     for (int i = 0; i < game_data->components->entities; i++) {
         WidgetComponent* widget = WidgetComponent_get(i);
         if (!widget) continue;
-        if (widget->type == WIDGET_TEXTBOX) {
-            top_textbox = i;
+        if (widget->type == WIDGET_TEXTBOX && widget->editable) {
+            editable_textbox = i;
         }
         if (!widget->selected) continue;
 
@@ -574,6 +587,9 @@ bool input_widgets(int camera, SDL_Event event) {
                 grab_offset = diff(coord->position, mouse_position);
             } else if (widget->type == WIDGET_SLIDER) {
                 set_slider(i, mouse_position);
+            } else if (widget->type == WIDGET_TEXTBOX) {
+                unedit_textboxes();
+                widget->editable = true;
             }
             int root = get_root(i);
             bring_to_top(root);
@@ -601,8 +617,8 @@ bool input_widgets(int camera, SDL_Event event) {
         }
     }
 
-    if (top_textbox != -1) {
-        WidgetComponent* widget = WidgetComponent_get(top_textbox);
+    if (editable_textbox != -1) {
+        WidgetComponent* widget = WidgetComponent_get(editable_textbox);
         if (event.type == SDL_TEXTINPUT) {
             char* character = (char*) &event.text.text;
             int len = strlen(widget->string);
@@ -623,7 +639,7 @@ bool input_widgets(int camera, SDL_Event event) {
         }
 
         if (widget->on_change && input_detected) {
-            widget->on_change(top_textbox, 0);
+            widget->on_change(editable_textbox, 0);
         }
     }
 

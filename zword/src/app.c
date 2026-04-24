@@ -217,8 +217,7 @@ void input_game(SDL_Event sdl_event) {
             }
             break;
         case STATE_JOIN:
-            const char* ip = "127.0.0.1";
-            if (!network_client_connect(ip, NET_DEFAULT_PORT)) {
+            if (!network_client_connect(network.host_ip, NET_DEFAULT_PORT)) {
                 LOG_ERROR("Failed to connect to host");
                 game_state = STATE_MENU;
             } else {
@@ -689,6 +688,7 @@ void draw() {
             break;
         case STATE_HOST_LOBBY:
             draw_menu();
+            draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.own_ip, 20, COLOR_WHITE);
             for (int i = 0; i < NET_MAX_CLIENTS; i++) {
                 if (network.clients[i].connected) {
                     String buffer;

@@ -20,6 +20,8 @@ bool network_init() {
     network.num_clients = 0;
     network.tick = 0;
     network.game_started = false;
+    network.own_ip[0] = '\0';
+    network.host_ip[0] = '\0';
 
     for (int i = 0; i < NET_MAX_CLIENTS; i++) {
         network.clients[i].connected = false;
@@ -83,7 +85,7 @@ static bool create_udp_socket() {
 }
 
 
-void get_server_ip(char ip_str[INET_ADDRSTRLEN]) {
+void get_own_ip(char ip_str[INET_ADDRSTRLEN]) {
     char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) != 0) {
         perror("gethostname");
@@ -133,9 +135,8 @@ bool network_host_start(int port) {
     network.mode = NET_MODE_HOST;
     network.local_player_slot = 0;  // Host is always player 0
 
-    char host_ip[INET_ADDRSTRLEN];
-    get_server_ip(host_ip);
-    LOG_INFO("Hosting on %s:%d", host_ip, port);
+    get_own_ip(network.own_ip);
+    LOG_INFO("Hosting on %s:%d", network.own_ip, port);
 
     return true;
 }

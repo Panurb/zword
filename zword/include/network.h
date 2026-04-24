@@ -84,6 +84,8 @@ typedef struct {
     uint8_t recv_buf[NET_MAX_PACKET_SIZE];
     uint8_t send_buf[NET_MAX_PACKET_SIZE];
     bool game_started;
+    char own_ip[INET_ADDRSTRLEN];
+    char host_ip[INET_ADDRSTRLEN];
 } Network;
 
 extern Network network;
