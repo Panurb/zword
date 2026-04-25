@@ -554,18 +554,24 @@ void update_camera(int camera, float time_step, bool follow_players) {
 
     if (follow_players) {
         int n = 0;
-        int slot_idx = 0;
         ListNode* node;
         FOREACH (node, game_data->components->player.order) {
             int i = node->value;
             PlayerComponent* player = PlayerComponent_get(i);
-            if (player->state != PLAYER_DEAD) {
-                if (network.mode == NET_MODE_NONE || slot_idx == network.local_player_slot) {
-                    n += 1;
-                    pos = sum(pos, get_position(i));
-                }
+            if (!player) {
+                continue;
             }
-            slot_idx++;
+
+            if (player->state == PLAYER_DEAD) {
+                continue;
+            }
+
+            if (network.mode != NET_MODE_NONE && !player->is_local) {
+                continue;
+            }
+
+            n += 1;
+            pos = sum(pos, get_position(i));
         }
         if (n != 0) {
             pos = mult(1.0 / n, pos);

@@ -176,6 +176,7 @@ typedef struct {
 
 typedef struct {
     int target;
+    bool is_local;
     float acceleration;
     int vehicle;
     int item;

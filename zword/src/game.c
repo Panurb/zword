@@ -194,6 +194,9 @@ void init_game() {
         player_spawns[i] = get_position(node->value);
         player_spawns_count++;
 
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        player->is_local = true;
+
         // In multiplayer, don't destroy remote players (they have CONTROLLER_NONE locally
         // but are controlled by remote clients)
         bool is_network_player = false;
@@ -209,8 +212,12 @@ void init_game() {
         if (app.player_controllers[i] == CONTROLLER_NONE && !is_network_player) {
             destroy_entity_recursive(node->value);
         } else {
-            PlayerComponent* player = PlayerComponent_get(node->value);
             player->controller.joystick = app.player_controllers[i];
+            if (network.mode == NET_MODE_HOST) {
+                player->is_local = !is_network_player;
+            } else if (network.mode == NET_MODE_CLIENT) {
+                player->is_local = (i == network.local_player_slot);
+            }
             LOG_DEBUG("Player %d: %d\n", i, player->controller.joystick);
         }
 

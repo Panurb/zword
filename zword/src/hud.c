@@ -8,6 +8,7 @@
 #include "game.h"
 #include "input.h"
 #include "app.h"
+#include "network.h"
 
 
 void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha) {
@@ -121,7 +122,7 @@ void draw_ammo_menu(int camera, int entity) {
 
     for (int i = 0; i < player->ammo_size - 1; i++) {
         float offset = (i == slot) ? 0.2f : 0.0f;
-        float alpha = (player->ammo[i] == 0) ? 0.25f : 0.5f;
+        float alpha = (player->ammo[i + 1] == NULL_ENTITY) ? 0.25f : 0.5f;
         draw_ammo_slot(camera, entity, i, offset, alpha);
     }
 }
@@ -235,7 +236,12 @@ void draw_hud(int camera) {
         }
 
         PlayerComponent* player = PlayerComponent_get(i);
+
         if (!player) continue;
+
+        if (network.mode != NET_MODE_NONE && !player->is_local) {
+            continue;
+        }
 
         int slot = get_slot(i, player->inventory_size);
         int atch = get_attachment(i);

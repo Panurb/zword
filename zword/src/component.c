@@ -236,6 +236,7 @@ void ColliderComponent_remove(int entity) {
 PlayerComponent* PlayerComponent_add(int entity) {
     PlayerComponent* player = malloc(sizeof(PlayerComponent));
     player->target = -1;
+    player->is_local = true;
     player->acceleration = 20.0;
     player->vehicle = -1;
     player->item = 0;
@@ -272,7 +273,7 @@ PlayerComponent* PlayerComponent_add(int entity) {
     }
 
     game_data->components->player.array[entity] = player;
-    List_add(game_data->components->player.order, entity);
+    List_append(game_data->components->player.order, entity);
 
     return player;
 }

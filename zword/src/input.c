@@ -308,12 +308,13 @@ void update_controller(int camera, int i) {
 
 
 void input_players(int camera) {
-    int slot_idx = 0;
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         int i = node->value;
         PlayerComponent* player = PlayerComponent_get(i);
-        if (!player) { slot_idx++; continue; }
+        if (!player) {
+            continue;
+        }
 
         bool skip_controller_update = false;
 
@@ -321,17 +322,13 @@ void input_players(int camera) {
         switch (game_state) {
             case STATE_HOST:
                 // Host: skip controller update for remote players (their input comes from network)
-                for (int c = 0; c < NET_MAX_CLIENTS; c++) {
-                    if (network.clients[c].connected && network.clients[c].player_slot == slot_idx) {
-                        skip_controller_update = true;
-                        break;
-                    }
+                if (!player->is_local) {
+                    skip_controller_update = true;
                 }
                 break;
             case STATE_CLIENT:
                 // Client: only update our local player's controller, skip remote players entirely
-                if (slot_idx != network.local_player_slot) {
-                    slot_idx++;
+                if (!player->is_local) {
                     continue;
                 }
                 break;
@@ -476,6 +473,5 @@ void input_players(int camera) {
             }
         }
 
-        slot_idx++;
     }
 }
