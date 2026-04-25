@@ -69,6 +69,7 @@ static float spawn_delay = 2.0f;
 // Deathmatch
 static Vector2f player_spawns[8];
 static int player_spawns_count = 0;
+static int max_kills = 1;
 
 
 void change_state_game_over() {
@@ -458,6 +459,11 @@ void update_deathmatch(float time_step) {
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
+
+        if (player->kills >= max_kills) {
+            change_state_win();
+            return;
+        }
 
         if (player->state == PLAYER_DEAD && player->respawn_timer == 0.0f) {
             float max_dist = 0.0f;

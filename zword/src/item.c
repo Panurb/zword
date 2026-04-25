@@ -278,6 +278,7 @@ void draw_player_targets() {
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
+        if (!player->is_local) continue;
         if (player->target == -1) continue;
         ItemComponent* item = ItemComponent_get(player->target);
         ImageComponent* image = ImageComponent_get(player->target);

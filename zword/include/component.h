@@ -196,6 +196,8 @@ typedef struct {
     int keys_size;
     int keys[3];
     float respawn_timer;
+    int kills;
+    int deaths;
 } PlayerComponent;
 
 typedef struct {

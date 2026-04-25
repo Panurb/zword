@@ -9,7 +9,6 @@
 #include "app.h"
 #include "camera.h"
 #include "component.h"
-#include "network.h"
 #include "util.h"
 #include "image.h"
 #include "game.h"
@@ -566,7 +565,7 @@ void update_camera(int camera, float time_step, bool follow_players) {
                 continue;
             }
 
-            if (network.mode != NET_MODE_NONE && !player->is_local) {
+            if (!player->is_local) {
                 continue;
             }
 

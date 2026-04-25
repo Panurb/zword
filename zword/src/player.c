@@ -366,6 +366,7 @@ void player_die(int entity) {
     }
 
     player->state = PLAYER_DEAD;
+    player->deaths++;
     WaypointComponent_remove(entity);
 
     if (game_data->game_mode == MODE_DEATHMATCH) {

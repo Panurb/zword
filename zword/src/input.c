@@ -316,25 +316,7 @@ void input_players(int camera) {
             continue;
         }
 
-        bool skip_controller_update = false;
-
-        // In multiplayer, only update controller for local players
-        switch (game_state) {
-            case STATE_HOST:
-                // Host: skip controller update for remote players (their input comes from network)
-                if (!player->is_local) {
-                    skip_controller_update = true;
-                }
-                break;
-            case STATE_CLIENT:
-                // Client: only update our local player's controller, skip remote players entirely
-                if (!player->is_local) {
-                    continue;
-                }
-                break;
-            default:
-                break;
-        }
+        bool skip_controller_update = !player->is_local;
 
         if (!skip_controller_update) {
             update_controller(camera, i);

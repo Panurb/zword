@@ -8,7 +8,6 @@
 #include "game.h"
 #include "input.h"
 #include "app.h"
-#include "network.h"
 
 
 void draw_menu_slot(int camera, int entity, int slot, float offset, float alpha) {
@@ -239,7 +238,7 @@ void draw_hud(int camera) {
 
         if (!player) continue;
 
-        if (network.mode != NET_MODE_NONE && !player->is_local) {
+        if (!player->is_local) {
             continue;
         }
 

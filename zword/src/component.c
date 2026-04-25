@@ -253,6 +253,8 @@ PlayerComponent* PlayerComponent_add(int entity) {
     player->money_timer = 0.0f;
     player->won = false;
     player->respawn_timer = -1.0f;
+    player->kills = 0;
+    player->deaths = 0;
     player->keys_size = 3;
     fill(player->keys, NULL_ENTITY, player->keys_size);
 

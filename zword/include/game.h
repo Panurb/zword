@@ -42,6 +42,8 @@ typedef enum {
     STATE_CLIENT,
     STATE_HOST_PAUSE,
     STATE_CLIENT_PAUSE,
+    STATE_HOST_GAME_OVER,
+    STATE_CLIENT_GAME_OVER,
 } GameState;
 
 
