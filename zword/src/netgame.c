@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "app.h"
 #include "netgame.h"
 #include "network.h"
 #include "component.h"
 #include "game.h"
 #include "grid.h"
 #include "image.h"
+#include "input.h"
 #include "serialize_binary.h"
 #include "sound.h"
 #include "particle.h"
@@ -504,6 +506,30 @@ void netgame_pack_input(InputPacket* pkt, int player_entity, uint8_t player_slot
     pkt->buttons_down = down;
     pkt->buttons_pressed = pressed;
     pkt->buttons_released = released;
+}
+
+
+bool netgame_client_send_input(bool neutral) {
+    int slot_idx = 0;
+    ListNode* pnode;
+    FOREACH(pnode, game_data->components->player.order) {
+        if (slot_idx == network.local_player_slot) {
+            if (neutral) {
+                PlayerComponent* player = PlayerComponent_get(pnode->value);
+                memset(&player->controller, 0, sizeof(player->controller));
+                player->controller.joystick = app.player_controllers[network.local_player_slot];
+            } else {
+                update_controller(game_data->camera, pnode->value);
+            }
+
+            InputPacket input_pkt;
+            netgame_pack_input(&input_pkt, pnode->value, (uint8_t)network.local_player_slot, network.tick);
+            network_send_to_host(&input_pkt, sizeof(input_pkt));
+            return true;
+        }
+        slot_idx++;
+    }
+    return false;
 }
 
 

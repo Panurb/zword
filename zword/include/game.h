@@ -122,6 +122,8 @@ void start_game(Filename map_name, bool load_save);
 
 void end_game();
 
+void end_match();
+
 void reset_game();
 
 void update_coordinates();

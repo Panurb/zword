@@ -119,7 +119,7 @@ void ParticleComponent_add_water(int entity, float size) {
 }
 
 
-void ParticleCompoenent_add_radiation(int entity) {
+void ParticleComponent_add_radiation(int entity) {
     ParticleComponent* part = ParticleComponent_add(entity, 0.0, 2.0f * M_PI, 0.1, 0.05, 2.0, 5.0, COLOR_ENERGY, COLOR_NONE);
     part->enabled = true;
     part->loop = true;
@@ -186,7 +186,7 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
             ParticleComponent_add_water(entity, size);
             break;
         case PARTICLE_RADIATION:
-            ParticleCompoenent_add_radiation(entity);
+            ParticleComponent_add_radiation(entity);
             break;
         case PARTICLE_PUSH:
             ParticleComponent_add_push(entity);

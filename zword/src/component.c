@@ -412,6 +412,7 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
     particle->height = 0.0f;
     particle->stretch = 0.1f;
     particle->wind_factor = 1.0f;
+    particle->pending_burst = 0;
 
     game_data->components->particle[entity] = particle;
 

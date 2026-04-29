@@ -124,7 +124,9 @@ void damage(Entity entity, Vector2f pos, Vector2f dir, int dmg, Entity dealer, D
         if (prev_health > 0 && health->health <= 0) {
             PlayerComponent* player = PlayerComponent_get(dealer);
             if (player) {
-                player->kills++;
+                if (PlayerComponent_get(entity)) {
+                    player->kills++;
+                }
                 if (enemy) {
                     add_money(dealer, enemy->bounty);
                 }

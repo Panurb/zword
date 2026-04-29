@@ -34,6 +34,8 @@ static String version = "0.4.1";
 
 static float title_scale = 2.0f;
 
+static float lobby_info_broadcast_timer = 0.0f;
+
 static int debug_level = 0;
 
 typedef struct {
@@ -43,7 +45,119 @@ typedef struct {
     float scale;
 } Intro;
 
+typedef struct {
+    bool valid;
+    char map_name[128];
+    GameMode game_mode;
+    int num_players;
+    char player_names[NET_MAX_CLIENTS + 1][32];
+} CachedLobbyInfo;
+
 static Intro intro = {1, 0, {0.0f, 0.0f}, 3.0f};
+
+static CachedLobbyInfo cached_lobby_info = {0};
+
+
+static const char* game_mode_to_string(GameMode mode) {
+    switch (mode) {
+        case MODE_SURVIVAL:
+            return "Survival";
+        case MODE_CAMPAIGN:
+            return "Campaign";
+        case MODE_TUTORIAL:
+            return "Tutorial";
+        case MODE_DEATHMATCH:
+            return "Deathmatch";
+    }
+
+    return "Unknown";
+}
+
+
+static void cache_lobby_info(const LobbyInfoPacket* lobby) {
+    cached_lobby_info.valid = true;
+    strncpy(cached_lobby_info.map_name, lobby->map_name, sizeof(cached_lobby_info.map_name) - 1);
+    cached_lobby_info.map_name[sizeof(cached_lobby_info.map_name) - 1] = '\0';
+    cached_lobby_info.game_mode = (GameMode)lobby->game_mode;
+    cached_lobby_info.num_players = lobby->num_players;
+
+    for (int i = 0; i < NET_MAX_CLIENTS + 1; i++) {
+        strncpy(cached_lobby_info.player_names[i], lobby->player_names[i], sizeof(cached_lobby_info.player_names[i]) - 1);
+        cached_lobby_info.player_names[i][sizeof(cached_lobby_info.player_names[i]) - 1] = '\0';
+    }
+}
+
+
+static void build_lobby_info_packet(LobbyInfoPacket* pkt) {
+    memset(pkt, 0, sizeof(*pkt));
+    pkt->header.type = PACKET_LOBBY_INFO;
+    pkt->header.tick = network.tick;
+    pkt->header.size = sizeof(LobbyInfoPacket);
+    strncpy(pkt->map_name, game_data->map_name, sizeof(pkt->map_name) - 1);
+    pkt->game_mode = (uint8_t)game_data->game_mode;
+    pkt->num_players = 1;
+    strncpy(pkt->player_names[0], game_data->player_name, sizeof(pkt->player_names[0]) - 1);
+
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+
+        pkt->num_players++;
+        strncpy(pkt->player_names[i + 1], network.clients[i].player_name, sizeof(pkt->player_names[i + 1]) - 1);
+    }
+}
+
+
+static void broadcast_lobby_info() {
+    LobbyInfoPacket pkt;
+    build_lobby_info_packet(&pkt);
+    cache_lobby_info(&pkt);
+    network_broadcast(&pkt, sizeof(pkt));
+}
+
+
+static void return_to_lobby() {
+    end_match();
+    clear_all_sounds();
+    network.game_started = false;
+    lobby_info_broadcast_timer = 0.0f;
+
+    destroy_menu();
+    if (network.mode == NET_MODE_HOST) {
+        create_host_lobby_menu();
+        game_state = STATE_HOST_LOBBY;
+    } else if (network.mode == NET_MODE_CLIENT) {
+        create_lobby_menu();
+        game_state = STATE_CLIENT_LOBBY;
+    } else {
+        create_menu();
+        game_state = STATE_MENU;
+    }
+}
+
+
+static void start_return_to_lobby() {
+    return_to_lobby();
+}
+
+
+static bool client_receive_packets(void) {
+    struct sockaddr_in from;
+    int received;
+    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+        if (received < (int)sizeof(PacketHeader)) continue;
+
+        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+        if (hdr->type == PACKET_SNAPSHOT) {
+            netgame_apply_snapshot(network.recv_buf, received);
+        } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+            cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
+            return_to_lobby();
+            return true;
+        }
+    }
+
+    return false;
+}
 
 
 void create_screen_textures() {
@@ -259,6 +373,11 @@ void input_game(SDL_Event sdl_event) {
                 }
             }
             break;
+        case STATE_HOST_GAME_OVER:
+            break;
+        case STATE_CLIENT_GAME_OVER:
+            input_menu(game_data->menu_camera, sdl_event);
+            break;
         case STATE_CLIENT:
             if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
                 if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
@@ -365,6 +484,12 @@ void update(float time_step) {
         case STATE_HOST_LOBBY:
             // Host: accept incoming client connections while in lobby
             network_host_accept_clients();
+            if (lobby_info_broadcast_timer <= 0.0f) {
+                broadcast_lobby_info();
+                lobby_info_broadcast_timer = 0.25f;
+            } else {
+                lobby_info_broadcast_timer = fmaxf(lobby_info_broadcast_timer - time_step, 0.0f);
+            }
             // Assign controllers for connected clients
             for (int i = 0; i < NET_MAX_CLIENTS; i++) {
                 if (network.clients[i].connected) {
@@ -388,6 +513,8 @@ void update(float time_step) {
                     JoinAckPacket* ack = (JoinAckPacket*)network.recv_buf;
                     network.local_player_slot = ack->player_slot;
                     LOG_INFO("Joined as player %d", network.local_player_slot);
+                } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+                    cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
                 } else if (hdr->type == PACKET_START_GAME && received >= (int)sizeof(StartGamePacket)) {
                     StartGamePacket* start = (StartGamePacket*)network.recv_buf;
                     strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
@@ -400,7 +527,9 @@ void update(float time_step) {
                         app.player_controllers[i] = CONTROLLER_MKB;  // all active
                     }
                     network.game_started = true;
+                    lobby_info_broadcast_timer = 0.0f;
                     game_state = STATE_CLIENT_START;
+                    break;
                 }
             }
             update_menu();
@@ -429,6 +558,7 @@ void update(float time_step) {
             start_pkt.num_players = (uint8_t)num_players;
             network_broadcast(&start_pkt, sizeof(start_pkt));
             network.game_started = true;
+            lobby_info_broadcast_timer = 0.0f;
 
             // Initialize net_entity_seen and ID mappings for both host and client
             memset(net_entity_seen, 0, sizeof(net_entity_seen));
@@ -449,6 +579,18 @@ void update(float time_step) {
             create_client_pause_menu();
             game_state = STATE_CLIENT;
             break;
+        case STATE_HOST_GAME_OVER:
+            start_return_to_lobby();
+            break;
+        case STATE_CLIENT_GAME_OVER:
+        {
+            if (client_receive_packets()) {
+                break;
+            }
+
+            update_game_over(time_step);
+            break;
+        }
         case STATE_END:
             end_game();
             clear_all_sounds();
@@ -532,6 +674,11 @@ void update(float time_step) {
             update_game(time_step);
             update_game_mode(time_step);
 
+            if (game_state == STATE_HOST_LOBBY) {
+                start_return_to_lobby();
+                break;
+            }
+
             // 4. Build and broadcast snapshot
             int snap_size = netgame_build_snapshot(network.send_buf, NET_MAX_PACKET_SIZE, network.tick);
             network_broadcast(network.send_buf, snap_size);
@@ -543,42 +690,16 @@ void update(float time_step) {
             // Client: only read local controller (no state machine -- host is authoritative),
             // send input to host, receive and apply snapshots.
 
-            // 1. Update local player's controller only (no state machine)
-            int slot_idx = 0;
-            ListNode* pnode;
-            FOREACH(pnode, game_data->components->player.order) {
-                if (slot_idx == network.local_player_slot) {
-                    update_controller(game_data->camera, pnode->value);
-                    break;
-                }
-                slot_idx++;
-            }
-
-            // 2. Pack and send our input to host
-            slot_idx = 0;
-            FOREACH(pnode, game_data->components->player.order) {
-                if (slot_idx == network.local_player_slot) {
-                    InputPacket input_pkt;
-                    netgame_pack_input(&input_pkt, pnode->value, (uint8_t)network.local_player_slot, network.tick);
-                    network_send_to_host(&input_pkt, sizeof(input_pkt));
-                    break;
-                }
-                slot_idx++;
-            }
+            // 1. Update local controller and send input to host.
+            netgame_client_send_input(false);
 
             // 3. Save current positions as "previous" BEFORE applying new snapshot,
             //    so the interpolation system has two distinct states to lerp between.
             update_coordinates();
 
             // 4. Receive and apply snapshots (overwrites current positions)
-            struct sockaddr_in from;
-            int received;
-            while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
-                if (received < (int)sizeof(PacketHeader)) continue;
-                PacketHeader* hdr = (PacketHeader*)network.recv_buf;
-                if (hdr->type == PACKET_SNAPSHOT) {
-                    netgame_apply_snapshot(network.recv_buf, received);
-                }
+            if (client_receive_packets()) {
+                break;
             }
 
             // 5. Rebuild collision grid so lights raycast against correct positions
@@ -606,7 +727,38 @@ void update(float time_step) {
             break;
         }
         case STATE_HOST_PAUSE:
+            if (game_state == STATE_HOST_LOBBY) {
+                start_return_to_lobby();
+                break;
+            }
+            update_menu();
+            break;
         case STATE_CLIENT_PAUSE:
+        {
+            netgame_client_send_input(true);
+
+            // Preserve interpolation while paused before applying fresh snapshots.
+            update_coordinates();
+
+            if (client_receive_packets()) {
+                break;
+            }
+
+            ColliderGrid_clear(game_data->grid);
+            init_grid();
+            update_camera(game_data->camera, time_step, true);
+            update_lights(time_step);
+            update_particles(game_data->camera, time_step);
+
+            CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
+            cam_coord->previous.position = cam_coord->position;
+            cam_coord->previous.angle = cam_coord->angle;
+            cam_coord->previous.scale = cam_coord->scale;
+
+            network.tick++;
+            update_menu();
+            break;
+        }
         case STATE_PAUSE:
             update_menu();
             break;
@@ -685,6 +837,20 @@ void draw() {
             break;
         case STATE_CLIENT_LOBBY:
             draw_menu();
+            if (cached_lobby_info.valid) {
+                draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.host_ip, 20, COLOR_WHITE);
+
+                String buffer;
+                snprintf(buffer, STRING_SIZE, "Map: %s", cached_lobby_info.map_name);
+                draw_text(game_data->menu_camera, vec(0.0f, 7.0f), buffer, 20, COLOR_WHITE);
+
+                snprintf(buffer, STRING_SIZE, "Mode: %s", game_mode_to_string(cached_lobby_info.game_mode));
+                draw_text(game_data->menu_camera, vec(0.0f, 5.0f), buffer, 20, COLOR_WHITE);
+
+                for (int i = 0; i < cached_lobby_info.num_players && i < NET_MAX_CLIENTS + 1; i++) {
+                    draw_text(game_data->menu_camera, vec(0.0f, -1.0f - i * 2.0f), cached_lobby_info.player_names[i], 20, COLOR_WHITE);
+                }
+            }
             break;
         case STATE_HOST_LOBBY:
             draw_menu();
@@ -696,6 +862,11 @@ void draw() {
                     draw_text(game_data->menu_camera, vec(0.0f, -5.0f + i * 2.0f), buffer, 20, COLOR_WHITE);
                 }
             }
+            break;
+        case STATE_HOST_GAME_OVER:
+        case STATE_CLIENT_GAME_OVER:
+        case STATE_GAME_OVER:
+            draw_game_over();
             break;
         case STATE_START:
         case STATE_END:
@@ -723,9 +894,6 @@ void draw() {
         case STATE_EDITOR:
             draw_editor();
             draw_hud(game_data->camera);
-            break;
-        case STATE_GAME_OVER:
-            draw_game_over();
             break;
         case STATE_INTRO:
             ;

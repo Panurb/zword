@@ -28,3 +28,5 @@ void create_win_menu();
 void create_lobby_menu();
 
 void create_host_lobby_menu();
+
+void change_state_lobby(int entity);

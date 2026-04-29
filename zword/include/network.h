@@ -35,7 +35,8 @@ typedef enum {
     PACKET_JOIN_ACK,
     PACKET_INPUT,
     PACKET_SNAPSHOT,
-    PACKET_START_GAME
+    PACKET_START_GAME,
+    PACKET_LOBBY_INFO
 } PacketType;
 
 #pragma pack(push, 1)
@@ -62,6 +63,14 @@ typedef struct {
     uint8_t game_mode;
     uint8_t num_players;
 } StartGamePacket;
+
+typedef struct {
+    PacketHeader header;
+    char map_name[128];
+    uint8_t game_mode;
+    uint8_t num_players;
+    char player_names[NET_MAX_CLIENTS + 1][32];
+} LobbyInfoPacket;
 
 #pragma pack(pop)
 

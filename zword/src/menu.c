@@ -62,6 +62,19 @@ void change_state_end(int entity) {
 }
 
 
+void change_state_lobby(int entity) {
+    UNUSED(entity);
+    if (network.mode == NET_MODE_HOST) {
+        game_state = STATE_HOST_GAME_OVER;
+    } else if (network.mode == NET_MODE_CLIENT) {
+        game_state = STATE_CLIENT_GAME_OVER;
+    } else {
+        game_state = STATE_MENU;
+    }
+    reset_ids();
+}
+
+
 void change_state_create(int entity) {
     UNUSED(entity);
     strcpy(game_data->map_name, WidgetComponent_get(map_name_textbox)->string);
@@ -572,7 +585,7 @@ void create_host_pause_menu() {
     int container = create_container(vec(-20.0f, 0.0f), 1, 3);
     add_button_to_container(container, "RESUME", change_state_host_game);
     add_button_to_container(container, "SETTINGS", toggle_settings);
-    add_button_to_container(container, "END GAME", change_state_end);
+    add_button_to_container(container, "RETURN TO LOBBY", change_state_lobby);
 }
 
 
@@ -608,12 +621,20 @@ void create_game_over_menu() {
     } else {
         create_button("Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     }
-    create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+    if (network.mode == NET_MODE_HOST) {
+        create_button("Lobby", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_lobby);
+    } else {
+        create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+    }
 }
 
 
 void create_win_menu() {
-    create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+    if (network.mode == NET_MODE_HOST) {
+        create_button("Lobby", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_lobby);
+    } else {
+        create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+    }
 }
 
 

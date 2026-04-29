@@ -65,6 +65,9 @@ void netgame_apply_snapshot(const uint8_t* buf, int size);
 // Pack local player controller state into an InputPacket.
 void netgame_pack_input(InputPacket* pkt, int player_entity, uint8_t player_slot, uint32_t tick);
 
+// Client: update local controller state if needed and send one input packet.
+bool netgame_client_send_input(bool neutral);
+
 // Host: unpack a received input packet into a player entity's controller.
 void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 

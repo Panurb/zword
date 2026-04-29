@@ -21,6 +21,8 @@ Network play uses dedicated game states instead of checking `network.mode` at ru
 | `STATE_CLIENT` | Client game loop (send input, receive/apply snapshots) |
 | `STATE_HOST_PAUSE` | Host pause menu |
 | `STATE_CLIENT_PAUSE` | Client pause menu |
+| `STATE_HOST_GAME_OVER` | Host-only transition state for returning the current match to lobby |
+| `STATE_CLIENT_GAME_OVER` | Client game-over screen while waiting for or reacting to host lobby return |
 
 `STATE_START` routes to the correct state based on `network.mode` and creates the appropriate pause menu (`create_host_pause_menu()`, `create_client_pause_menu()`, or `create_pause_menu()` for single-player). The pause menu functions live in `menu.c` — `menu.c` does not include `network.h`.
 
@@ -43,6 +45,7 @@ Packet types:
 | `PACKET_INPUT` | Client -> Host | Controller state (sticks, triggers, button flags) |
 | `PACKET_SNAPSHOT` | Host -> Clients | Full game state (binary-serialized entities + sound/particle events) |
 | `PACKET_START_GAME` | Host -> Clients | Map name, game mode, player count |
+| `PACKET_LOBBY_INFO` | Host -> Clients | Current lobby map, mode, and connected player names |
 
 ## Snapshot format
 
@@ -76,6 +79,13 @@ Each tick:
 5. Rebuild collision grid (needed for light raycasting)
 6. Update camera, lights, particles locally
 
+## Lobby return flow
+
+- Host ending a LAN match does not use `STATE_END`, because that tears down the session and recreates the main menu.
+- Instead, the host enters `STATE_HOST_GAME_OVER`, tears down the match world with `end_match()`, rebuilds the host lobby UI, and resumes broadcasting `PACKET_LOBBY_INFO`.
+- Clients cache `PACKET_LOBBY_INFO` for the lobby UI and also treat it as the signal that the host has returned from a match back to lobby.
+- The host rebroadcasts `PACKET_LOBBY_INFO` periodically while in `STATE_HOST_LOBBY`, so clients can recover from dropped UDP packets and keep their lobby UI in sync.
+
 ## Input handling
 
 Local players: `update_controller()` (`input.c`) computes `buttons_pressed` as a rising edge from `buttons_down`. The flag is `true` for exactly one tick, then cleared by the next call.
@@ -95,3 +105,4 @@ Snapshots are serialized with host IDs. `netgame_apply_snapshot()` remaps on the
 - **No client-side prediction** -- all actions have a full round-trip delay before the client sees the result
 - **Snapshot size cap** -- 65 KB limit can cause entities to be omitted from snapshots
 - **Pause is local only** -- pausing on the host or client only pauses locally; the other side keeps running
+- **Lobby info is best-effort UDP** -- periodic rebroadcast helps, but there is still no full ack/retry reliability layer
