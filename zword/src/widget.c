@@ -33,7 +33,7 @@ void bring_to_top(int entity) {
 
 
 int create_window(Vector2f position, ButtonText text, int width, OnClick on_close) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, width * BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_WINDOW);
@@ -46,7 +46,7 @@ int create_window(Vector2f position, ButtonText text, int width, OnClick on_clos
 
 
 int create_label(ButtonText text, Vector2f position) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_LABEL);

@@ -562,8 +562,6 @@ void update(float time_step) {
 
             // Initialize net_entity_seen and ID mappings for both host and client
             memset(net_entity_seen, 0, sizeof(net_entity_seen));
-            net_clear_id_map();
-            net_map_max_entity = game_data->components->entities;
 
             create_host_pause_menu();
             game_state = STATE_HOST;
@@ -573,8 +571,6 @@ void update(float time_step) {
 
             // Initialize net_entity_seen and ID mappings for both host and client
             memset(net_entity_seen, 0, sizeof(net_entity_seen));
-            net_clear_id_map();
-            net_map_max_entity = game_data->components->entities;
 
             create_client_pause_menu();
             game_state = STATE_CLIENT;

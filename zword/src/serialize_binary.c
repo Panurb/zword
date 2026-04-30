@@ -585,6 +585,9 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool
             coord->position.x = pos_x;
             coord->position.y = pos_y;
             coord->angle = angle;
+            coord->previous.position.x = pos_x;
+            coord->previous.position.y = pos_y;
+            coord->previous.angle = angle;
         }
         coord->parent = (int)parent;  // raw host ID; remapped by netgame.c post-pass
         coord->scale.x = scale_x;

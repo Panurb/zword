@@ -40,21 +40,6 @@ typedef struct {
 // Indexed by LOCAL entity ID.
 extern bool net_entity_seen[MAX_ENTITIES];
 
-// Track the max entity id after map load (entities above this are runtime)
-extern int net_map_max_entity;
-
-// Entity ID mapping: host_id -> local_id for mismatched entities.
-// -1 means identity mapping (host_id == local_id).
-extern int net_host_to_local[MAX_ENTITIES];
-extern int net_local_to_host[MAX_ENTITIES];
-
-// Resolve a host entity ID to the local entity ID.
-// Returns the local ID (may differ from host_id if there was a mismatch).
-int net_resolve_id(int host_id);
-
-// Clear entity ID mappings (call when starting a new game).
-void net_clear_id_map(void);
-
 // Host: build a snapshot of all dynamic entities into the send buffer.
 // Returns the total packet size.
 int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick);
