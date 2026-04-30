@@ -611,6 +611,16 @@ void update_coordinates() {
             coord->previous.scale = get_scale(i);
         }
     }
+
+    for (int i = 0; i < game_data->components->menu_entities; i++) {
+        int j = game_data->components->menu_entities_start + i;
+        CoordinateComponent* coord = CoordinateComponent_get(j);
+        if (coord) {
+            coord->previous.position = get_position(j);
+            coord->previous.angle = get_angle(j);
+            coord->previous.scale = get_scale(j);
+        }
+    }
 }
 
 

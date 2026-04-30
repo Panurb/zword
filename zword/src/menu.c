@@ -559,12 +559,14 @@ void create_menu() {
 
 
 void destroy_menu() {
-    for (int i = 0; i < game_data->components->entities; i++) {
-        WidgetComponent* widget = WidgetComponent_get(i);
+    for (int i = 0; i < game_data->components->menu_entities; i++) {
+        int j = game_data->components->menu_entities_start + i;
+        WidgetComponent* widget = WidgetComponent_get(j);
         if (widget) {
-            destroy_entity(i);
+            destroy_entity(j);
         }
     }
+    game_data->components->menu_entities = 0;
 }
 
 

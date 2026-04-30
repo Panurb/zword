@@ -527,6 +527,8 @@ typedef struct {
 
 struct ComponentData {
     int entities;
+    int menu_entities_start;
+    int menu_entities;
     List* added_entities;
     CoordinateComponent* coordinate[MAX_ENTITIES];
     OrderedArray image;
@@ -644,6 +646,8 @@ TextComponent* TextComponent_get(int entity);
 void TextComponent_remove(int entity);
 
 int create_entity();
+Entity create_entity_with_id(Entity id);
+Entity create_menu_entity();
 void destroy_entity(int i);
 void destroy_entities(List* entities);
 void destroy_entity_recursive(int entity);

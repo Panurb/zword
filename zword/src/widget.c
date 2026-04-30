@@ -56,7 +56,7 @@ int create_label(ButtonText text, Vector2f position) {
 
 
 int create_button(ButtonText text, Vector2f position, OnClick on_click) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent_add(i, text, WIDGET_BUTTON)->on_click = on_click;
@@ -66,7 +66,7 @@ int create_button(ButtonText text, Vector2f position, OnClick on_click) {
 
 
 int create_button_small(ButtonText text, Vector2f position, OnClick on_click) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, sum(position, vec(0.0f, 0.25f * BORDER_WIDTH)), 0.0f);
     float height = BUTTON_HEIGHT - 0.5f * BORDER_WIDTH;
     ColliderComponent_add_rectangle(i, BUTTON_HEIGHT, height, GROUP_WALLS)->enabled = false;
@@ -77,7 +77,7 @@ int create_button_small(ButtonText text, Vector2f position, OnClick on_click) {
 
 
 int create_container(Vector2f position, int width, int height) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, width * BUTTON_WIDTH, height * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_CONTAINER);
@@ -321,7 +321,7 @@ void set_slider(int entity, Vector2f mouse_position) {
 
 int create_slider(Vector2f position, int min_value, int max_value, int value, 
         OnChange on_change) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_SLIDER);
@@ -349,7 +349,7 @@ void set_scrollbar(int entity, Vector2f mouse_position) {
 
 
 int create_scrollbar(Vector2f position, int height, int max_value, OnChange on_change) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(i, SCROLLBAR_WIDTH, 
         BUTTON_HEIGHT * height, GROUP_WALLS);
@@ -363,7 +363,7 @@ int create_scrollbar(Vector2f position, int height, int max_value, OnChange on_c
 
 
 int create_textbox(Vector2f position, int width) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(i, BUTTON_WIDTH * width, 
         BUTTON_HEIGHT, GROUP_WALLS);
@@ -385,7 +385,7 @@ void toggle_checkbox(int entity) {
 
 
 int create_checkbox(Vector2f position, bool value, OnChange on_change) {
-    int i = create_entity();
+    int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent_add_rectangle(i, BUTTON_WIDTH, BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_CHECKBOX);
@@ -554,9 +554,11 @@ bool input_widgets(int camera, SDL_Event event) {
 
     bool input_detected = false;
     int editable_textbox = -1;
-    for (int i = 0; i < game_data->components->entities; i++) {
+    ListNode* node;
+    FOREACH(node, game_data->components->widget.order) {
+        int i = node->value;
         WidgetComponent* widget = WidgetComponent_get(i);
-        if (!widget) continue;
+
         if (widget->type == WIDGET_TEXTBOX && widget->editable) {
             editable_textbox = i;
         }
@@ -648,9 +650,9 @@ bool input_widgets(int camera, SDL_Event event) {
 
 
 void destroy_widgets() {
-    for (int i = 0; i < game_data->components->entities; i++) {
-        if (WidgetComponent_get(i)) {
-            destroy_entity(i);
-        }
+    ListNode* node;
+    FOREACH(node, game_data->components->widget.order) {
+        Entity i = node->value;
+        destroy_entity(i);
     }
 }

@@ -20,6 +20,8 @@
 ComponentData* ComponentData_create() {
     ComponentData* components = malloc(sizeof(ComponentData));
     components->entities = 0;
+    components->menu_entities_start = 3500;
+    components->menu_entities = 0;
     components->added_entities = NULL;
 
     components->image.order = List_create();
@@ -929,8 +931,8 @@ int create_entity() {
         }
     }
 
-    if (game_data->components->entities >= MAX_ENTITIES) {
-        LOG_ERROR("Maximum number of entities reached (%d)", MAX_ENTITIES);
+    if (game_data->components->entities >= game_data->components->menu_entities_start) {
+        LOG_ERROR("Maximum number of entities reached (%d)", game_data->components->menu_entities_start);
         return NULL_ENTITY;
     }
 
@@ -939,6 +941,36 @@ int create_entity() {
         List_add(game_data->components->added_entities, game_data->components->entities - 1);
     }
     return game_data->components->entities - 1;
+}
+
+
+Entity create_entity_with_id(Entity id) {
+    if (entity_exists(id)) {
+        LOG_WARNING("Entity with id %d already exists", id);
+        return id;
+    }
+    game_data->components->entities = maxi(game_data->components->entities, id + 1);
+    return id;
+}
+
+
+Entity create_menu_entity() {
+    for (int i = 0; i < game_data->components->menu_entities; i++) {
+        int j = game_data->components->menu_entities_start + i;
+        if (!entity_exists(j)) {
+            return j;
+        }
+    }
+
+    int max_menu_entities = MAX_ENTITIES - game_data->components->menu_entities_start;
+    if (game_data->components->menu_entities >= max_menu_entities) {
+        LOG_ERROR("Maximum number of menu entities reached (%d)", max_menu_entities);
+        return NULL_ENTITY;
+    }
+
+    game_data->components->menu_entities++;
+
+    return game_data->components->menu_entities_start + game_data->components->menu_entities - 1;
 }
 
 
@@ -1048,6 +1080,11 @@ void ComponentData_clear() {
         destroy_entity(i);
     }
     game_data->components->entities = 0;
+
+    for (int i = 0; i < game_data->components->menu_entities; i++) {
+        destroy_entity(game_data->components->menu_entities_start + i);
+    }
+    game_data->components->menu_entities = 0;
 }
 
 
