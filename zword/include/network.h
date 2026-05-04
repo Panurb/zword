@@ -40,6 +40,11 @@ typedef enum {
     PACKET_LOBBY_INFO
 } PacketType;
 
+typedef enum {
+    MATCH_END_GAME_OVER,
+    MATCH_END_WIN
+} MatchEndType;
+
 #pragma pack(push, 1)
 
 typedef struct {
@@ -64,6 +69,11 @@ typedef struct {
     uint8_t game_mode;
     uint8_t num_players;
 } StartGamePacket;
+
+typedef struct {
+    PacketHeader header;
+    uint8_t end_type;
+} EndGamePacket;
 
 typedef struct {
     PacketHeader header;

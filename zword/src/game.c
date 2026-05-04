@@ -72,13 +72,26 @@ static int player_spawns_count = 0;
 static int max_kills = 1;
 
 
-void change_state_game_over() {
-    if (game_data->testing) {
-        game_state = STATE_LOAD_EDITOR;
+static void send_match_end_packet(bool won) {
+    if (network.mode != NET_MODE_HOST) {
         return;
     }
-    
+
+    EndGamePacket pkt;
+    memset(&pkt, 0, sizeof(pkt));
+    pkt.header.type = PACKET_END_GAME;
+    pkt.header.tick = network.tick;
+    pkt.header.size = sizeof(EndGamePacket);
+    pkt.end_type = won ? MATCH_END_WIN : MATCH_END_GAME_OVER;
+    network_broadcast(&pkt, sizeof(pkt));
+}
+
+
+void enter_match_end_screen(bool won) {
     game_over_timer = 2.0f;
+    level_won = won;
+    send_match_end_packet(won);
+
     if (network.mode == NET_MODE_HOST) {
         game_state = STATE_HOST_GAME_OVER;
     } else if (network.mode == NET_MODE_CLIENT) {
@@ -86,18 +99,28 @@ void change_state_game_over() {
     } else {
         game_state = STATE_GAME_OVER;
     }
-    level_won = false;
+
     destroy_menu();
-    create_game_over_menu();
+    if (won) {
+        create_win_menu();
+    } else {
+        create_game_over_menu();
+    }
+}
+
+
+void change_state_game_over() {
+    if (game_data->testing) {
+        game_state = STATE_LOAD_EDITOR;
+        return;
+    }
+
+    enter_match_end_screen(false);
 }
 
 
 void change_state_win() {
-    game_over_timer = 2.0f;
-    game_state = STATE_GAME_OVER;
-    level_won = true;
-    destroy_menu();
-    create_win_menu();
+    enter_match_end_screen(true);
 }
 
 

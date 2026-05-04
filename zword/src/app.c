@@ -115,6 +115,15 @@ static void broadcast_lobby_info() {
 }
 
 
+static void enter_client_match_end(const EndGamePacket* pkt) {
+    if (pkt->end_type == MATCH_END_WIN) {
+        enter_match_end_screen(true);
+    } else {
+        enter_match_end_screen(false);
+    }
+}
+
+
 static void return_to_lobby() {
     end_match();
     clear_all_sounds();
@@ -149,6 +158,9 @@ static bool client_receive_packets(void) {
         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
         if (hdr->type == PACKET_SNAPSHOT) {
             netgame_apply_snapshot(network.recv_buf, received);
+        } else if (hdr->type == PACKET_END_GAME && received >= (int)sizeof(EndGamePacket)) {
+            enter_client_match_end((EndGamePacket*)network.recv_buf);
+            return true;
         } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
             cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
             return_to_lobby();
@@ -375,7 +387,9 @@ void input_game(SDL_Event sdl_event) {
             break;
         case STATE_HOST_END:
             break;
+        case STATE_HOST_GAME_OVER:
         case STATE_CLIENT_GAME_OVER:
+        case STATE_GAME_OVER:
             input_menu(game_data->menu_camera, sdl_event);
             break;
         case STATE_CLIENT:
@@ -399,7 +413,6 @@ void input_game(SDL_Event sdl_event) {
             input_editor(sdl_event);
             break;
         case STATE_MENU:
-        case STATE_GAME_OVER:
         case STATE_HOST_LOBBY:
         case STATE_CLIENT_LOBBY:
             input_menu(game_data->menu_camera, sdl_event);
@@ -579,16 +592,19 @@ void update(float time_step) {
             start_return_to_lobby();
             break;
         case STATE_HOST_GAME_OVER:
+            update_game_over(time_step);
             break;
         case STATE_CLIENT_GAME_OVER:
-        {
             if (client_receive_packets()) {
                 break;
             }
 
             update_game_over(time_step);
             break;
-        }
+        case STATE_GAME_OVER:
+            input_players(game_data->camera);
+            update_game_over(time_step);
+            break;
         case STATE_END:
             end_game();
             clear_all_sounds();
@@ -794,10 +810,6 @@ void update(float time_step) {
         case STATE_EDITOR:
             update_editor(time_step);
             break;
-        case STATE_GAME_OVER:
-            input_players(game_data->camera);
-            update_game_over(time_step);
-            break;
         case STATE_QUIT:
             app.quit = true;
             return;
@@ -862,6 +874,7 @@ void draw() {
             }
             break;
         case STATE_HOST_END:
+        case STATE_HOST_GAME_OVER:
         case STATE_CLIENT_GAME_OVER:
         case STATE_GAME_OVER:
             draw_game_over();

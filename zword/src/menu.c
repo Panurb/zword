@@ -621,19 +621,29 @@ void create_game_over_menu() {
     } else {
         create_button("Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     }
-    if (network.mode == NET_MODE_HOST) {
-        create_button("Lobby", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_lobby);
-    } else {
-        create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+    switch (network.mode) {
+        case NET_MODE_HOST:
+            create_button("Return to lobby", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_create_lobby);
+            break;
+        case NET_MODE_CLIENT:
+            create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+            break;
+        default:
+            create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
     }
 }
 
 
 void create_win_menu() {
-    if (network.mode == NET_MODE_HOST) {
-        create_button("Lobby", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_lobby);
-    } else {
-        create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+    switch (network.mode) {
+        case NET_MODE_HOST:
+            create_button("Return to lobby", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_lobby);
+            break;
+        case NET_MODE_CLIENT:
+            create_button("Quit", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+            break;
+        default:
+            create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
     }
 }
 

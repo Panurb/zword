@@ -45,6 +45,7 @@ Packet types:
 | `PACKET_INPUT` | Client -> Host | Controller state (sticks, triggers, button flags) |
 | `PACKET_SNAPSHOT` | Host -> Clients | Full game state (binary-serialized entities + sound/particle events) |
 | `PACKET_START_GAME` | Host -> Clients | Map name, game mode, player count |
+| `PACKET_END_GAME` | Host -> Clients | Match-end result (`MATCH_END_GAME_OVER` or `MATCH_END_WIN`) |
 | `PACKET_LOBBY_INFO` | Host -> Clients | Current lobby map, mode, and connected player names |
 
 ## Snapshot format
@@ -79,10 +80,12 @@ Each tick:
 5. Rebuild collision grid (needed for light raycasting)
 6. Update camera, lights, particles locally
 
-## Lobby return flow
+## Match end flow
 
 - Host ending a LAN match does not use `STATE_END`, because that tears down the session and recreates the main menu.
-- Instead, the host enters `STATE_HOST_GAME_OVER`, tears down the match world with `end_match()`, rebuilds the host lobby UI, and resumes broadcasting `PACKET_LOBBY_INFO`.
+- Instead, the host enters `STATE_HOST_GAME_OVER` and periodically broadcasts `PACKET_END_GAME` while the game-over / win screen is visible.
+- Clients handle `PACKET_END_GAME` in active gameplay states and enter `STATE_CLIENT_GAME_OVER` immediately, recreating the correct match-end menu from the packet result.
+- When the host leaves the match-end screen, it tears down the match world with `end_match()`, rebuilds the host lobby UI, and resumes broadcasting `PACKET_LOBBY_INFO`.
 - Clients cache `PACKET_LOBBY_INFO` for the lobby UI and also treat it as the signal that the host has returned from a match back to lobby.
 - The host rebroadcasts `PACKET_LOBBY_INFO` periodically while in `STATE_HOST_LOBBY`, so clients can recover from dropped UDP packets and keep their lobby UI in sync.
 

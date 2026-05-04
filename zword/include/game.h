@@ -111,6 +111,10 @@ extern Resources resources;
 
 void change_state_win();
 
+void change_state_game_over();
+
+void enter_match_end_screen(bool won);
+
 void load_resources();
 
 void create_game();
