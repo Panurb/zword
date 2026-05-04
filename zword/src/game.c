@@ -79,7 +79,13 @@ void change_state_game_over() {
     }
     
     game_over_timer = 2.0f;
-    game_state = STATE_GAME_OVER;
+    if (network.mode == NET_MODE_HOST) {
+        game_state = STATE_HOST_GAME_OVER;
+    } else if (network.mode == NET_MODE_CLIENT) {
+        game_state = STATE_CLIENT_GAME_OVER;
+    } else {
+        game_state = STATE_GAME_OVER;
+    }
     level_won = false;
     destroy_menu();
     create_game_over_menu();

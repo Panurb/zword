@@ -36,6 +36,7 @@ typedef enum {
     PACKET_INPUT,
     PACKET_SNAPSHOT,
     PACKET_START_GAME,
+    PACKET_END_GAME,
     PACKET_LOBBY_INFO
 } PacketType;
 

@@ -373,7 +373,7 @@ void input_game(SDL_Event sdl_event) {
                 }
             }
             break;
-        case STATE_HOST_GAME_OVER:
+        case STATE_HOST_END:
             break;
         case STATE_CLIENT_GAME_OVER:
             input_menu(game_data->menu_camera, sdl_event);
@@ -575,8 +575,10 @@ void update(float time_step) {
             create_client_pause_menu();
             game_state = STATE_CLIENT;
             break;
-        case STATE_HOST_GAME_OVER:
+        case STATE_HOST_END:
             start_return_to_lobby();
+            break;
+        case STATE_HOST_GAME_OVER:
             break;
         case STATE_CLIENT_GAME_OVER:
         {
@@ -859,7 +861,7 @@ void draw() {
                 }
             }
             break;
-        case STATE_HOST_GAME_OVER:
+        case STATE_HOST_END:
         case STATE_CLIENT_GAME_OVER:
         case STATE_GAME_OVER:
             draw_game_over();

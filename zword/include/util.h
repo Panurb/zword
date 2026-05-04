@@ -224,6 +224,8 @@ void permute(int* array, int size);
 
 float lerp(float a, float b, float t);
 
+Vector2f lerp_vector(Vector2f a, Vector2f b, float t);
+
 float lerp_angle(float a, float b, float t);
 
 float smoothstep(float x, float mu, float nu);

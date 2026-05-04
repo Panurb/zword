@@ -65,7 +65,7 @@ void change_state_end(int entity) {
 void change_state_lobby(int entity) {
     UNUSED(entity);
     if (network.mode == NET_MODE_HOST) {
-        game_state = STATE_HOST_GAME_OVER;
+        game_state = STATE_HOST_END;
     } else if (network.mode == NET_MODE_CLIENT) {
         game_state = STATE_CLIENT_GAME_OVER;
     } else {
@@ -137,8 +137,6 @@ void change_state_client_game(int entity) {
 
 void change_state_host_start(int entity) {
     UNUSED(entity);
-    WidgetComponent* widget = WidgetComponent_get(map_dropdown_lan);
-    strcpy(game_data->map_name, widget->strings[widget->value]);
     game_state = STATE_HOST_START;
     reset_ids();
 }
@@ -649,6 +647,12 @@ void create_lobby_menu() {
 }
 
 
+void set_map_data(Entity entity, int value) {
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    strcpy(game_data->map_name, widget->strings[value]);
+}
+
+
 void create_host_lobby_menu() {
     static ButtonText maps[] = {
         "mp_test",
@@ -660,6 +664,8 @@ void create_host_lobby_menu() {
     WidgetComponent_get(container)->enabled = false;
 
     map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
+    set_map_data(map_dropdown_lan, 0);
+    WidgetComponent_get(map_dropdown_lan)->on_change = set_map_data;
     add_widget_to_container(container, map_dropdown_lan);
     add_button_to_container(container, "Start Game", change_state_host_start);
     add_button_to_container(container, "Close lobby", change_state_end);
