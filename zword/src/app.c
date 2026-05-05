@@ -158,11 +158,6 @@ static void return_to_lobby() {
 }
 
 
-static void start_return_to_lobby() {
-    return_to_lobby();
-}
-
-
 static bool client_receive_packets(void) {
     struct sockaddr_in from;
     int received;
@@ -604,7 +599,7 @@ void update(float time_step) {
             game_state = STATE_CLIENT;
             break;
         case STATE_HOST_END:
-            start_return_to_lobby();
+            return_to_lobby();
             break;
         case STATE_HOST_GAME_OVER:
             update_game_over(time_step);
@@ -623,6 +618,10 @@ void update(float time_step) {
         case STATE_END:
             end_game();
             clear_all_sounds();
+            if (network.mode != NET_MODE_NONE) {
+                network_shutdown();
+                network_init();
+            }
             network.game_started = false;
             game_state = STATE_MENU;
             break;
@@ -671,24 +670,6 @@ void update(float time_step) {
                         slot_idx++;
                     }
                 }
-                // Handle late JOIN during game: re-send ACK inline
-                // (don't call network_host_accept_clients which drains the socket)
-                if (hdr->type == PACKET_JOIN) {
-                    // Find if this client is already connected
-                    for (int ci = 0; ci < NET_MAX_CLIENTS; ci++) {
-                        if (network.clients[ci].connected &&
-                            from.sin_addr.s_addr == network.clients[ci].addr.sin_addr.s_addr &&
-                            from.sin_port == network.clients[ci].addr.sin_port) {
-                            JoinAckPacket ack;
-                            ack.header.type = PACKET_JOIN_ACK;
-                            ack.header.tick = 0;
-                            ack.header.size = sizeof(JoinAckPacket);
-                            ack.player_slot = network.clients[ci].player_slot;
-                            network_send_to(&from, &ack, sizeof(ack));
-                            break;
-                        }
-                    }
-                }
             }
 
             // 1b. Check for client timeouts
@@ -704,7 +685,7 @@ void update(float time_step) {
             update_game_mode(time_step);
 
             if (game_state == STATE_HOST_LOBBY) {
-                start_return_to_lobby();
+                return_to_lobby();
                 break;
             }
 
@@ -749,15 +730,13 @@ void update(float time_step) {
             // continuity; interpolating on top of it causes desync with entity positions.
             CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
             cam_coord->previous.position = cam_coord->position;
-            cam_coord->previous.angle = cam_coord->angle;
-            cam_coord->previous.scale = cam_coord->scale;
 
             network.tick++;
             break;
         }
         case STATE_HOST_PAUSE:
             if (game_state == STATE_HOST_LOBBY) {
-                start_return_to_lobby();
+                return_to_lobby();
                 break;
             }
             update_menu();
