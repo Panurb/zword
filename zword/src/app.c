@@ -124,11 +124,25 @@ static void enter_client_match_end(const EndGamePacket* pkt) {
 }
 
 
+static void reset_host_client_timeouts() {
+    if (network.mode != NET_MODE_HOST) {
+        return;
+    }
+
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+
+        network.clients[i].last_recv_time = 0.0f;
+    }
+}
+
+
 static void return_to_lobby() {
     end_match();
     clear_all_sounds();
     network.game_started = false;
     lobby_info_broadcast_timer = 0.0f;
+    reset_host_client_timeouts();
 
     destroy_menu();
     if (network.mode == NET_MODE_HOST) {
@@ -554,6 +568,7 @@ void update(float time_step) {
             break;
         case STATE_HOST_START:
             start_game(game_data->map_name, false);
+            reset_host_client_timeouts();
 
             // Count total players (host + connected clients)
             int num_players = 1;
