@@ -22,7 +22,7 @@
 #define NET_DEFAULT_PORT 12345
 #define NET_MAX_PACKET_SIZE 65000
 #define NET_MAX_CLIENTS 3
-#define NET_DISCONNECT_TIMEOUT 5.0f  // seconds without receiving a packet before disconnect
+#define NET_DISCONNECT_TIMEOUT 2.0f  // seconds without receiving a packet before disconnect
 
 typedef enum {
     NET_MODE_NONE,

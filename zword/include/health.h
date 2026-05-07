@@ -4,6 +4,8 @@
 #include "grid.h"
 
 
+void die(int entity);
+
 void damage(int entity, Vector2f pos, Vector2f dir, int dmg, int dealer, DamageType type);
 
 void blunt_damage(int entity, Vector2f vel);

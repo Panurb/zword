@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "light.h"
 #include "grid.h"
+#include "health.h"
 #include "particle.h"
 #include "network.h"
 #include "netgame.h"
@@ -674,7 +675,16 @@ void update(float time_step) {
 
             // 1b. Check for client timeouts
             int disconnected = network_check_timeouts(current_time);
-            UNUSED(disconnected);  // Could handle player entity cleanup here
+            if (disconnected) {
+                int i = 0;
+                ListNode* node;
+                FOREACH(node, game_data->components->player.order) {
+                    if (disconnected & (1 << i)) {
+                        die(node->value);
+                    }
+                    i++;
+                }
+            }
 
             // 2. Read local input + run state machines for all players
             // (remote players now have fresh controller data from step 1)

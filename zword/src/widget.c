@@ -527,7 +527,9 @@ void draw_widgets(int camera) {
 
 
 void unedit_textboxes() {
-    for (Entity i = 0; i < game_data->components->entities; i++) {
+    ListNode* node;
+    FOREACH(node, game_data->components->widget.order) {
+        Entity i = node->value;
         WidgetComponent* widget = WidgetComponent_get(i);
         if (widget && widget->type == WIDGET_TEXTBOX) {
             widget->editable = false;
