@@ -663,20 +663,33 @@ void set_map_data(Entity entity, int value) {
 }
 
 
+void set_point_limit(Entity entity, int value) {
+    UNUSED(entity);
+    game_data->point_limit = value;
+}
+
+
 void create_host_lobby_menu() {
     static ButtonText maps[] = {
         "mp_test",
         "Campaign"
     };
 
-    int height = 3;
-    int container = create_container(vec(-18.0f, -2.0f), 1, height);
+    int height = 4;
+    int container = create_container(vec(-18.0f, -2.0f), 2, height);
     WidgetComponent_get(container)->enabled = false;
 
+    Entity map_label = create_label("Map", zeros());
     map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
     set_map_data(map_dropdown_lan, 0);
     WidgetComponent_get(map_dropdown_lan)->on_change = set_map_data;
-    add_widget_to_container(container, map_dropdown_lan);
-    add_button_to_container(container, "Start Game", change_state_host_start);
-    add_button_to_container(container, "Close lobby", change_state_end);
+    add_row_to_container(container, map_label, map_dropdown_lan);
+
+    Entity points_label = create_label("Point limit", zeros());
+    Entity point_limit = create_slider(vec(0.0f, 0.0f), 1, 20, 10, set_point_limit);
+    add_row_to_container(container, points_label, point_limit);
+
+    Entity start_button = create_button("Start game", zeros(), change_state_host_start);
+    Entity close_button = create_button("Close lobby", zeros(), change_state_end);
+    add_row_to_container(container, start_button, close_button);
 }

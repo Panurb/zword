@@ -312,9 +312,9 @@ void set_slider(int entity, Vector2f mouse_position) {
     float x = mouse_position.x - get_position(entity).x + 0.5f * collider->width;
     int n = widget->max_value - widget->min_value;
     int value = clamp(x  / collider->width, 0.0f, 1.0f) * n;
-    widget->value = value;
+    widget->value = value + widget->min_value;
     if (widget->on_change) {
-        widget->on_change(entity, value);
+        widget->on_change(entity, widget->value);
     }
 }
 
@@ -329,6 +329,10 @@ int create_slider(Vector2f position, int min_value, int max_value, int value,
     widget->max_value = max_value;
     widget->value = value;
     widget->on_change = on_change;
+
+    if (widget->on_change) {
+        widget->on_change(i, widget->value);
+    }
 
     return i;
 }
@@ -488,7 +492,7 @@ void draw_widgets(int camera) {
             break;
         case WIDGET_SLIDER:
             draw_rectangle(camera, pos, w - MARGIN, h - MARGIN, 0.0f, COLOR_SHADOW);
-            float x = widget->value / (float) (widget->max_value - widget->min_value);
+            float x = (widget->value - widget->min_value) / (float) (widget->max_value - widget->min_value);
             draw_rectangle(camera, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 
                 0.0f, COLOR_BUTTON);
             char buffer[256];

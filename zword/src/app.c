@@ -52,6 +52,7 @@ typedef struct {
     GameMode game_mode;
     int num_players;
     char player_names[NET_MAX_CLIENTS + 1][32];
+    int point_limit;
 } CachedLobbyInfo;
 
 static Intro intro = {1, 0, {0.0f, 0.0f}, 3.0f};
@@ -81,6 +82,7 @@ static void cache_lobby_info(const LobbyInfoPacket* lobby) {
     cached_lobby_info.map_name[sizeof(cached_lobby_info.map_name) - 1] = '\0';
     cached_lobby_info.game_mode = (GameMode)lobby->game_mode;
     cached_lobby_info.num_players = lobby->num_players;
+    cached_lobby_info.point_limit = lobby->point_limit;
 
     for (int i = 0; i < NET_MAX_CLIENTS + 1; i++) {
         strncpy(cached_lobby_info.player_names[i], lobby->player_names[i], sizeof(cached_lobby_info.player_names[i]) - 1);
@@ -98,6 +100,7 @@ static void build_lobby_info_packet(LobbyInfoPacket* pkt) {
     pkt->game_mode = (uint8_t)game_data->game_mode;
     pkt->num_players = 1;
     strncpy(pkt->player_names[0], game_data->player_name, sizeof(pkt->player_names[0]) - 1);
+    pkt->point_limit = game_data->point_limit;
 
     for (int i = 0; i < NET_MAX_CLIENTS; i++) {
         if (!network.clients[i].connected) continue;
@@ -138,12 +141,34 @@ static void reset_host_client_timeouts() {
 }
 
 
+static void rebuild_host_player_controllers() {
+    if (network.mode != NET_MODE_HOST) {
+        return;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        app.player_controllers[i] = CONTROLLER_NONE;
+    }
+
+    app.player_controllers[0] = CONTROLLER_MKB;
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+
+        int slot = network.clients[i].player_slot;
+        if (slot > 0 && slot < 4) {
+            app.player_controllers[slot] = CONTROLLER_MKB;
+        }
+    }
+}
+
+
 static void return_to_lobby() {
     end_match();
     clear_all_sounds();
     network.game_started = false;
     lobby_info_broadcast_timer = 0.0f;
     reset_host_client_timeouts();
+    rebuild_host_player_controllers();
 
     destroy_menu();
     if (network.mode == NET_MODE_HOST) {
@@ -345,8 +370,7 @@ void input_game(SDL_Event sdl_event) {
                 LOG_ERROR("Failed to start host");
                 game_state = STATE_MENU;
             } else {
-                // Host is player 0 with MKB
-                app.player_controllers[0] = CONTROLLER_MKB;
+                rebuild_host_player_controllers();
                 destroy_menu();
                 create_host_lobby_menu();
                 game_state = STATE_HOST_LOBBY;
@@ -507,20 +531,12 @@ void update(float time_step) {
         case STATE_HOST_LOBBY:
             // Host: accept incoming client connections while in lobby
             network_host_accept_clients();
+            rebuild_host_player_controllers();
             if (lobby_info_broadcast_timer <= 0.0f) {
                 broadcast_lobby_info();
                 lobby_info_broadcast_timer = 0.25f;
             } else {
                 lobby_info_broadcast_timer = fmaxf(lobby_info_broadcast_timer - time_step, 0.0f);
-            }
-            // Assign controllers for connected clients
-            for (int i = 0; i < NET_MAX_CLIENTS; i++) {
-                if (network.clients[i].connected) {
-                    int slot = network.clients[i].player_slot;
-                    if (slot >= 0 && slot < 4) {
-                        app.player_controllers[slot] = CONTROLLER_MKB;  // placeholder, remote
-                    }
-                }
             }
             update_menu();
             break;
@@ -563,6 +579,7 @@ void update(float time_step) {
             game_state = STATE_GAME;
             break;
         case STATE_HOST_START:
+            rebuild_host_player_controllers();
             start_game(game_data->map_name, false);
             reset_host_client_timeouts();
 
@@ -860,6 +877,9 @@ void draw() {
 
                 snprintf(buffer, STRING_SIZE, "Mode: %s", game_mode_to_string(cached_lobby_info.game_mode));
                 draw_text(game_data->menu_camera, vec(0.0f, 5.0f), buffer, 20, COLOR_WHITE);
+
+                snprintf(buffer, STRING_SIZE, "Point Limit: %d", cached_lobby_info.point_limit);
+                draw_text(game_data->menu_camera, vec(0.0f, 3.0f), buffer, 20, COLOR_WHITE);
 
                 for (int i = 0; i < cached_lobby_info.num_players && i < NET_MAX_CLIENTS + 1; i++) {
                     draw_text(game_data->menu_camera, vec(0.0f, -1.0f - i * 2.0f), cached_lobby_info.player_names[i], 20, COLOR_WHITE);

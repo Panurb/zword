@@ -99,6 +99,7 @@ typedef struct {
     Vector2f start_position;
     int music;
     String player_name;
+    int point_limit;
 } GameData;
 
 

@@ -69,7 +69,6 @@ static float spawn_delay = 2.0f;
 // Deathmatch
 static Vector2f player_spawns[8];
 static int player_spawns_count = 0;
-static int max_kills = 1;
 
 
 static void send_match_end_packet(bool won) {
@@ -169,6 +168,7 @@ void create_game() {
 
     game_data->music = 0;
     game_data->player_name[0] = '\0';
+    game_data->point_limit = 0;
 }
 
 
@@ -533,7 +533,7 @@ void update_deathmatch(float time_step) {
     FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
 
-        if (player->kills >= max_kills) {
+        if (player->kills >= game_data->point_limit) {
             change_state_win();
             return;
         }
