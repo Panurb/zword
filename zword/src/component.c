@@ -259,6 +259,7 @@ PlayerComponent* PlayerComponent_add(int entity) {
     player->deaths = 0;
     player->keys_size = 3;
     fill(player->keys, NULL_ENTITY, player->keys_size);
+    player->name[0] = '\0';
 
     player->controller.joystick = -1;
     

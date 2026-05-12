@@ -58,6 +58,7 @@ ButtonText WEATHERS[] = {
 
 static float game_over_timer = 0.0f;
 static bool level_won = false;
+static MatchEndType match_end_type = MATCH_END_GAME_OVER;
 
 // Survival
 static int wave = 1;
@@ -167,7 +168,6 @@ void create_game() {
     game_data->start_position = zeros();
 
     game_data->music = 0;
-    game_data->player_name[0] = '\0';
     game_data->point_limit = 0;
 }
 
@@ -326,6 +326,21 @@ void start_game(Filename map_name, bool load_save) {
     }
 
     init_game();
+}
+
+
+void set_player_names(String names[], int names_size) {
+    int i = 0;
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        LOG_INFO("Setting player %d name to %s", i, names[i]);
+        strncpy(player->name, names[i], sizeof(player->name) - 1);
+        i++;
+        if (i >= names_size) {
+            break;
+        }
+    }
 }
 
 

@@ -98,7 +98,6 @@ typedef struct {
     bool testing;
     Vector2f start_position;
     int music;
-    String player_name;
     int point_limit;
 } GameData;
 
@@ -125,6 +124,8 @@ void resize_game();
 void init_game();
 
 void start_game(Filename map_name, bool load_save);
+
+void set_player_names(String names[], int names_size);
 
 void end_game();
 

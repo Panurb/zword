@@ -217,6 +217,42 @@ void draw_boss_health(int camera) {
 }
 
 
+void draw_leaderboard(Entity camera) {
+    Color color = get_color(0.0f, 0.0f, 0.0f, 0.5f);
+    draw_rectangle(camera, zeros(), 15.0f, 10.0f, 0.0f, color);
+
+    float header_y = 4.0f;
+    float name_x = -5.0f;
+    float kills_x = 0.0f;
+    float deaths_x = 5.0f;
+
+    draw_text(camera, vec(name_x, header_y), "player", 20, COLOR_WHITE);
+    draw_text(camera, vec(kills_x, header_y), "kills", 20, COLOR_WHITE);
+    draw_text(camera, vec(deaths_x, header_y), "deaths", 20, COLOR_WHITE);
+
+    draw_line(camera, vec(-7.5f, header_y - 0.5f), vec(7.5f, header_y - 0.5f), 0.05f, COLOR_WHITE);
+
+    String buffer;
+
+    ListNode* node;
+    float y = 1.5f;
+    FOREACH(node, game_data->components->player.order) {
+        Entity i = node->value;
+        PlayerComponent* player = PlayerComponent_get(i);
+
+        draw_text(camera, vec(name_x, y), player->name, 20, COLOR_WHITE);
+
+        snprintf(buffer, STRING_SIZE, "%d", player->kills);
+        draw_text(camera, vec(kills_x, y), buffer, 20, COLOR_WHITE);
+
+        snprintf(buffer, STRING_SIZE, "%d", player->deaths);
+        draw_text(camera, vec(deaths_x, y), buffer, 20, COLOR_WHITE);
+
+        y -= 1.5f;
+    }
+}
+
+
 void draw_hud(int camera) {
     for (int i = 0; i < game_data->components->entities; i++) {
         if (!CoordinateComponent_get(i)) continue;

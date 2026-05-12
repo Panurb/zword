@@ -57,6 +57,8 @@ The snapshot packet layout is:
 3. Sound events: `[u8 count]` + N × `[u16 entity_id][u16 sound_index][u8 volume]` (5 bytes each)
 4. Particle events: `[u8 count]` + N × `[u16 entity_id][u16 count][float origin_x][float origin_y][float max_time]` (16 bytes each)
 
+Player runtime data inside snapshots includes `kills` and `deaths`, so client HUD / end-game UI can read authoritative deathmatch stats directly from `PlayerComponent`.
+
 Sound events are discovered at snapshot-build time by scanning `SoundComponent.events[]` for pending one-shot events. Particle events use `ParticleComponent.pending_burst`, which accumulates burst counts across multiple hits in one frame (e.g. shotgun pellets). Only non-looping particles are synced; looping emitters run locally on clients.
 
 ## Game loops

@@ -5,6 +5,7 @@
 #include "network.h"
 
 #include "game.h"
+#include "settings.h"
 
 Network network;
 
@@ -173,7 +174,7 @@ bool network_client_connect(const char* host_ip, int port) {
     join.header.type = PACKET_JOIN;
     join.header.tick = 0;
     join.header.size = sizeof(PacketHeader);
-    strcpy(join.player_name, game_data->player_name);
+    strcpy(join.player_name, game_settings.player_name);
     network_send_to_host(&join, sizeof(join));
 
     LOG_INFO("Connecting to %s:%d", host_ip, port);

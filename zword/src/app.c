@@ -39,6 +39,8 @@ static float lobby_info_broadcast_timer = 0.0f;
 
 static int debug_level = 0;
 
+static bool show_leaderboard = false;
+
 typedef struct {
     int page;
     int panel;
@@ -51,13 +53,13 @@ typedef struct {
     char map_name[128];
     GameMode game_mode;
     int num_players;
-    char player_names[NET_MAX_CLIENTS + 1][32];
+    String player_names[NET_MAX_CLIENTS + 1];
     int point_limit;
-} CachedLobbyInfo;
+} LobbyInfo;
 
 static Intro intro = {1, 0, {0.0f, 0.0f}, 3.0f};
 
-static CachedLobbyInfo cached_lobby_info = {0};
+static LobbyInfo cached_lobby_info = {0};
 
 
 static const char* game_mode_to_string(GameMode mode) {
@@ -99,9 +101,9 @@ static void build_lobby_info_packet(LobbyInfoPacket* pkt) {
     strncpy(pkt->map_name, game_data->map_name, sizeof(pkt->map_name) - 1);
     pkt->game_mode = (uint8_t)game_data->game_mode;
     pkt->num_players = 1;
-    strncpy(pkt->player_names[0], game_data->player_name, sizeof(pkt->player_names[0]) - 1);
     pkt->point_limit = game_data->point_limit;
 
+    strncpy(pkt->player_names[0], game_settings.player_name, sizeof(pkt->player_names[0]) - 1);
     for (int i = 0; i < NET_MAX_CLIENTS; i++) {
         if (!network.clients[i].connected) continue;
 
@@ -418,6 +420,11 @@ void input_game(SDL_Event sdl_event) {
                     game_state = STATE_HOST_PAUSE;
                 }
             }
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_TAB) {
+                show_leaderboard = true;
+            } else if (sdl_event.type == SDL_KEYUP && sdl_event.key.keysym.sym == SDLK_TAB) {
+                show_leaderboard = false;
+            }
             break;
         case STATE_HOST_END:
             break;
@@ -431,6 +438,11 @@ void input_game(SDL_Event sdl_event) {
                 if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
                     game_state = STATE_CLIENT_PAUSE;
                 }
+            }
+            if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_TAB) {
+                show_leaderboard = true;
+            } else if (sdl_event.type == SDL_KEYUP && sdl_event.key.keysym.sym == SDLK_TAB) {
+                show_leaderboard = false;
             }
             break;
         case STATE_PAUSE:
@@ -528,6 +540,7 @@ void update(float time_step) {
             intro.page = 1;
             intro.panel = 0;
             update_menu();
+            break;
         case STATE_HOST_LOBBY:
             // Host: accept incoming client connections while in lobby
             network_host_accept_clients();
@@ -581,6 +594,7 @@ void update(float time_step) {
         case STATE_HOST_START:
             rebuild_host_player_controllers();
             start_game(game_data->map_name, false);
+            set_player_names(cached_lobby_info.player_names, cached_lobby_info.num_players);
             reset_host_client_timeouts();
 
             // Count total players (host + connected clients)
@@ -609,6 +623,7 @@ void update(float time_step) {
             break;
         case STATE_CLIENT_START:
             start_game(game_data->map_name, false);
+            set_player_names(cached_lobby_info.player_names, cached_lobby_info.num_players);
 
             // Initialize net_entity_seen and ID mappings for both host and client
             memset(net_entity_seen, 0, sizeof(net_entity_seen));
@@ -917,6 +932,9 @@ void draw() {
             draw_game();
             draw_hud(game_data->camera);
             draw_game_mode();
+            if (show_leaderboard) {
+                draw_leaderboard(game_data->menu_camera);
+            }
             break;
         case STATE_HOST_PAUSE:
         case STATE_CLIENT_PAUSE:

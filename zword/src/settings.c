@@ -98,6 +98,7 @@ void load_settings() {
 void save_settings() {
     FILE* file = fopen("config.cfg", "w");
 
+
     fprintf(file, "WIDTH=%i\n", game_settings.width);
     fprintf(file, "HEIGHT=%i\n", game_settings.height);
     fprintf(file, "ANTIALIASING=%i\n", game_settings.antialiasing);
@@ -109,6 +110,7 @@ void save_settings() {
     for (int i = 0; i < ACTIONS_SIZE; i++) {
         fprintf(file, "%s=%s\n", ACTIONS[i], keybind_to_string(game_settings.keybinds[i]));
     }
+    fprintf(file, "PLAYER_NAME=%s\n", game_settings.player_name);
 
     fclose(file);
 }

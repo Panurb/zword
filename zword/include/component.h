@@ -198,6 +198,7 @@ typedef struct {
     float respawn_timer;
     int kills;
     int deaths;
+    String name;
 } PlayerComponent;
 
 typedef struct {

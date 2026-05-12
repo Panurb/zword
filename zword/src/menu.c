@@ -107,6 +107,8 @@ void change_state_game(int entity) {
 
 void change_state_create_lobby(Entity entity) {
     UNUSED(entity);
+    strcpy(game_settings.player_name, WidgetComponent_get(name_input_lan)->string);
+    save_settings();
     game_state = STATE_CREATE_LOBBY;
     reset_ids();
 }
@@ -114,8 +116,9 @@ void change_state_create_lobby(Entity entity) {
 
 void change_state_join(Entity entity) {
     UNUSED(entity);
-    strcpy(game_data->player_name, WidgetComponent_get(name_input_lan)->string);
+    strcpy(game_settings.player_name, WidgetComponent_get(name_input_lan)->string);
     strcpy(network.host_ip, WidgetComponent_get(ip_input_lan)->string);
+    save_settings();
     game_state = STATE_JOIN;
     reset_ids();
 }

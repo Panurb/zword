@@ -244,6 +244,10 @@ int binary_serialize_entity(uint8_t* buf, int buf_size, int entity) {
         if (!n) return 0; ptr += n; rem -= n;
         n = write_i32(ptr, rem, (int32_t)player->money_increment);
         if (!n) return 0; ptr += n; rem -= n;
+        n = write_i32(ptr, rem, (int32_t)player->kills);
+        if (!n) return 0; ptr += n; rem -= n;
+        n = write_i32(ptr, rem, (int32_t)player->deaths);
+        if (!n) return 0; ptr += n; rem -= n;
     }
 
     // --- Enemy (creation + runtime) ---
@@ -683,7 +687,7 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool
 
     // --- Player ---
     if (flags & BFLAG_HAS_PLAYER) {
-        CHECK(1 + 4 + 1 + 4*2 + 4*2 + 3*2 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4);
+        CHECK(1 + 4 + 1 + 4*2 + 4*2 + 3*2 + 2 + 2 + 2 + 4 + 2 + 1 + 4 + 4 + 4 + 4);
         uint8_t state = read_u8(&ptr);
         int32_t money = read_i32(&ptr);
         uint8_t item_slot = read_u8(&ptr);
@@ -701,6 +705,8 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool
         uint8_t won = read_u8(&ptr);
         float money_timer = read_f32(&ptr);
         int32_t money_increment = read_i32(&ptr);
+        int32_t kills = read_i32(&ptr);
+        int32_t deaths = read_i32(&ptr);
 
         PlayerComponent* player = PlayerComponent_get(entity);
         if (!player) {
@@ -720,6 +726,8 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool
         player->won = won != 0;
         player->money_timer = money_timer;
         player->money_increment = (int)money_increment;
+        player->kills = (int)kills;
+        player->deaths = (int)deaths;
     }
 
     // --- Enemy ---
