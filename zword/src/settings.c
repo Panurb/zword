@@ -33,7 +33,8 @@ Settings game_settings = {
         { DEVICE_KEYBOARD, SDL_SCANCODE_SPACE },
         { DEVICE_KEYBOARD, SDL_SCANCODE_LSHIFT }
     },
-    .player_name = ""
+    .player_name = "",
+    .last_ip = "127.0.0.1",
 };
 
 
@@ -82,6 +83,8 @@ void load_settings() {
             game_settings.debug = strtol(line.value, NULL, 10);
         } else if (strcmp(line.key, "PLAYER_NAME") == 0) {
             strcpy(game_settings.player_name, line.value);
+        } else if (strcmp(line.key, "LAST_IP") == 0) {
+            strcpy(game_settings.last_ip, line.value);
         } else {
             for (int i = 0; i < ACTIONS_SIZE; i++) {
                 if (strcmp(line.key, ACTIONS[i]) == 0) {
@@ -111,6 +114,7 @@ void save_settings() {
         fprintf(file, "%s=%s\n", ACTIONS[i], keybind_to_string(game_settings.keybinds[i]));
     }
     fprintf(file, "PLAYER_NAME=%s\n", game_settings.player_name);
+    fprintf(file, "LAST_IP=%s\n", game_settings.last_ip);
 
     fclose(file);
 }

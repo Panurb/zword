@@ -544,6 +544,8 @@ float get_nearest_player_distance(Vector2f position) {
 
 
 void update_deathmatch(float time_step) {
+    UNUSED(time_step);
+
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         PlayerComponent* player = PlayerComponent_get(node->value);
@@ -770,6 +772,18 @@ void update_game_over(float time_step) {
 }
 
 
+Entity get_winner() {
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        if (player->kills >= game_data->point_limit) {
+            return node->value;
+        }
+    }
+    return NULL_ENTITY;
+}
+
+
 void draw_game_over() {
     draw_game();
     float alpha = 1.0f - game_over_timer / 2.0f;
@@ -777,7 +791,15 @@ void draw_game_over() {
     Color color = get_color(1.0f, 0.0f, 0.0f, alpha);
     if (alpha == 1.0f) {
         if (level_won) {
-            draw_text(game_data->menu_camera, vec(0.0f, 5.0f), "YOU WON", 300, color);
+            if (game_data->game_mode == MODE_DEATHMATCH) {
+                PlayerComponent* player = PlayerComponent_get(get_winner());
+                String buffer;
+                snprintf(buffer, STRING_SIZE, "%s WINS", player->name);
+                draw_text(game_data->menu_camera, vec(0.0f, 8.0f), buffer, 300, color);
+                draw_leaderboard(game_data->menu_camera);
+            } else {
+                draw_text(game_data->menu_camera, vec(0.0f, 5.0f), "YOU WON", 300, color);
+            }
         } else {
             draw_text(game_data->menu_camera, vec(0.0f, 5.0f), "GAME OVER", 300, color);
         }

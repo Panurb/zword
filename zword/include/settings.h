@@ -33,6 +33,7 @@ typedef struct {
     bool debug;
     Keybind keybinds[16];
     String player_name;
+    String last_ip;
 } Settings;
 
 typedef struct {

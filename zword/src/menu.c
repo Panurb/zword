@@ -118,6 +118,7 @@ void change_state_join(Entity entity) {
     UNUSED(entity);
     strcpy(game_settings.player_name, WidgetComponent_get(name_input_lan)->string);
     strcpy(network.host_ip, WidgetComponent_get(ip_input_lan)->string);
+    strcpy(game_settings.last_ip, network.host_ip);
     save_settings();
     game_state = STATE_JOIN;
     reset_ids();
@@ -233,7 +234,7 @@ void toggle_lan(Entity entity) {
     add_row_to_container(container, name_label, name_input_lan);
 
     ip_input_lan = create_textbox(zeros(), 1);
-    strcpy(WidgetComponent_get(ip_input_lan)->string, "127.0.0.1");
+    strcpy(WidgetComponent_get(ip_input_lan)->string, game_settings.last_ip);
     Entity join_button = create_button("JOIN", zeros(), change_state_join);
     add_row_to_container(container, ip_input_lan, join_button);
 
@@ -620,33 +621,30 @@ void draw_menu() {
 
 void create_game_over_menu() {
     if (game_data->game_mode == MODE_CAMPAIGN && save_exists()) {
-        create_button("Load save", vec(0.0f, -1.0f * BUTTON_HEIGHT), load_campaign);
+        create_button("LOAD SAVE", vec(0.0f, -1.0f * BUTTON_HEIGHT), load_campaign);
     } else {
-        create_button("Restart", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
+        create_button("RESTART", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     }
+
+    float y = game_data->game_mode == MODE_DEATHMATCH ? -5.0f * BUTTON_HEIGHT : -1.0f * BUTTON_HEIGHT;
     switch (network.mode) {
         case NET_MODE_HOST:
-            create_button("Return to lobby", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_create_lobby);
-            break;
-        case NET_MODE_CLIENT:
-            create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+            create_button("RETURN TO LOBBY", vec(0.0f, y), change_state_create_lobby);
             break;
         default:
-            create_button("Quit", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
+            create_button("QUIT", vec(0.0f, y), change_state_end);
     }
 }
 
 
 void create_win_menu() {
+    float y = game_data->game_mode == MODE_DEATHMATCH ? -5.0f * BUTTON_HEIGHT : -1.0f * BUTTON_HEIGHT;
     switch (network.mode) {
         case NET_MODE_HOST:
-            create_button("Return to lobby", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_lobby);
-            break;
-        case NET_MODE_CLIENT:
-            create_button("Quit", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+            create_button("RETURN TO LOBBY", vec(0.0f, y), change_state_lobby);
             break;
         default:
-            create_button("Continue", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_end);
+            create_button("CONTINUE", vec(0.0f, y), change_state_end);
     }
 }
 
