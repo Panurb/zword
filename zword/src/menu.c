@@ -12,6 +12,7 @@
 #include "app.h"
 #include "benchmark.h"
 #include "network.h"
+#include "serialize.h"
 #include "util.h"
 
 
@@ -670,6 +671,11 @@ void set_point_limit(Entity entity, int value) {
 }
 
 
+bool game_mode_is_deathmatch(Filename map_name) {
+    return get_map_game_mode(map_name) == MODE_DEATHMATCH;
+}
+
+
 void create_host_lobby_menu() {
     static ButtonText maps[] = {
         "mp_test",
@@ -681,8 +687,9 @@ void create_host_lobby_menu() {
     WidgetComponent_get(container)->enabled = false;
 
     Entity map_label = create_label("Map", zeros());
-    map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
-    set_map_data(map_dropdown_lan, 0);
+    // map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
+    map_dropdown_lan = create_dropdown_from_files(vec(0.0f, 0.0f), "maps", game_mode_is_deathmatch);
+    // set_map_data(map_dropdown_lan, 0);
     WidgetComponent_get(map_dropdown_lan)->on_change = set_map_data;
     add_row_to_container(container, map_label, map_dropdown_lan);
 

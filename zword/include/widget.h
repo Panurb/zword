@@ -41,6 +41,8 @@ void add_files_to_container(int container, Filename path, OnClick on_click);
 
 int create_dropdown(Vector2f position, ButtonText* strings, int size);
 
+Entity create_dropdown_from_files(Vector2f position, Filename path, bool (*condition)(Filename));
+
 void set_slider(int entity, Vector2f mouse_position);
 
 int create_slider(Vector2f position, int min_value, int max_value, int value, 

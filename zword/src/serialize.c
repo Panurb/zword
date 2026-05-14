@@ -1248,3 +1248,14 @@ int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scal
 
     return root;
 }
+
+
+GameMode get_map_game_mode(ButtonText map_name) {
+    cJSON* json = load_json("data/maps", map_name);
+    if (!json) {
+        return MODE_SURVIVAL;
+    }
+    int game_mode = deserialize_int(json, "game_mode", MODE_SURVIVAL);
+    cJSON_Delete(json);
+    return game_mode;
+}

@@ -306,6 +306,47 @@ int create_dropdown(Vector2f position, ButtonText* strings, int size) {
 }
 
 
+Entity create_dropdown_from_files(Vector2f position, Filename path, bool (*condition)(Filename)) {
+    #ifndef __EMSCRIPTEN__
+        Filename full_path;
+        snprintf(full_path, 128, "data/%s/*.json", path);
+        WIN32_FIND_DATA file;
+        HANDLE handle = FindFirstFile(full_path, &file);
+
+        if (handle == INVALID_HANDLE_VALUE) {
+            printf("Path not found: %s\n", full_path);
+            return -1;
+        }
+
+        ButtonText* strings = malloc(sizeof(ButtonText) * 100);
+        int size = 0;
+
+        do {
+            if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
+                continue;
+            }
+            char* dot = strchr(file.cFileName, '.');
+            if (dot) {
+                *dot = '\0';
+            }
+            if (condition && !condition(file.cFileName)) {
+                continue;
+            }
+
+            strncpy(strings[size], file.cFileName, BUTTON_TEXT_SIZE);
+            size++;
+        } while (FindNextFile(handle, &file));
+
+        return create_dropdown(position, strings, size);
+    #else
+        UNUSED(position);
+        UNUSED(path);
+        UNUSED(condition);
+        return NULL_ENTITY;
+    #endif
+}
+
+
 void set_slider(int entity, Vector2f mouse_position) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     ColliderComponent* collider = ColliderComponent_get(entity);
