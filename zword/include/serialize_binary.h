@@ -38,8 +38,3 @@ int binary_serialize_entity(uint8_t* buf, int buf_size, int entity);
 // values instead of hard-snapped (used for client-side network smoothing).
 // Returns number of bytes consumed, or 0 on error.
 int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool smooth);
-
-// Skip past binary entity data without creating anything.
-// Parses the data to determine its size.
-// Returns number of bytes consumed, or 0 on error.
-int binary_skip_entity(const uint8_t* buf, int buf_size);

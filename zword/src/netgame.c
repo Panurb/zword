@@ -230,13 +230,7 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
         int consumed = binary_deserialize_entity(data, remaining, entity, !is_new);
         if (consumed == 0) {
             LOG_WARNING("Failed to deserialize entity snapshot for entity=%d", entity);
-            // Try to skip
-            int skipped = binary_skip_entity(data, remaining);
-            if (skipped > 0) {
-                data += skipped;
-                remaining -= skipped;
-            }
-            continue;
+            return;
         }
 
         data += consumed;
