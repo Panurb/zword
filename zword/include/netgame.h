@@ -16,6 +16,8 @@
 typedef struct {
     PacketHeader header;
     uint16_t entity_count;
+    uint16_t wave;
+    float wave_delay;
 } SnapshotPacket;
 
 // Input packet sent from client to host

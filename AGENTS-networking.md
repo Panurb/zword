@@ -121,6 +121,8 @@ Clients may allocate entities in different order than the host. Two mapping arra
 
 Snapshots are serialized with host IDs. `netgame_apply_snapshot()` remaps on the client side, creating local entities as needed.
 
+The snapshot header can also carry small pieces of authoritative match-level state that do not belong to any entity. Survival currently syncs `wave` and `wave_delay` this way so client-side HUD and end-game text match the host.
+
 ## Known limitations
 
 - **No client-side prediction** -- all actions have a full round-trip delay before the client sees the result

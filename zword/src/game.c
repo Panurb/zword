@@ -61,9 +61,7 @@ static bool level_won = false;
 static MatchEndType match_end_type = MATCH_END_GAME_OVER;
 
 // Survival
-static int wave = 1;
 static int enemies = 0;
-static float wave_delay = 5.0f;
 static List* spawners = NULL;
 static float spawn_delay = 2.0f;
 
@@ -169,6 +167,8 @@ void create_game() {
 
     game_data->music = 0;
     game_data->point_limit = 0;
+    game_data->wave = 1;
+    game_data->wave_delay = 5.0f;
 }
 
 
@@ -185,9 +185,9 @@ void resize_game() {
 
 
 void init_survival() {
-    wave = 1;
+    game_data->wave = 1;
     enemies = 0;
-    wave_delay = 5.0f;
+    game_data->wave_delay = 5.0f;
     spawn_delay = 2.0f;
     game_over_timer = 0.0f;
     level_won = false;
@@ -362,8 +362,8 @@ void end_match() {
 
 
 float spawn_prob(float min_wave, float max_prob, float rate) {
-    if (wave + rate - min_wave == 0.0f) return 0.0f;
-    return fmaxf(0.0f, max_prob * (1 - rate / (wave + rate - min_wave)));
+    if (game_data->wave + rate - min_wave == 0.0f) return 0.0f;
+    return fmaxf(0.0f, max_prob * (1 - rate / (game_data->wave + rate - min_wave)));
 }
 
 
@@ -428,13 +428,13 @@ void update_survival(float time_step) {
         return;
     }
 
-    if (wave_delay > 0.0f) {
-        wave_delay -= time_step;
+    if (game_data->wave_delay > 0.0f) {
+        game_data->wave_delay -= time_step;
         return;
     }
 
-    if (enemies < 10 + wave * 5) {
-        enemies += spawn_enemies(game_data->camera, time_step, 4 + wave);
+    if (enemies < 10 + game_data->wave * 5) {
+        enemies += spawn_enemies(game_data->camera, time_step, 4 + game_data->wave);
     } else {
         bool enemies_alive = false;
         for (int i = 0; i < game_data->components->entities; i++) {
@@ -446,8 +446,8 @@ void update_survival(float time_step) {
         }
 
         if (!enemies_alive) {
-            wave++;
-            wave_delay = 5.0f;
+            game_data->wave++;
+            game_data->wave_delay = 5.0f;
             enemies = 0;
         }
     }
@@ -596,9 +596,9 @@ void update_game_mode(float time_step) {
 void draw_game_mode() {
     switch (game_data->game_mode) {
         case MODE_SURVIVAL:
-            if (wave_delay > 0.0f) {
+            if (game_data->wave_delay > 0.0f) {
                 char buffer[256];
-                snprintf(buffer, 256, "WAVE %d", wave);
+                snprintf(buffer, 256, "WAVE %d", game_data->wave);
                 draw_text(game_data->menu_camera, zeros(), buffer, 300, COLOR_WHITE);
             }
             break;
@@ -805,7 +805,7 @@ void draw_game_over() {
         }
         if (game_data->game_mode == MODE_SURVIVAL) {
             char buffer[256];
-            snprintf(buffer, 256, "You survived until wave %d", wave);
+            snprintf(buffer, 256, "You survived until wave %d", game_data->wave);
             draw_text(game_data->menu_camera, vec(0.0f, 1.0f), buffer, 40, color);
         }
         draw_menu();

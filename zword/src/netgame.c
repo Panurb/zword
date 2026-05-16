@@ -50,6 +50,13 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
     pkt->header.type = PACKET_SNAPSHOT;
     pkt->header.tick = tick;
     pkt->entity_count = 0;
+    pkt->wave = 0;
+    pkt->wave_delay = 0.0f;
+
+    if (game_data->game_mode == MODE_SURVIVAL) {
+        pkt->wave = (uint16_t)game_data->wave;
+        pkt->wave_delay = game_data->wave_delay;
+    }
 
     uint8_t* data = buf + sizeof(SnapshotPacket);
     int remaining = buf_size - (int)sizeof(SnapshotPacket);
@@ -179,6 +186,11 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
 
     const SnapshotPacket* pkt = (const SnapshotPacket*)buf;
     if (pkt->header.type != PACKET_SNAPSHOT) return;
+
+    if (game_data->game_mode == MODE_SURVIVAL) {
+        game_data->wave = pkt->wave;
+        game_data->wave_delay = pkt->wave_delay;
+    }
 
     const uint8_t* data = buf + sizeof(SnapshotPacket);
     int remaining = size - (int)sizeof(SnapshotPacket);

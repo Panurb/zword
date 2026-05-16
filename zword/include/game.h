@@ -99,6 +99,8 @@ typedef struct {
     Vector2f start_position;
     int music;
     int point_limit;
+    int wave;
+    float wave_delay;
 } GameData;
 
 
