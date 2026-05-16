@@ -39,9 +39,11 @@ void add_row_to_container(int container, int left, int right);
 
 void add_files_to_container(int container, Filename path, OnClick on_click);
 
-int create_dropdown(Vector2f position, ButtonText* strings, int size);
+void set_widget_strings(Entity entity, String* strings, int size);
 
-Entity create_dropdown_from_files(Vector2f position, Filename path, bool (*condition)(Filename));
+int create_dropdown(Vector2f position, String* strings, int size);
+
+void add_files_to_dropdown(Entity dropdown, Filename path, bool (*condition)(Filename));
 
 void set_slider(int entity, Vector2f mouse_position);
 

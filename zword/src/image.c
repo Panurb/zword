@@ -157,7 +157,7 @@ SDL_Texture* create_snow_texture(Permutation p) {
 void load_textures() {
     LOG_INFO("Loading textures");
 
-    resources.textures_size = list_files_alphabetically("data/images/*.png", resources.texture_names);
+    resources.textures_size = list_files_alphabetically("data/images/*.png", resources.texture_names, NULL);
     LOG_INFO("Found %d textures", resources.textures_size);
 
     Permutation p;

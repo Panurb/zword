@@ -5,6 +5,9 @@
 #include "game.h"
 
 
+#define MAX_MAPS 128
+
+
 void create_menu();
 
 void destroy_menu();

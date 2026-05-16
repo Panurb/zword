@@ -887,11 +887,11 @@ void draw() {
                 draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.host_ip, 20, COLOR_WHITE);
 
                 String buffer;
-                snprintf(buffer, STRING_SIZE, "Map: %s", cached_lobby_info.map_name);
-                draw_text(game_data->menu_camera, vec(0.0f, 7.0f), buffer, 20, COLOR_WHITE);
-
                 snprintf(buffer, STRING_SIZE, "Mode: %s", game_mode_to_string(cached_lobby_info.game_mode));
                 draw_text(game_data->menu_camera, vec(0.0f, 5.0f), buffer, 20, COLOR_WHITE);
+
+                snprintf(buffer, STRING_SIZE, "Map: %s", cached_lobby_info.map_name);
+                draw_text(game_data->menu_camera, vec(0.0f, 7.0f), buffer, 20, COLOR_WHITE);
 
                 snprintf(buffer, STRING_SIZE, "Point Limit: %d", cached_lobby_info.point_limit);
                 draw_text(game_data->menu_camera, vec(0.0f, 3.0f), buffer, 20, COLOR_WHITE);

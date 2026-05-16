@@ -56,8 +56,8 @@ typedef enum {
 } GameMode;
 
 
-extern ButtonText GAME_MODES[];
-extern ButtonText WEATHERS[];
+extern String GAME_MODES[];
+extern String WEATHERS[];
 
 
 typedef struct {

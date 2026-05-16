@@ -230,7 +230,7 @@ float lerp_angle(float a, float b, float t);
 
 float smoothstep(float x, float mu, float nu);
 
-int list_files_alphabetically(String path, String* files);
+int list_files_alphabetically(String path, String* files, bool (*condition)(Filename));
 
 void create_directory(String directory);
 

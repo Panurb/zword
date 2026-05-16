@@ -282,10 +282,9 @@ void toggle_dropdown(int entity) {
         int container = create_container(vec(0.0f, -0.5f * (height + 1) * BUTTON_HEIGHT), 1, height);
         add_child(entity, container);
         for (int i = widget->min_value; i <= widget->max_value; i++) {
-            int j = add_button_to_container(container, "", set_dropdown);
+            int j = add_button_to_container(container, widget->strings[i], set_dropdown);
             WidgetComponent* widget_child = WidgetComponent_get(j);
             widget_child->value = i;
-            widget_child->strings = widget->strings;
         }
 
         if (widget->max_value > 3) {
@@ -295,55 +294,33 @@ void toggle_dropdown(int entity) {
 }
 
 
-int create_dropdown(Vector2f position, ButtonText* strings, int size) {
-    int i = create_button(strings[0], position, toggle_dropdown);
-    WidgetComponent* widget = WidgetComponent_get(i);
-    widget->strings = strings;
-    widget->max_value = size - 1;
-    widget->type = WIDGET_DROPDOWN;
+void set_widget_strings(Entity entity, String* strings, int size) {
+    WidgetComponent* widget = WidgetComponent_get(entity);
 
-    return i;
+    if (widget->type == WIDGET_DROPDOWN) {
+        close_dropdown(entity);
+    }
+
+    if (widget->strings) {
+        free(widget->strings);
+    }
+    widget->strings = malloc(sizeof(String) * size);
+    for (int j = 0; j < size; j++) {
+        strcpy(widget->strings[j], strings[j]);
+        widget->strings[j][BUTTON_TEXT_SIZE - 1] = '\0';
+    }
+    widget->max_value = size - 1;
+    widget->value = 0;
 }
 
 
-Entity create_dropdown_from_files(Vector2f position, Filename path, bool (*condition)(Filename)) {
-    #ifndef __EMSCRIPTEN__
-        Filename full_path;
-        snprintf(full_path, 128, "data/%s/*.json", path);
-        WIN32_FIND_DATA file;
-        HANDLE handle = FindFirstFile(full_path, &file);
+int create_dropdown(Vector2f position, String* strings, int size) {
+    int i = create_button(strings[0], position, toggle_dropdown);
+    WidgetComponent* widget = WidgetComponent_get(i);
+    widget->type = WIDGET_DROPDOWN;
+    set_widget_strings(i, strings, size);
 
-        if (handle == INVALID_HANDLE_VALUE) {
-            printf("Path not found: %s\n", full_path);
-            return -1;
-        }
-
-        ButtonText* strings = malloc(sizeof(ButtonText) * 100);
-        int size = 0;
-
-        do {
-            if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
-                continue;
-            }
-            char* dot = strchr(file.cFileName, '.');
-            if (dot) {
-                *dot = '\0';
-            }
-            if (condition && !condition(file.cFileName)) {
-                continue;
-            }
-
-            strncpy(strings[size], file.cFileName, BUTTON_TEXT_SIZE);
-            size++;
-        } while (FindNextFile(handle, &file));
-
-        return create_dropdown(position, strings, size);
-    #else
-        UNUSED(position);
-        UNUSED(path);
-        UNUSED(condition);
-        return NULL_ENTITY;
-    #endif
+    return i;
 }
 
 

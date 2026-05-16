@@ -16,7 +16,7 @@
 #include "util.h"
 
 
-static ButtonText RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
+static String RESOLUTIONS[] = {"1280x720", "1360x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"};
 int RESOLUTION_ID = -1;
 int fullscreen_id = -1;
 static int map_name_textbox = -1;
@@ -33,7 +33,8 @@ static int button_benchmark = -1;
 static Entity name_input_lan = NULL_ENTITY;
 static Entity ip_input_lan = NULL_ENTITY;
 static Entity window_lan = NULL_ENTITY;
-static Entity map_dropdown_lan = NULL_ENTITY;
+static Entity lan_map_dropdown = NULL_ENTITY;
+static Entity lan_mode_dropdown = NULL_ENTITY;
 
 
 void reset_ids() {
@@ -52,7 +53,8 @@ void reset_ids() {
     name_input_lan = NULL_ENTITY;
     ip_input_lan = NULL_ENTITY;
     window_lan = NULL_ENTITY;
-    map_dropdown_lan = NULL_ENTITY;
+    lan_map_dropdown = NULL_ENTITY;
+    lan_mode_dropdown = NULL_ENTITY;
 }
 
 
@@ -427,7 +429,7 @@ void toggle_controls(int entity) {
     int container = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 2, 5);
     add_child(window_controls, container);
 
-    static ButtonText CONTROLLERS[9] = {"None", "Keyboard", "", "", "", "", "", "", ""};
+    static String CONTROLLERS[9] = {"None", "Keyboard", "", "", "", "", "", "", ""};
     
     for (int i = 0; i < 8; i++) {
         if (app.controllers[i] == NULL) {
@@ -518,7 +520,7 @@ void start_tutorial(int entity) {
 bool save_exists() {
     // Make static to prevent stack overflow in Emscripten
     static String files[128];
-    int files_count = list_files_alphabetically("save/*.json", files);
+    int files_count = list_files_alphabetically("save/*.json", files, NULL);
     return files_count > 0 && strcmp(files[0], "Campaign") == 0;
 }
 
@@ -671,27 +673,42 @@ void set_point_limit(Entity entity, int value) {
 }
 
 
-bool game_mode_is_deathmatch(Filename map_name) {
-    return get_map_game_mode(map_name) == MODE_DEATHMATCH;
+bool game_mode_is_selected(Filename map_name) {
+    WidgetComponent* widget = WidgetComponent_get(lan_mode_dropdown);
+    return get_map_game_mode(map_name) == widget->value;
+}
+
+
+void update_maps(Entity entity, int value) {
+    UNUSED(entity);
+    game_data->game_mode = value;
+
+    String files[MAX_MAPS];
+    int size = list_files_alphabetically("data/maps/*.json", files, game_mode_is_selected);
+    set_widget_strings(lan_map_dropdown, files, size);
+    set_map_data(lan_map_dropdown, 0);
 }
 
 
 void create_host_lobby_menu() {
-    static ButtonText maps[] = {
-        "mp_test",
-        "Campaign"
-    };
-
     int height = 4;
     int container = create_container(vec(-18.0f, -2.0f), 2, height);
     WidgetComponent_get(container)->enabled = false;
 
+    Entity mode_label = create_label("Mode", zeros());
+    lan_mode_dropdown = create_dropdown(zeros(), GAME_MODES, 4);
+    WidgetComponent_get(lan_mode_dropdown)->on_change = update_maps;
+    add_row_to_container(container, mode_label, lan_mode_dropdown);
+
     Entity map_label = create_label("Map", zeros());
-    // map_dropdown_lan = create_dropdown(vec(0.0f, 0.0f), maps, LENGTH(maps));
-    map_dropdown_lan = create_dropdown_from_files(vec(0.0f, 0.0f), "maps", game_mode_is_deathmatch);
-    // set_map_data(map_dropdown_lan, 0);
-    WidgetComponent_get(map_dropdown_lan)->on_change = set_map_data;
-    add_row_to_container(container, map_label, map_dropdown_lan);
+
+    String files[MAX_MAPS];
+    int size = list_files_alphabetically("data/maps/*.json", files, game_mode_is_selected);
+    lan_map_dropdown = create_dropdown(zeros(), files, size);
+    set_map_data(lan_map_dropdown, 0);
+    WidgetComponent_get(lan_map_dropdown)->on_change = set_map_data;
+
+    add_row_to_container(container, map_label, lan_map_dropdown);
 
     Entity points_label = create_label("Point limit", zeros());
     Entity point_limit = create_slider(vec(0.0f, 0.0f), 1, 20, 10, set_point_limit);

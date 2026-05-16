@@ -885,6 +885,9 @@ WidgetComponent* WidgetComponent_get(int entity) {
 void WidgetComponent_remove(int entity) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     if (widget) {
+        if (widget->strings) {
+            free(widget->strings);
+        }
         free(widget);
         game_data->components->widget.array[entity] = NULL;
         List_remove(game_data->components->widget.order, entity);

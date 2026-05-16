@@ -341,7 +341,7 @@ float smoothstep(float x, float mu, float nu) {
     return powf(1.0 + powf(x * (1.0 - mu) / (mu * (1.0 - x)), -nu), -1.0);
 }
 
-int list_files_alphabetically(String path, String* files) {
+int list_files_alphabetically(String path, String* files, bool (*condition)(Filename)) {
     LOG_INFO("Listing files in path: %s", path);
     int files_size = 0;
 
@@ -361,6 +361,10 @@ int list_files_alphabetically(String path, String* files) {
             char* dot = strchr(file.cFileName, '.');
             if (dot) {
                 *dot = '\0';
+            }
+            if (condition && !condition(file.cFileName)) {
+                LOG_INFO("Skipping file: %s", file.cFileName);
+                continue;
             }
             strcpy(files[files_size], file.cFileName);
             files_size++;

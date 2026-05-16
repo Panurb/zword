@@ -42,14 +42,14 @@ GameData* game_data;
 
 Resources resources;
 
-ButtonText GAME_MODES[] = {
+String GAME_MODES[] = {
     "SURVIVAL",
     "CAMPAIGN",
     "TUTORIAL",
     "DEATHMATCH"
 };
 
-ButtonText WEATHERS[] = {
+String WEATHERS[] = {
     "NONE",
     "RAIN",
     "SNOW"
