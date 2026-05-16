@@ -32,7 +32,7 @@ Network play uses dedicated game states instead of checking `network.mode` at ru
 
 - Transport: UDP, non-blocking sockets
 - Default port: 12345, max 3 clients (4 players total)
-- Disconnect timeout: 5 seconds
+- Disconnect timeout: 2 seconds
 - Max packet size: 65000 bytes
 - CLI: `--host [port]` or `--join [ip] [port]`
 
@@ -42,6 +42,7 @@ Packet types:
 |------|-----------|---------|
 | `PACKET_JOIN` | Client -> Host | Request to join |
 | `PACKET_JOIN_ACK` | Host -> Client | Accept with player slot assignment |
+| `PACKET_KEEPALIVE` | Client -> Host | Lobby heartbeat so the host can timeout disconnected clients |
 | `PACKET_INPUT` | Client -> Host | Controller state (sticks, triggers, button flags) |
 | `PACKET_SNAPSHOT` | Host -> Clients | Full game state (binary-serialized entities + sound/particle events) |
 | `PACKET_START_GAME` | Host -> Clients | Map name, game mode, player count |
@@ -72,6 +73,14 @@ Each tick at 60 Hz:
 4. Simulate (`update_game()`, `update_game_mode()`)
 5. Build binary snapshot (entities + sound events + particle events), broadcast to all clients
 
+### Host Lobby (`app.c`, `STATE_HOST_LOBBY`)
+
+Each tick:
+1. Receive join and keepalive packets from clients
+2. Check client timeouts
+3. Rebuild active player controllers from connected clients
+4. Periodically broadcast `PACKET_LOBBY_INFO`
+
 ### Client (`app.c`, `STATE_CLIENT`)
 
 Each tick:
@@ -81,6 +90,13 @@ Each tick:
 4. Receive and apply snapshots (overwrites current entity state, replays sound events, triggers particle bursts)
 5. Rebuild collision grid (needed for light raycasting)
 6. Update camera, lights, particles locally
+
+### Client Lobby (`app.c`, `STATE_CLIENT_LOBBY`)
+
+Each tick:
+1. Periodically send `PACKET_KEEPALIVE` to the host
+2. Receive `PACKET_JOIN_ACK`, `PACKET_LOBBY_INFO`, and `PACKET_START_GAME`
+3. Update the lobby UI from the latest cached lobby info
 
 ## Match end flow
 
@@ -111,3 +127,4 @@ Snapshots are serialized with host IDs. `netgame_apply_snapshot()` remaps on the
 - **Snapshot size cap** -- 65 KB limit can cause entities to be omitted from snapshots
 - **Pause is local only** -- pausing on the host or client only pauses locally; the other side keeps running
 - **Lobby info is best-effort UDP** -- periodic rebroadcast helps, but there is still no full ack/retry reliability layer
+- **Lobby disconnects are timeout-based** -- the host removes lobby clients after missed keepalives, so disconnect detection is not immediate

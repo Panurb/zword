@@ -233,8 +233,19 @@ static bool addr_equals(struct sockaddr_in* a, struct sockaddr_in* b) {
 }
 
 
+static void disconnect_client(int client_index) {
+    network.clients[client_index].connected = false;
+    network.clients[client_index].player_slot = -1;
+    network.clients[client_index].last_recv_time = 0.0f;
+    network.clients[client_index].ip[0] = '\0';
+    network.clients[client_index].player_name[0] = '\0';
+    network.num_clients--;
+}
+
+
 void network_host_accept_clients() {
     struct sockaddr_in from_addr;
+    float current_time = SDL_GetTicks() / 1000.0f;
 
     while (true) {
         int received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from_addr);
@@ -254,6 +265,8 @@ void network_host_accept_clients() {
             }
 
             if (existing >= 0) {
+                network.clients[existing].last_recv_time = current_time;
+
                 // Re-send ack
                 JoinAckPacket ack;
                 ack.header.type = PACKET_JOIN_ACK;
@@ -283,7 +296,7 @@ void network_host_accept_clients() {
                 network.clients[slot].connected = true;
                 network.clients[slot].addr = from_addr;
                 network.clients[slot].player_slot = slot + 1;  // Host is slot 0, clients are 1-3
-                network.clients[slot].last_recv_time = 0.0f;  // Will be set on first input packet
+                network.clients[slot].last_recv_time = current_time;
                 strcpy(network.clients[slot].player_name, join_pkt->player_name);
                 strcpy(network.clients[slot].ip, inet_ntoa(from_addr.sin_addr));
                 network.num_clients++;
@@ -296,6 +309,14 @@ void network_host_accept_clients() {
                 network_send_to(&from_addr, &ack, sizeof(ack));
 
                 LOG_INFO("Client connected as player %d, name %s", ack.player_slot, join_pkt->player_name);
+            }
+        } else if (header->type == PACKET_KEEPALIVE && received >= (int)sizeof(KeepAlivePacket)) {
+            for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+                if (!network.clients[i].connected) continue;
+                if (!addr_equals(&network.clients[i].addr, &from_addr)) continue;
+
+                network.clients[i].last_recv_time = current_time;
+                break;
             }
         }
     }
@@ -314,10 +335,7 @@ int network_check_timeouts(float current_time) {
         if (elapsed > NET_DISCONNECT_TIMEOUT) {
             int slot = network.clients[i].player_slot;
             LOG_WARNING("Client player %d timed out (%.1fs)", slot, elapsed);
-            network.clients[i].connected = false;
-            network.clients[i].player_slot = -1;
-            network.clients[i].last_recv_time = 0.0f;
-            network.num_clients--;
+            disconnect_client(i);
             disconnected_mask |= (1 << slot);
         }
     }

@@ -37,6 +37,8 @@ static float title_scale = 2.0f;
 
 static float lobby_info_broadcast_timer = 0.0f;
 
+static float lobby_keepalive_timer = 0.0f;
+
 static int debug_level = 0;
 
 static bool show_leaderboard = false;
@@ -121,6 +123,20 @@ static void broadcast_lobby_info() {
 }
 
 
+static void send_lobby_keepalive() {
+    if (network.mode != NET_MODE_CLIENT) {
+        return;
+    }
+
+    KeepAlivePacket pkt;
+    memset(&pkt, 0, sizeof(pkt));
+    pkt.header.type = PACKET_KEEPALIVE;
+    pkt.header.tick = network.tick;
+    pkt.header.size = sizeof(KeepAlivePacket);
+    network_send_to_host(&pkt, sizeof(pkt));
+}
+
+
 static void enter_client_match_end(const EndGamePacket* pkt) {
     if (pkt->end_type == MATCH_END_WIN) {
         enter_match_end_screen(true);
@@ -169,6 +185,7 @@ static void return_to_lobby() {
     clear_all_sounds();
     network.game_started = false;
     lobby_info_broadcast_timer = 0.0f;
+    lobby_keepalive_timer = 0.0f;
     reset_host_client_timeouts();
     rebuild_host_player_controllers();
 
@@ -544,6 +561,7 @@ void update(float time_step) {
         case STATE_HOST_LOBBY:
             // Host: accept incoming client connections while in lobby
             network_host_accept_clients();
+            network_check_timeouts(SDL_GetTicks() / 1000.0f);
             rebuild_host_player_controllers();
             if (lobby_info_broadcast_timer <= 0.0f) {
                 broadcast_lobby_info();
@@ -554,7 +572,13 @@ void update(float time_step) {
             update_menu();
             break;
         case STATE_CLIENT_LOBBY:
-            ;
+            if (lobby_keepalive_timer <= 0.0f) {
+                send_lobby_keepalive();
+                lobby_keepalive_timer = 0.25f;
+            } else {
+                lobby_keepalive_timer = fmaxf(lobby_keepalive_timer - time_step, 0.0f);
+            }
+
             // Client: check for JOIN_ACK or START_GAME
             struct sockaddr_in from;
             int received;

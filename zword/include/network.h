@@ -33,6 +33,7 @@ typedef enum {
 typedef enum {
     PACKET_JOIN,
     PACKET_JOIN_ACK,
+    PACKET_KEEPALIVE,
     PACKET_INPUT,
     PACKET_SNAPSHOT,
     PACKET_START_GAME,
@@ -62,6 +63,10 @@ typedef struct {
     PacketHeader header;
     uint8_t player_slot;
 } JoinAckPacket;
+
+typedef struct {
+    PacketHeader header;
+} KeepAlivePacket;
 
 typedef struct {
     PacketHeader header;
