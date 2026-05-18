@@ -2,18 +2,176 @@
 #include <string.h>
 
 #include "app.h"
+#include "camera.h"
+#include "light.h"
+#include "menu.h"
 #include "netgame.h"
 #include "network.h"
 #include "component.h"
 #include "game.h"
 #include "grid.h"
-#include "image.h"
+#include "health.h"
 #include "input.h"
+#include "settings.h"
 #include "serialize_binary.h"
 #include "sound.h"
 #include "particle.h"
 
 bool net_entity_seen[MAX_ENTITIES];
+
+typedef struct {
+    bool valid;
+    char map_name[128];
+    GameMode game_mode;
+    int num_players;
+    String player_names[NET_MAX_CLIENTS + 1];
+    int point_limit;
+} LobbyInfo;
+
+static float lobby_info_broadcast_timer = 0.0f;
+
+static float lobby_keepalive_timer = 0.0f;
+
+static LobbyInfo cached_lobby_info = {0};
+
+
+static const char* game_mode_to_string(GameMode mode) {
+    switch (mode) {
+        case MODE_SURVIVAL:
+            return "Survival";
+        case MODE_CAMPAIGN:
+            return "Campaign";
+        case MODE_TUTORIAL:
+            return "Tutorial";
+        case MODE_DEATHMATCH:
+            return "Deathmatch";
+    }
+
+    return "Unknown";
+}
+
+
+static void cache_lobby_info(const LobbyInfoPacket* lobby) {
+    cached_lobby_info.valid = true;
+    strncpy(cached_lobby_info.map_name, lobby->map_name, sizeof(cached_lobby_info.map_name) - 1);
+    cached_lobby_info.map_name[sizeof(cached_lobby_info.map_name) - 1] = '\0';
+    cached_lobby_info.game_mode = (GameMode)lobby->game_mode;
+    cached_lobby_info.num_players = lobby->num_players;
+    cached_lobby_info.point_limit = lobby->point_limit;
+
+    for (int i = 0; i < NET_MAX_CLIENTS + 1; i++) {
+        strncpy(cached_lobby_info.player_names[i], lobby->player_names[i], sizeof(cached_lobby_info.player_names[i]) - 1);
+        cached_lobby_info.player_names[i][sizeof(cached_lobby_info.player_names[i]) - 1] = '\0';
+    }
+}
+
+
+static void build_lobby_info_packet(LobbyInfoPacket* pkt) {
+    memset(pkt, 0, sizeof(*pkt));
+    pkt->header.type = PACKET_LOBBY_INFO;
+    pkt->header.tick = network.tick;
+    pkt->header.size = sizeof(LobbyInfoPacket);
+    strncpy(pkt->map_name, game_data->map_name, sizeof(pkt->map_name) - 1);
+    pkt->game_mode = (uint8_t)game_data->game_mode;
+    pkt->num_players = 1;
+    pkt->point_limit = game_data->point_limit;
+
+    strncpy(pkt->player_names[0], game_settings.player_name, sizeof(pkt->player_names[0]) - 1);
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+
+        pkt->num_players++;
+        strncpy(pkt->player_names[i + 1], network.clients[i].player_name, sizeof(pkt->player_names[i + 1]) - 1);
+    }
+}
+
+
+static void broadcast_lobby_info() {
+    LobbyInfoPacket pkt;
+    build_lobby_info_packet(&pkt);
+    cache_lobby_info(&pkt);
+    network_broadcast(&pkt, sizeof(pkt));
+}
+
+
+static void send_lobby_keepalive() {
+    if (network.mode != NET_MODE_CLIENT) {
+        return;
+    }
+
+    KeepAlivePacket pkt;
+    memset(&pkt, 0, sizeof(pkt));
+    pkt.header.type = PACKET_KEEPALIVE;
+    pkt.header.tick = network.tick;
+    pkt.header.size = sizeof(KeepAlivePacket);
+    network_send_to_host(&pkt, sizeof(pkt));
+}
+
+
+static void enter_client_match_end(const EndGamePacket* pkt) {
+    if (pkt->end_type == MATCH_END_WIN) {
+        enter_match_end_screen(true);
+    } else {
+        enter_match_end_screen(false);
+    }
+}
+
+
+static void reset_host_client_timeouts() {
+    if (network.mode != NET_MODE_HOST) {
+        return;
+    }
+
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+
+        network.clients[i].last_recv_time = 0.0f;
+    }
+}
+
+
+static void rebuild_host_player_controllers() {
+    if (network.mode != NET_MODE_HOST) {
+        return;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        app.player_controllers[i] = CONTROLLER_NONE;
+    }
+
+    app.player_controllers[0] = CONTROLLER_MKB;
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (!network.clients[i].connected) continue;
+
+        int slot = network.clients[i].player_slot;
+        if (slot > 0 && slot < 4) {
+            app.player_controllers[slot] = CONTROLLER_MKB;
+        }
+    }
+}
+
+
+static bool client_receive_packets(void) {
+    struct sockaddr_in from;
+    int received;
+    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+        if (received < (int)sizeof(PacketHeader)) continue;
+
+        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+        if (hdr->type == PACKET_SNAPSHOT) {
+            netgame_apply_snapshot(network.recv_buf, received);
+        } else if (hdr->type == PACKET_END_GAME && received >= (int)sizeof(EndGamePacket)) {
+            enter_client_match_end((EndGamePacket*)network.recv_buf);
+            return true;
+        } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+            cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
+            return_to_lobby();
+            return true;
+        }
+    }
+
+    return false;
+}
 
 
 // Check if an entity has dynamic components (not counting parent chain).
@@ -29,6 +187,29 @@ static bool has_dynamic_components(int entity) {
     if (ItemComponent_get(entity)) return true;
     if (AmmoComponent_get(entity)) return true;
     return false;
+}
+
+
+void return_to_lobby() {
+    end_match();
+    clear_all_sounds();
+    network.game_started = false;
+    lobby_info_broadcast_timer = 0.0f;
+    lobby_keepalive_timer = 0.0f;
+    reset_host_client_timeouts();
+    rebuild_host_player_controllers();
+
+    destroy_menu();
+    if (network.mode == NET_MODE_HOST) {
+        create_host_lobby_menu();
+        game_state = STATE_HOST_LOBBY;
+    } else if (network.mode == NET_MODE_CLIENT) {
+        create_lobby_menu();
+        game_state = STATE_CLIENT_LOBBY;
+    } else {
+        create_menu();
+        game_state = STATE_MENU;
+    }
 }
 
 
@@ -438,5 +619,317 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity) {
         // These flags are cleared after the state machine runs each tick.
         ctrl->buttons_pressed[i]  = ctrl->buttons_pressed[i]  || ((pkt->buttons_pressed  & (1 << i)) != 0);
         ctrl->buttons_released[i] = ctrl->buttons_released[i] || ((pkt->buttons_released & (1 << i)) != 0);
+    }
+}
+
+
+void create_lobby(void) {
+    if (!network_host_start(NET_DEFAULT_PORT)) {
+        LOG_ERROR("Failed to start host");
+        game_state = STATE_MENU;
+    } else {
+        rebuild_host_player_controllers();
+        destroy_menu();
+        create_host_lobby_menu();
+        game_state = STATE_HOST_LOBBY;
+    }
+}
+
+
+void join_lobby(void) {
+    if (!network_client_connect(network.host_ip, NET_DEFAULT_PORT)) {
+        LOG_ERROR("Failed to connect to host");
+        game_state = STATE_MENU;
+    } else {
+        destroy_menu();
+        create_lobby_menu();
+        game_state = STATE_CLIENT_LOBBY;
+    }
+}
+
+
+void input_host(SDL_Event sdl_event) {
+    if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
+        if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
+            game_state = STATE_HOST_PAUSE;
+        }
+    }
+    if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_TAB) {
+        game_data->show_leaderboard = true;
+    } else if (sdl_event.type == SDL_KEYUP && sdl_event.key.keysym.sym == SDLK_TAB) {
+        game_data->show_leaderboard = false;
+    }
+}
+
+
+void input_client(SDL_Event sdl_event) {
+    if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.repeat == 0) {
+        if (sdl_event.key.keysym.sym == SDLK_ESCAPE || sdl_event.key.keysym.sym == SDLK_p) {
+            game_state = STATE_CLIENT_PAUSE;
+        }
+    }
+    if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_TAB) {
+        game_data->show_leaderboard = true;
+    } else if (sdl_event.type == SDL_KEYUP && sdl_event.key.keysym.sym == SDLK_TAB) {
+        game_data->show_leaderboard = false;
+    }
+}
+
+
+void input_host_pause(SDL_Event sdl_event) {
+    input_menu(game_data->menu_camera, sdl_event);
+}
+
+
+void input_client_pause(SDL_Event sdl_event) {
+    input_menu(game_data->menu_camera, sdl_event);
+}
+
+
+void update_host_lobby(float time_step) {
+    network_host_accept_clients();
+    network_check_timeouts(SDL_GetTicks() / 1000.0f);
+    rebuild_host_player_controllers();
+    if (lobby_info_broadcast_timer <= 0.0f) {
+        broadcast_lobby_info();
+        lobby_info_broadcast_timer = 0.25f;
+    } else {
+        lobby_info_broadcast_timer = fmaxf(lobby_info_broadcast_timer - time_step, 0.0f);
+    }
+    update_menu();
+}
+
+
+void update_client_lobby(float time_step) {
+    if (lobby_keepalive_timer <= 0.0f) {
+        send_lobby_keepalive();
+        lobby_keepalive_timer = 0.25f;
+    } else {
+        lobby_keepalive_timer = fmaxf(lobby_keepalive_timer - time_step, 0.0f);
+    }
+
+    struct sockaddr_in from;
+    int received;
+    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+        if (received < (int)sizeof(PacketHeader)) continue;
+
+        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+        if (hdr->type == PACKET_JOIN_ACK && received >= (int)sizeof(JoinAckPacket)) {
+            JoinAckPacket* ack = (JoinAckPacket*)network.recv_buf;
+            network.local_player_slot = ack->player_slot;
+            LOG_INFO("Joined as player %d", network.local_player_slot);
+        } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+            cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
+        } else if (hdr->type == PACKET_START_GAME && received >= (int)sizeof(StartGamePacket)) {
+            StartGamePacket* start = (StartGamePacket*)network.recv_buf;
+            strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
+            game_data->map_name[sizeof(game_data->map_name) - 1] = '\0';
+            game_data->game_mode = (GameMode)start->game_mode;
+
+            for (int i = 0; i < 4; i++) {
+                app.player_controllers[i] = CONTROLLER_NONE;
+            }
+            for (int i = 0; i < (int)start->num_players; i++) {
+                app.player_controllers[i] = CONTROLLER_MKB;
+            }
+            network.game_started = true;
+            lobby_info_broadcast_timer = 0.0f;
+            game_state = STATE_CLIENT_START;
+            break;
+        }
+    }
+    update_menu();
+}
+
+
+void host_start(void) {
+    rebuild_host_player_controllers();
+    start_game(game_data->map_name, false);
+    set_player_names(cached_lobby_info.player_names, cached_lobby_info.num_players);
+    reset_host_client_timeouts();
+
+    int num_players = 1;
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (network.clients[i].connected) {
+            num_players++;
+        }
+    }
+
+    StartGamePacket start_pkt;
+    memset(&start_pkt, 0, sizeof(start_pkt));
+    start_pkt.header.type = PACKET_START_GAME;
+    start_pkt.header.tick = network.tick;
+    start_pkt.header.size = sizeof(StartGamePacket);
+    strncpy(start_pkt.map_name, game_data->map_name, sizeof(start_pkt.map_name) - 1);
+    start_pkt.game_mode = (uint8_t)game_data->game_mode;
+    start_pkt.num_players = (uint8_t)num_players;
+    network_broadcast(&start_pkt, sizeof(start_pkt));
+    network.game_started = true;
+    lobby_info_broadcast_timer = 0.0f;
+
+    memset(net_entity_seen, 0, sizeof(net_entity_seen));
+
+    create_host_pause_menu();
+    game_state = STATE_HOST;
+}
+
+
+void client_start(void) {
+    start_game(game_data->map_name, false);
+    set_player_names(cached_lobby_info.player_names, cached_lobby_info.num_players);
+
+    memset(net_entity_seen, 0, sizeof(net_entity_seen));
+
+    create_client_pause_menu();
+    game_state = STATE_CLIENT;
+}
+
+
+void update_host(float time_step) {
+    float current_time = SDL_GetTicks() / 1000.0f;
+
+    struct sockaddr_in from;
+    int received;
+    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+        if (received < (int)sizeof(PacketHeader)) continue;
+
+        PacketHeader* hdr = (PacketHeader*)network.recv_buf;
+        if (hdr->type == PACKET_INPUT && received >= (int)sizeof(InputPacket)) {
+            InputPacket* input_pkt = (InputPacket*)network.recv_buf;
+            for (int ci = 0; ci < NET_MAX_CLIENTS; ci++) {
+                if (network.clients[ci].connected &&
+                    from.sin_addr.s_addr == network.clients[ci].addr.sin_addr.s_addr &&
+                    from.sin_port == network.clients[ci].addr.sin_port) {
+                    network.clients[ci].last_recv_time = current_time;
+                    break;
+                }
+            }
+
+            int slot_idx = 0;
+            ListNode* pnode;
+            FOREACH(pnode, game_data->components->player.order) {
+                if (slot_idx == (int)input_pkt->player_slot) {
+                    netgame_unpack_input(input_pkt, pnode->value);
+                    break;
+                }
+                slot_idx++;
+            }
+        }
+    }
+
+    int disconnected = network_check_timeouts(current_time);
+    if (disconnected) {
+        int i = 0;
+        ListNode* node;
+        FOREACH(node, game_data->components->player.order) {
+            if (disconnected & (1 << i)) {
+                die(node->value);
+            }
+            i++;
+        }
+    }
+
+    input_players(game_data->camera);
+    update_game(time_step);
+    update_game_mode(time_step);
+
+    if (game_state == STATE_HOST_LOBBY) {
+        return_to_lobby();
+        return;
+    }
+
+    int snap_size = netgame_build_snapshot(network.send_buf, NET_MAX_PACKET_SIZE, network.tick);
+    network_broadcast(network.send_buf, snap_size);
+    network.tick++;
+}
+
+
+void update_client(float time_step) {
+    netgame_client_send_input(false);
+
+    update_coordinates();
+
+    if (client_receive_packets()) {
+        return;
+    }
+
+    ColliderGrid_clear(game_data->grid);
+    init_grid();
+    update_camera(game_data->camera, time_step, true);
+    update_lights(time_step);
+    update_particles(game_data->camera, time_step);
+
+    CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
+    cam_coord->previous.position = cam_coord->position;
+
+    network.tick++;
+}
+
+
+void update_client_pause(float time_step) {
+    netgame_client_send_input(true);
+
+    update_coordinates();
+
+    if (client_receive_packets()) {
+        return;
+    }
+
+    ColliderGrid_clear(game_data->grid);
+    init_grid();
+    update_camera(game_data->camera, time_step, true);
+    update_lights(time_step);
+    update_particles(game_data->camera, time_step);
+
+    CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
+    cam_coord->previous.position = cam_coord->position;
+    cam_coord->previous.angle = cam_coord->angle;
+    cam_coord->previous.scale = cam_coord->scale;
+
+    network.tick++;
+    update_menu();
+}
+
+
+void update_client_game_over(float time_step) {
+    if (client_receive_packets()) {
+        return;
+    }
+
+    update_game_over(time_step);
+}
+
+
+void draw_host_lobby(void) {
+    draw_menu();
+    draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.own_ip, 20, COLOR_WHITE);
+    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+        if (network.clients[i].connected) {
+            String buffer;
+            snprintf(buffer, STRING_SIZE, "%s - %s", network.clients[i].player_name, network.clients[i].ip);
+            draw_text(game_data->menu_camera, vec(0.0f, -5.0f + i * 2.0f), buffer, 20, COLOR_WHITE);
+        }
+    }
+}
+
+
+void draw_client_lobby(void) {
+    draw_menu();
+    if (cached_lobby_info.valid) {
+        draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.host_ip, 20, COLOR_WHITE);
+
+        String buffer;
+        snprintf(buffer, STRING_SIZE, "Mode: %s", game_mode_to_string(cached_lobby_info.game_mode));
+        draw_text(game_data->menu_camera, vec(0.0f, 7.0f), buffer, 20, COLOR_WHITE);
+
+        snprintf(buffer, STRING_SIZE, "Map: %s", cached_lobby_info.map_name);
+        draw_text(game_data->menu_camera, vec(0.0f, 5.0f), buffer, 20, COLOR_WHITE);
+
+        snprintf(buffer, STRING_SIZE, "Point Limit: %d", cached_lobby_info.point_limit);
+        draw_text(game_data->menu_camera, vec(0.0f, 3.0f), buffer, 20, COLOR_WHITE);
+
+        for (int i = 0; i < cached_lobby_info.num_players && i < NET_MAX_CLIENTS + 1; i++) {
+            draw_text(game_data->menu_camera, vec(0.0f, -1.0f - i * 2.0f), cached_lobby_info.player_names[i], 20, COLOR_WHITE);
+        }
     }
 }

@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <SDL.h>
+
 #include "component.h"
 #include "network.h"
 
@@ -58,7 +60,41 @@ bool netgame_client_send_input(bool neutral);
 // Host: unpack a received input packet into a player entity's controller.
 void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 
+void return_to_lobby();
+
 // Check if an entity is "dynamic" (needs to be synced).
 // An entity is dynamic if it has dynamic components OR any ancestor in
 // its coord->parent chain is dynamic.
 bool netgame_is_dynamic(int entity);
+
+void create_lobby(void);
+
+void join_lobby(void);
+
+void input_host(SDL_Event sdl_event);
+
+void input_client(SDL_Event sdl_event);
+
+void input_host_pause(SDL_Event sdl_event);
+
+void input_client_pause(SDL_Event sdl_event);
+
+void update_host_lobby(float time_step);
+
+void update_client_lobby(float time_step);
+
+void host_start(void);
+
+void client_start(void);
+
+void update_host(float time_step);
+
+void update_client(float time_step);
+
+void update_client_pause(float time_step);
+
+void update_client_game_over(float time_step);
+
+void draw_host_lobby(void);
+
+void draw_client_lobby(void);

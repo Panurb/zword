@@ -163,6 +163,7 @@ void create_game() {
 
     game_data->game_mode = MODE_SURVIVAL;
     game_data->testing = false;
+    game_data->show_leaderboard = false;
     game_data->start_position = zeros();
 
     game_data->music = 0;
@@ -318,6 +319,7 @@ void start_game(Filename map_name, bool load_save) {
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
     game_data->ambient_light = 0.5f;
+    game_data->show_leaderboard = false;
 
     if (load_save) {
         load_state(map_name);
@@ -349,6 +351,7 @@ void end_game() {
     ComponentData_clear();
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
+    game_data->show_leaderboard = false;
     create_menu();
 }
 
@@ -358,6 +361,7 @@ void end_match() {
     ComponentData_clear();
     game_data->camera = create_camera();
     game_data->menu_camera = create_menu_camera();
+    game_data->show_leaderboard = false;
 }
 
 

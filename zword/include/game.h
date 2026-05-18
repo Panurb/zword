@@ -96,6 +96,7 @@ typedef struct {
     ButtonText map_name;
     GameMode game_mode;
     bool testing;
+    bool show_leaderboard;
     Vector2f start_position;
     int music;
     int point_limit;
