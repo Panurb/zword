@@ -67,10 +67,10 @@ void main_loop() {
         FPSCounter_update(app.fps, delta_time);
     }
 
-    // TODO: fix jittering on client
-    if (network.mode != NET_MODE_CLIENT) {
-        app.delta = fminf(elapsed_time / app.time_step, 1.0f);
-    }
+    // 0 means only interpolate, 1 means only extrapolate
+    float extrapolation_factor = 0.0f;
+
+    app.delta = fminf(elapsed_time / app.time_step, 1.0f) + extrapolation_factor;
 
     draw();
     play_audio();

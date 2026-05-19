@@ -160,10 +160,15 @@ static bool client_receive_packets(void) {
         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
         if (hdr->type == PACKET_SNAPSHOT) {
             netgame_apply_snapshot(network.recv_buf, received);
-        } else if (hdr->type == PACKET_END_GAME && received >= (int)sizeof(EndGamePacket)) {
+            return false;
+        }
+
+        if (hdr->type == PACKET_END_GAME && received >= (int)sizeof(EndGamePacket)) {
             enter_client_match_end((EndGamePacket*)network.recv_buf);
             return true;
-        } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+        }
+
+        if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
             cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
             return_to_lobby();
             return true;
@@ -186,6 +191,8 @@ static bool has_dynamic_components(int entity) {
     if (DoorComponent_get(entity)) return true;
     if (ItemComponent_get(entity)) return true;
     if (AmmoComponent_get(entity)) return true;
+    ImageComponent* image = ImageComponent_get(entity);
+    if (image && fabsf(image->stretch) > 1e-3f) return true;
     return false;
 }
 
@@ -858,9 +865,6 @@ void update_client(float time_step) {
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
     update_particles(game_data->camera, time_step);
-
-    CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
-    cam_coord->previous.position = cam_coord->position;
 
     network.tick++;
 }

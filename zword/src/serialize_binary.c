@@ -153,7 +153,7 @@ static bool CoordinateComponent_serialize_binary(BinaryWriteCursor* cursor, Coor
 }
 
 
-static bool CoordinateComponent_deserialize_binary(BinaryReadCursor* cursor, int entity, bool* smooth) {
+static bool CoordinateComponent_deserialize_binary(BinaryReadCursor* cursor, int entity, bool smooth) {
     float pos_x;
     float pos_y;
     float angle;
@@ -178,10 +178,10 @@ static bool CoordinateComponent_deserialize_binary(BinaryReadCursor* cursor, int
     Vector2f new_pos = vec(pos_x, pos_y);
     float distance = dist(new_pos, coord->position);
     if (coord->parent != (int)parent || distance > 1.0f) {
-        *smooth = false;
+        smooth = false;
     }
 
-    if (*smooth) {
+    if (smooth) {
         float t = 0.5f;
         coord->position.x = lerp(coord->position.x, pos_x, t);
         coord->position.y = lerp(coord->position.y, pos_y, t);
@@ -190,9 +190,10 @@ static bool CoordinateComponent_deserialize_binary(BinaryReadCursor* cursor, int
         coord->position.x = pos_x;
         coord->position.y = pos_y;
         coord->angle = angle;
-        coord->previous.position.x = pos_x;
-        coord->previous.position.y = pos_y;
-        coord->previous.angle = angle;
+        Vector2f pos = get_position(entity);
+        coord->previous.position.x = pos.x;
+        coord->previous.position.y = pos.y;
+        coord->previous.angle = get_angle(entity);
     }
 
     coord->parent = (int)parent;
@@ -210,6 +211,7 @@ static bool ImageComponent_serialize_binary(BinaryWriteCursor* cursor, ImageComp
     if (!write_u8_value(cursor, (uint8_t)image->layer)) return false;
     if (!write_f32_value(cursor, image->alpha)) return false;
     if (!write_f32_value(cursor, image->shine)) return false;
+    if (!write_f32_value(cursor, image->stretch)) return false;
     return true;
 }
 
@@ -221,6 +223,7 @@ static bool ImageComponent_deserialize_binary(BinaryReadCursor* cursor, int enti
     uint8_t layer;
     float alpha;
     float shine;
+    float stretch;
 
     if (!read_string_value(cursor, filename, sizeof(filename))) return false;
     if (!read_f32_value(cursor, &width)) return false;
@@ -228,6 +231,7 @@ static bool ImageComponent_deserialize_binary(BinaryReadCursor* cursor, int enti
     if (!read_u8_value(cursor, &layer)) return false;
     if (!read_f32_value(cursor, &alpha)) return false;
     if (!read_f32_value(cursor, &shine)) return false;
+    if (!read_f32_value(cursor, &stretch)) return false;
 
     ImageComponent* image = ImageComponent_get(entity);
     if (image) {
@@ -241,10 +245,12 @@ static bool ImageComponent_deserialize_binary(BinaryReadCursor* cursor, int enti
         }
         image->alpha = alpha;
         image->shine = shine;
+        image->stretch = stretch;
     } else {
         image = ImageComponent_add(entity, filename, width, height, (Layer)layer);
         image->alpha = alpha;
         image->shine = shine;
+        image->stretch = stretch;
     }
 
     return true;
@@ -1252,7 +1258,7 @@ int binary_deserialize_entity(const uint8_t* buf, int buf_size, int entity, bool
     BinaryReadCursor cursor = { buf, buf + buf_size };
     uint32_t flags;
 
-    if (!CoordinateComponent_deserialize_binary(&cursor, entity, &smooth)) return 0;
+    if (!CoordinateComponent_deserialize_binary(&cursor, entity, smooth)) return 0;
     if (!read_u32_value(&cursor, &flags)) return 0;
     if ((flags & BFLAG_HAS_IMAGE) && !ImageComponent_deserialize_binary(&cursor, entity)) return 0;
     if ((flags & BFLAG_HAS_PHYSICS) && !PhysicsComponent_deserialize_binary(&cursor, entity)) return 0;
