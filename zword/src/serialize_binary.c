@@ -186,20 +186,33 @@ static bool CoordinateComponent_deserialize_binary(BinaryReadCursor* cursor, int
         coord->position.x = lerp(coord->position.x, pos_x, t);
         coord->position.y = lerp(coord->position.y, pos_y, t);
         coord->angle = lerp_angle(coord->angle, angle, t);
+        coord->scale.x = lerp(coord->scale.x, scale_x, t);
+        coord->scale.y = lerp(coord->scale.y, scale_y, t);
     } else {
         coord->position.x = pos_x;
         coord->position.y = pos_y;
         coord->angle = angle;
-        Vector2f pos = get_position(entity);
-        coord->previous.position.x = pos.x;
-        coord->previous.position.y = pos.y;
-        coord->previous.angle = get_angle(entity);
+        coord->scale.x = scale_x;
+        coord->scale.y = scale_y;
+
+        if (coord->parent != (int)parent && parent == -1) {
+            coord->previous.position = new_pos;
+            coord->previous.angle = angle;
+            coord->previous.scale = vec(scale_x, scale_y);
+        } else {
+            Vector2f pos = get_position(entity);
+            coord->previous.position.x = pos.x;
+            coord->previous.position.y = pos.y;
+            coord->previous.angle = get_angle(entity);
+            coord->previous.scale = get_scale(entity);
+        }
     }
 
     coord->parent = (int)parent;
     coord->scale.x = scale_x;
     coord->scale.y = scale_y;
     coord->lifetime = lifetime;
+
     return true;
 }
 
