@@ -6,7 +6,17 @@
 #include <SDL.h>
 
 #include "component.h"
+#include "game.h"
 #include "network.h"
+
+typedef struct {
+    bool valid;
+    char map_name[128];
+    GameMode game_mode;
+    int num_players;
+    String player_names[NET_MAX_CLIENTS + 1];
+    int point_limit;
+} LobbyInfo;
 
 #pragma pack(push, 1)
 
@@ -43,6 +53,7 @@ typedef struct {
 // Track which entities have been seen in snapshots (for implicit destroy).
 // Indexed by LOCAL entity ID.
 extern bool net_entity_seen[MAX_ENTITIES];
+extern LobbyInfo cached_lobby_info;
 
 // Host: build a snapshot of all dynamic entities into the send buffer.
 // Returns the total packet size.

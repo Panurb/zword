@@ -363,7 +363,7 @@ int list_files_alphabetically(String path, String* files, bool (*condition)(File
                 *dot = '\0';
             }
             if (condition && !condition(file.cFileName)) {
-                LOG_INFO("Skipping file: %s", file.cFileName);
+                LOG_DEBUG("Skipping file: %s", file.cFileName);
                 continue;
             }
             strcpy(files[files_size], file.cFileName);

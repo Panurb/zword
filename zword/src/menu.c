@@ -11,6 +11,7 @@
 #include "input.h"
 #include "app.h"
 #include "benchmark.h"
+#include "netgame.h"
 #include "network.h"
 #include "serialize.h"
 #include "util.h"
@@ -35,6 +36,101 @@ static Entity ip_input_lan = NULL_ENTITY;
 static Entity window_lan = NULL_ENTITY;
 static Entity lan_map_dropdown = NULL_ENTITY;
 static Entity lan_mode_dropdown = NULL_ENTITY;
+static Entity client_lobby_mode_label = NULL_ENTITY;
+static Entity client_lobby_map_label = NULL_ENTITY;
+static Entity client_lobby_point_limit_label = NULL_ENTITY;
+static Entity lobby_player_panel = NULL_ENTITY;
+static Entity lobby_player_container = NULL_ENTITY;
+static Entity lobby_player_header = NULL_ENTITY;
+
+
+static void recreate_lobby_player_container(void) {
+    if (lobby_player_container == NULL_ENTITY) {
+        return;
+    }
+
+    remove_parent(lobby_player_container);
+    destroy_entity_recursive(lobby_player_container);
+
+    lobby_player_container = create_container(zeros(), 1, 5);
+    WidgetComponent_get(lobby_player_container)->enabled = false;
+    add_child(lobby_player_panel, lobby_player_container);
+}
+
+
+static void update_lobby_player_panel(void) {
+    if (lobby_player_panel == NULL_ENTITY ||
+        lobby_player_container == NULL_ENTITY ||
+        lobby_player_header == NULL_ENTITY) {
+        return;
+    }
+
+    recreate_lobby_player_container();
+
+    WidgetComponent* header = WidgetComponent_get(lobby_player_header);
+    if (network.mode == NET_MODE_HOST) {
+        strcpy(header->string, network.own_ip);
+
+        for (int i = 0; i < NET_MAX_CLIENTS; i++) {
+            if (!network.clients[i].connected) {
+                continue;
+            }
+
+            String buffer;
+            snprintf(buffer, STRING_SIZE, "%s - %s", network.clients[i].player_name, network.clients[i].ip);
+            add_widget_to_container(lobby_player_container, create_label(buffer, zeros()));
+        }
+    } else if (network.mode == NET_MODE_CLIENT) {
+        strcpy(header->string, network.host_ip);
+
+        if (!cached_lobby_info.valid) {
+            return;
+        }
+
+        for (int i = 0; i < cached_lobby_info.num_players; i++) {
+            add_widget_to_container(lobby_player_container, create_label(cached_lobby_info.player_names[i], zeros()));
+        }
+    }
+
+    if (CoordinateComponent_get(lobby_player_container)->children->size > 5) {
+        add_scrollbar_to_container(lobby_player_container);
+    }
+}
+
+
+static void update_client_lobby_menu_info(void) {
+    if (client_lobby_mode_label == NULL_ENTITY ||
+        client_lobby_map_label == NULL_ENTITY ||
+        client_lobby_point_limit_label == NULL_ENTITY) {
+        return;
+    }
+
+    WidgetComponent* mode = WidgetComponent_get(client_lobby_mode_label);
+    WidgetComponent* map = WidgetComponent_get(client_lobby_map_label);
+    WidgetComponent* point_limit = WidgetComponent_get(client_lobby_point_limit_label);
+
+    if (!cached_lobby_info.valid) {
+        strcpy(mode->string, "Waiting...");
+        strcpy(map->string, "Waiting...");
+        strcpy(point_limit->string, "Waiting...");
+        return;
+    }
+
+    strcpy(mode->string, GAME_MODES[cached_lobby_info.game_mode]);
+    strcpy(map->string, cached_lobby_info.map_name);
+    snprintf(point_limit->string, STRING_SIZE, "%d", cached_lobby_info.point_limit);
+}
+
+
+static void update_lobby_menu(void) {
+    if (game_state == STATE_HOST_LOBBY || game_state == STATE_CLIENT_LOBBY) {
+        if (game_state == STATE_CLIENT_LOBBY) {
+            update_client_lobby_menu_info();
+        }
+
+        update_lobby_player_panel();
+    }
+}
 
 
 void reset_ids() {
@@ -55,6 +151,27 @@ void reset_ids() {
     window_lan = NULL_ENTITY;
     lan_map_dropdown = NULL_ENTITY;
     lan_mode_dropdown = NULL_ENTITY;
+    client_lobby_mode_label = NULL_ENTITY;
+    client_lobby_map_label = NULL_ENTITY;
+    client_lobby_point_limit_label = NULL_ENTITY;
+    lobby_player_panel = NULL_ENTITY;
+    lobby_player_container = NULL_ENTITY;
+    lobby_player_header = NULL_ENTITY;
+}
+
+
+static void create_lobby_player_panel() {
+    lobby_player_panel = create_menu_entity();
+    CoordinateComponent_add(lobby_player_panel, vec(0.0f, -1.0f), 0.0f);
+    ColliderComponent_add_rectangle(lobby_player_panel, BUTTON_WIDTH, 6 * BUTTON_HEIGHT, GROUP_WALLS)->enabled = false;
+    WidgetComponent_add(lobby_player_panel, "", WIDGET_LABEL)->enabled = false;
+
+    lobby_player_header = create_label("", vec(0.0f, 14.0f));
+    add_child(lobby_player_panel, lobby_player_header);
+
+    lobby_player_container = create_container(zeros(), 1, 5);
+    WidgetComponent_get(lobby_player_container)->enabled = false;
+    add_child(lobby_player_panel, lobby_player_container);
 }
 
 
@@ -605,6 +722,7 @@ void create_client_pause_menu() {
 
 
 void update_menu() {
+    update_lobby_menu();
     update_widgets(game_data->menu_camera);
 }
 
@@ -653,11 +771,26 @@ void create_win_menu() {
 
 
 void create_lobby_menu() {
-    int height = 1;
-    int container = create_container(vec(-18.0f, -2.0f), 1, height);
+    int height = 4;
+    int container = create_container(vec(-18.0f, -2.0f), 2, height);
     WidgetComponent_get(container)->enabled = false;
 
-    add_button_to_container(container, "Leave", change_state_end);
+    Entity mode_label = create_label("Mode", zeros());
+    client_lobby_mode_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, mode_label, client_lobby_mode_label);
+
+    Entity map_label = create_label("Map", zeros());
+    client_lobby_map_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, map_label, client_lobby_map_label);
+
+    Entity points_label = create_label("Point limit", zeros());
+    client_lobby_point_limit_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, points_label, client_lobby_point_limit_label);
+
+    Entity leave_button = create_button("Leave", zeros(), change_state_end);
+    add_widget_to_container(container, leave_button);
+
+    create_lobby_player_panel();
 }
 
 
@@ -717,4 +850,6 @@ void create_host_lobby_menu() {
     Entity start_button = create_button("Start game", zeros(), change_state_host_start);
     Entity close_button = create_button("Close lobby", zeros(), change_state_end);
     add_row_to_container(container, start_button, close_button);
+
+    create_lobby_player_panel();
 }

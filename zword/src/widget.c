@@ -511,8 +511,15 @@ void draw_widgets(int camera) {
         case WIDGET_SLIDER:
             draw_rectangle(camera, pos, w - MARGIN, h - MARGIN, 0.0f, COLOR_SHADOW);
             float x = (widget->value - widget->min_value) / (float) (widget->max_value - widget->min_value);
-            draw_rectangle(camera, sum(pos, vec(0.5f * (x - 1.0f) * w, 0.0f)), x * w, h, 
-                0.0f, COLOR_BUTTON);
+            float slider_w = w - 2 * MARGIN;
+            draw_rectangle(
+                camera,
+                sum(pos, vec(0.5f * (x - 1.0f) * slider_w, 0.0f)),
+                x * slider_w,
+                h - 2 * MARGIN,
+                0.0f,
+                COLOR_BUTTON
+            );
             char buffer[256];
             sprintf(buffer, "%d", widget->value);
             draw_text(camera, pos, buffer, 20, COLOR_TEXT);

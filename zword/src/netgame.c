@@ -19,36 +19,11 @@
 
 bool net_entity_seen[MAX_ENTITIES];
 
-typedef struct {
-    bool valid;
-    char map_name[128];
-    GameMode game_mode;
-    int num_players;
-    String player_names[NET_MAX_CLIENTS + 1];
-    int point_limit;
-} LobbyInfo;
-
 static float lobby_info_broadcast_timer = 0.0f;
 
 static float lobby_keepalive_timer = 0.0f;
 
-static LobbyInfo cached_lobby_info = {0};
-
-
-static const char* game_mode_to_string(GameMode mode) {
-    switch (mode) {
-        case MODE_SURVIVAL:
-            return "Survival";
-        case MODE_CAMPAIGN:
-            return "Campaign";
-        case MODE_TUTORIAL:
-            return "Tutorial";
-        case MODE_DEATHMATCH:
-            return "Deathmatch";
-    }
-
-    return "Unknown";
-}
+LobbyInfo cached_lobby_info = {0};
 
 
 static void cache_lobby_info(const LobbyInfoPacket* lobby) {
@@ -703,6 +678,7 @@ void update_host_lobby(float time_step) {
     } else {
         lobby_info_broadcast_timer = fmaxf(lobby_info_broadcast_timer - time_step, 0.0f);
     }
+
     update_menu();
 }
 
@@ -906,34 +882,9 @@ void update_client_game_over(float time_step) {
 
 void draw_host_lobby(void) {
     draw_menu();
-    draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.own_ip, 20, COLOR_WHITE);
-    for (int i = 0; i < NET_MAX_CLIENTS; i++) {
-        if (network.clients[i].connected) {
-            String buffer;
-            snprintf(buffer, STRING_SIZE, "%s - %s", network.clients[i].player_name, network.clients[i].ip);
-            draw_text(game_data->menu_camera, vec(0.0f, -5.0f + i * 2.0f), buffer, 20, COLOR_WHITE);
-        }
-    }
 }
 
 
 void draw_client_lobby(void) {
     draw_menu();
-    if (cached_lobby_info.valid) {
-        draw_text(game_data->menu_camera, vec(0.0f, 12.0f), network.host_ip, 20, COLOR_WHITE);
-
-        String buffer;
-        snprintf(buffer, STRING_SIZE, "Mode: %s", game_mode_to_string(cached_lobby_info.game_mode));
-        draw_text(game_data->menu_camera, vec(0.0f, 7.0f), buffer, 20, COLOR_WHITE);
-
-        snprintf(buffer, STRING_SIZE, "Map: %s", cached_lobby_info.map_name);
-        draw_text(game_data->menu_camera, vec(0.0f, 5.0f), buffer, 20, COLOR_WHITE);
-
-        snprintf(buffer, STRING_SIZE, "Point Limit: %d", cached_lobby_info.point_limit);
-        draw_text(game_data->menu_camera, vec(0.0f, 3.0f), buffer, 20, COLOR_WHITE);
-
-        for (int i = 0; i < cached_lobby_info.num_players && i < NET_MAX_CLIENTS + 1; i++) {
-            draw_text(game_data->menu_camera, vec(0.0f, -1.0f - i * 2.0f), cached_lobby_info.player_names[i], 20, COLOR_WHITE);
-        }
-    }
 }
