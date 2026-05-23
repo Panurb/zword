@@ -30,6 +30,8 @@
 
 void load_sounds();
 
+int sound_index(Filename filename);
+
 void add_sound(int entity, Filename filename, float volume, float pitch);
 
 void loop_sound(int entity, Filename filename, float volume, float pitch);

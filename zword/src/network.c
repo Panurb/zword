@@ -205,7 +205,7 @@ bool network_send_to_host(const void* data, int size) {
 
 int network_receive(void* buf, int buf_size, struct sockaddr_in* from_addr) {
     struct sockaddr_in addr;
-    int addr_len = sizeof(addr);
+    socklen_t addr_len = sizeof(addr);
 
     int received = recvfrom(network.sock, (char*)buf, buf_size, 0,
                             (struct sockaddr*)&addr, &addr_len);

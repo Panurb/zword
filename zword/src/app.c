@@ -12,6 +12,7 @@
 #include "menu.h"
 #include "editor.h"
 #include "input.h"
+#include "hud.h"
 #include "serialize.h"
 #include "network.h"
 #include "netgame.h"
