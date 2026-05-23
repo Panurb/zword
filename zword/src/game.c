@@ -216,6 +216,24 @@ void init_tutorial() {
 }
 
 
+void init_deathmatch() {
+    game_over_timer = 0.0f;
+    level_won = false;
+
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ItemComponent* item = ItemComponent_get(i);
+        if (!item) continue;
+        WeaponComponent* weapon = WeaponComponent_get(i);
+
+        item->price = 0;
+        if (weapon) {
+            item->spawner = true;
+            item->respawn_timer = 0.0f;
+        }
+    }
+}
+
+
 int get_player_count() {
     int player_count = 0;
 
@@ -300,8 +318,10 @@ void init_game() {
             break;
         case MODE_TUTORIAL:
         case MODE_CAMPAIGN:
-        case MODE_DEATHMATCH:
             init_tutorial();
+            break;
+        case MODE_DEATHMATCH:
+            init_deathmatch();
             break;
         default:
             break;
@@ -547,8 +567,33 @@ float get_nearest_player_distance(Vector2f position) {
 }
 
 
+void update_deathmatch_weapons(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ItemComponent* item = ItemComponent_get(i);
+        WeaponComponent* weapon = WeaponComponent_get(i);
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!item || !weapon || !coord) continue;
+        if (!item->spawner) continue;
+        if (item->respawn_timer <= 0.0f) continue;
+
+        item->respawn_timer = fmaxf(item->respawn_timer - time_step, 0.0f);
+        if (item->respawn_timer > 0.0f) continue;
+
+        ColliderComponent* collider = ColliderComponent_get(i);
+        ImageComponent* image = ImageComponent_get(i);
+        if (collider) {
+            collider->enabled = true;
+            update_grid(i);
+        }
+        if (image) {
+            image->alpha = 1.0f;
+        }
+    }
+}
+
+
 void update_deathmatch(float time_step) {
-    UNUSED(time_step);
+    update_deathmatch_weapons(time_step);
 
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
@@ -706,6 +751,7 @@ void draw_game() {
     draw_particles(game_data->camera);
     SDL_RenderCopy(app.renderer, app.light_texture, NULL, NULL);
     draw_roofs(game_data->camera);
+    draw_respawning_weapons();
     draw_player_targets();
 
     draw_shadows(game_data->camera);

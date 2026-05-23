@@ -344,14 +344,21 @@ void player_die(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
 
-    float angle = coord->angle;
-    for (int j = 0; j < player->inventory_size; j++) {
-        if (player->inventory[j] != -1) {
-            coord->angle = rand_angle();
+    if (game_data->game_mode == MODE_DEATHMATCH) {
+        if (player->inventory[player->item] != -1) {
             drop_item(entity);
         }
+        clear_player_inventory(entity);
+    } else {
+        float angle = coord->angle;
+        for (int j = 0; j < player->inventory_size; j++) {
+            if (player->inventory[j] != -1) {
+                coord->angle = rand_angle();
+                drop_item(entity);
+            }
+        }
+        coord->angle = angle;
     }
-    coord->angle = angle;
 
     for (int j = 1; j < player->ammo_size; j++) {
         AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
@@ -367,6 +374,7 @@ void player_die(int entity) {
 
     player->state = PLAYER_DEAD;
     player->deaths++;
+    player->target = NULL_ENTITY;
     WaypointComponent_remove(entity);
 
     if (game_data->game_mode == MODE_DEATHMATCH) {
@@ -389,6 +397,7 @@ void respawn_player(Entity entity, Vector2f position) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     clear_grid(entity);
     coord->position = position;
+    coord->previous.position = position;
     update_grid(entity);
 
     PlayerComponent* player = PlayerComponent_get(entity);

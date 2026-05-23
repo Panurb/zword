@@ -682,6 +682,8 @@ static bool ItemComponent_serialize_binary(BinaryWriteCursor* cursor, ItemCompon
     if (!write_u8_value(cursor, (uint8_t)item->type)) return false;
     if (!write_i16_value(cursor, (int16_t)item->value)) return false;
     if (!write_f32_value(cursor, item->use_time)) return false;
+    if (!write_u8_value(cursor, (uint8_t)item->spawner)) return false;
+    if (!write_f32_value(cursor, item->respawn_timer)) return false;
     for (int i = 0; i < 5; i++) {
         if (!write_i16_value(cursor, (int16_t)item->attachments[i])) return false;
     }
@@ -696,6 +698,8 @@ static bool ItemComponent_deserialize_binary(BinaryReadCursor* cursor, int entit
     uint8_t type;
     int16_t value;
     float use_time;
+    uint8_t spawner;
+    float respawn_timer;
     int16_t attachments[5];
 
     if (!read_u8_value(cursor, &size)) return false;
@@ -704,6 +708,8 @@ static bool ItemComponent_deserialize_binary(BinaryReadCursor* cursor, int entit
     if (!read_u8_value(cursor, &type)) return false;
     if (!read_i16_value(cursor, &value)) return false;
     if (!read_f32_value(cursor, &use_time)) return false;
+    if (!read_u8_value(cursor, &spawner)) return false;
+    if (!read_f32_value(cursor, &respawn_timer)) return false;
     for (int i = 0; i < 5; i++) {
         if (!read_i16_value(cursor, &attachments[i])) return false;
     }
@@ -719,6 +725,8 @@ static bool ItemComponent_deserialize_binary(BinaryReadCursor* cursor, int entit
     item->type = (ItemType)type;
     item->value = (int)value;
     item->use_time = use_time;
+    item->spawner = spawner != 0;
+    item->respawn_timer = respawn_timer;
     for (int i = 0; i < 5; i++) {
         item->attachments[i] = (int)attachments[i];
     }

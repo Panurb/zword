@@ -1061,6 +1061,9 @@ int deserialize_prefab(cJSON* json, Vector2f position, float angle, Vector2f sca
             coord->position = position_from_transform(entity_transform);
             coord->angle = angle_from_transform(entity_transform);
             coord->scale = scale_from_transform(entity_transform);
+            coord->previous.position = coord->position;
+            coord->previous.angle = coord->angle;
+            coord->previous.scale = coord->scale;
         }
 
         if (root == -1) {

@@ -526,7 +526,7 @@ void WeaponComponent_remove(int entity) {
 ItemComponent* ItemComponent_add(int entity, int size, int price, ButtonText name) {
     ItemComponent* item = malloc(sizeof(ItemComponent));
     item->size = size;
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < LENGTH(item->attachments); i++) {
         item->attachments[i]= -1;
     }
     item->price = price;
@@ -534,6 +534,8 @@ ItemComponent* ItemComponent_add(int entity, int size, int price, ButtonText nam
     item->use_time = 0.0f;
     item->type = ITEM_NONE;
     item->value = 0;
+    item->spawner = false;
+    item->respawn_timer = 0.0f;
 
     game_data->components->item[entity] = item;
     return item;

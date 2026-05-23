@@ -366,6 +366,8 @@ typedef struct {
     float use_time;
     ItemType type;
     int value;
+    bool spawner;
+    float respawn_timer;
 } ItemComponent;
 
 typedef struct {

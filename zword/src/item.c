@@ -8,6 +8,91 @@
 #include "game.h" 
 #include "player.h"
 #include "door.h"
+#include "serialize.h"
+
+
+#define DEATHMATCH_WEAPON_RESPAWN_TIME 10.0f
+
+
+static int create_inventory_copy_from_source(int entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    ItemComponent* source_item = ItemComponent_get(entity);
+    WeaponComponent* source_weapon = WeaponComponent_get(entity);
+    if (!coord || !source_item || !source_weapon || coord->prefab[0] == '\0') {
+        return NULL_ENTITY;
+    }
+
+    int copy = load_prefab(coord->prefab, get_position(entity), get_angle(entity), ones());
+    if (copy == NULL_ENTITY) {
+        return NULL_ENTITY;
+    }
+
+    CoordinateComponent* copy_coord = CoordinateComponent_get(copy);
+    ItemComponent* copy_item = ItemComponent_get(copy);
+    WeaponComponent* copy_weapon = WeaponComponent_get(copy);
+    ColliderComponent* copy_collider = ColliderComponent_get(copy);
+    ImageComponent* copy_image = ImageComponent_get(copy);
+    if (!copy_coord || !copy_item || !copy_weapon || !copy_collider || !copy_image) {
+        destroy_entity_recursive(copy);
+        return NULL_ENTITY;
+    }
+
+    copy_coord->position = get_position(entity);
+    copy_coord->angle = get_angle(entity);
+    copy_item->price = source_item->price;
+    copy_item->type = source_item->type;
+    copy_item->value = source_item->value;
+    copy_item->use_time = source_item->use_time;
+    copy_item->spawner = false;
+    copy_item->respawn_timer = -1.0f;
+    copy_weapon->magazine = source_weapon->magazine;
+    copy_weapon->cooldown = source_weapon->cooldown;
+    copy_weapon->recoil = source_weapon->recoil;
+    copy_weapon->reloading = false;
+    copy_collider->enabled = true;
+    copy_image->alpha = 1.0f;
+
+    return copy;
+}
+
+
+static void destroy_item_recursive(int entity) {
+    if (entity == NULL_ENTITY) {
+        return;
+    }
+
+    ItemComponent* item = ItemComponent_get(entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (item) {
+        for (int i = 0; i < item->size; i++) {
+            int attachment = item->attachments[i];
+            if (attachment == NULL_ENTITY) continue;
+
+            item->attachments[i] = NULL_ENTITY;
+            destroy_item_recursive(attachment);
+        }
+    }
+
+    if (coord && coord->parent != NULL_ENTITY) {
+        remove_parent(entity);
+    }
+    clear_grid(entity);
+    destroy_entity(entity);
+}
+
+
+void clear_player_inventory(Entity entity) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    if (!player) return;
+
+    for (int i = 0; i < player->inventory_size; i++) {
+        int item_entity = player->inventory[i];
+        if (item_entity == NULL_ENTITY) continue;
+
+        player->inventory[i] = NULL_ENTITY;
+        destroy_item_recursive(item_entity);
+    }
+}
 
 
 bool is_attachment(int entity) {
@@ -155,6 +240,35 @@ void add_item_to_inventory(Entity player_entity, Entity item_entity) {
 
     int i = find(-1, player->inventory, player->inventory_size);
     if (i != -1) {
+        WeaponComponent* weapon = WeaponComponent_get(item_entity);
+        if (item->spawner) {
+            if (item->respawn_timer == 0.0f) {
+                int copy = create_inventory_copy_from_source(item_entity);
+                if (copy == NULL_ENTITY) {
+                    return;
+                }
+
+                item->respawn_timer = DEATHMATCH_WEAPON_RESPAWN_TIME;
+                ColliderComponent* source_collider = ColliderComponent_get(item_entity);
+                ImageComponent* source_image = ImageComponent_get(item_entity);
+                if (source_collider) {
+                    source_collider->enabled = false;
+                }
+                if (source_image) {
+                    source_image->alpha = 0.0f;
+                }
+                clear_grid(item_entity);
+
+                item_entity = copy;
+                coord = CoordinateComponent_get(item_entity);
+                image = ImageComponent_get(item_entity);
+                item = ItemComponent_get(item_entity);
+                weapon = WeaponComponent_get(item_entity);
+            } else {
+                return;
+            }
+        }
+
         clear_grid(item_entity);
 
         player->inventory[i] = item_entity;
@@ -166,7 +280,6 @@ void add_item_to_inventory(Entity player_entity, Entity item_entity) {
         if (player->item != i) {
             image->alpha = 0.0f;
         }
-        WeaponComponent* weapon = WeaponComponent_get(item_entity);
         if (weapon) {
             image->alpha = 0.0f;
             if (item->price != 0) {
@@ -319,5 +432,23 @@ void draw_player_targets() {
                 draw_text(game_data->camera, pos, buffer, 20, COLOR_YELLOW);
             }
         }
+    }
+}
+
+
+void draw_respawning_weapons(void) {
+    if (game_data->game_mode != MODE_DEATHMATCH) {
+        return;
+    }
+
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ItemComponent* item = ItemComponent_get(i);
+        ImageComponent* image = ImageComponent_get(i);
+        if (!item || !image) continue;
+        if (!item->spawner) continue;
+        if (item->respawn_timer <= 0.0f) continue;
+
+        draw_sprite_outline(game_data->camera, image->texture_index, image->width, image->height, 0,
+            get_position(i), get_angle(i), ones());
     }
 }

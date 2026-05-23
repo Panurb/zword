@@ -23,4 +23,8 @@ void drop_item(int entity);
 
 bool use_item(int entity, float time_step);
 
+void clear_player_inventory(Entity entity);
+
+void draw_respawning_weapons(void);
+
 void draw_player_targets();
