@@ -27,30 +27,19 @@ static int create_inventory_copy_from_source(int entity) {
         return NULL_ENTITY;
     }
 
-    CoordinateComponent* copy_coord = CoordinateComponent_get(copy);
     ItemComponent* copy_item = ItemComponent_get(copy);
     WeaponComponent* copy_weapon = WeaponComponent_get(copy);
-    ColliderComponent* copy_collider = ColliderComponent_get(copy);
-    ImageComponent* copy_image = ImageComponent_get(copy);
-    if (!copy_coord || !copy_item || !copy_weapon || !copy_collider || !copy_image) {
+    if (!copy_item || !copy_weapon) {
         destroy_entity_recursive(copy);
         return NULL_ENTITY;
     }
 
-    copy_coord->position = get_position(entity);
-    copy_coord->angle = get_angle(entity);
     copy_item->price = source_item->price;
-    copy_item->type = source_item->type;
-    copy_item->value = source_item->value;
-    copy_item->use_time = source_item->use_time;
     copy_item->spawner = false;
-    copy_item->respawn_timer = -1.0f;
     copy_weapon->magazine = source_weapon->magazine;
     copy_weapon->cooldown = source_weapon->cooldown;
     copy_weapon->recoil = source_weapon->recoil;
     copy_weapon->reloading = false;
-    copy_collider->enabled = true;
-    copy_image->alpha = 1.0f;
 
     return copy;
 }

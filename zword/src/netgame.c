@@ -708,6 +708,7 @@ void update_client_lobby(float time_step) {
             strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
             game_data->map_name[sizeof(game_data->map_name) - 1] = '\0';
             game_data->game_mode = (GameMode)start->game_mode;
+            game_data->point_limit = start->point_limit;
 
             for (int i = 0; i < 4; i++) {
                 app.player_controllers[i] = CONTROLLER_NONE;
@@ -746,6 +747,7 @@ void host_start(void) {
     strncpy(start_pkt.map_name, game_data->map_name, sizeof(start_pkt.map_name) - 1);
     start_pkt.game_mode = (uint8_t)game_data->game_mode;
     start_pkt.num_players = (uint8_t)num_players;
+    start_pkt.point_limit = (uint8_t)game_data->point_limit;
     network_broadcast(&start_pkt, sizeof(start_pkt));
     network.game_started = true;
     lobby_info_broadcast_timer = 0.0f;

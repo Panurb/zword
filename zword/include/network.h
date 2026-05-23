@@ -73,6 +73,7 @@ typedef struct {
     char map_name[128];
     uint8_t game_mode;
     uint8_t num_players;
+    uint8_t point_limit;
 } StartGamePacket;
 
 typedef struct {
