@@ -1,0 +1,367 @@
+{
+	"game_mode":	3,
+	"ambient_light":	0.5,
+	"entities":	[{
+			"id":	0,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-16,
+				"prefab":	"tiles/floor",
+				"scale_x":	32,
+				"scale_y":	32
+			}
+		}, {
+			"id":	1,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-0.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	32
+			}
+		}, {
+			"id":	2,
+			"Coordinate":	{
+				"x":	15.5,
+				"y":	-16.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	31
+			}
+		}, {
+			"id":	3,
+			"Coordinate":	{
+				"x":	-0.5,
+				"y":	-31.5,
+				"prefab":	"tiles/concrete",
+				"scale_x":	31
+			}
+		}, {
+			"id":	4,
+			"Coordinate":	{
+				"x":	-15.5,
+				"y":	-16,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/concrete",
+				"scale_x":	30
+			}
+		}, {
+			"id":	5,
+			"Coordinate":	{
+				"x":	-5.5,
+				"y":	-14,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/window"
+			}
+		}, {
+			"id":	6,
+			"Coordinate":	{
+				"x":	1,
+				"y":	-11.5,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	7,
+			"Coordinate":	{
+				"x":	5.5,
+				"y":	-16,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	8
+			}
+		}, {
+			"id":	8,
+			"Coordinate":	{
+				"x":	-1.0000004768371582,
+				"y":	-20.5,
+				"angle":	-3.1415925025939941,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	9,
+			"Coordinate":	{
+				"x":	-13,
+				"y":	-3,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	10,
+			"Coordinate":	{
+				"x":	13,
+				"y":	-3,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	11,
+			"Coordinate":	{
+				"x":	-13,
+				"y":	-29,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	12,
+			"Coordinate":	{
+				"x":	12,
+				"y":	-29,
+				"prefab":	"creatures/player"
+			}
+		}, {
+			"id":	13,
+			"Coordinate":	{
+				"x":	4.5,
+				"y":	-5,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	14,
+			"Coordinate":	{
+				"x":	-4.5000004768371582,
+				"y":	-5,
+				"angle":	1.5707962512969971,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	15,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	-3,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	4
+			}
+		}, {
+			"id":	16,
+			"Coordinate":	{
+				"x":	-4.5,
+				"y":	-9,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	4
+			}
+		}, {
+			"id":	17,
+			"Coordinate":	{
+				"x":	4.5,
+				"y":	-9,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	4
+			}
+		}, {
+			"id":	18,
+			"Coordinate":	{
+				"x":	4.5,
+				"y":	-3,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	4
+			}
+		}, {
+			"id":	19,
+			"Coordinate":	{
+				"x":	3.5,
+				"y":	-11.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	5
+			}
+		}, {
+			"id":	20,
+			"Coordinate":	{
+				"x":	-3.5,
+				"y":	-11.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	5
+			}
+		}, {
+			"id":	21,
+			"Coordinate":	{
+				"x":	-3.5,
+				"y":	-20.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	5
+			}
+		}, {
+			"id":	22,
+			"Coordinate":	{
+				"x":	3.5,
+				"y":	-20.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	5
+			}
+		}, {
+			"id":	23,
+			"Coordinate":	{
+				"x":	-10.5,
+				"y":	-15.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	9
+			}
+		}, {
+			"id":	24,
+			"Coordinate":	{
+				"x":	10.5,
+				"y":	-16.5,
+				"prefab":	"objects/window"
+			}
+		}, {
+			"id":	25,
+			"Coordinate":	{
+				"x":	-5.5,
+				"y":	-12.5,
+				"prefab":	"tiles/brick"
+			}
+		}, {
+			"id":	26,
+			"Coordinate":	{
+				"x":	-5.5,
+				"y":	-17.5,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	5
+			}
+		}, {
+			"id":	27,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-16,
+				"angle":	0.78539818525314331,
+				"prefab":	"weapons/sniper"
+			}
+		}, {
+			"id":	28,
+			"Coordinate":	{
+				"x":	-13.5,
+				"y":	-14,
+				"prefab":	"weapons/smg"
+			}
+		}, {
+			"id":	29,
+			"Coordinate":	{
+				"x":	13.5,
+				"y":	-18,
+				"prefab":	"weapons/sawed-off"
+			}
+		}, {
+			"id":	30,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-2,
+				"prefab":	"weapons/axe"
+			}
+		}, {
+			"id":	31,
+			"Coordinate":	{
+				"x":	0,
+				"y":	-30,
+				"prefab":	"weapons/pistol"
+			}
+		}, {
+			"id":	32,
+			"Coordinate":	{
+				"x":	-5.5,
+				"y":	-27,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	8
+			}
+		}, {
+			"id":	33,
+			"Coordinate":	{
+				"x":	5.5,
+				"y":	-25,
+				"angle":	1.5707963705062866,
+				"prefab":	"tiles/brick",
+				"scale_x":	8
+			}
+		}, {
+			"id":	34,
+			"Coordinate":	{
+				"x":	-5.5000004768371582,
+				"y":	-21,
+				"angle":	1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	35,
+			"Coordinate":	{
+				"x":	5.4999995231628418,
+				"y":	-31,
+				"angle":	-1.5707963705062866,
+				"prefab":	"objects/door"
+			}
+		}, {
+			"id":	36,
+			"Coordinate":	{
+				"x":	4,
+				"y":	-13,
+				"angle":	-3.0565497875213623,
+				"prefab":	"objects/lamp"
+			}
+		}, {
+			"id":	37,
+			"Coordinate":	{
+				"x":	-4,
+				"y":	-19,
+				"angle":	-3.0565497875213623,
+				"prefab":	"objects/lamp"
+			}
+		}, {
+			"id":	38,
+			"Coordinate":	{
+				"x":	-7,
+				"y":	-17,
+				"prefab":	"objects/marschall"
+			}
+		}, {
+			"id":	39,
+			"Coordinate":	{
+				"x":	7,
+				"y":	-18,
+				"prefab":	"objects/marschall"
+			}
+		}, {
+			"id":	40,
+			"Coordinate":	{
+				"x":	7.75,
+				"y":	-16.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	3.5
+			}
+		}, {
+			"id":	41,
+			"Coordinate":	{
+				"x":	13.25,
+				"y":	-16.5,
+				"prefab":	"tiles/brick",
+				"scale_x":	3.5
+			}
+		}, {
+			"id":	42,
+			"Coordinate":	{
+				"x":	-13,
+				"y":	-17,
+				"prefab":	"weapons/sword"
+			}
+		}, {
+			"id":	43,
+			"Coordinate":	{
+				"x":	14,
+				"y":	-15,
+				"prefab":	"weapons/knife"
+			}
+		}, {
+			"id":	44,
+			"Coordinate":	{
+				"x":	3,
+				"y":	-2,
+				"prefab":	"objects/fire"
+			}
+		}, {
+			"id":	45,
+			"Coordinate":	{
+				"x":	4,
+				"y":	-22,
+				"prefab":	"objects/candle"
+			}
+		}]
+}

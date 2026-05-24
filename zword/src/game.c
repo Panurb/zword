@@ -196,8 +196,14 @@ void init_survival() {
     spawners = List_create();
     for (int i = 0; i < game_data->components->entities; i++) {
         EnemyComponent* enemy = EnemyComponent_get(i);
+        ItemComponent* item = ItemComponent_get(i);
+        WeaponComponent* weapon = WeaponComponent_get(i);
         if (enemy && enemy->spawner) {
             List_add(spawners, i);
+        }
+        if (item && weapon && item->price > 0) {
+            item->spawner = true;
+            item->respawn_timer = 0.0f;
         }
     }
 }

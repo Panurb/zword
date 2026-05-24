@@ -231,7 +231,18 @@ void add_item_to_inventory(Entity player_entity, Entity item_entity) {
     if (i != -1) {
         WeaponComponent* weapon = WeaponComponent_get(item_entity);
         if (item->spawner) {
-            if (item->respawn_timer == 0.0f) {
+            if (game_data->game_mode == MODE_SURVIVAL && item->price > 0) {
+                int copy = create_inventory_copy_from_source(item_entity);
+                if (copy == NULL_ENTITY) {
+                    return;
+                }
+
+                item_entity = copy;
+                coord = CoordinateComponent_get(item_entity);
+                image = ImageComponent_get(item_entity);
+                item = ItemComponent_get(item_entity);
+                weapon = WeaponComponent_get(item_entity);
+            } else if (item->respawn_timer == 0.0f) {
                 int copy = create_inventory_copy_from_source(item_entity);
                 if (copy == NULL_ENTITY) {
                     return;
