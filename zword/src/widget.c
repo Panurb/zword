@@ -209,12 +209,9 @@ void add_files_to_container(int container, Filename directory, OnClick on_click)
 
 void close_dropdown(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
-    ListNode* node;
-    FOREACH (node, coord->children) {
-        int i = node->value;
-        destroy_entity_recursive(i);
+    while (coord->children->head) {
+        destroy_entity_recursive(coord->children->head->value);
     }
-    List_clear(coord->children);
 }
 
 
@@ -681,9 +678,8 @@ bool input_widgets(int camera, SDL_Event event) {
 
 
 void destroy_widgets() {
-    ListNode* node;
-    FOREACH(node, game_data->components->widget.order) {
-        Entity i = node->value;
-        destroy_entity(i);
+    while (game_data->components->widget.order->head) {
+        Entity entity = game_data->components->widget.order->head->value;
+        destroy_entity_recursive(get_root(entity));
     }
 }

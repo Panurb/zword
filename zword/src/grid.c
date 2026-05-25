@@ -101,6 +101,27 @@ void update_grid(int entity) {
 }
 
 
+void update_grid_recursive(int entity) {
+    if (entity == NULL_ENTITY) {
+        return;
+    }
+
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (!coord) {
+        return;
+    }
+
+    ColliderComponent* collider = ColliderComponent_get(entity);
+    if (collider && collider->enabled) {
+        update_grid(entity);
+    }
+
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        update_grid_recursive(node->value);
+    }
+}
+
+
 void init_grid() {
     for (int i = 0; i < game_data->components->entities; i++) {
         ColliderComponent* collider = ColliderComponent_get(i);
@@ -118,6 +139,27 @@ void clear_grid(int entity) {
         for (int j = bounds.bottom; j <= bounds.top; j++) {
             List_remove(game_data->grid->array[i][j], entity);
         }
+    }
+}
+
+
+void clear_grid_recursive(int entity) {
+    if (entity == NULL_ENTITY) {
+        return;
+    }
+
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (!coord) {
+        return;
+    }
+
+    ColliderComponent* collider = ColliderComponent_get(entity);
+    if (collider && collider->enabled) {
+        clear_grid(entity);
+    }
+
+    for (ListNode* node = coord->children->head; node; node = node->next) {
+        clear_grid_recursive(node->value);
     }
 }
 

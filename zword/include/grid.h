@@ -39,9 +39,13 @@ List* get_entities(Vector2f origin, float radius);
 
 void update_grid(int i);
 
+void update_grid_recursive(int i);
+
 void init_grid();
 
 void clear_grid(int i);
+
+void clear_grid_recursive(int i);
 
 Bounds get_bounds(int i);
 

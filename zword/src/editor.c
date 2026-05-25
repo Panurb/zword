@@ -403,35 +403,39 @@ void move_selections(Vector2f delta_pos) {
         FOREACH (node, selections) {
             int i = node->value;
             CoordinateComponent* coord = CoordinateComponent_get(i);
-            ColliderComponent* col = ColliderComponent_get(i);
             PathComponent* path = PathComponent_get(i);
 
-            if (col) {
-                clear_grid(i);
-            }
+            clear_grid_recursive(i);
 
             coord->position = sum(coord->position, delta_pos);
 
             if (path) {
+                int prev = path->prev;
                 Vector2f pos = coord->position;
-                CoordinateComponent* prev = CoordinateComponent_get(path->prev);
+                CoordinateComponent* prev_coord = CoordinateComponent_get(prev);
                 CoordinateComponent* next = CoordinateComponent_get(path->next);
+
+                if (prev != NULL_ENTITY && !List_find(selections, prev)) {
+                    clear_grid_recursive(prev);
+                }
 
                 if (next) {
                     Vector2f next_pos = next->position;
                     coord->angle = atan2f(next_pos.y - pos.y, next_pos.x - pos.x);
                     coord->scale.x = dist(pos, next_pos) / 8.0f;
                 }
-                if (prev) {
-                    Vector2f prev_pos = prev->position;
-                    prev->angle = atan2f(pos.y - prev_pos.y, pos.x - prev_pos.x);
-                    prev->scale.x = dist(prev_pos, pos) / 8.0f;
+                if (prev_coord) {
+                    Vector2f prev_pos = prev_coord->position;
+                    prev_coord->angle = atan2f(pos.y - prev_pos.y, pos.x - prev_pos.x);
+                    prev_coord->scale.x = dist(prev_pos, pos) / 8.0f;
+                }
+
+                if (prev != NULL_ENTITY && !List_find(selections, prev)) {
+                    update_grid_recursive(prev);
                 }
             }
 
-            if (col) {
-                update_grid(i);
-            }
+            update_grid_recursive(i);
         }
     }
 }
@@ -449,15 +453,10 @@ void rotate_selections(float angle) {
 
         Vector2f r = diff(coord->position, center);
         r = rotate(r, angle);
-        if (ColliderComponent_get(i)) {
-            clear_grid(i);
-            coord->position = sum(center, r);
-            coord->angle += angle;
-            update_grid(i);
-        } else {
-            coord->position = sum(center, r);
-            coord->angle += angle;
-        }
+        clear_grid_recursive(i);
+        coord->position = sum(center, r);
+        coord->angle += angle;
+        update_grid_recursive(i);
     }
 }
 
@@ -473,15 +472,10 @@ void scale_selections(float scale) {
 
         Vector2f r = diff(coord->position, center);
         r = mult(scale, r);
-        if (ColliderComponent_get(i)) {
-            clear_grid(i);
-            coord->position = sum(center, r);
-            coord->scale = mult(scale, coord->scale);
-            update_grid(i);
-        } else {
-            coord->position = sum(center, r);
-            coord->scale = mult(scale, coord->scale);
-        }
+        clear_grid_recursive(i);
+        coord->position = sum(center, r);
+        coord->scale = mult(scale, coord->scale);
+        update_grid_recursive(i);
     }
 }
 
@@ -492,9 +486,7 @@ void destroy_selections() {
         int i = node->value;
         if (get_parent(i) != -1) continue;
 
-        if (ColliderComponent_get(i)) {
-            clear_grid(i);
-        }
+        clear_grid_recursive(i);
         destroy_entity_recursive(i);
     }
     List_clear(selections);

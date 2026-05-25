@@ -1010,8 +1010,15 @@ void remove_children(int parent) {
 
 void remove_parent(int child) {
     CoordinateComponent* coord = CoordinateComponent_get(child);
+    if (!coord) {
+        return;
+    }
+
     if (coord->parent != NULL_ENTITY) {
-        List_remove(CoordinateComponent_get(coord->parent)->children, child);
+        CoordinateComponent* parent = CoordinateComponent_get(coord->parent);
+        if (parent) {
+            List_remove(parent->children, child);
+        }
         coord->parent = NULL_ENTITY;
     }
 }
@@ -1026,7 +1033,7 @@ void remove_prefab(int entity) {
 void destroy_entity(int entity) {
     if (entity == -1) return;
 
-    // TODO: remove parent
+    remove_parent(entity);
 
     CoordinateComponent_remove(entity);
     ImageComponent_remove(entity);
@@ -1067,10 +1074,10 @@ void destroy_entities(List* entities) {
 
 void do_destroy_entity_recursive(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
-    for (ListNode* node = coord->children->head; node; node = node->next) {
-        do_destroy_entity_recursive(node->value);
+    while (coord && coord->children->head) {
+        do_destroy_entity_recursive(coord->children->head->value);
+        coord = CoordinateComponent_get(entity);
     }
-    List_clear(coord->children);
     destroy_entity(entity);
 }
 
