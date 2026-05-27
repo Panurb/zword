@@ -999,6 +999,27 @@ void add_child(int parent, int child) {
 }
 
 
+void update_parents() {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!coord) {
+            continue;
+        }
+        List_clear(coord->children);
+    }
+
+    for (int i = 0; i < game_data->components->entities; i++) {
+        CoordinateComponent* coord = CoordinateComponent_get(i);
+        if (!coord) {
+            continue;
+        }
+        if (coord->parent != NULL_ENTITY) {
+            add_child(coord->parent, i);
+        }
+    }
+}
+
+
 void remove_children(int parent) {
     CoordinateComponent* coord = CoordinateComponent_get(parent);
     for (ListNode* node = coord->children->head; node; node = node->next) {

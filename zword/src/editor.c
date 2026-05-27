@@ -140,6 +140,7 @@ void select_object(int entity) {
     game_data->components->added_entities = List_create();
 
     int i = load_prefab(selected_object_name, zeros(), 0.0f, ones());
+    update_parents();
     ColliderComponent* collider = ColliderComponent_get(i);
     ImageComponent* image = ImageComponent_get(i);
     if (collider) {
@@ -743,6 +744,7 @@ void input_tool_tile(SDL_Event event) {
 
         game_data->components->added_entities = List_create();
         int entity = load_prefab(selected_object_name, pos, 0.0f, ones());
+        update_parents();
 
         if (width > 0.0f && height > 0.0f) {
             CoordinateComponent* coord = CoordinateComponent_get(entity);
@@ -783,6 +785,7 @@ Entity load_object_from_prefab(String name, Vector2f pos, Vector2f scale) {
     game_data->components->added_entities = List_create();
 
     load_prefab(name, pos, selected_object_angle, scale);
+    update_parents();
     
     Entity root = NULL_ENTITY;
     ListNode* node;
@@ -831,6 +834,7 @@ void input_tool_path(SDL_Event event) {
         String path_end;
         sprintf(path_end, "%s_end", selected_object_name);
         create_path(tile_start, tile_end, selected_object_name, path_end);
+        update_parents();
 
         ListNode* node;
         FOREACH(node, game_data->components->added_entities) {
@@ -878,6 +882,7 @@ void input_tool_forest(SDL_Event event) {
                 p = sum(p, mult(0.5f, rand_vector()));
                 float scale = randf(0.8f, 1.2f);
                 int e = load_prefab(prefab, p, rand_angle(), vec(scale, scale));
+                update_parents();
                 List_add(game_data->components->added_entities, e);
             }
         }

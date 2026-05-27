@@ -747,7 +747,7 @@ void create_game_over_menu() {
         create_button("RESTART", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
     }
 
-    float y = game_data->game_mode == MODE_DEATHMATCH ? -5.0f * BUTTON_HEIGHT : -1.0f * BUTTON_HEIGHT;
+    float y = game_data->game_mode == MODE_DEATHMATCH ? -5.0f * BUTTON_HEIGHT : -2.0f * BUTTON_HEIGHT;
     switch (network.mode) {
         case NET_MODE_HOST:
             create_button("RETURN TO LOBBY", vec(0.0f, y), change_state_create_lobby);
