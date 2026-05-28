@@ -8,7 +8,7 @@
         },
         "Image":	{
             "filename":	"arms_assault_rifle",
-            "layer":	7
+            "layer":	8
         },
         "Physics":	{
             "mass":	0.5

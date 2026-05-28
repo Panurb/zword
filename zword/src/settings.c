@@ -113,6 +113,7 @@ void save_settings() {
     for (int i = 0; i < ACTIONS_SIZE; i++) {
         fprintf(file, "%s=%s\n", ACTIONS[i], keybind_to_string(game_settings.keybinds[i]));
     }
+    fprintf(file, "DEBUG=%i\n", game_settings.debug);
     fprintf(file, "PLAYER_NAME=%s\n", game_settings.player_name);
     fprintf(file, "LAST_IP=%s\n", game_settings.last_ip);
 

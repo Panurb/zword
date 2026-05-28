@@ -30,7 +30,7 @@
 				"magazine":	1000,
 				"max_recoil":	0.15707963705062866,
 				"reload_time":	3,
-				"range":	30,
+				"range":	5,
 				"sound_range":	5,
 				"spread":	0,
 				"shots":	1,

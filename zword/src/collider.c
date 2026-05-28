@@ -377,12 +377,12 @@ void apply_trigger(int trigger, int target) {
             burn(target);
             if (PhysicsComponent_get(trigger)) {
                 coord->lifetime = 0.0f;
+                collider->enabled = false;
+                clear_grid(trigger);
             }
             if (PhysicsComponent_get(target)) {
                 apply_force(target, mult(100.0f, dir));
             }
-            collider->enabled = false;
-            clear_grid(trigger);
             break;
         case TRIGGER_FREEZE:
             freeze(target);
