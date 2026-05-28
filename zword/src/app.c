@@ -25,7 +25,7 @@ App app;
 
 static GameState previous_state = STATE_MENU;
 
-static String version = "0.4.1";
+static String version = "0.5.0";
 
 static float title_scale = 2.0f;
 

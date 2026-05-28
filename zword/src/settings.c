@@ -14,7 +14,7 @@ Settings game_settings = {
     .height = 720,
     .antialiasing = 8,
     .fullscreen = false,
-    .vsync = false,
+    .vsync = true,
     .max_fps = 0,
     .volume = 100,
     .music = 100,
@@ -33,7 +33,7 @@ Settings game_settings = {
         { DEVICE_KEYBOARD, SDL_SCANCODE_SPACE },
         { DEVICE_KEYBOARD, SDL_SCANCODE_LSHIFT }
     },
-    .player_name = "",
+    .player_name = "player",
     .last_ip = "127.0.0.1",
 };
 

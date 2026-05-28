@@ -80,7 +80,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     )   
 else()
     # Enable console by removing WIN32 flag
-    add_executable(notk ${SOURCES})
+    add_executable(notk WIN32 ${SOURCES})
 endif()
 
 install(TARGETS notk
