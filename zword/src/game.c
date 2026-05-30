@@ -243,20 +243,25 @@ void init_deathmatch() {
 int get_player_count() {
     int player_count = 0;
 
-    if (network.mode == NET_MODE_NONE) {
-        for (int i = 0; i < 4; i++) {
-            if (app.player_controllers[i] != CONTROLLER_NONE) {
-                player_count++;
+    switch (network.mode) {
+        case NET_MODE_NONE:
+        case NET_MODE_CLIENT:
+            for (int i = 0; i < 4; i++) {
+                if (app.player_controllers[i] != CONTROLLER_NONE) {
+                    player_count++;
+                }
             }
-        }
-    } else {
-        player_count = 1;  // host player
-        for (int c = 0; c < NET_MAX_CLIENTS; c++) {
-            if (network.clients[c].connected) {
-                player_count++;
+            break;
+        case NET_MODE_HOST:
+            player_count = 1;  // host player
+            for (int c = 0; c < NET_MAX_CLIENTS; c++) {
+                if (network.clients[c].connected) {
+                    player_count++;
+                }
             }
-        }
+            break;
     }
+
     return player_count;
 }
 
@@ -267,7 +272,7 @@ void init_game() {
     int player_count = get_player_count();
     int map_player_count = game_data->components->player.order->size;
 
-    if (player_count > map_player_count) {
+    while (map_player_count < player_count) {
         Vector2f pos = get_position(game_data->components->player.order->head->value);
         pos = sum(pos, rand_vector());
         int entity = load_prefab("creatures/player", pos, 0.0f, ones());
@@ -277,6 +282,7 @@ void init_game() {
             LOG_INFO("Extra player %d host collider type=%d width=%.2f height=%.2f radius=%.2f", entity,
                 collider->type, collider->width, collider->height, collider->radius);
         }
+        map_player_count++;
     }
 
     int i = 0;
