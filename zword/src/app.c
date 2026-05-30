@@ -410,14 +410,12 @@ void update(float time_step) {
         case STATE_CLIENT:
             update_client(time_step);
             break;
+        case STATE_PAUSE:
         case STATE_HOST_PAUSE:
             update_menu();
             break;
         case STATE_CLIENT_PAUSE:
             update_client_pause(time_step);
-            break;
-        case STATE_PAUSE:
-            update_menu();
             break;
         case STATE_SAVE:
             save_state(game_data->map_name);

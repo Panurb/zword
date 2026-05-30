@@ -621,7 +621,6 @@ void start_campaign(int entity) {
 
 
 void load_campaign(int entity) {
-    UNUSED(entity);
     strcpy(game_data->map_name, "Campaign");
     change_state_load(entity);
     reset_ids();
@@ -741,19 +740,19 @@ void draw_menu() {
 
 
 void create_game_over_menu() {
-    if (game_data->game_mode == MODE_CAMPAIGN && save_exists()) {
-        create_button("LOAD SAVE", vec(0.0f, -1.0f * BUTTON_HEIGHT), load_campaign);
-    } else {
-        create_button("RESTART", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
-    }
-
-    float y = game_data->game_mode == MODE_DEATHMATCH ? -5.0f * BUTTON_HEIGHT : -2.0f * BUTTON_HEIGHT;
     switch (network.mode) {
         case NET_MODE_HOST:
-            create_button("RETURN TO LOBBY", vec(0.0f, y), change_state_create_lobby);
+            create_button("RETURN TO LOBBY", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_lobby);
+            break;
+        case NET_MODE_NONE:
+            if (game_data->game_mode == MODE_CAMPAIGN && save_exists()) {
+                create_button("LOAD SAVE", vec(0.0f, -1.0f * BUTTON_HEIGHT), load_campaign);
+            } else {
+                create_button("RESTART", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
+            }
             break;
         default:
-            create_button("QUIT", vec(0.0f, y), change_state_end);
+            create_button("QUIT", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_end);
     }
 }
 
@@ -763,6 +762,9 @@ void create_win_menu() {
     switch (network.mode) {
         case NET_MODE_HOST:
             create_button("RETURN TO LOBBY", vec(0.0f, y), change_state_lobby);
+            break;
+        case NET_MODE_CLIENT:
+            create_button("QUIT", vec(0.0f, y), change_state_end);
             break;
         default:
             create_button("CONTINUE", vec(0.0f, y), change_state_end);

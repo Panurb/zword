@@ -482,6 +482,19 @@ void update_survival(float time_step) {
         }
 
         if (!enemies_alive) {
+            int i = 0;
+            FOREACH(node, game_data->components->player.order) {
+                PlayerComponent* player = PlayerComponent_get(node->value);
+                if (player->state == PLAYER_DEAD && i < player_spawns_count) {
+                    respawn_player(node->value, player_spawns[i]);
+                    player->money = 0;
+                    player->money_increment = 0;
+                    player->money_timer = 0.0f;
+                }
+
+                i++;
+            }
+
             game_data->wave++;
             game_data->wave_delay = 5.0f;
             enemies = 0;
