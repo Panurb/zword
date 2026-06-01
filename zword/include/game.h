@@ -102,6 +102,7 @@ typedef struct {
     int point_limit;
     int wave;
     float wave_delay;
+    bool friendly_fire;
 } GameData;
 
 

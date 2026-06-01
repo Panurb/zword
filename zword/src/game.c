@@ -170,6 +170,7 @@ void create_game() {
     game_data->point_limit = 0;
     game_data->wave = 1;
     game_data->wave_delay = 5.0f;
+    game_data->friendly_fire = true;
 }
 
 

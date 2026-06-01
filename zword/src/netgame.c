@@ -32,6 +32,7 @@ static void cache_lobby_info(const LobbyInfoPacket* lobby) {
     cached_lobby_info.map_name[sizeof(cached_lobby_info.map_name) - 1] = '\0';
     cached_lobby_info.game_mode = (GameMode)lobby->game_mode;
     cached_lobby_info.num_players = lobby->num_players;
+    cached_lobby_info.friendly_fire = lobby->friendly_fire;
     cached_lobby_info.point_limit = lobby->point_limit;
 
     for (int i = 0; i < NET_MAX_CLIENTS + 1; i++) {
@@ -49,6 +50,7 @@ static void build_lobby_info_packet(LobbyInfoPacket* pkt) {
     strncpy(pkt->map_name, game_data->map_name, sizeof(pkt->map_name) - 1);
     pkt->game_mode = (uint8_t)game_data->game_mode;
     pkt->num_players = 1;
+    pkt->friendly_fire = game_data->friendly_fire ? 1 : 0;
     pkt->point_limit = game_data->point_limit;
 
     strncpy(pkt->player_names[0], game_settings.player_name, sizeof(pkt->player_names[0]) - 1);

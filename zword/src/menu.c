@@ -38,10 +38,39 @@ static Entity lan_map_dropdown = NULL_ENTITY;
 static Entity lan_mode_dropdown = NULL_ENTITY;
 static Entity client_lobby_mode_label = NULL_ENTITY;
 static Entity client_lobby_map_label = NULL_ENTITY;
+static Entity client_lobby_friendly_fire_label = NULL_ENTITY;
 static Entity client_lobby_point_limit_label = NULL_ENTITY;
 static Entity lobby_player_panel = NULL_ENTITY;
 static Entity lobby_player_container = NULL_ENTITY;
 static Entity lobby_player_header = NULL_ENTITY;
+
+
+void reset_ids() {
+    RESOLUTION_ID = -1;
+    fullscreen_id = -1;
+    window_play = -1;
+    window_new_map = -1;
+    window_editor = -1;
+    window_settings = -1;
+    window_controls = -1;
+    window_credits = -1;
+    window_keyboard_controls = -1;
+    window_xbox_controls = -1;
+    button_benchmark = -1;
+
+    name_input_lan = NULL_ENTITY;
+    ip_input_lan = NULL_ENTITY;
+    window_lan = NULL_ENTITY;
+    lan_map_dropdown = NULL_ENTITY;
+    lan_mode_dropdown = NULL_ENTITY;
+    client_lobby_mode_label = NULL_ENTITY;
+    client_lobby_map_label = NULL_ENTITY;
+    client_lobby_friendly_fire_label = NULL_ENTITY;
+    client_lobby_point_limit_label = NULL_ENTITY;
+    lobby_player_panel = NULL_ENTITY;
+    lobby_player_container = NULL_ENTITY;
+    lobby_player_header = NULL_ENTITY;
+}
 
 
 static void recreate_lobby_player_container(void) {
@@ -107,17 +136,21 @@ static void update_client_lobby_menu_info(void) {
 
     WidgetComponent* mode = WidgetComponent_get(client_lobby_mode_label);
     WidgetComponent* map = WidgetComponent_get(client_lobby_map_label);
+    WidgetComponent* friendly_fire = WidgetComponent_get(client_lobby_friendly_fire_label);
     WidgetComponent* point_limit = WidgetComponent_get(client_lobby_point_limit_label);
 
     if (!cached_lobby_info.valid) {
         strcpy(mode->string, "Waiting...");
         strcpy(map->string, "Waiting...");
+        strcpy(friendly_fire->string, "Waiting...");
         strcpy(point_limit->string, "Waiting...");
         return;
     }
 
     strcpy(mode->string, GAME_MODES[cached_lobby_info.game_mode]);
     strcpy(map->string, cached_lobby_info.map_name);
+    String strings[] = { "OFF", "ON" };
+    strcpy(friendly_fire->string, strings[cached_lobby_info.friendly_fire]);
     snprintf(point_limit->string, STRING_SIZE, "%d", cached_lobby_info.point_limit);
 }
 
@@ -130,33 +163,6 @@ static void update_lobby_menu(void) {
 
         update_lobby_player_panel();
     }
-}
-
-
-void reset_ids() {
-    RESOLUTION_ID = -1;
-    fullscreen_id = -1;
-    window_play = -1;
-    window_new_map = -1;
-    window_editor = -1;
-    window_settings = -1;
-    window_controls = -1;
-    window_credits = -1;
-    window_keyboard_controls = -1;
-    window_xbox_controls = -1;
-    button_benchmark = -1;
-
-    name_input_lan = NULL_ENTITY;
-    ip_input_lan = NULL_ENTITY;
-    window_lan = NULL_ENTITY;
-    lan_map_dropdown = NULL_ENTITY;
-    lan_mode_dropdown = NULL_ENTITY;
-    client_lobby_mode_label = NULL_ENTITY;
-    client_lobby_map_label = NULL_ENTITY;
-    client_lobby_point_limit_label = NULL_ENTITY;
-    lobby_player_panel = NULL_ENTITY;
-    lobby_player_container = NULL_ENTITY;
-    lobby_player_header = NULL_ENTITY;
 }
 
 
@@ -772,30 +778,6 @@ void create_win_menu() {
 }
 
 
-void create_lobby_menu() {
-    int height = 4;
-    int container = create_container(vec(-18.0f, -2.0f), 2, height);
-    WidgetComponent_get(container)->enabled = false;
-
-    Entity mode_label = create_label("Mode", zeros());
-    client_lobby_mode_label = create_label("Waiting...", zeros());
-    add_row_to_container(container, mode_label, client_lobby_mode_label);
-
-    Entity map_label = create_label("Map", zeros());
-    client_lobby_map_label = create_label("Waiting...", zeros());
-    add_row_to_container(container, map_label, client_lobby_map_label);
-
-    Entity points_label = create_label("Point limit", zeros());
-    client_lobby_point_limit_label = create_label("Waiting...", zeros());
-    add_row_to_container(container, points_label, client_lobby_point_limit_label);
-
-    Entity leave_button = create_button("Leave", zeros(), change_state_end);
-    add_widget_to_container(container, leave_button);
-
-    create_lobby_player_panel();
-}
-
-
 void set_map_data(Entity entity, int value) {
     WidgetComponent* widget = WidgetComponent_get(entity);
     strcpy(game_data->map_name, widget->strings[value]);
@@ -805,6 +787,12 @@ void set_map_data(Entity entity, int value) {
 void set_point_limit(Entity entity, int value) {
     UNUSED(entity);
     game_data->point_limit = value;
+}
+
+
+void set_friendly_fire(Entity entity, int value) {
+    UNUSED(entity);
+    game_data->friendly_fire = value;
 }
 
 
@@ -826,7 +814,7 @@ void update_maps(Entity entity, int value) {
 
 
 void create_host_lobby_menu() {
-    int height = 4;
+    int height = 5;
     int container = create_container(vec(-18.0f, -2.0f), 2, height);
     WidgetComponent_get(container)->enabled = false;
 
@@ -842,8 +830,11 @@ void create_host_lobby_menu() {
     lan_map_dropdown = create_dropdown(zeros(), files, size);
     set_map_data(lan_map_dropdown, 0);
     WidgetComponent_get(lan_map_dropdown)->on_change = set_map_data;
-
     add_row_to_container(container, map_label, lan_map_dropdown);
+
+    Entity friendly_fire_label = create_label("Friendly Fire", zeros());
+    Entity friendly_fire_checkbox = create_checkbox(zeros(), game_data->friendly_fire, set_friendly_fire);
+    add_row_to_container(container, friendly_fire_label, friendly_fire_checkbox);
 
     Entity points_label = create_label("Point limit", zeros());
     Entity point_limit = create_slider(vec(0.0f, 0.0f), 1, 20, 10, set_point_limit);
@@ -852,6 +843,34 @@ void create_host_lobby_menu() {
     Entity start_button = create_button("Start game", zeros(), change_state_host_start);
     Entity close_button = create_button("Close lobby", zeros(), change_state_end);
     add_row_to_container(container, start_button, close_button);
+
+    create_lobby_player_panel();
+}
+
+
+void create_lobby_menu() {
+    int height = 5;
+    int container = create_container(vec(-18.0f, -2.0f), 2, height);
+    WidgetComponent_get(container)->enabled = false;
+
+    Entity mode_label = create_label("Mode", zeros());
+    client_lobby_mode_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, mode_label, client_lobby_mode_label);
+
+    Entity map_label = create_label("Map", zeros());
+    client_lobby_map_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, map_label, client_lobby_map_label);
+
+    Entity friendly_fire_label = create_label("Friendly Fire", zeros());
+    client_lobby_friendly_fire_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, friendly_fire_label, client_lobby_friendly_fire_label);
+
+    Entity points_label = create_label("Point limit", zeros());
+    client_lobby_point_limit_label = create_label("Waiting...", zeros());
+    add_row_to_container(container, points_label, client_lobby_point_limit_label);
+
+    Entity leave_button = create_button("Leave", zeros(), change_state_end);
+    add_widget_to_container(container, leave_button);
 
     create_lobby_player_panel();
 }

@@ -96,7 +96,29 @@ void die(int entity) {
 }
 
 
+bool is_friendly_fire(Entity dealer, Entity target) {
+    if (game_data->game_mode == MODE_DEATHMATCH) {
+        return false;
+    }
+
+    if (game_data->friendly_fire) {
+        return false;
+    }
+
+    PlayerComponent* player_dealer = PlayerComponent_get(dealer);
+    PlayerComponent* player_target = PlayerComponent_get(target);
+    if (player_dealer && player_target) {
+        return true;
+    }
+    return false;
+}
+
+
 void damage(Entity entity, Vector2f pos, Vector2f dir, int dmg, Entity dealer, DamageType type) {
+    if (is_friendly_fire(dealer, entity)) {
+        return;
+    }
+
     HealthComponent* health = HealthComponent_get(entity);
     EnemyComponent* enemy = EnemyComponent_get(entity);
     int final_dmg = dmg;

@@ -410,6 +410,7 @@ int create_checkbox(Vector2f position, bool value, OnChange on_change) {
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_CHECKBOX);
     widget->value = value;
     widget->on_click = toggle_checkbox;
+    widget->on_change = on_change;
 
     return i;
 }

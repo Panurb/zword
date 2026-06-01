@@ -15,6 +15,7 @@ typedef struct {
     GameMode game_mode;
     int num_players;
     String player_names[NET_MAX_CLIENTS + 1];
+    bool friendly_fire;
     int point_limit;
 } LobbyInfo;
 

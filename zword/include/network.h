@@ -88,6 +88,7 @@ typedef struct {
     uint8_t game_mode;
     uint8_t num_players;
     char player_names[NET_MAX_CLIENTS + 1][32];
+    uint8_t friendly_fire;
     uint8_t point_limit;
 } LobbyInfoPacket;
 
