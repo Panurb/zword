@@ -73,10 +73,9 @@ void netgame_unpack_input(const InputPacket* pkt, int player_entity);
 
 void return_to_lobby();
 
-// Check if an entity is "dynamic" (needs to be synced).
-// An entity is dynamic if it has dynamic components OR any ancestor in
-// its coord->parent chain is dynamic.
-bool netgame_is_dynamic(int entity);
+bool netgame_is_dynamic(Entity entity);
+
+bool netgame_should_sync(Entity entity);
 
 void create_lobby(void);
 

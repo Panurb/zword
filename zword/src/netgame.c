@@ -166,8 +166,6 @@ static bool has_dynamic_components(int entity) {
     if (DoorComponent_get(entity)) return true;
     if (ItemComponent_get(entity)) return true;
     if (AmmoComponent_get(entity)) return true;
-    ImageComponent* image = ImageComponent_get(entity);
-    if (image && fabsf(image->stretch) > 1e-3f) return true;
     return false;
 }
 
@@ -195,7 +193,7 @@ void return_to_lobby() {
 }
 
 
-bool netgame_is_dynamic(int entity) {
+bool netgame_is_dynamic(Entity entity) {
     // Check own components
     if (has_dynamic_components(entity)) return true;
 
@@ -204,6 +202,18 @@ bool netgame_is_dynamic(int entity) {
     if (coord && coord->parent >= 0) {
         return netgame_is_dynamic(coord->parent);
     }
+    return false;
+}
+
+
+bool netgame_should_sync(Entity entity) {
+    if (netgame_is_dynamic(entity)) return true;
+
+    ImageComponent* image = ImageComponent_get(entity);
+    if (image && fabsf(image->stretch) > 1e-3f) {
+        return true;
+    }
+
     return false;
 }
 
@@ -232,7 +242,7 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
         if (CameraComponent_get(i)) continue;
         if (WidgetComponent_get(i)) continue;
 
-        if (!netgame_is_dynamic(i)) continue;
+        if (!netgame_should_sync(i)) continue;
 
         // Write entity_id (u16) + binary_serialize_entity() output
         if (remaining < 2) {

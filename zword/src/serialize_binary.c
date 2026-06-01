@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "app.h"
 #include "serialize_binary.h"
 #include "component.h"
 #include "particle.h"
@@ -258,6 +259,7 @@ static bool ImageComponent_deserialize_binary(BinaryReadCursor* cursor, int enti
         }
         image->alpha = alpha;
         image->shine = shine;
+        image->stretch_speed = (stretch - image->stretch) / app.time_step;
         image->stretch = stretch;
     } else {
         image = ImageComponent_add(entity, filename, width, height, (Layer)layer);
