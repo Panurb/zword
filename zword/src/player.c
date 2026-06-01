@@ -421,3 +421,23 @@ void respawn_player(Entity entity, Vector2f position) {
         }
     }
 }
+
+
+Entity get_random_player() {
+    int players_alive = 0;
+
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        if (player->state != PLAYER_DEAD) {
+            players_alive++;
+        }
+    }
+
+    if (players_alive == 0) {
+        return NULL_ENTITY;
+    }
+
+    int target = randi(0, players_alive - 1);
+    return List_get(game_data->components->player.order, target)->value;
+}

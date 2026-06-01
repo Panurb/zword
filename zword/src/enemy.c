@@ -17,6 +17,7 @@
 #include "game.h"
 #include "list.h"
 #include "item.h"
+#include "player.h"
 
 
 int create_zombie(Vector2f pos, float angle) {
@@ -319,10 +320,11 @@ void update_enemies(float time_step) {
 
                 PlayerComponent* player = PlayerComponent_get(enemy->target);
                 if (player && player->state == PLAYER_DEAD) {
-                    enemy->target = NULL_ENTITY;
-                    enemy->state = ENEMY_IDLE;
+                    enemy->target = get_random_player();
+                    if (enemy->target == NULL_ENTITY) {
+                        enemy->state = ENEMY_IDLE;
+                    }
                 }
-
                 break;
             } case ENEMY_ATTACK: {
                 if (enemy->attack_timer <= 0.0f) {
@@ -525,10 +527,9 @@ int spawn_enemy(Vector2f position, float probs[4]) {
             j = create_priest(position, angle);
             break;
     }
-    int p = game_data->components->player.order->head->value;
     EnemyComponent* enemy = EnemyComponent_get(j);
     if (enemy) {
-        enemy->target = p;
+        enemy->target = get_random_player();
         enemy->state = ENEMY_CHASE;
         // TODO: update grid?
     }
