@@ -1,17 +1,13 @@
 #define _USE_MATH_DEFINES
 
 #include <stdlib.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include "util.h"
+#include "player.h"
 #include "component.h"
 #include "camera.h"
-#include "collider.h"
-#include "raycast.h"
-#include "util.h"
 #include "weapon.h"
 #include "vehicle.h"
 #include "item.h"
@@ -19,8 +15,18 @@
 #include "input.h"
 #include "particle.h"
 #include "enemy.h"
-#include "health.h"
 #include "door.h"
+
+
+void respawn_dead_players(Vector2f position) {
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        if (player->state != PLAYER_DEAD) continue;
+
+        respawn_player(node->value, position);
+    }
+}
 
 
 int create_player(Vector2f pos, float angle) {
@@ -165,6 +171,9 @@ void update_players(float time_step) {
             case PLAYER_INTERACT:
                 if (ItemComponent_get(player->target)) {
                     if (ItemComponent_get(player->target)->type == ITEM_SAVE) {
+                        if (game_data->game_mode == MODE_CAMPAIGN) {
+                            respawn_dead_players(get_position(player->target));
+                        }
                         game_state = STATE_SAVE;
                     } else {
                         pick_up_item(i);
