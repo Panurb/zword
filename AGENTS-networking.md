@@ -88,15 +88,17 @@ Each tick:
 2. Pack and send `InputPacket` to host
 3. Save current positions as `previous` (for interpolation)
 4. Receive and apply snapshots (overwrites current entity state, replays sound events, triggers particle bursts)
-5. Rebuild collision grid (needed for light raycasting)
-6. Update camera, lights, particles locally
+5. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
+6. Rebuild collision grid (needed for light raycasting)
+7. Update camera, lights, particles locally
 
 ### Client Lobby (`app.c`, `STATE_CLIENT_LOBBY`)
 
 Each tick:
 1. Periodically send `PACKET_KEEPALIVE` to the host
 2. Receive `PACKET_JOIN_ACK`, `PACKET_LOBBY_INFO`, and `PACKET_START_GAME`
-3. Update the lobby UI from the latest cached lobby info
+3. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
+4. Update the lobby UI from the latest cached lobby info
 
 ## Match end flow
 
@@ -106,6 +108,7 @@ Each tick:
 - When the host leaves the match-end screen, it tears down the match world with `end_match()`, rebuilds the host lobby UI, and resumes broadcasting `PACKET_LOBBY_INFO`.
 - Clients cache `PACKET_LOBBY_INFO` for the lobby UI and also treat it as the signal that the host has returned from a match back to lobby.
 - The host rebroadcasts `PACKET_LOBBY_INFO` periodically while in `STATE_HOST_LOBBY`, so clients can recover from dropped UDP packets and keep their lobby UI in sync.
+- Client-side host timeout checks run in lobby, active gameplay, and client pause. They intentionally do not run in `STATE_CLIENT_GAME_OVER`, because the host does not periodically send packets during `STATE_HOST_GAME_OVER`.
 
 ## Input handling
 

@@ -824,7 +824,6 @@ void create_host_lobby_menu() {
     add_row_to_container(container, mode_label, lan_mode_dropdown);
 
     Entity map_label = create_label("Map", zeros());
-
     String files[MAX_MAPS];
     int size = list_files_alphabetically("data/maps/*.json", files, game_mode_is_selected);
     lan_map_dropdown = create_dropdown(zeros(), files, size);

@@ -180,6 +180,21 @@ Vector2f get_mouse_position(int camera) {
 }
 
 
+void reset_controller(Controller* controller) {
+    controller->left_stick = zeros();
+    controller->right_stick = zeros();
+    controller->dpad = zeros();
+    controller->left_trigger = 0.0f;
+    controller->right_trigger = 0.0f;
+
+    for (int i = 0; i < 12; i++) {
+        controller->buttons_down[i] = false;
+        controller->buttons_pressed[i] = false;
+        controller->buttons_released[i] = false;
+    }
+}
+
+
 void update_controller(int camera, int i) {
     PlayerComponent* player = PlayerComponent_get(i);
     int joystick = player->controller.joystick;
@@ -307,7 +322,7 @@ void update_controller(int camera, int i) {
 }
 
 
-void input_players(int camera) {
+void input_players(int camera, bool poll_local_input) {
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
         int i = node->value;
@@ -316,10 +331,12 @@ void input_players(int camera) {
             continue;
         }
 
-        bool skip_controller_update = !player->is_local;
+        bool skip_controller_update = !player->is_local || !poll_local_input;
 
         if (!skip_controller_update) {
             update_controller(camera, i);
+        } else if (player->is_local) {
+            reset_controller(&player->controller);
         }
 
         Controller controller = player->controller;

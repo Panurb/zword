@@ -28,6 +28,7 @@
 #include "door.h"
 #include "menu.h"
 #include "serialize.h"
+#include "input.h"
 #include "item.h"
 #include "widget.h"
 #include "settings.h"
@@ -85,10 +86,24 @@ static void send_match_end_packet(bool won) {
 }
 
 
+static void reset_player_controllers() {
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        PlayerComponent* player = PlayerComponent_get(node->value);
+        if (!player) {
+            continue;
+        }
+
+        reset_controller(&player->controller);
+    }
+}
+
+
 void enter_match_end_screen(bool won) {
     game_over_timer = 2.0f;
     level_won = won;
     send_match_end_packet(won);
+    reset_player_controllers();
 
     if (network.mode == NET_MODE_HOST) {
         game_state = STATE_HOST_GAME_OVER;

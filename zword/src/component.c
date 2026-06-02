@@ -269,13 +269,7 @@ PlayerComponent* PlayerComponent_add(int entity) {
                         SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN};
     memcpy(player->controller.buttons, buttons, sizeof(buttons));
 
-    player->controller.left_stick = zeros();
-    player->controller.right_stick = zeros();
-    for (int i = 0; i < 12; i++) {
-        player->controller.buttons_down[i] = false;
-        player->controller.buttons_pressed[i] = false;
-        player->controller.buttons_released[i] = false;
-    }
+    reset_controller(&player->controller);
 
     game_data->components->player.array[entity] = player;
     List_append(game_data->components->player.order, entity);

@@ -98,7 +98,7 @@ void host_start(void);
 
 void client_start(void);
 
-void update_host(float time_step);
+void update_host(float time_step, bool paused);
 
 void update_client(float time_step);
 

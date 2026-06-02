@@ -85,6 +85,36 @@ static void send_lobby_keepalive() {
 }
 
 
+static void mark_server_packet_received() {
+    if (network.mode != NET_MODE_CLIENT) {
+        return;
+    }
+
+    network.last_server_recv_time = SDL_GetTicks() / 1000.0f;
+}
+
+
+static bool client_check_server_timeout() {
+    if (network.mode != NET_MODE_CLIENT) {
+        return false;
+    }
+
+    if (network.last_server_recv_time <= 0.0f) {
+        return false;
+    }
+
+    float current_time = SDL_GetTicks() / 1000.0f;
+    float elapsed = current_time - network.last_server_recv_time;
+    if (elapsed <= NET_DISCONNECT_TIMEOUT) {
+        return false;
+    }
+
+    LOG_WARNING("Host timed out (%.1fs)", elapsed);
+    game_state = STATE_END;
+    return true;
+}
+
+
 static void enter_client_match_end(const EndGamePacket* pkt) {
     if (pkt->end_type == MATCH_END_WIN) {
         enter_match_end_screen(true);
@@ -136,16 +166,19 @@ static bool client_receive_packets(void) {
 
         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
         if (hdr->type == PACKET_SNAPSHOT) {
+            mark_server_packet_received();
             netgame_apply_snapshot(network.recv_buf, received);
             return false;
         }
 
         if (hdr->type == PACKET_END_GAME && received >= (int)sizeof(EndGamePacket)) {
+            mark_server_packet_received();
             enter_client_match_end((EndGamePacket*)network.recv_buf);
             return true;
         }
 
         if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+            mark_server_packet_received();
             cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
             return_to_lobby();
             return true;
@@ -710,12 +743,15 @@ void update_client_lobby(float time_step) {
 
         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
         if (hdr->type == PACKET_JOIN_ACK && received >= (int)sizeof(JoinAckPacket)) {
+            mark_server_packet_received();
             JoinAckPacket* ack = (JoinAckPacket*)network.recv_buf;
             network.local_player_slot = ack->player_slot;
             LOG_INFO("Joined as player %d", network.local_player_slot);
         } else if (hdr->type == PACKET_LOBBY_INFO && received >= (int)sizeof(LobbyInfoPacket)) {
+            mark_server_packet_received();
             cache_lobby_info((LobbyInfoPacket*)network.recv_buf);
         } else if (hdr->type == PACKET_START_GAME && received >= (int)sizeof(StartGamePacket)) {
+            mark_server_packet_received();
             StartGamePacket* start = (StartGamePacket*)network.recv_buf;
             strncpy(game_data->map_name, start->map_name, sizeof(game_data->map_name) - 1);
             game_data->map_name[sizeof(game_data->map_name) - 1] = '\0';
@@ -734,6 +770,11 @@ void update_client_lobby(float time_step) {
             break;
         }
     }
+
+    if (client_check_server_timeout()) {
+        return;
+    }
+
     update_menu();
 }
 
@@ -782,7 +823,7 @@ void client_start(void) {
 }
 
 
-void update_host(float time_step) {
+void update_host(float time_step, bool paused) {
     float current_time = SDL_GetTicks() / 1000.0f;
 
     struct sockaddr_in from;
@@ -826,7 +867,7 @@ void update_host(float time_step) {
         }
     }
 
-    input_players(game_data->camera);
+    input_players(game_data->camera, !paused);
     update_game(time_step);
     update_game_mode(time_step);
 
@@ -850,6 +891,10 @@ void update_client(float time_step) {
         return;
     }
 
+    if (client_check_server_timeout()) {
+        return;
+    }
+
     ColliderGrid_clear(game_data->grid);
     init_grid();
     update_camera(game_data->camera, time_step, true);
@@ -866,6 +911,10 @@ void update_client_pause(float time_step) {
     update_coordinates();
 
     if (client_receive_packets()) {
+        return;
+    }
+
+    if (client_check_server_timeout()) {
         return;
     }
 

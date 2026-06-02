@@ -108,6 +108,7 @@ typedef struct {
     NetSocket sock;
     struct sockaddr_in host_addr;
     int local_player_slot;
+    float last_server_recv_time;  // SDL_GetTicks() / 1000.0f when client last heard from host
     int num_clients;
     ClientInfo clients[NET_MAX_CLIENTS];
     uint32_t tick;

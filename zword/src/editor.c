@@ -939,6 +939,7 @@ void input_tool_test(SDL_Event event) {
 
 void input_editor(SDL_Event event) {
     if (input_widgets(game_data->menu_camera, event)) {
+        tile_started = false;
         return;
     }
 

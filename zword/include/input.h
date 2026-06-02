@@ -56,6 +56,8 @@ char* action_to_keybind(char* action);
 
 void replace_actions(String output, String input);
 
-void input_players(int camera);
+void reset_controller(Controller* controller);
+
+void input_players(int camera, bool poll_local_input);
 
 void update_controller(int camera, int entity);

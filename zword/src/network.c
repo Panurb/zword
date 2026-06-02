@@ -18,6 +18,7 @@ bool network_init() {
     network.mode = NET_MODE_NONE;
     network.sock = NET_INVALID_SOCKET;
     network.local_player_slot = 0;
+    network.last_server_recv_time = 0.0f;
     network.num_clients = 0;
     network.tick = 0;
     network.game_started = false;
@@ -168,6 +169,7 @@ bool network_client_connect(const char* host_ip, int port) {
     inet_pton(AF_INET, host_ip, &network.host_addr.sin_addr);
 
     network.mode = NET_MODE_CLIENT;
+    network.last_server_recv_time = SDL_GetTicks() / 1000.0f;
 
     // Send JOIN packet
     JoinPacket join;

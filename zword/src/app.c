@@ -381,7 +381,7 @@ void update(float time_step) {
             update_client_game_over(time_step);
             break;
         case STATE_GAME_OVER:
-            input_players(game_data->camera);
+            input_players(game_data->camera, true);
             update_game_over(time_step);
             break;
         case STATE_END:
@@ -400,18 +400,22 @@ void update(float time_step) {
             game_state = STATE_START;
             break;
         case STATE_GAME:
-            input_players(game_data->camera);
+            input_players(game_data->camera, true);
             update_game(time_step);
             update_game_mode(time_step);
             break;
         case STATE_HOST:
-            update_host(time_step);
+            update_host(time_step, false);
             break;
         case STATE_CLIENT:
             update_client(time_step);
             break;
         case STATE_PAUSE:
+            update_menu();
+            break;
         case STATE_HOST_PAUSE:
+            input_players(game_data->camera, false);
+            update_host(time_step, true);
             update_menu();
             break;
         case STATE_CLIENT_PAUSE:

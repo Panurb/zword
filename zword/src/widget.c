@@ -284,7 +284,7 @@ void toggle_dropdown(int entity) {
             widget_child->value = i;
         }
 
-        if (widget->max_value > 3) {
+        if (widget->max_value >= 3) {
             add_scrollbar_to_container(container);
         }
     }
