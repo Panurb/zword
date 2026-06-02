@@ -403,3 +403,18 @@ void draw_hud(int camera) {
 
     draw_boss_health(camera);
 }
+
+
+void draw_player_names(Entity camera) {
+    Color color = get_color(1.0f, 1.0f, 1.0f, 0.5f);
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        Entity i = node->value;
+        PlayerComponent* player = PlayerComponent_get(i);
+        if (player->is_local) continue;
+        if (player->state == PLAYER_DEAD) continue;
+
+        Vector2f pos = get_position_interpolated(i, app.delta);
+        draw_text(camera, sum(pos, vec(0.0f, 1.0f)), player->name, 20, color);
+    }
+}

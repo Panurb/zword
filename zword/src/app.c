@@ -514,13 +514,18 @@ void draw() {
             break;
         case STATE_HOST:
         case STATE_CLIENT:
-        case STATE_GAME:
             draw_game();
             draw_hud(game_data->camera);
             draw_game_mode();
             if (game_data->show_leaderboard) {
                 draw_leaderboard(game_data->menu_camera);
             }
+            draw_player_names(game_data->camera);
+            break;
+        case STATE_GAME:
+            draw_game();
+            draw_hud(game_data->camera);
+            draw_game_mode();
             break;
         case STATE_HOST_PAUSE:
         case STATE_CLIENT_PAUSE:
