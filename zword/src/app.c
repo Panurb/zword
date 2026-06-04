@@ -346,7 +346,7 @@ void update(float time_step) {
         case STATE_MENU:
             intro.page = 1;
             intro.panel = 0;
-            update_menu();
+            update_menu(time_step);
             break;
         case STATE_HOST_LOBBY:
             update_host_lobby(time_step);
@@ -411,12 +411,12 @@ void update(float time_step) {
             update_client(time_step);
             break;
         case STATE_PAUSE:
-            update_menu();
+            update_menu(time_step);
             break;
         case STATE_HOST_PAUSE:
             input_players(game_data->camera, false);
             update_host(time_step, true);
-            update_menu();
+            update_menu(time_step);
             break;
         case STATE_CLIENT_PAUSE:
             update_client_pause(time_step);

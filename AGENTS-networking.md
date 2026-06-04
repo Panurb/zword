@@ -48,6 +48,8 @@ Packet types:
 | `PACKET_START_GAME` | Host -> Clients | Map name, game mode, player count |
 | `PACKET_END_GAME` | Host -> Clients | Match-end result (`MATCH_END_GAME_OVER` or `MATCH_END_WIN`) |
 | `PACKET_LOBBY_INFO` | Host -> Clients | Current lobby map, mode, and connected player names |
+| `PACKET_DISCOVER` | Browser -> Host | LAN discovery query sent by the server browser to `NET_DEFAULT_PORT` |
+| `PACKET_DISCOVER_RESPONSE` | Host -> Browser | LAN discovery response with host IP/port, host name, map, mode, player counts, and in-game flag |
 
 ## Snapshot format
 
@@ -100,6 +102,13 @@ Each tick:
 3. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
 4. Update the lobby UI from the latest cached lobby info
 
+### Server Browser
+
+1. Browser sends one UDP broadcast `PACKET_DISCOVER` to `255.255.255.255:12345`
+2. Hosts listening on `NET_DEFAULT_PORT` reply directly to the sender with `PACKET_DISCOVER_RESPONSE`
+3. Browser collects responses for a short window and deduplicates by source IP and advertised port
+4. Clicking a browser row copies the discovered host IP into the LAN join textbox and uses the normal `PACKET_JOIN` flow
+
 ## Match end flow
 
 - Host ending a LAN match does not use `STATE_END`, because that tears down the session and recreates the main menu.
@@ -133,3 +142,4 @@ The snapshot header can also carry small pieces of authoritative match-level sta
 - **Pause is local only** -- pausing on the host or client only pauses locally; the other side keeps running
 - **Lobby info is best-effort UDP** -- periodic rebroadcast helps, but there is still no full ack/retry reliability layer
 - **Lobby disconnects are timeout-based** -- the host removes lobby clients after missed keepalives, so disconnect detection is not immediate
+- **LAN discovery is subnet-local** -- it uses IPv4 UDP broadcast to `255.255.255.255`, so routers typically will not forward it beyond the local subnet

@@ -34,6 +34,7 @@ static int button_benchmark = -1;
 static Entity name_input_lan = NULL_ENTITY;
 static Entity ip_input_lan = NULL_ENTITY;
 static Entity window_lan = NULL_ENTITY;
+static Entity window_server_browser = NULL_ENTITY;
 static Entity lan_map_dropdown = NULL_ENTITY;
 static Entity lan_mode_dropdown = NULL_ENTITY;
 static Entity client_lobby_mode_label = NULL_ENTITY;
@@ -43,6 +44,9 @@ static Entity client_lobby_point_limit_label = NULL_ENTITY;
 static Entity lobby_player_panel = NULL_ENTITY;
 static Entity lobby_player_container = NULL_ENTITY;
 static Entity lobby_player_header = NULL_ENTITY;
+static Entity server_list = NULL_ENTITY;
+
+static float server_browser_refresh_time = 0.0f;
 
 
 void reset_ids() {
@@ -70,6 +74,18 @@ void reset_ids() {
     lobby_player_panel = NULL_ENTITY;
     lobby_player_container = NULL_ENTITY;
     lobby_player_header = NULL_ENTITY;
+    window_server_browser = NULL_ENTITY;
+    server_list = NULL_ENTITY;
+    server_browser_refresh_time = -1.0f;
+}
+
+
+static void refresh_server_list() {
+    netgame_clear_discovered_servers();
+    if (!network_send_discover(NET_DEFAULT_PORT)) {
+        LOG_WARNING("Failed to send LAN discover packet");
+    }
+    server_browser_refresh_time = 0.5f;
 }
 
 
@@ -340,6 +356,93 @@ void toggle_survival(int entity) {
 }
 
 
+void join_discovered_server(Entity entity) {
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    int server_index = widget->value;
+    if (server_index < 0 || server_index >= discovered_servers_count) {
+        return;
+    }
+
+    strcpy(network.host_ip, discovered_servers[server_index].host_ip);
+    game_state = STATE_JOIN;
+    reset_ids();
+}
+
+
+void update_server_list(float time_step) {
+    if (window_server_browser == NULL_ENTITY) {
+        return;
+    }
+
+    if (server_browser_refresh_time < 0.0f) {
+        return;
+    }
+
+    struct sockaddr_in from;
+    int received;
+    while ((received = network_receive(network.recv_buf, NET_MAX_PACKET_SIZE, &from)) > 0) {
+        if (received != (int)sizeof(DiscoverResponsePacket)) {
+            continue;
+        }
+
+        PacketHeader* header = (PacketHeader*)network.recv_buf;
+        if (header->type != PACKET_DISCOVER_RESPONSE) {
+            continue;
+        }
+
+        DiscoverResponsePacket* response = (DiscoverResponsePacket*)network.recv_buf;
+        netgame_store_discovered_server(response, &from);
+    }
+
+    server_browser_refresh_time = fmaxf(server_browser_refresh_time - time_step, 0.0f);
+    if (server_browser_refresh_time > 0.0f) {
+        return;
+    }
+
+    clear_container(server_list);
+
+    for (int i = 0; i < discovered_servers_count; i++) {
+        DiscoveredServer* server = &discovered_servers[i];
+        if (!server->valid) {
+            continue;
+        }
+
+        String buffer;
+        snprintf(buffer, STRING_SIZE, "%s | %s | %d/%d",
+            server->host_name,
+            server->host_ip,
+            server->num_players,
+            server->max_players
+        );
+
+        Entity label = create_label(buffer, zeros());
+        Entity button = create_button("JOIN", vec(150.0f, 0.0f), join_discovered_server);
+        add_row_to_container(server_list, label, button);
+        WidgetComponent_get(button)->value = i;
+    }
+
+    server_browser_refresh_time = -1.0f;
+}
+
+
+void toggle_server_browser(Entity entity) {
+    UNUSED(entity);
+    if (window_server_browser != NULL_ENTITY) {
+        destroy_entity_recursive(window_server_browser);
+        window_server_browser = NULL_ENTITY;
+        return;
+    }
+
+    Vector2f pos = sum(vec(0.0f, 2 * BUTTON_HEIGHT), mult(BUTTON_HEIGHT, rand_vector()));
+    window_server_browser = create_window(pos, "SERVER BROWSER", 2, toggle_server_browser);
+
+    server_list = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 2, 5);
+    add_child(window_server_browser, server_list);
+
+    refresh_server_list();
+}
+
+
 void toggle_lan(Entity entity) {
     UNUSED(entity);
     if (window_lan != NULL_ENTITY) {
@@ -354,7 +457,7 @@ void toggle_lan(Entity entity) {
     Entity container = create_container(vec(0.0f, -2.0f * BUTTON_HEIGHT), 2, 3);
     add_child(window_lan, container);
 
-    Entity name_label = create_label("Name", zeros());
+    Entity name_label = create_label("NAME", zeros());
     name_input_lan = create_textbox(zeros(), 1);
     strcpy(WidgetComponent_get(name_input_lan)->string, game_settings.player_name);
     add_row_to_container(container, name_label, name_input_lan);
@@ -364,7 +467,9 @@ void toggle_lan(Entity entity) {
     Entity join_button = create_button("JOIN", zeros(), change_state_join);
     add_row_to_container(container, ip_input_lan, join_button);
 
-    add_button_to_container(container, "HOST", change_state_create_lobby);
+    Entity browse_button = create_button("BROWSE", zeros(), toggle_server_browser);
+    Entity host_button = create_button("HOST", zeros(), change_state_create_lobby);
+    add_row_to_container(container, browse_button, host_button);
 }
 
 
@@ -726,7 +831,8 @@ void create_client_pause_menu() {
 }
 
 
-void update_menu() {
+void update_menu(float time_step) {
+    update_server_list(time_step);
     update_lobby_menu();
     update_widgets(game_data->menu_camera);
 }

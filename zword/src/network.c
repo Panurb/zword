@@ -5,12 +5,41 @@
 #include "network.h"
 
 #include "game.h"
+#include "netgame.h"
 #include "settings.h"
 
 Network network;
 
 
+#define NET_DISCOVER_PROTOCOL_ID 0x5A574F52u
+
+
 static bool winsock_initialized = false;
+
+
+static void close_socket(void) {
+    if (network.sock == NET_INVALID_SOCKET) {
+        return;
+    }
+
+    #ifdef _WIN32
+        closesocket(network.sock);
+    #else
+        close(network.sock);
+    #endif
+    network.sock = NET_INVALID_SOCKET;
+}
+
+
+static bool bind_any_port(unsigned short port) {
+    struct sockaddr_in bind_addr;
+    memset(&bind_addr, 0, sizeof(bind_addr));
+    bind_addr.sin_family = AF_INET;
+    bind_addr.sin_addr.s_addr = INADDR_ANY;
+    bind_addr.sin_port = htons(port);
+
+    return bind(network.sock, (struct sockaddr*)&bind_addr, sizeof(bind_addr)) == 0;
+}
 
 
 bool network_init() {
@@ -49,14 +78,7 @@ bool network_init() {
 
 
 void network_shutdown() {
-    if (network.sock != NET_INVALID_SOCKET) {
-        #ifdef _WIN32
-            closesocket(network.sock);
-        #else
-            close(network.sock);
-        #endif
-        network.sock = NET_INVALID_SOCKET;
-    }
+    close_socket();
 
     #ifdef _WIN32
         if (winsock_initialized) {
@@ -70,9 +92,20 @@ void network_shutdown() {
 
 
 static bool create_udp_socket() {
+    if (network.mode == NET_MODE_NONE && network.sock != NET_INVALID_SOCKET) {
+        close_socket();
+    }
+
     network.sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (network.sock == NET_INVALID_SOCKET) {
         LOG_ERROR("Failed to create socket");
+        return false;
+    }
+
+    int broadcast = 1;
+    if (setsockopt(network.sock, SOL_SOCKET, SO_BROADCAST, (const char*)&broadcast, sizeof(broadcast)) != 0) {
+        LOG_ERROR("Failed to enable UDP broadcast");
+        network_shutdown();
         return false;
     }
 
@@ -124,13 +157,7 @@ void get_own_ip(char ip_str[INET_ADDRSTRLEN]) {
 bool network_host_start(int port) {
     if (!create_udp_socket()) return false;
 
-    struct sockaddr_in bind_addr;
-    memset(&bind_addr, 0, sizeof(bind_addr));
-    bind_addr.sin_family = AF_INET;
-    bind_addr.sin_addr.s_addr = INADDR_ANY;
-    bind_addr.sin_port = htons((unsigned short)port);
-
-    if (bind(network.sock, (struct sockaddr*)&bind_addr, sizeof(bind_addr)) != 0) {
+    if (!bind_any_port((unsigned short)port)) {
         LOG_ERROR("Failed to bind socket on port %d", port);
         network_shutdown();
         return false;
@@ -149,14 +176,7 @@ bool network_host_start(int port) {
 bool network_client_connect(const char* host_ip, int port) {
     if (!create_udp_socket()) return false;
 
-    // Bind to any port for receiving
-    struct sockaddr_in bind_addr;
-    memset(&bind_addr, 0, sizeof(bind_addr));
-    bind_addr.sin_family = AF_INET;
-    bind_addr.sin_addr.s_addr = INADDR_ANY;
-    bind_addr.sin_port = 0;  // OS picks a port
-
-    if (bind(network.sock, (struct sockaddr*)&bind_addr, sizeof(bind_addr)) != 0) {
+    if (!bind_any_port(0)) {
         LOG_ERROR("Failed to bind client socket");
         network_shutdown();
         return false;
@@ -188,6 +208,34 @@ bool network_send_to(struct sockaddr_in* addr, const void* data, int size) {
     int sent = sendto(network.sock, (const char*)data, size, 0,
                       (struct sockaddr*)addr, sizeof(struct sockaddr_in));
     return sent == size;
+}
+
+
+bool network_send_discover(int port) {
+    if (network.mode == NET_MODE_NONE && network.sock == NET_INVALID_SOCKET) {
+        if (!create_udp_socket()) {
+            return false;
+        }
+        if (!bind_any_port(0)) {
+            LOG_ERROR("Failed to bind discovery socket");
+            network_shutdown();
+            return false;
+        }
+    }
+
+    DiscoverPacket pkt;
+    memset(&pkt, 0, sizeof(pkt));
+    pkt.header.type = PACKET_DISCOVER;
+    pkt.header.tick = network.tick;
+    pkt.header.size = sizeof(DiscoverPacket);
+    pkt.protocol_id = NET_DISCOVER_PROTOCOL_ID;
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons((unsigned short)port);
+    addr.sin_addr.s_addr = INADDR_BROADCAST;
+    return network_send_to(&addr, &pkt, sizeof(pkt));
 }
 
 
@@ -256,7 +304,29 @@ void network_host_accept_clients() {
 
         PacketHeader* header = (PacketHeader*)network.recv_buf;
 
-        if (header->type == PACKET_JOIN) {
+        if (header->type == PACKET_DISCOVER && received >= (int)sizeof(DiscoverPacket)) {
+            DiscoverPacket* discover = (DiscoverPacket*)network.recv_buf;
+            if (discover->protocol_id != NET_DISCOVER_PROTOCOL_ID) {
+                continue;
+            }
+
+            DiscoverResponsePacket response;
+            memset(&response, 0, sizeof(response));
+            response.header.type = PACKET_DISCOVER_RESPONSE;
+            response.header.tick = network.tick;
+            response.header.size = sizeof(DiscoverResponsePacket);
+            response.protocol_id = NET_DISCOVER_PROTOCOL_ID;
+            response.port = NET_DEFAULT_PORT;
+            strcpy(response.host_name, game_settings.player_name);
+            if (game_data) {
+                strcpy(response.map_name, game_data->map_name);
+                response.game_mode = (uint8_t)game_data->game_mode;
+            }
+            response.num_players = 1 + network.num_clients;
+            response.max_players = NET_MAX_CLIENTS + 1;
+            response.game_started = network.game_started ? 1 : 0;
+            network_send_to(&from_addr, &response, sizeof(response));
+        } else if (header->type == PACKET_JOIN) {
             // Check if already connected
             int existing = -1;
             for (int i = 0; i < NET_MAX_CLIENTS; i++) {

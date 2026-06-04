@@ -25,6 +25,10 @@ static float lobby_keepalive_timer = 0.0f;
 
 LobbyInfo cached_lobby_info = {0};
 
+DiscoveredServer discovered_servers[NET_MAX_CLIENTS + 1] = {0};
+
+int discovered_servers_count = 0;
+
 
 static void cache_lobby_info(const LobbyInfoPacket* lobby) {
     cached_lobby_info.valid = true;
@@ -39,6 +43,58 @@ static void cache_lobby_info(const LobbyInfoPacket* lobby) {
         strncpy(cached_lobby_info.player_names[i], lobby->player_names[i], sizeof(cached_lobby_info.player_names[i]) - 1);
         cached_lobby_info.player_names[i][sizeof(cached_lobby_info.player_names[i]) - 1] = '\0';
     }
+}
+
+
+void netgame_clear_discovered_servers(void) {
+    memset(discovered_servers, 0, sizeof(discovered_servers));
+    discovered_servers_count = 0;
+}
+
+
+void netgame_store_discovered_server(const DiscoverResponsePacket* pkt, const struct sockaddr_in* from_addr) {
+    if (pkt->num_players <= 0 || pkt->max_players <= 0) {
+        return;
+    }
+
+    char host_ip[INET_ADDRSTRLEN];
+    if (inet_ntop(AF_INET, &from_addr->sin_addr, host_ip, sizeof(host_ip)) == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < discovered_servers_count; i++) {
+        if (strcmp(discovered_servers[i].host_ip, host_ip) != 0) {
+            continue;
+        }
+        if (discovered_servers[i].port != pkt->port) {
+            continue;
+        }
+
+        discovered_servers[i].valid = true;
+        strcpy(discovered_servers[i].host_name, pkt->host_name);
+        strcpy(discovered_servers[i].map_name, pkt->map_name);
+        discovered_servers[i].game_mode = (GameMode)pkt->game_mode;
+        discovered_servers[i].num_players = pkt->num_players;
+        discovered_servers[i].max_players = pkt->max_players;
+        discovered_servers[i].game_started = pkt->game_started != 0;
+        return;
+    }
+
+    if (discovered_servers_count >= LENGTH(discovered_servers)) {
+        return;
+    }
+
+    DiscoveredServer* server = &discovered_servers[discovered_servers_count++];
+    memset(server, 0, sizeof(*server));
+    server->valid = true;
+    strcpy(server->host_ip, host_ip);
+    server->port = pkt->port;
+    strcpy(server->host_name, pkt->host_name);
+    strcpy(server->map_name, pkt->map_name);
+    server->game_mode = (GameMode)pkt->game_mode;
+    server->num_players = pkt->num_players;
+    server->max_players = pkt->max_players;
+    server->game_started = pkt->game_started != 0;
 }
 
 
@@ -724,7 +780,7 @@ void update_host_lobby(float time_step) {
         lobby_info_broadcast_timer = fmaxf(lobby_info_broadcast_timer - time_step, 0.0f);
     }
 
-    update_menu();
+    update_menu(time_step);
 }
 
 
@@ -775,7 +831,7 @@ void update_client_lobby(float time_step) {
         return;
     }
 
-    update_menu();
+    update_menu(time_step);
 }
 
 
@@ -930,7 +986,7 @@ void update_client_pause(float time_step) {
     cam_coord->previous.scale = cam_coord->scale;
 
     network.tick++;
-    update_menu();
+    update_menu(time_step);
 }
 
 

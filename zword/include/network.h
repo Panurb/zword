@@ -39,7 +39,9 @@ typedef enum {
     PACKET_SNAPSHOT,
     PACKET_START_GAME,
     PACKET_END_GAME,
-    PACKET_LOBBY_INFO
+    PACKET_LOBBY_INFO,
+    PACKET_DISCOVER,
+    PACKET_DISCOVER_RESPONSE
 } PacketType;
 
 typedef enum {
@@ -71,6 +73,11 @@ typedef struct {
 
 typedef struct {
     PacketHeader header;
+    uint32_t protocol_id;
+} DiscoverPacket;
+
+typedef struct {
+    PacketHeader header;
     char map_name[128];
     uint8_t game_mode;
     uint8_t num_players;
@@ -91,6 +98,18 @@ typedef struct {
     uint8_t friendly_fire;
     uint8_t point_limit;
 } LobbyInfoPacket;
+
+typedef struct {
+    PacketHeader header;
+    uint32_t protocol_id;
+    uint16_t port;
+    char host_name[32];
+    char map_name[128];
+    uint8_t game_mode;
+    uint8_t num_players;
+    uint8_t max_players;
+    uint8_t game_started;
+} DiscoverResponsePacket;
 
 #pragma pack(pop)
 
@@ -126,6 +145,8 @@ void network_shutdown();
 
 bool network_host_start(int port);
 bool network_client_connect(const char* host_ip, int port);
+
+bool network_send_discover(int port);
 
 // Send raw data to a specific address
 bool network_send_to(struct sockaddr_in* addr, const void* data, int size);

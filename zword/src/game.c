@@ -863,7 +863,7 @@ void update_game_over(float time_step) {
     if (game_over_timer > 0.0f) {
         update_game(time_step);
     } else {
-        update_menu();
+        update_menu(time_step);
     }
     game_over_timer = fmaxf(game_over_timer - time_step, 0.0f);
 }

@@ -19,6 +19,18 @@ typedef struct {
     int point_limit;
 } LobbyInfo;
 
+typedef struct {
+    bool valid;
+    char host_ip[INET_ADDRSTRLEN];
+    int port;
+    char host_name[32];
+    char map_name[128];
+    GameMode game_mode;
+    int num_players;
+    int max_players;
+    bool game_started;
+} DiscoveredServer;
+
 #pragma pack(push, 1)
 
 // Snapshot packet header: sent from host to clients every tick.
@@ -55,6 +67,8 @@ typedef struct {
 // Indexed by LOCAL entity ID.
 extern bool net_entity_seen[MAX_ENTITIES];
 extern LobbyInfo cached_lobby_info;
+extern DiscoveredServer discovered_servers[NET_MAX_CLIENTS + 1];
+extern int discovered_servers_count;
 
 // Host: build a snapshot of all dynamic entities into the send buffer.
 // Returns the total packet size.
@@ -105,6 +119,10 @@ void update_client(float time_step);
 void update_client_pause(float time_step);
 
 void update_client_game_over(float time_step);
+
+void netgame_clear_discovered_servers(void);
+
+void netgame_store_discovered_server(const DiscoverResponsePacket* pkt, const struct sockaddr_in* from_addr);
 
 void draw_host_lobby(void);
 

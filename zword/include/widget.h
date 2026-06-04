@@ -31,6 +31,8 @@ int create_container(Vector2f position, int width, int height);
 
 void add_widget_to_container(int container, int entity);
 
+void clear_container(int container);
+
 int add_button_to_container(int container, ButtonText string, OnClick on_click);
 
 void increment_value(int entity, int direction);

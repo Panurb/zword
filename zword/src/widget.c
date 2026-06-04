@@ -159,6 +159,22 @@ void add_widget_to_container(int container, int entity) {
 }
 
 
+void clear_container(int container) {
+    CoordinateComponent* coord = CoordinateComponent_get(container);
+    WidgetComponent* widget = WidgetComponent_get(container);
+    if (!coord || !widget) {
+        return;
+    }
+
+    while (coord->children->head) {
+        destroy_entity_recursive(coord->children->head->value);
+    }
+
+    widget->value = 0;
+    widget->max_value = 0;
+}
+
+
 int add_button_to_container(int container, ButtonText string, OnClick on_click) {
     int i = create_button(string, zeros(), on_click);
     add_widget_to_container(container, i);
