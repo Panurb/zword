@@ -15,6 +15,8 @@ void player_die(int entity);
 
 void add_money(int entity, int amount);
 
+void reset_player_spawn_ammo(Entity entity);
+
 void respawn_player(Entity entity, Vector2f position);
 
 Entity get_random_player();

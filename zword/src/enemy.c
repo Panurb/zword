@@ -392,6 +392,7 @@ void alert_enemies(int player, float range) {
 
 void drop_loot(int entity) {
     float probs[5] = { 0.1f, 0.1f, 0.1f, 0.1f, 1.0f };
+    Vector2f position = get_position(entity);
 
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
@@ -433,22 +434,31 @@ void drop_loot(int entity) {
     int j = -1;
     switch (rand_choice(probs, 5)) {
         case 0:
-            j = create_bandage(zeros());
+            j = create_bandage(position);
             break;
         case 1:
-            j = create_ammo(zeros(), AMMO_PISTOL);
+            j = create_ammo(position, AMMO_PISTOL);
             break;
         case 2:
-            j = create_ammo(zeros(), AMMO_RIFLE);
+            j = create_ammo(position, AMMO_RIFLE);
             break;
         case 3:
-            j = create_ammo(zeros(), AMMO_SHOTGUN);
+            j = create_ammo(position, AMMO_SHOTGUN);
             break;
         default:
             break;
     }
     if (j != -1) {
-        add_child(entity, j);
+        CoordinateComponent* coord = CoordinateComponent_get(j);
+        if (coord) {
+            coord->previous.position = position;
+            coord->previous.angle = coord->angle;
+        }
+
+        ColliderComponent* collider = ColliderComponent_get(j);
+        if (collider && collider->enabled) {
+            update_grid(j);
+        }
     }
 }
 

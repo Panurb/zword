@@ -92,6 +92,27 @@ void reset_editor_ids() {
 }
 
 
+bool selection_has_waypoint(int entity) {
+    if (WaypointComponent_get(entity)) {
+        return true;
+    }
+
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (!coord) {
+        return false;
+    }
+
+    ListNode* node;
+    FOREACH(node, get_children(entity)) {
+        if (WaypointComponent_get(node->value)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 bool category_selected(int entity) {
     if (WaypointComponent_get(entity)) {
         return selected_categories[CATEGORY_WAYPOINTS];
@@ -1061,6 +1082,7 @@ void draw_barriers() {
 
         switch (collider->group) {
             case GROUP_WALLS:
+            case GROUP_OBSTACLES:
                 color = get_color(0.0f, 1.0f, 0.0f, 0.25f);
                 text_color = COLOR_GREEN;
                 strcpy(text, "wall");
@@ -1189,7 +1211,7 @@ void draw_editor() {
                 draw_circle(game_data->camera, pos, 0.1f, COLOR_WHITE);
             }
 
-            if (WaypointComponent_get(i)) {
+            if (selection_has_waypoint(i)) {
                 waypoint_selected = true;
             }
         }

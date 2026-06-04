@@ -29,6 +29,44 @@ void respawn_dead_players(Vector2f position) {
 }
 
 
+static int get_default_ammo_size(AmmoType type) {
+    switch (type) {
+        case AMMO_PISTOL:
+            return 24;
+        case AMMO_RIFLE:
+            return 30;
+        case AMMO_SHOTGUN:
+            return 16;
+        default:
+            return 0;
+    }
+}
+
+
+void reset_player_spawn_ammo(Entity entity) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    if (!player) {
+        return;
+    }
+
+    AmmoType ammo_types[] = { AMMO_PISTOL, AMMO_RIFLE, AMMO_SHOTGUN };
+    for (int i = 0; i < LENGTH(ammo_types); i++) {
+        AmmoType type = ammo_types[i];
+        int ammo_entity = player->ammo[type];
+        if (ammo_entity == NULL_ENTITY) {
+            ammo_entity = create_ammo(zeros(), type);
+            add_item_to_inventory(entity, ammo_entity);
+            ammo_entity = player->ammo[type];
+        }
+
+        AmmoComponent* ammo = AmmoComponent_get(ammo_entity);
+        if (ammo) {
+            ammo->size = get_default_ammo_size(type);
+        }
+    }
+}
+
+
 int create_player(Vector2f pos, float angle) {
     int i = create_entity();
 
@@ -352,11 +390,10 @@ void update_players(float time_step) {
 void player_die(int entity) {
     CoordinateComponent* coord = CoordinateComponent_get(entity);
     PlayerComponent* player = PlayerComponent_get(entity);
+    bool deathmatch = game_data->game_mode == MODE_DEATHMATCH;
 
-    if (game_data->game_mode == MODE_DEATHMATCH) {
-        if (player->inventory[player->item] != -1) {
-            drop_item(entity);
-        }
+    if (deathmatch) {
+        drop_loot(entity);
         clear_player_inventory(entity);
     } else {
         float angle = coord->angle;
@@ -367,17 +404,17 @@ void player_die(int entity) {
             }
         }
         coord->angle = angle;
-    }
 
-    for (int j = 1; j < player->ammo_size; j++) {
-        AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
-        while (ammo && ammo->size > 0) {
-            Vector2f pos = get_position(entity);
-            int k = create_ammo(sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
-            int size = mini(AmmoComponent_get(k)->size, ammo->size);
-            AmmoComponent* drop = AmmoComponent_get(k);
-            drop->size = size;
-            ammo->size -= size;
+        for (int j = 1; j < player->ammo_size; j++) {
+            AmmoComponent* ammo = AmmoComponent_get(player->ammo[j]);
+            while (ammo && ammo->size > 0) {
+                Vector2f pos = get_position(entity);
+                int k = create_ammo(sum(pos, polar_to_cartesian(1.0f, rand_angle())), ammo->type);
+                int size = mini(AmmoComponent_get(k)->size, ammo->size);
+                AmmoComponent* drop = AmmoComponent_get(k);
+                drop->size = size;
+                ammo->size -= size;
+            }
         }
     }
 
@@ -386,7 +423,7 @@ void player_die(int entity) {
     player->target = NULL_ENTITY;
     WaypointComponent_remove(entity);
 
-    if (game_data->game_mode == MODE_DEATHMATCH) {
+    if (deathmatch) {
         player->respawn_timer = 10.0f;
     }
 }
@@ -412,6 +449,9 @@ void respawn_player(Entity entity, Vector2f position) {
     PlayerComponent* player = PlayerComponent_get(entity);
     player->state = PLAYER_ON_FOOT;
     player->respawn_timer = -1.0f;
+    if (game_data->game_mode == MODE_DEATHMATCH) {
+        reset_player_spawn_ammo(entity);
+    }
 
     HealthComponent* health = HealthComponent_get(entity);
     health->dead = false;

@@ -220,6 +220,7 @@ void init_survival() {
         if (item && weapon && item->price > 0) {
             item->spawner = true;
             item->respawn_timer = 0.0f;
+            PhysicsComponent_remove(i);
         }
     }
 }
@@ -251,6 +252,7 @@ void init_deathmatch() {
         if (weapon) {
             item->spawner = true;
             item->respawn_timer = 0.0f;
+            PhysicsComponent_remove(i);
         }
     }
 }
@@ -332,6 +334,10 @@ void init_game() {
                 player->is_local = (i == network.local_player_slot);
             }
             LOG_DEBUG("Player %d: %d\n", i, player->controller.joystick);
+
+            if (game_data->game_mode == MODE_DEATHMATCH) {
+                reset_player_spawn_ammo(node->value);
+            }
         }
 
         i++;

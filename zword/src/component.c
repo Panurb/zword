@@ -739,7 +739,7 @@ AmmoComponent* AmmoComponent_add(int entity, AmmoType type) {
             ammo->size = 24;
             break;
         case AMMO_RIFLE:
-            ammo->size = 60;
+            ammo->size = 30;
             break;
         case AMMO_SHOTGUN:
             ammo->size = 16;
