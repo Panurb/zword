@@ -997,13 +997,3 @@ void update_client_game_over(float time_step) {
 
     update_game_over(time_step);
 }
-
-
-void draw_host_lobby(void) {
-    draw_menu();
-}
-
-
-void draw_client_lobby(void) {
-    draw_menu();
-}

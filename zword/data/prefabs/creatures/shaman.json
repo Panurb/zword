@@ -7,7 +7,7 @@
             "parent":	1
         },
         "Weapon":	{
-            "fire_rate":	0.5,
+            "fire_rate":	0.3,
             "recoil":	0,
             "damage":	20,
             "max_magazine":	-1,
@@ -72,7 +72,7 @@
             "color_r":	127,
             "color_g":	255,
             "color_b":	0,
-            "brightness":	0.5,
+            "brightness":	1,
             "speed":	1,
             "flicker":	0.25
         }

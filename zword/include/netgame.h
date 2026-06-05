@@ -123,7 +123,3 @@ void update_client_game_over(float time_step);
 void netgame_clear_discovered_servers(void);
 
 void netgame_store_discovered_server(const DiscoverResponsePacket* pkt, const struct sockaddr_in* from_addr);
-
-void draw_host_lobby(void);
-
-void draw_client_lobby(void);

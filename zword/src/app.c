@@ -493,10 +493,9 @@ void draw() {
             draw_text(game_data->menu_camera, vec(24.5f, -13.5f), buffer, 20, color);
             break;
         case STATE_CLIENT_LOBBY:
-            draw_client_lobby();
-            break;
         case STATE_HOST_LOBBY:
-            draw_host_lobby();
+            draw_sprite(game_data->menu_camera, get_texture_index("menu_blurred"), 0, 0, 0, zeros(), 0.0f, mult(3.5f, ones()), 1.0f);
+            draw_menu();
             break;
         case STATE_HOST_END:
         case STATE_HOST_GAME_OVER:
