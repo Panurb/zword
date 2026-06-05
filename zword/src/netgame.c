@@ -72,11 +72,8 @@ void netgame_store_discovered_server(const DiscoverResponsePacket* pkt, const st
 
         discovered_servers[i].valid = true;
         strcpy(discovered_servers[i].host_name, pkt->host_name);
-        strcpy(discovered_servers[i].map_name, pkt->map_name);
-        discovered_servers[i].game_mode = (GameMode)pkt->game_mode;
         discovered_servers[i].num_players = pkt->num_players;
         discovered_servers[i].max_players = pkt->max_players;
-        discovered_servers[i].game_started = pkt->game_started != 0;
         return;
     }
 
@@ -90,11 +87,8 @@ void netgame_store_discovered_server(const DiscoverResponsePacket* pkt, const st
     strcpy(server->host_ip, host_ip);
     server->port = pkt->port;
     strcpy(server->host_name, pkt->host_name);
-    strcpy(server->map_name, pkt->map_name);
-    server->game_mode = (GameMode)pkt->game_mode;
     server->num_players = pkt->num_players;
     server->max_players = pkt->max_players;
-    server->game_started = pkt->game_started != 0;
 }
 
 

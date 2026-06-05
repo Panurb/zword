@@ -78,7 +78,8 @@ void reset_ids() {
 }
 
 
-static void refresh_server_list() {
+static void refresh_server_list(Entity entity) {
+    UNUSED(entity);
     netgame_clear_discovered_servers();
     if (!network_send_discover(NET_DEFAULT_PORT)) {
         LOG_WARNING("Failed to send LAN discover packet");
@@ -114,12 +115,15 @@ static void update_lobby_player_panel(void) {
     if (network.mode == NET_MODE_HOST) {
         strcpy(header->string, network.own_ip);
 
+        String buffer;
+        snprintf(buffer, STRING_SIZE, "%s - %s", game_settings.player_name, network.own_ip);
+        add_widget_to_container(lobby_player_container, create_label(buffer, zeros()));
+
         for (int i = 0; i < NET_MAX_CLIENTS; i++) {
             if (!network.clients[i].connected) {
                 continue;
             }
 
-            String buffer;
             snprintf(buffer, STRING_SIZE, "%s - %s", network.clients[i].player_name, network.clients[i].ip);
             add_widget_to_container(lobby_player_container, create_label(buffer, zeros()));
         }
@@ -401,9 +405,8 @@ void update_server_list(float time_step) {
         }
 
         String buffer;
-        snprintf(buffer, STRING_SIZE, "%s | %s | %d/%d",
+        snprintf(buffer, STRING_SIZE, "%s's lobby (%d/%d)",
             server->host_name,
-            server->host_ip,
             server->num_players,
             server->max_players
         );
@@ -432,7 +435,10 @@ void toggle_server_browser(Entity entity) {
     server_list = create_container(vec(0.0f, -3.0f * BUTTON_HEIGHT), 2, 5);
     add_child(window_server_browser, server_list);
 
-    refresh_server_list();
+    Entity refresh_button = create_button("REFRESH", vec(0.0f, -5.0f * BUTTON_HEIGHT), refresh_server_list);
+    add_child(window_server_browser, refresh_button);
+
+    refresh_server_list(refresh_button);
 }
 
 

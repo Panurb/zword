@@ -318,13 +318,8 @@ void network_host_accept_clients() {
             response.protocol_id = NET_DISCOVER_PROTOCOL_ID;
             response.port = NET_DEFAULT_PORT;
             strcpy(response.host_name, game_settings.player_name);
-            if (game_data) {
-                strcpy(response.map_name, game_data->map_name);
-                response.game_mode = (uint8_t)game_data->game_mode;
-            }
             response.num_players = 1 + network.num_clients;
             response.max_players = NET_MAX_CLIENTS + 1;
-            response.game_started = network.game_started ? 1 : 0;
             network_send_to(&from_addr, &response, sizeof(response));
         } else if (header->type == PACKET_JOIN) {
             // Check if already connected

@@ -24,11 +24,8 @@ typedef struct {
     char host_ip[INET_ADDRSTRLEN];
     int port;
     char host_name[32];
-    char map_name[128];
-    GameMode game_mode;
     int num_players;
     int max_players;
-    bool game_started;
 } DiscoveredServer;
 
 #pragma pack(push, 1)

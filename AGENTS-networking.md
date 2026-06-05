@@ -49,7 +49,7 @@ Packet types:
 | `PACKET_END_GAME` | Host -> Clients | Match-end result (`MATCH_END_GAME_OVER` or `MATCH_END_WIN`) |
 | `PACKET_LOBBY_INFO` | Host -> Clients | Current lobby map, mode, and connected player names |
 | `PACKET_DISCOVER` | Browser -> Host | LAN discovery query sent by the server browser to `NET_DEFAULT_PORT` |
-| `PACKET_DISCOVER_RESPONSE` | Host -> Browser | LAN discovery response with host IP/port, host name, map, mode, player counts, and in-game flag |
+| `PACKET_DISCOVER_RESPONSE` | Host -> Browser | LAN discovery response with host IP/port, host name, and player counts |
 
 ## Snapshot format
 
