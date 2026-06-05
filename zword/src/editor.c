@@ -409,12 +409,10 @@ void open_entity_settings(int entity) {
 
     TextComponent* text = TextComponent_get(entity);
     if (text) {
-        int i = create_textbox(zeros(), 2);
+        int i = create_textbox(zeros(), 2, text->source_string, change_text);
         add_widget_to_container(container, i);
         WidgetComponent* widget = WidgetComponent_get(i);
-        strcpy(widget->string, text->source_string);
         widget->max_value = 100;
-        widget->on_change = change_text;
     }
 }
 

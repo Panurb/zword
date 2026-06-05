@@ -58,7 +58,7 @@ int create_scrollbar(Vector2f position, int height, int max_value, OnChange on_c
 
 void add_scrollbar_to_container(int container);
 
-int create_textbox(Vector2f position, int width);
+int create_textbox(Vector2f position, int width, String string, OnChange on_change);
 
 int create_checkbox(Vector2f position, bool value, OnChange on_change);
 

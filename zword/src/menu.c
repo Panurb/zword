@@ -31,7 +31,6 @@ static int window_keyboard_controls = -1;
 static int window_xbox_controls = -1;
 static int button_benchmark = -1;
 
-static Entity name_input_lan = NULL_ENTITY;
 static Entity ip_input_lan = NULL_ENTITY;
 static Entity window_lan = NULL_ENTITY;
 static Entity window_server_browser = NULL_ENTITY;
@@ -62,7 +61,6 @@ void reset_ids() {
     window_xbox_controls = -1;
     button_benchmark = -1;
 
-    name_input_lan = NULL_ENTITY;
     ip_input_lan = NULL_ENTITY;
     window_lan = NULL_ENTITY;
     lan_map_dropdown = NULL_ENTITY;
@@ -249,7 +247,6 @@ void change_state_game(int entity) {
 
 void change_state_create_lobby(Entity entity) {
     UNUSED(entity);
-    strcpy(game_settings.player_name, WidgetComponent_get(name_input_lan)->string);
     save_settings();
     game_state = STATE_CREATE_LOBBY;
     reset_ids();
@@ -258,8 +255,6 @@ void change_state_create_lobby(Entity entity) {
 
 void change_state_join(Entity entity) {
     UNUSED(entity);
-    strcpy(game_settings.player_name, WidgetComponent_get(name_input_lan)->string);
-    strcpy(network.host_ip, WidgetComponent_get(ip_input_lan)->string);
     strcpy(game_settings.last_ip, network.host_ip);
     save_settings();
     game_state = STATE_JOIN;
@@ -362,10 +357,8 @@ void join_discovered_server(Entity entity) {
     if (server_index < 0 || server_index >= discovered_servers_count) {
         return;
     }
-
     strcpy(network.host_ip, discovered_servers[server_index].host_ip);
-    game_state = STATE_JOIN;
-    reset_ids();
+    change_state_join(entity);
 }
 
 
@@ -443,6 +436,20 @@ void toggle_server_browser(Entity entity) {
 }
 
 
+void update_player_name(Entity entity, int value) {
+    UNUSED(value);
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    strcpy(game_settings.player_name, widget->string);
+}
+
+
+void update_host_ip(Entity entity, int value) {
+    UNUSED(value);
+    WidgetComponent* widget = WidgetComponent_get(entity);
+    strcpy(network.host_ip, widget->string);
+}
+
+
 void toggle_lan(Entity entity) {
     UNUSED(entity);
     if (window_lan != NULL_ENTITY) {
@@ -458,12 +465,10 @@ void toggle_lan(Entity entity) {
     add_child(window_lan, container);
 
     Entity name_label = create_label("NAME", zeros());
-    name_input_lan = create_textbox(zeros(), 1);
-    strcpy(WidgetComponent_get(name_input_lan)->string, game_settings.player_name);
-    add_row_to_container(container, name_label, name_input_lan);
+    Entity name_input = create_textbox(zeros(), 1, game_settings.player_name, update_player_name);
+    add_row_to_container(container, name_label, name_input);
 
-    ip_input_lan = create_textbox(zeros(), 1);
-    strcpy(WidgetComponent_get(ip_input_lan)->string, game_settings.last_ip);
+    ip_input_lan = create_textbox(zeros(), 1, game_settings.last_ip, update_host_ip);
     Entity join_button = create_button("JOIN", zeros(), change_state_join);
     add_row_to_container(container, ip_input_lan, join_button);
 
@@ -488,7 +493,7 @@ void toggle_new_map(int entity) {
     add_child(window_new_map, container);
 
     int label = create_label("NAME", zeros());
-    map_name_textbox = create_textbox(zeros(), 1);
+    map_name_textbox = create_textbox(zeros(), 1, "", NULL);
     add_row_to_container(container, label, map_name_textbox);
     add_button_to_container(container, "CREATE", change_state_create);
 }

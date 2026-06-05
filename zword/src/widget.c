@@ -397,7 +397,7 @@ int create_scrollbar(Vector2f position, int height, int max_value, OnChange on_c
 }
 
 
-int create_textbox(Vector2f position, int width) {
+int create_textbox(Vector2f position, int width, String string, OnChange on_change) {
     int i = create_menu_entity();
     CoordinateComponent_add(i, position, 0.0f);
     ColliderComponent* collider = ColliderComponent_add_rectangle(i, BUTTON_WIDTH * width, 
@@ -405,6 +405,8 @@ int create_textbox(Vector2f position, int width) {
     collider->enabled = false;
     WidgetComponent* widget = WidgetComponent_add(i, "", WIDGET_TEXTBOX);
     widget->max_value = width * 18;
+    strcpy(widget->string, string);
+    widget->on_change = on_change;
 
     return i;
 }
