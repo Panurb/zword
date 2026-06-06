@@ -14,7 +14,7 @@
             "magazine":	1,
             "max_recoil":	0,
             "reload_time":	0,
-            "range":	15,
+            "range":	12,
             "sound_range":	10,
             "spread":	3.141592653589793,
             "shots":	15,
@@ -58,8 +58,8 @@
         "Waypoint":	{
         },
         "Health":	{
-            "health":	3000,
-            "dead_image":	"big_boy_dead",
+            "health":	2000,
+            "dead_image":	"shaman_dead",
             "decal":	"blood",
             "die_sound":	""
         },
