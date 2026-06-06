@@ -427,6 +427,14 @@ int binary_search_filename(String filename, String* array, int size) {
     return -1;
 }
 
+void delete_file(String path) {
+    #ifndef __EMSCRIPTEN__
+        DeleteFile(path);
+    #else
+        remove(path);
+    #endif
+}
+
 bool non_zero(Vector2f v) {
     return (v.x != 0.0f || v.y != 0.0f);
 }

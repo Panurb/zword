@@ -156,7 +156,7 @@ void damage(Entity entity, Vector2f pos, Vector2f dir, int dmg, Entity dealer, D
         }
     }
     
-    if (enemy) {
+    if (enemy && health && health->health > 0) {
         if (dealer != NULL_ENTITY && PlayerComponent_get(dealer)) {
             enemy->target = dealer;
             enemy->state = ENEMY_CHASE;

@@ -29,3 +29,5 @@ void save_prefab(Filename filename, List* entities);
 int load_prefab(Filename filename, Vector2f position, float angle, Vector2f scale);
 
 GameMode get_map_game_mode(Filename map_name);
+
+void delete_map(String map_name);

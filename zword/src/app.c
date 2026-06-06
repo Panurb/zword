@@ -241,7 +241,7 @@ void input_game(SDL_Event sdl_event) {
         case STATE_PAUSE:
             if (sdl_event.type == SDL_KEYDOWN) {
                 if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                    game_state = previous_state;
+                    game_state = STATE_GAME;
                 }
             }
             input_menu(game_data->menu_camera, sdl_event);
@@ -249,7 +249,7 @@ void input_game(SDL_Event sdl_event) {
         case STATE_HOST_PAUSE:
             if (sdl_event.type == SDL_KEYDOWN) {
                 if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                    game_state = previous_state;
+                    game_state = STATE_HOST;
                 }
             }
             input_host_pause(sdl_event);
@@ -257,7 +257,7 @@ void input_game(SDL_Event sdl_event) {
         case STATE_CLIENT_PAUSE:
             if (sdl_event.type == SDL_KEYDOWN) {
                 if (sdl_event.key.keysym.sym == SDLK_p || sdl_event.key.keysym.sym == SDLK_ESCAPE) {
-                    game_state = previous_state;
+                    game_state = STATE_CLIENT;
                 }
             }
             input_client_pause(sdl_event);
@@ -436,7 +436,7 @@ void update(float time_step) {
             resize_game();
             resize_game_window();
             save_settings();
-            game_state = STATE_MENU;
+            game_state = previous_state;
             break;
         case STATE_CREATE:
             destroy_menu();
@@ -444,11 +444,19 @@ void update(float time_step) {
             game_state = STATE_EDITOR;
             break;
         case STATE_LOAD_EDITOR:
-            game_data->testing = false;
             end_game();
             CoordinateComponent_get(game_data->camera)->position = game_data->start_position;
             create_editor_menu();
-            load_map(game_data->map_name);
+            if (game_data->testing) {
+                ButtonText map_name;
+                strcpy(map_name, game_data->map_name);
+                load_map("_temp_");
+                delete_map("_temp_");
+                game_data->testing = false;
+                strcpy(game_data->map_name, map_name);
+            } else {
+                load_map(game_data->map_name);
+            }
             init_grid();
             game_state = STATE_EDITOR;
             break;

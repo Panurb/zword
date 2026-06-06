@@ -1219,7 +1219,6 @@ void load_map(ButtonText map_name) {
         strcpy(game_data->map_name, map_name);
         deserialize_game(json, false);
         cJSON_Delete(json);
-        strcpy(game_data->map_name, map_name);
     }
 }
 
@@ -1263,4 +1262,11 @@ GameMode get_map_game_mode(ButtonText map_name) {
     int game_mode = deserialize_int(json, "game_mode", MODE_SURVIVAL);
     cJSON_Delete(json);
     return game_mode;
+}
+
+
+void delete_map(String map_name) {
+    Filename path;
+    snprintf(path, 128, "data/maps/%s.json", map_name);
+    delete_file(path);
 }

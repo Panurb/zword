@@ -755,11 +755,11 @@ void start_tutorial(int entity) {
 }
 
 
-bool save_exists() {
+bool save_exists(String map_name) {
     // Make static to prevent stack overflow in Emscripten
     static String files[128];
     int files_count = list_files_alphabetically("save/*.json", files, NULL);
-    return files_count > 0 && strcmp(files[0], "Campaign") == 0;
+    return files_count > 0 && strcmp(files[0], map_name) == 0;
 }
 
 
@@ -776,7 +776,7 @@ void create_menu() {
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     WidgetComponent_get(container)->enabled = false;
 
-    if (save_exists()) {
+    if (save_exists("Campaign")) {
         add_button_to_container(container, "CONTINUE", load_campaign);
     }
 
@@ -868,8 +868,8 @@ void create_game_over_menu() {
             create_button("RETURN TO LOBBY", vec(0.0f, -2.0f * BUTTON_HEIGHT), change_state_lobby);
             break;
         case NET_MODE_NONE:
-            if (game_data->game_mode == MODE_CAMPAIGN && save_exists()) {
-                create_button("LOAD SAVE", vec(0.0f, -1.0f * BUTTON_HEIGHT), load_campaign);
+            if (game_data->game_mode == MODE_CAMPAIGN && save_exists(game_data->map_name)) {
+                create_button("LOAD SAVE", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_load);
             } else {
                 create_button("RESTART", vec(0.0f, -1.0f * BUTTON_HEIGHT), change_state_reset);
             }

@@ -923,7 +923,7 @@ void input_tool_test(SDL_Event event) {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             // TODO: save temporary version of map
-            save_current_map(NULL_ENTITY);
+            save_map("_temp_");
 
             Vector2f pos = snap_to_grid(mouse_world, grid_sizes[grid_size_index], grid_sizes[grid_size_index]);
 

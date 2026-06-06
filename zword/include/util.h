@@ -236,6 +236,8 @@ void create_directory(String directory);
 
 int binary_search_filename(String filename, String* array, int size);
 
+void delete_file(String path);
+
 bool non_zero(Vector2f v);
 
 float clamp(float val, float min_val, float max_val);
