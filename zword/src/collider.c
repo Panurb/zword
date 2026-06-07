@@ -415,7 +415,7 @@ void apply_trigger(int trigger, int target) {
 }
 
 
-void collide(int entity) {
+void collide(int entity, bool apply_triggers) {
     ColliderComponent* collider = ColliderComponent_get(entity);
     if (!collider) return;
 
@@ -444,7 +444,7 @@ void collide(int entity) {
 
                 bool triggered = false;
 
-                if (collider_other->trigger_type != TRIGGER_NONE) {
+                if (apply_triggers && collider_other->trigger_type != TRIGGER_NONE) {
                     apply_trigger(n, entity);
 
                     // Entity died by hurt trigger
@@ -454,7 +454,7 @@ void collide(int entity) {
                     triggered = true;
                 }
 
-                if (!PhysicsComponent_get(n)) {
+                if (apply_triggers && !PhysicsComponent_get(n)) {
                     if (collider->trigger_type != TRIGGER_NONE) {
                         apply_trigger(entity, n);
                         triggered = true;
@@ -521,7 +521,7 @@ void update_collisions() {
     }
 
     for (int i = 0; i < game_data->components->entities; i++) {
-        collide(i);
+        collide(i, true);
     }
 }
 

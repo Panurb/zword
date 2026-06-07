@@ -90,9 +90,10 @@ Each tick:
 2. Pack and send `InputPacket` to host
 3. Save current positions as `previous` (for interpolation)
 4. Receive and apply snapshots (overwrites current entity state, replays sound events, triggers particle bursts)
-5. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
-6. Rebuild collision grid (needed for light raycasting)
-7. Update camera, lights, particles locally
+5. Rebuild collision grid from the authoritative snapshot
+6. Reconcile the local player by replaying buffered local inputs newer than the snapshot tick; prediction is limited to on-foot movement and aiming, and reuses collision response against the latest snapshot world without running trigger side effects
+7. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
+8. Update camera, lights, particles locally
 
 ### Client Lobby (`app.c`, `STATE_CLIENT_LOBBY`)
 
@@ -125,6 +126,8 @@ Local players: `update_controller()` (`input.c`) computes `buttons_pressed` as a
 
 Remote players on host: `update_controller()` is skipped. Flags are set by `netgame_unpack_input()` from network packets. Edge-triggered flags (`buttons_pressed`, `buttons_released`) are OR'd across packets within a tick to prevent overwrite, then explicitly cleared after the state machine runs (`input.c`, end of `input_players()`).
 
+Clients also keep a small ring buffer of their own sent controller states, keyed by `PacketHeader.tick`. After each snapshot, the client discards acknowledged inputs and replays newer buffered inputs for the local player only.
+
 ## Entity ID remapping
 
 Clients may allocate entities in different order than the host. Two mapping arrays handle this:
@@ -137,7 +140,7 @@ The snapshot header can also carry small pieces of authoritative match-level sta
 
 ## Known limitations
 
-- **No client-side prediction** -- all actions have a full round-trip delay before the client sees the result
+- **Prediction scope is narrow** -- only the local player's on-foot movement and aiming are predicted; vehicles, combat, interactions, and world state remain fully host-authoritative
 - **Snapshot size cap** -- 65 KB limit can cause entities to be omitted from snapshots
 - **Pause is local only** -- pausing on the host or client only pauses locally; the other side keeps running
 - **Lobby info is best-effort UDP** -- periodic rebroadcast helps, but there is still no full ack/retry reliability layer

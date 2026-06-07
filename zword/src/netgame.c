@@ -3,6 +3,7 @@
 
 #include "app.h"
 #include "camera.h"
+#include "collider.h"
 #include "light.h"
 #include "menu.h"
 #include "netgame.h"
@@ -12,6 +13,7 @@
 #include "grid.h"
 #include "health.h"
 #include "input.h"
+#include "physics.h"
 #include "settings.h"
 #include "serialize_binary.h"
 #include "sound.h"
@@ -28,6 +30,117 @@ LobbyInfo cached_lobby_info = {0};
 DiscoveredServer discovered_servers[NET_MAX_CLIENTS + 1] = {0};
 
 int discovered_servers_count = 0;
+
+
+#define NET_PREDICTION_HISTORY_SIZE 128
+
+typedef struct {
+    bool valid;
+    uint32_t tick;
+    Controller controller;
+} PredictedInput;
+
+static PredictedInput predicted_inputs[NET_PREDICTION_HISTORY_SIZE] = {0};
+static int predicted_input_start = 0;
+static int predicted_input_count = 0;
+
+
+static void clear_local_prediction_history(void) {
+    memset(predicted_inputs, 0, sizeof(predicted_inputs));
+    predicted_input_start = 0;
+    predicted_input_count = 0;
+}
+
+
+static void store_local_prediction_input(uint32_t tick, const Controller* controller) {
+    int index = (predicted_input_start + predicted_input_count) % NET_PREDICTION_HISTORY_SIZE;
+    if (predicted_input_count == NET_PREDICTION_HISTORY_SIZE) {
+        predicted_input_start = (predicted_input_start + 1) % NET_PREDICTION_HISTORY_SIZE;
+        predicted_input_count--;
+    }
+
+    predicted_inputs[index].valid = true;
+    predicted_inputs[index].tick = tick;
+    predicted_inputs[index].controller = *controller;
+    predicted_input_count++;
+}
+
+
+static Entity get_local_player_entity(void) {
+    int slot_idx = 0;
+    ListNode* node;
+    FOREACH(node, game_data->components->player.order) {
+        if (slot_idx == network.local_player_slot) {
+            return node->value;
+        }
+        slot_idx++;
+    }
+
+    return NULL_ENTITY;
+}
+
+
+static void predict_local_player_input(Entity entity, const Controller* controller, float time_step) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    PhysicsComponent* phys = PhysicsComponent_get(entity);
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (!player || !phys || !coord) {
+        return;
+    }
+
+    if (!player->is_local || player->state != PLAYER_ON_FOOT) {
+        return;
+    }
+
+    player->controller = *controller;
+    if (non_zero(player->controller.right_stick)) {
+        coord->angle = polar_angle(player->controller.right_stick);
+        if (coord->parent != -1) {
+            coord->angle -= get_angle(coord->parent);
+        }
+    }
+
+    phys->acceleration = sum(phys->acceleration, mult(player->acceleration, player->controller.left_stick));
+    collide(entity, false);
+    update_physics_entity(entity, time_step);
+}
+
+
+static void reconcile_local_player(uint32_t snapshot_tick, float time_step) {
+    Entity entity = get_local_player_entity();
+    if (entity == NULL_ENTITY) {
+        clear_local_prediction_history();
+        return;
+    }
+
+    while (predicted_input_count > 0) {
+        PredictedInput* input = &predicted_inputs[predicted_input_start];
+        if (!input->valid || input->tick > snapshot_tick) {
+            break;
+        }
+
+        input->valid = false;
+        predicted_input_start = (predicted_input_start + 1) % NET_PREDICTION_HISTORY_SIZE;
+        predicted_input_count--;
+    }
+
+    for (int i = 0; i < predicted_input_count; i++) {
+        int index = (predicted_input_start + i) % NET_PREDICTION_HISTORY_SIZE;
+        PredictedInput* input = &predicted_inputs[index];
+        if (!input->valid || input->tick <= snapshot_tick) {
+            continue;
+        }
+
+        predict_local_player_input(entity, &input->controller, time_step);
+    }
+
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    if (coord) {
+        coord->previous.position = coord->position;
+        coord->previous.angle = coord->angle;
+        coord->previous.scale = coord->scale;
+    }
+}
 
 
 static void cache_lobby_info(const LobbyInfoPacket* lobby) {
@@ -216,8 +329,12 @@ static bool client_receive_packets(void) {
 
         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
         if (hdr->type == PACKET_SNAPSHOT) {
+            SnapshotPacket* snapshot = (SnapshotPacket*)network.recv_buf;
             mark_server_packet_received();
             netgame_apply_snapshot(network.recv_buf, received);
+            ColliderGrid_clear(game_data->grid);
+            init_grid();
+            reconcile_local_player(snapshot->header.tick, app.time_step);
             return false;
         }
 
@@ -261,6 +378,7 @@ void return_to_lobby() {
     network.game_started = false;
     lobby_info_broadcast_timer = 0.0f;
     lobby_keepalive_timer = 0.0f;
+    clear_local_prediction_history();
     reset_host_client_timeouts();
     rebuild_host_player_controllers();
 
@@ -657,12 +775,18 @@ bool netgame_client_send_input(bool neutral) {
     ListNode* pnode;
     FOREACH(pnode, game_data->components->player.order) {
         if (slot_idx == network.local_player_slot) {
+            PlayerComponent* player = PlayerComponent_get(pnode->value);
+            if (!player) {
+                return false;
+            }
+
             if (neutral) {
-                PlayerComponent* player = PlayerComponent_get(pnode->value);
                 memset(&player->controller, 0, sizeof(player->controller));
                 player->controller.joystick = app.player_controllers[network.local_player_slot];
+                clear_local_prediction_history();
             } else {
                 update_controller(game_data->camera, pnode->value);
+                store_local_prediction_input(network.tick, &player->controller);
             }
 
             InputPacket input_pkt;
@@ -867,6 +991,7 @@ void client_start(void) {
     set_player_names(cached_lobby_info.player_names, cached_lobby_info.num_players);
 
     memset(net_entity_seen, 0, sizeof(net_entity_seen));
+    clear_local_prediction_history();
 
     create_client_pause_menu();
     game_state = STATE_CLIENT;
@@ -945,8 +1070,6 @@ void update_client(float time_step) {
         return;
     }
 
-    ColliderGrid_clear(game_data->grid);
-    init_grid();
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
     update_particles(game_data->camera, time_step);
@@ -968,8 +1091,6 @@ void update_client_pause(float time_step) {
         return;
     }
 
-    ColliderGrid_clear(game_data->grid);
-    init_grid();
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
     update_particles(game_data->camera, time_step);
