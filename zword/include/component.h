@@ -663,6 +663,7 @@ void remove_prefab(int entity);
 
 void ComponentData_clear();
 
+Matrix3 get_transform(int entity);
 Vector2f get_position(int i);
 float get_angle(int i);
 Vector2f get_scale(int entity);

@@ -224,7 +224,7 @@ void burn(Entity entity) {
         float size = 0.3f;
         ColliderComponent* collider = ColliderComponent_get(entity);
         if (collider) {
-            size = 0.5f * collider_radius(entity);
+            size = 0.75f * collider_radius(entity);
         }
 
         int i = create_entity();
@@ -280,7 +280,7 @@ void freeze(Entity entity) {
 
 void update_health(float time_step) {
     static float burn_delay = 1.0f;
-    static float burn_damage = 5.0f;
+    static float burn_damage = 10.0f;
 
     for (int i = 0; i < game_data->components->entities; i++) {
         HealthComponent* health = HealthComponent_get(i);

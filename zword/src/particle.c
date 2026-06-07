@@ -235,13 +235,36 @@ void add_particles(int entity, int n) {
 }
 
 
+Vector2f get_particle_bounds(Entity entity) {
+    ParticleComponent* part = ParticleComponent_get(entity);
+
+    Vector2f scale = get_scale(entity);
+    float angle = get_angle(entity);
+
+    float w = part->width * scale.x;
+    float h = part->height * scale.y;
+
+    float c = fabsf(cosf(angle));
+    float s = fabsf(sinf(angle));
+
+    float bounds_width = c * w + s * h;
+    float bounds_height = s * w + c * h;
+
+    float max_size = fmaxf(part->start_size, part->end_size);
+    float max_travel = 2.0f * max_size * part->max_time * part->speed;
+    float width = bounds_width + max_travel;
+    float height = bounds_height + max_travel;
+    return (Vector2f) { width, height };
+}
+
+
 void update_particles(int camera, float time_step) {
     for (int i = 0; i < game_data->components->entities; i++) {
         ParticleComponent* part = ParticleComponent_get(i);
         if (!part) continue;
 
-        float w = 3.0f * part->max_time * part->speed;
-        bool visible = on_screen(camera, get_position(i), w, w);
+        Vector2f bounds = get_particle_bounds(i);
+        bool visible = on_screen(camera, get_position(i), bounds.x, bounds.y);
         if (part->loop && !visible) {
             continue;
         }
