@@ -35,6 +35,7 @@ Network play uses dedicated game states instead of checking `network.mode` at ru
 - Disconnect timeout: 2 seconds
 - Max packet size: 65000 bytes
 - CLI: `--host [port]` or `--join [ip] [port]`
+- For local prediction testing, `netgame.c` can buffer snapshots on the client via `NET_BUFFERED_SNAPSHOT_COUNT`; `0` disables buffering, and when the FIFO buffer is full the client applies the oldest buffered snapshot
 
 Packet types:
 
@@ -89,11 +90,12 @@ Each tick:
 1. `update_controller()` for local player only (no state machine -- host is authoritative)
 2. Pack and send `InputPacket` to host
 3. Save current positions as `previous` (for interpolation)
-4. Receive and apply snapshots (overwrites current entity state, replays sound events, triggers particle bursts)
-5. Rebuild collision grid from the authoritative snapshot
-6. Reconcile the local player by replaying buffered local inputs newer than the snapshot tick; prediction is limited to on-foot movement and aiming, and reuses collision response against the latest snapshot world without running trigger side effects
-7. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
-8. Update camera, lights, particles locally
+4. Receive snapshots immediately; when snapshot buffering is enabled, enqueue them in a client-side FIFO
+5. When the FIFO buffer reaches `NET_BUFFERED_SNAPSHOT_COUNT`, apply and remove the oldest buffered snapshot (overwrites current entity state, replays sound events, triggers particle bursts)
+6. Rebuild collision grid from the authoritative snapshot
+7. Reconcile the local player by replaying buffered local inputs newer than the snapshot tick; prediction is limited to on-foot movement and aiming, and reuses collision response against the latest snapshot world without running trigger side effects
+8. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
+9. Update camera, lights, particles locally
 
 ### Client Lobby (`app.c`, `STATE_CLIENT_LOBBY`)
 

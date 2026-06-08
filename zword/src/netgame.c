@@ -33,22 +33,54 @@ int discovered_servers_count = 0;
 
 
 #define NET_PREDICTION_HISTORY_SIZE 128
+#define NET_BUFFERED_SNAPSHOT_COUNT 0
+#define NET_BUFFERED_SNAPSHOT_STORAGE_SIZE ((NET_BUFFERED_SNAPSHOT_COUNT) > 0 ? (NET_BUFFERED_SNAPSHOT_COUNT) : 1)
 
 typedef struct {
-    bool valid;
     uint32_t tick;
     Controller controller;
 } PredictedInput;
 
+typedef struct {
+    int size;
+    uint8_t data[NET_MAX_PACKET_SIZE];
+} BufferedSnapshot;
+
 static PredictedInput predicted_inputs[NET_PREDICTION_HISTORY_SIZE] = {0};
 static int predicted_input_start = 0;
 static int predicted_input_count = 0;
+static BufferedSnapshot buffered_snapshots[NET_BUFFERED_SNAPSHOT_STORAGE_SIZE] = {0};
+static int buffered_snapshot_start = 0;
+static int buffered_snapshot_count = 0;
+
+static void mark_server_packet_received(void);
+
+static void apply_authoritative_snapshot(const uint8_t* buf, int size);
+
+static void reset_buffered_snapshots(void);
+
+static void enqueue_buffered_snapshot(const uint8_t* buf, int size);
+
+static bool dequeue_and_apply_buffered_snapshot(void);
+
+static Entity get_local_player_entity(void);
+
+static void predict_local_player_input(Entity entity, const Controller* controller, float time_step);
+
+static void reconcile_local_player(uint32_t snapshot_tick, float time_step);
 
 
 static void clear_local_prediction_history(void) {
     memset(predicted_inputs, 0, sizeof(predicted_inputs));
     predicted_input_start = 0;
     predicted_input_count = 0;
+}
+
+
+static void reset_buffered_snapshots(void) {
+    memset(buffered_snapshots, 0, sizeof(buffered_snapshots));
+    buffered_snapshot_start = 0;
+    buffered_snapshot_count = 0;
 }
 
 
@@ -59,7 +91,6 @@ static void store_local_prediction_input(uint32_t tick, const Controller* contro
         predicted_input_count--;
     }
 
-    predicted_inputs[index].valid = true;
     predicted_inputs[index].tick = tick;
     predicted_inputs[index].controller = *controller;
     predicted_input_count++;
@@ -115,11 +146,10 @@ static void reconcile_local_player(uint32_t snapshot_tick, float time_step) {
 
     while (predicted_input_count > 0) {
         PredictedInput* input = &predicted_inputs[predicted_input_start];
-        if (!input->valid || input->tick > snapshot_tick) {
+        if (input->tick > snapshot_tick) {
             break;
         }
 
-        input->valid = false;
         predicted_input_start = (predicted_input_start + 1) % NET_PREDICTION_HISTORY_SIZE;
         predicted_input_count--;
     }
@@ -127,7 +157,7 @@ static void reconcile_local_player(uint32_t snapshot_tick, float time_step) {
     for (int i = 0; i < predicted_input_count; i++) {
         int index = (predicted_input_start + i) % NET_PREDICTION_HISTORY_SIZE;
         PredictedInput* input = &predicted_inputs[index];
-        if (!input->valid || input->tick <= snapshot_tick) {
+        if (input->tick <= snapshot_tick) {
             continue;
         }
 
@@ -140,6 +170,45 @@ static void reconcile_local_player(uint32_t snapshot_tick, float time_step) {
         coord->previous.angle = coord->angle;
         coord->previous.scale = coord->scale;
     }
+}
+
+
+static void enqueue_buffered_snapshot(const uint8_t* buf, int size) {
+    if (NET_BUFFERED_SNAPSHOT_COUNT <= 0) {
+        return;
+    }
+
+    int index = (buffered_snapshot_start + buffered_snapshot_count) % NET_BUFFERED_SNAPSHOT_COUNT;
+    if (buffered_snapshot_count == NET_BUFFERED_SNAPSHOT_COUNT) {
+        return;
+    }
+
+    buffered_snapshots[index].size = size;
+    memcpy(buffered_snapshots[index].data, buf, size);
+    buffered_snapshot_count++;
+}
+
+
+static void apply_authoritative_snapshot(const uint8_t* buf, int size) {
+    const SnapshotPacket* snapshot = (const SnapshotPacket*)buf;
+    mark_server_packet_received();
+    netgame_apply_snapshot(buf, size);
+    ColliderGrid_clear(game_data->grid);
+    init_grid();
+    reconcile_local_player(snapshot->header.tick, app.time_step);
+}
+
+
+static bool dequeue_and_apply_buffered_snapshot(void) {
+    if (buffered_snapshot_count <= 0) {
+        return false;
+    }
+
+    BufferedSnapshot* snapshot = &buffered_snapshots[buffered_snapshot_start];
+    apply_authoritative_snapshot(snapshot->data, snapshot->size);
+    buffered_snapshot_start = (buffered_snapshot_start + 1) % NET_BUFFERED_SNAPSHOT_COUNT;
+    buffered_snapshot_count--;
+    return true;
 }
 
 
@@ -329,12 +398,15 @@ static bool client_receive_packets(void) {
 
         PacketHeader* hdr = (PacketHeader*)network.recv_buf;
         if (hdr->type == PACKET_SNAPSHOT) {
-            SnapshotPacket* snapshot = (SnapshotPacket*)network.recv_buf;
             mark_server_packet_received();
-            netgame_apply_snapshot(network.recv_buf, received);
-            ColliderGrid_clear(game_data->grid);
-            init_grid();
-            reconcile_local_player(snapshot->header.tick, app.time_step);
+            if (NET_BUFFERED_SNAPSHOT_COUNT <= 0) {
+                apply_authoritative_snapshot(network.recv_buf, received);
+            } else {
+                enqueue_buffered_snapshot(network.recv_buf, received);
+                if (buffered_snapshot_count >= NET_BUFFERED_SNAPSHOT_COUNT) {
+                    dequeue_and_apply_buffered_snapshot();
+                }
+            }
             return false;
         }
 
@@ -379,6 +451,7 @@ void return_to_lobby() {
     lobby_info_broadcast_timer = 0.0f;
     lobby_keepalive_timer = 0.0f;
     clear_local_prediction_history();
+    reset_buffered_snapshots();
     reset_host_client_timeouts();
     rebuild_host_player_controllers();
 
@@ -992,6 +1065,7 @@ void client_start(void) {
 
     memset(net_entity_seen, 0, sizeof(net_entity_seen));
     clear_local_prediction_history();
+    reset_buffered_snapshots();
 
     create_client_pause_menu();
     game_state = STATE_CLIENT;
