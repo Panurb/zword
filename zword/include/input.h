@@ -58,6 +58,8 @@ void replace_actions(String output, String input);
 
 void reset_controller(Controller* controller);
 
+void input_player(Entity entity);
+
 void input_players(int camera, bool poll_local_input);
 
 void update_controller(int camera, int entity);

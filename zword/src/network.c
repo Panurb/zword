@@ -13,7 +13,6 @@ Network network;
 
 #define NET_DISCOVER_PROTOCOL_ID 0x5A574F52u
 
-
 static bool winsock_initialized = false;
 
 
@@ -50,6 +49,7 @@ bool network_init() {
     network.last_server_recv_time = 0.0f;
     network.num_clients = 0;
     network.tick = 0;
+    network.predicted_tick = 0;
     network.game_started = false;
     network.own_ip[0] = '\0';
     network.host_ip[0] = '\0';

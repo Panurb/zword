@@ -93,7 +93,7 @@ Each tick:
 4. Receive snapshots immediately; when snapshot buffering is enabled, enqueue them in a client-side FIFO
 5. When the FIFO buffer reaches `NET_BUFFERED_SNAPSHOT_COUNT`, apply and remove the oldest buffered snapshot (overwrites current entity state, replays sound events, triggers particle bursts)
 6. Rebuild collision grid from the authoritative snapshot
-7. Reconcile the local player by replaying buffered local inputs newer than the snapshot tick; prediction is limited to on-foot movement and aiming, and reuses collision response against the latest snapshot world without running trigger side effects
+7. Reconcile the local player by replaying buffered local inputs newer than the snapshot tick; prediction covers on-foot movement and aiming plus local hitscan weapon muzzle feedback (shot sound and tracer particles only), and reuses collision response against the latest snapshot world without running trigger side effects
 8. Timeout back to menu if the host has been silent for more than `NET_DISCONNECT_TIMEOUT`
 9. Update camera, lights, particles locally
 
@@ -142,7 +142,7 @@ The snapshot header can also carry small pieces of authoritative match-level sta
 
 ## Known limitations
 
-- **Prediction scope is narrow** -- only the local player's on-foot movement and aiming are predicted; vehicles, combat, interactions, and world state remain fully host-authoritative
+- **Prediction scope is narrow** -- only the local player's on-foot movement, aiming, and hitscan muzzle feedback are predicted; damage, blood/hit effects, vehicles, interactions, and world state remain fully host-authoritative
 - **Snapshot size cap** -- 65 KB limit can cause entities to be omitted from snapshots
 - **Pause is local only** -- pausing on the host or client only pauses locally; the other side keeps running
 - **Lobby info is best-effort UDP** -- periodic rebroadcast helps, but there is still no full ack/retry reliability layer

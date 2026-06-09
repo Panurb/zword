@@ -410,6 +410,7 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
     particle->stretch = 0.1f;
     particle->wind_factor = 1.0f;
     particle->pending_burst = 0;
+    particle->last_predicted_event_tick = 0;
 
     game_data->components->particle[entity] = particle;
 
@@ -710,6 +711,7 @@ SoundComponent* SoundComponent_add(int entity, Filename hit_sound) {
     }
     strcpy(sound->hit_sound, hit_sound);
     strcpy(sound->loop_sound, "");
+    sound->last_predicted_event_tick = 0;
     game_data->components->sound[entity] = sound;
     return sound;
 }

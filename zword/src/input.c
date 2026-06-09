@@ -322,6 +322,131 @@ void update_controller(int camera, int i) {
 }
 
 
+void input_player(Entity entity) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    Controller controller = player->controller;
+
+    WeaponComponent* weapon = WeaponComponent_get(player->inventory[player->item]);
+
+    switch (player->state) {
+        case PLAYER_ON_FOOT:
+            if (controller.buttons_down[BUTTON_LT]) {
+                player->state = PLAYER_MENU;
+            }
+
+            if (controller.buttons_pressed[BUTTON_RB]) {
+                player->state = PLAYER_INTERACT;
+            }
+
+            if (controller.buttons_pressed[BUTTON_RT]) {
+                player->state = PLAYER_SHOOT;
+            }
+
+            if (weapon) {
+                if (controller.buttons_pressed[BUTTON_X]) {
+                    player->state = PLAYER_RELOAD;
+                }
+
+                if (controller.buttons_pressed[BUTTON_Y]) {
+                    ItemComponent* item = ItemComponent_get(player->inventory[player->item]);
+                    for (int j = 0; j < item->size; j++) {
+                        int k = item->attachments[j];
+                        LightComponent* light = LightComponent_get(k);
+                        if (light) {
+                            // FIXME
+                            light->enabled = !light->enabled;
+                        }
+                    }
+                }
+            }
+
+            if (controller.buttons_down[BUTTON_LB]) {
+                player->state = PLAYER_AMMO_MENU;
+            }
+
+            if (controller.buttons_pressed[BUTTON_A]) {
+                player->state = PLAYER_ENTER;
+            }
+
+            break;
+        case PLAYER_INTERACT:
+            break;
+        case PLAYER_SHOOT:
+            if (!controller.buttons_down[BUTTON_RT]) {
+                player->state = PLAYER_ON_FOOT;
+            }
+
+            break;
+        case PLAYER_RELOAD:
+            if (controller.buttons_down[BUTTON_LT]) {
+                player->state = PLAYER_MENU;
+            }
+
+            break;
+        case PLAYER_ENTER:
+            break;
+        case PLAYER_DRIVE:
+            if (controller.buttons_pressed[BUTTON_A]) {
+                exit_vehicle(entity);
+                player->state = PLAYER_ON_FOOT;
+            }
+
+            break;
+        case PLAYER_PASSENGER:
+            if (controller.buttons_down[BUTTON_LT]) {
+                player->state = PLAYER_MENU;
+            }
+
+            if (controller.buttons_pressed[BUTTON_RT]) {
+                player->state = PLAYER_SHOOT;
+            }
+
+            if (controller.buttons_pressed[BUTTON_A]) {
+                exit_vehicle(entity);
+                player->state = PLAYER_ON_FOOT;
+            }
+
+            break;
+        case PLAYER_MENU:
+            if (controller.buttons_pressed[BUTTON_RT]) {
+                player->state = PLAYER_MENU_GRAB;
+            }
+
+            if (!controller.buttons_down[BUTTON_LT]) {
+                player->state = PLAYER_ON_FOOT;
+            }
+
+            if (controller.buttons_pressed[BUTTON_RB]) {
+                drop_item(entity);
+            }
+
+            break;
+        case PLAYER_MENU_GRAB:
+            if (controller.buttons_released[BUTTON_RT]) {
+                player->state = PLAYER_MENU_DROP;
+            }
+
+            break;
+        case PLAYER_MENU_DROP:
+            if (controller.buttons_down[BUTTON_LT]) {
+                player->state = PLAYER_MENU;
+            } else {
+                player->state = PLAYER_ON_FOOT;
+            }
+
+            break;
+        case PLAYER_AMMO_MENU:
+            if (!controller.buttons_down[BUTTON_LB]) {
+                player->state = PLAYER_ON_FOOT;
+            }
+
+            break;
+        case PLAYER_DEAD:
+            break;
+    }
+}
+
+
 void input_players(int camera, bool poll_local_input) {
     ListNode* node;
     FOREACH(node, game_data->components->player.order) {
@@ -339,126 +464,7 @@ void input_players(int camera, bool poll_local_input) {
             reset_controller(&player->controller);
         }
 
-        Controller controller = player->controller;
-
-        WeaponComponent* weapon = WeaponComponent_get(player->inventory[player->item]);
-
-        switch (player->state) {
-            case PLAYER_ON_FOOT:
-                if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = PLAYER_MENU;
-                }
-
-                if (controller.buttons_pressed[BUTTON_RB]) {
-                    player->state = PLAYER_INTERACT;
-                }
-
-                if (controller.buttons_pressed[BUTTON_RT]) {
-                    player->state = PLAYER_SHOOT;
-                }
-
-                if (weapon) {
-                    if (controller.buttons_pressed[BUTTON_X]) {
-                        player->state = PLAYER_RELOAD;
-                    }
-
-                    if (controller.buttons_pressed[BUTTON_Y]) {
-                        ItemComponent* item = ItemComponent_get(player->inventory[player->item]);
-                        for (int j = 0; j < item->size; j++) {
-                            int k = item->attachments[j];
-                            LightComponent* light = LightComponent_get(k);
-                            if (light) {
-                                // FIXME
-                                light->enabled = !light->enabled;
-                            }
-                        }
-                    }
-                }
-
-                if (controller.buttons_down[BUTTON_LB]) {
-                    player->state = PLAYER_AMMO_MENU;
-                }
-
-                if (controller.buttons_pressed[BUTTON_A]) {
-                    player->state = PLAYER_ENTER;
-                }
-
-                break;
-            case PLAYER_INTERACT:
-                break;
-            case PLAYER_SHOOT:
-                if (!controller.buttons_down[BUTTON_RT]) {
-                    player->state = PLAYER_ON_FOOT;
-                }
-
-                break;
-            case PLAYER_RELOAD:
-                if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = PLAYER_MENU;
-                }
-
-                break;
-            case PLAYER_ENTER:
-                break;
-            case PLAYER_DRIVE:
-                if (controller.buttons_pressed[BUTTON_A]) {
-                    exit_vehicle(i);
-                    player->state = PLAYER_ON_FOOT;
-                }
-
-                break;
-            case PLAYER_PASSENGER:
-                if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = PLAYER_MENU;
-                }
-
-                if (controller.buttons_pressed[BUTTON_RT]) {
-                    player->state = PLAYER_SHOOT;
-                }
-
-                if (controller.buttons_pressed[BUTTON_A]) {
-                    exit_vehicle(i);
-                    player->state = PLAYER_ON_FOOT;
-                }
-
-                break;
-            case PLAYER_MENU:
-                if (controller.buttons_pressed[BUTTON_RT]) {
-                    player->state = PLAYER_MENU_GRAB;
-                }
-
-                if (!controller.buttons_down[BUTTON_LT]) {
-                    player->state = PLAYER_ON_FOOT;
-                }
-
-                if (controller.buttons_pressed[BUTTON_RB]) {
-                    drop_item(i);
-                }
-
-                break;
-            case PLAYER_MENU_GRAB:
-                if (controller.buttons_released[BUTTON_RT]) {
-                    player->state = PLAYER_MENU_DROP;
-                }
-
-                break;
-            case PLAYER_MENU_DROP:
-                if (controller.buttons_down[BUTTON_LT]) {
-                    player->state = PLAYER_MENU;
-                } else {
-                    player->state = PLAYER_ON_FOOT;
-                }
-
-                break;
-            case PLAYER_AMMO_MENU:
-                if (!controller.buttons_down[BUTTON_LB]) {
-                    player->state = PLAYER_ON_FOOT;
-                }
-
-                break;
-            case PLAYER_DEAD:
-                break;
-        }
+        input_player(i);
 
         // Clear edge-triggered flags for remote players after the state machine
         // has consumed them. For local players, update_controller() handles this

@@ -128,6 +128,7 @@ typedef struct {
     int num_clients;
     ClientInfo clients[NET_MAX_CLIENTS];
     uint32_t tick;
+    uint32_t predicted_tick;
     uint8_t recv_buf[NET_MAX_PACKET_SIZE];
     uint8_t send_buf[NET_MAX_PACKET_SIZE];
     bool game_started;

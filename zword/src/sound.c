@@ -12,6 +12,7 @@
 #include "component.h"
 #include "settings.h"
 #include "game.h"
+#include "network.h"
 
 
 void load_sounds() {
@@ -35,6 +36,14 @@ int sound_index(Filename filename) {
 
 void add_sound(int entity, Filename filename, float volume, float pitch) {
     SoundComponent* scomp = SoundComponent_get(entity);
+
+    if (network.mode == NET_MODE_CLIENT) {
+        if (network.predicted_tick <= scomp->last_predicted_event_tick) {
+            return;
+        }
+        scomp->last_predicted_event_tick = network.predicted_tick;
+    }
+
     for (int i = 0; i < scomp->size; i++) {
         if (!scomp->events[i]) {
             SoundEvent* event = malloc(sizeof(SoundEvent));

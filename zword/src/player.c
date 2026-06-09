@@ -125,264 +125,290 @@ int get_attachment(int i) {
 }
 
 
-void update_players(float time_step) {
-    for (int i = 0; i < game_data->components->entities; i++) {
-        PlayerComponent* player = PlayerComponent_get(i);
-        if (!player) continue;
+void update_player_movement(Entity entity) {
+    CoordinateComponent* coord = CoordinateComponent_get(entity);
+    PlayerComponent* player = PlayerComponent_get(entity);
+    PhysicsComponent* phys = PhysicsComponent_get(entity);
 
-        PhysicsComponent* phys = PhysicsComponent_get(i);
-        CoordinateComponent* coord = CoordinateComponent_get(i);
-        Vector2f left_stick = player->controller.left_stick;
-        Vector2f right_stick = player->controller.right_stick;
+    Vector2f left_stick = player->controller.left_stick;
+    Vector2f right_stick = player->controller.right_stick;
 
-        int slot = get_slot(i, player->inventory_size);
-        int atch = get_attachment(i);
-
-        int item = player->inventory[player->item];
-        ItemComponent* itco = ItemComponent_get(item);
-        WeaponComponent* weapon = WeaponComponent_get(item);
-        LightComponent* light = LightComponent_get(item);
-        ImageComponent* image = ImageComponent_get(item);
-
-        if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
-            phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
-            if (non_zero(right_stick)) {
-                coord->angle = polar_angle(right_stick);
-                if (coord->parent != -1) {
-                    coord->angle -= get_angle(coord->parent);
-                }
+    if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
+        phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+        if (non_zero(right_stick)) {
+            coord->angle = polar_angle(right_stick);
+            if (coord->parent != -1) {
+                coord->angle -= get_angle(coord->parent);
             }
-
-            player->money_timer = fmaxf(player->money_timer - time_step, 0.0f);
         }
+    }
+}
 
-        if (weapon) {
-            char buffer[256];
-            snprintf(buffer, 256, "arms_%s", image->filename);
 
-            int texture_index = get_texture_index(buffer);
-            int frames = resources.animation_frames[texture_index];
-            Resolution res = resources.texture_sizes[texture_index];
-            change_texture(player->arms, buffer, res.w / frames, res.h);
+void player_shoot(Entity entity, float time_step) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    Entity item = player->inventory[player->item];
+    ItemComponent* itco = ItemComponent_get(item);
+    WeaponComponent* weapon = WeaponComponent_get(item);
+
+    if (weapon) {
+        attack(item);
+
+        if (weapon->reloading) {
+            player->state = PLAYER_RELOAD;
+
+        } else if (!weapon->automatic) {
+            player->state = PLAYER_ON_FOOT;
+        }
+    } else if (itco) {
+        if (use_item(item, time_step)) {
+            player->state = PLAYER_ON_FOOT;
+        }
+    }
+}
+
+
+void update_player(Entity entity, float time_step) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    if (!player) return;
+
+    PhysicsComponent* phys = PhysicsComponent_get(entity);
+    Vector2f left_stick = player->controller.left_stick;
+
+    int slot = get_slot(entity, player->inventory_size);
+    int atch = get_attachment(entity);
+
+    int item = player->inventory[player->item];
+    ItemComponent* itco = ItemComponent_get(item);
+    WeaponComponent* weapon = WeaponComponent_get(item);
+    LightComponent* light = LightComponent_get(item);
+    ImageComponent* image = ImageComponent_get(item);
+
+    update_player_movement(entity);
+    if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
+        player->money_timer = fmaxf(player->money_timer - time_step, 0.0f);
+    }
+
+    if (weapon) {
+        char buffer[256];
+        snprintf(buffer, 256, "arms_%s", image->filename);
+
+        int texture_index = get_texture_index(buffer);
+        int frames = resources.animation_frames[texture_index];
+        Resolution res = resources.texture_sizes[texture_index];
+        change_texture(player->arms, buffer, res.w / frames, res.h);
+    } else {
+        if (itco) {
+            change_texture(player->arms, "arms", 0.0f, 0.0f);
         } else {
-            if (itco) {
-                change_texture(player->arms, "arms", 0.0f, 0.0f);
-            } else {
-                change_texture(player->arms, "", 0.0f, 0.0f);
-            }
+            change_texture(player->arms, "", 0.0f, 0.0f);
         }
-        
-        switch (player->state) {
-            case PLAYER_ON_FOOT:;
-                Vector2f pos = get_position(i);
+    }
 
+    switch (player->state) {
+        case PLAYER_ON_FOOT:;
+            Vector2f pos = get_position(entity);
+
+            player->target = -1;
+
+            float min_dist = 9999.0;
+
+            List* list = get_entities(pos, 1.0f);
+            for (ListNode* current = list->head; current; current = current->next) {
+                int k = current->value;
+                if (k == -1) break;
+                if (!ItemComponent_get(k) && !DoorComponent_get(k)) continue;
+                if (CoordinateComponent_get(k)->parent != -1) continue;
+
+                float d = dist(pos, get_position(k));
+                if (d < min_dist) {
+                    player->target = k;
+                    min_dist = d;
+                }
+            }
+            List_delete(list);
+
+            if (itco) {
+                for (int j = 0; j < itco->size; j++) {
+                    LightComponent* a = LightComponent_get(itco->attachments[j]);
+                    if (a) {
+                        a->enabled = true;
+                    }
+                }
+            }
+
+            player->use_timer = 0.0f;
+            break;
+        case PLAYER_INTERACT:
+            if (ItemComponent_get(player->target)) {
+                if (ItemComponent_get(player->target)->type == ITEM_SAVE) {
+                    if (game_data->game_mode == MODE_CAMPAIGN) {
+                        respawn_dead_players(get_position(player->target));
+                    }
+                    game_state = STATE_SAVE;
+                } else {
+                    pick_up_item(entity);
+                }
+            } else if (DoorComponent_get(player->target)) {
+                unlock_door(entity);
+            }
+            player->state = PLAYER_ON_FOOT;
+            break;
+        case PLAYER_SHOOT:
+            player_shoot(entity, time_step);
+            break;
+        case PLAYER_RELOAD:
+            if (weapon) {
                 player->target = -1;
+                reload(item);
 
-                float min_dist = 9999.0;
-
-                List* list = get_entities(pos, 1.0f);
-                for (ListNode* current = list->head; current; current = current->next) {
-                    int k = current->value;
-                    if (k == -1) break;
-                    if (!ItemComponent_get(k) && !DoorComponent_get(k)) continue;
-                    if (CoordinateComponent_get(k)->parent != -1) continue;
-
-                    float d = dist(pos, get_position(k));
-                    if (d < min_dist) {
-                        player->target = k;
-                        min_dist = d;
-                    }
-                }
-                List_delete(list);
-
-                if (itco) {
-                    for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(itco->attachments[j]);
-                        if (a) {
-                            a->enabled = true;
-                        }
-                    }
-                }
-
-                player->use_timer = 0.0f;
-                break;
-            case PLAYER_INTERACT:
-                if (ItemComponent_get(player->target)) {
-                    if (ItemComponent_get(player->target)->type == ITEM_SAVE) {
-                        if (game_data->game_mode == MODE_CAMPAIGN) {
-                            respawn_dead_players(get_position(player->target));
-                        }
-                        game_state = STATE_SAVE;
-                    } else {
-                        pick_up_item(i);
-                    }
-                } else if (DoorComponent_get(player->target)) {
-                    unlock_door(i);
-                }
-                player->state = PLAYER_ON_FOOT;
-                break;
-            case PLAYER_SHOOT:
-                if (weapon) {
-                    attack(item);
-
-                    if (weapon->reloading) {
-                        player->state = PLAYER_RELOAD;
-                    } else if (!weapon->automatic) {
-                        player->state = PLAYER_ON_FOOT;
-                    }
-                } else if (itco) {
-                    if (use_item(item, time_step)) {
-                        player->state = PLAYER_ON_FOOT;
-                    }
-                }
-
-                break;
-            case PLAYER_RELOAD:
-                if (weapon) {
-                    player->target = -1;
-                    reload(item);
-
-                    if (!weapon->reloading) {
-                        player->state = PLAYER_ON_FOOT;
-                    }
-                }
-
-                break;
-            case PLAYER_ENTER:
-                if (!enter_vehicle(i)) {
+                if (!weapon->reloading) {
                     player->state = PLAYER_ON_FOOT;
                 }
-                break;
-            case PLAYER_DRIVE:
-                if (player->controller.joystick == -1) {
-                    drive_vehicle(i, sign(left_stick.y), sign(left_stick.x));
-                } else {
-                    float gas = player->controller.right_trigger - player->controller.left_trigger;
-                    drive_vehicle(i, gas, left_stick.x);
+            }
+
+            break;
+        case PLAYER_ENTER:
+            if (!enter_vehicle(entity)) {
+                player->state = PLAYER_ON_FOOT;
+            }
+            break;
+        case PLAYER_DRIVE:
+            if (player->controller.joystick == -1) {
+                drive_vehicle(entity, sign(left_stick.y), sign(left_stick.x));
+            } else {
+                float gas = player->controller.right_trigger - player->controller.left_trigger;
+                drive_vehicle(entity, gas, left_stick.x);
+            }
+
+            alert_enemies(entity, 10.0f);
+
+            break;
+        case PLAYER_PASSENGER:
+            if (!weapon && light) {
+                light->enabled = true;
+            }
+
+            if (itco) {
+                for (int j = 0; j < itco->size; j++) {
+                    LightComponent* a = LightComponent_get(itco->attachments[j]);
+                    if (a) {
+                        a->enabled = true;
+                    }
                 }
+            }
 
-                alert_enemies(i, 10.0f);
+            break;
+        case PLAYER_MENU:
+            player->target = -1;
 
-                break;
-            case PLAYER_PASSENGER:
-                if (!weapon && light) {
-                    light->enabled = true;
+            // phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
+
+            if (light) {
+                light->enabled = false;
+            }
+
+            if (weapon) {
+                weapon->reloading = false;
+            }
+
+            if (itco) {
+                for (int j = 0; j < itco->size; j++) {
+                    LightComponent* a = LightComponent_get(itco->attachments[j]);
+                    if (a) {
+                        a->enabled = false;
+                    }
                 }
+            }
 
-                if (itco) {
+            player->item = get_slot(entity, player->inventory_size);
+
+            int new_item = player->inventory[player->item];
+
+            if (new_item != item) {
+                if (item != -1) {
+                    ImageComponent_get(item)->alpha = 0.0f;
+                }
+                if (new_item != -1) {
+                    itco = ItemComponent_get(new_item);
+
+                    if (!WeaponComponent_get(new_item)) {
+                        ImageComponent_get(new_item)->alpha = 1.0f;
+                    }
                     for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(itco->attachments[j]);
-                        if (a) {
-                            a->enabled = true;
+                        int k = itco->attachments[j];
+                        if (k != -1) {
+                            ImageComponent_get(k)->alpha = 0.0f;
                         }
                     }
                 }
+            }
 
-                break;
-            case PLAYER_MENU:
-                player->target = -1;
-                
-                phys->acceleration = sum(phys->acceleration, mult(player->acceleration, left_stick));
-                
-                if (light) {
-                    light->enabled = false;
+            break;
+        case PLAYER_MENU_GRAB:
+            if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
+                if (atch == -1) {
+                    player->grabbed_item = item;
+                } else if (itco->attachments[atch] != -1) {
+                    player->grabbed_item = itco->attachments[atch];
                 }
-                
-                if (weapon) {
-                    weapon->reloading = false;
-                }
+            }
 
-                if (itco) {
-                    for (int j = 0; j < itco->size; j++) {
-                        LightComponent* a = LightComponent_get(itco->attachments[j]);
-                        if (a) {
-                            a->enabled = false;
-                        }
+            break;
+        case PLAYER_MENU_DROP:
+            if (player->grabbed_item != -1) {
+                if (player->inventory[slot] == -1) {
+                    replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
+                    for (int j = 0; j < player->inventory_size; j++) {
+                        if (player->inventory[j] == -1) continue;
+                        ItemComponent* it = ItemComponent_get(player->inventory[j]);
+                        replace(player->grabbed_item, -1, it->attachments, it->size);
                     }
-                }
-
-                player->item = get_slot(i, player->inventory_size);
-
-                int new_item = player->inventory[player->item];
-
-                if (new_item != item) {
-                    if (item != -1) {
-                        ImageComponent_get(item)->alpha = 0.0f;
-                    }
-                    if (new_item != -1) {
-                        itco = ItemComponent_get(new_item);
-
-                        if (!WeaponComponent_get(new_item)) {
-                            ImageComponent_get(new_item)->alpha = 1.0f;
-                        }
-                        for (int j = 0; j < itco->size; j++) {
-                            int k = itco->attachments[j];
-                            if (k != -1) {
-                                ImageComponent_get(k)->alpha = 0.0f;
+                    player->inventory[slot] = player->grabbed_item;
+                    CoordinateComponent_get(player->grabbed_item)->parent = entity;
+                } else if (atch != -1) {
+                    ItemComponent* item_slot = ItemComponent_get(player->inventory[slot]);
+                    if (player->inventory[slot] != player->grabbed_item && item_slot->attachments[atch] == -1) {
+                        if (is_attachment(player->grabbed_item)) {
+                            replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
+                            for (int j = 0; j < player->inventory_size; j++) {
+                                if (player->inventory[j] == -1) continue;
+                                ItemComponent* it = ItemComponent_get(player->inventory[j]);
+                                replace(player->grabbed_item, -1, it->attachments, it->size);
                             }
+                            item_slot->attachments[atch] = player->grabbed_item;
+                            CoordinateComponent_get(player->grabbed_item)->parent = player->inventory[slot];
                         }
                     }
                 }
+                player->grabbed_item = -1;
+            }
 
-                break;
-            case PLAYER_MENU_GRAB:
-                if (player->grabbed_item == -1 && player->inventory[slot] != -1) {
-                    if (atch == -1) {
-                        player->grabbed_item = item;
-                    } else if (itco->attachments[atch] != -1) {
-                        player->grabbed_item = itco->attachments[atch];
-                    }
+            break;
+        case PLAYER_AMMO_MENU:
+            player->target = -1;
+            break;
+        case PLAYER_DEAD:;
+            ColliderComponent* col = ColliderComponent_get(entity);
+            if (col) {
+                col->group = GROUP_ITEMS;
+                if (phys->speed == 0.0) {
+                    clear_grid(entity);
+                    // ColliderComponent_remove(i);
                 }
+            }
+            if (player->respawn_timer > 0.0f) {
+                player->respawn_timer = fmaxf(player->respawn_timer - time_step, 0.0f);
+            }
 
-                break;
-            case PLAYER_MENU_DROP:
-                if (player->grabbed_item != -1) {
-                    if (player->inventory[slot] == -1) {
-                        replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
-                        for (int j = 0; j < player->inventory_size; j++) {
-                            if (player->inventory[j] == -1) continue;
-                            ItemComponent* it = ItemComponent_get(player->inventory[j]);
-                            replace(player->grabbed_item, -1, it->attachments, it->size);
-                        }
-                        player->inventory[slot] = player->grabbed_item;
-                        CoordinateComponent_get(player->grabbed_item)->parent = i;
-                    } else if (atch != -1) {
-                        ItemComponent* item_slot = ItemComponent_get(player->inventory[slot]);
-                        if (player->inventory[slot] != player->grabbed_item && item_slot->attachments[atch] == -1) {
-                            if (is_attachment(player->grabbed_item)) {
-                                replace(player->grabbed_item, -1, player->inventory, player->inventory_size);
-                                for (int j = 0; j < player->inventory_size; j++) {
-                                    if (player->inventory[j] == -1) continue;
-                                    ItemComponent* it = ItemComponent_get(player->inventory[j]);
-                                    replace(player->grabbed_item, -1, it->attachments, it->size);
-                                }
-                                item_slot->attachments[atch] = player->grabbed_item;
-                                CoordinateComponent_get(player->grabbed_item)->parent = player->inventory[slot];
-                            }
-                        }
-                    }
-                    player->grabbed_item = -1;
-                }
+            break;
+    }
+}
 
-                break;
-            case PLAYER_AMMO_MENU:
-                player->target = -1;
-                break;
-            case PLAYER_DEAD:;
-                ColliderComponent* col = ColliderComponent_get(i);
-                if (col) {
-                    col->group = GROUP_ITEMS;
-                    if (phys->speed == 0.0) {
-                        clear_grid(i);
-                        // ColliderComponent_remove(i);
-                    }
-                }
-                if (player->respawn_timer > 0.0f) {
-                    player->respawn_timer = fmaxf(player->respawn_timer - time_step, 0.0f);
-                }
 
-                break;
-        }
+void update_players(float time_step) {
+    for (int i = 0; i < game_data->components->entities; i++) {
+        update_player(i, time_step);
     }
 }
 

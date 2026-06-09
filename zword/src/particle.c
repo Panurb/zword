@@ -9,6 +9,7 @@
 #include "util.h"
 #include "camera.h"
 #include "game.h"
+#include "network.h"
 #include "settings.h"
 
 
@@ -205,6 +206,13 @@ void add_particles(int entity, int n) {
     Vector2f scale = get_scale(entity);
     ParticleComponent* part = ParticleComponent_get(entity);
 
+    if (network.mode == NET_MODE_CLIENT) {
+        if (network.predicted_tick <= part->last_predicted_event_tick) {
+            return;
+        }
+        part->last_predicted_event_tick = network.predicted_tick;
+    }
+
     if (!part->loop) {
         part->pending_burst += n;
     }
@@ -215,8 +223,8 @@ void add_particles(int entity, int n) {
         if (part->width > 0.0f && part->height > 0.0f) {
             float dx = 0.5f * part->width * scale.x;
             float dy = 0.5f * part->height * scale.y;
-            part->origin = (Vector2f) { 
-                randf(-dx, dx), 
+            part->origin = (Vector2f) {
+                randf(-dx, dx),
                 randf(-dy, dy)
             };
         }
@@ -225,7 +233,7 @@ void add_particles(int entity, int n) {
         float angle = randf(part->angle - 0.5 * part->spread, part->angle + 0.5 * part->spread);
         part->velocity[next] = polar_to_cartesian(r, get_angle(entity) + angle);
         part->time[next] = part->max_time;
-        
+
         if (part->particles < part->max_particles) {
             part->particles++;
         } else {

@@ -18,6 +18,7 @@
 #include "serialize_binary.h"
 #include "sound.h"
 #include "particle.h"
+#include "player.h"
 
 bool net_entity_seen[MAX_ENTITIES];
 
@@ -33,8 +34,9 @@ int discovered_servers_count = 0;
 
 
 #define NET_PREDICTION_HISTORY_SIZE 128
-#define NET_BUFFERED_SNAPSHOT_COUNT 0
+#define NET_BUFFERED_SNAPSHOT_COUNT 10
 #define NET_BUFFERED_SNAPSHOT_STORAGE_SIZE ((NET_BUFFERED_SNAPSHOT_COUNT) > 0 ? (NET_BUFFERED_SNAPSHOT_COUNT) : 1)
+#define NET_PREDICTED_EVENT_TICK_THRESHOLD 10
 
 typedef struct {
     uint32_t tick;
@@ -53,22 +55,6 @@ static BufferedSnapshot buffered_snapshots[NET_BUFFERED_SNAPSHOT_STORAGE_SIZE] =
 static int buffered_snapshot_start = 0;
 static int buffered_snapshot_count = 0;
 
-static void mark_server_packet_received(void);
-
-static void apply_authoritative_snapshot(const uint8_t* buf, int size);
-
-static void reset_buffered_snapshots(void);
-
-static void enqueue_buffered_snapshot(const uint8_t* buf, int size);
-
-static bool dequeue_and_apply_buffered_snapshot(void);
-
-static Entity get_local_player_entity(void);
-
-static void predict_local_player_input(Entity entity, const Controller* controller, float time_step);
-
-static void reconcile_local_player(uint32_t snapshot_tick, float time_step);
-
 
 static void clear_local_prediction_history(void) {
     memset(predicted_inputs, 0, sizeof(predicted_inputs));
@@ -81,6 +67,15 @@ static void reset_buffered_snapshots(void) {
     memset(buffered_snapshots, 0, sizeof(buffered_snapshots));
     buffered_snapshot_start = 0;
     buffered_snapshot_count = 0;
+}
+
+
+static void mark_server_packet_received() {
+    if (network.mode != NET_MODE_CLIENT) {
+        return;
+    }
+
+    network.last_server_recv_time = SDL_GetTicks() / 1000.0f;
 }
 
 
@@ -119,19 +114,16 @@ static void predict_local_player_input(Entity entity, const Controller* controll
         return;
     }
 
-    if (!player->is_local || player->state != PLAYER_ON_FOOT) {
+    if (!player->is_local) {
         return;
     }
 
     player->controller = *controller;
-    if (non_zero(player->controller.right_stick)) {
-        coord->angle = polar_angle(player->controller.right_stick);
-        if (coord->parent != -1) {
-            coord->angle -= get_angle(coord->parent);
-        }
+    input_player(entity);
+    update_player_movement(entity);
+    if (player->state == PLAYER_SHOOT) {
+        player_shoot(entity, time_step);
     }
-
-    phys->acceleration = sum(phys->acceleration, mult(player->acceleration, player->controller.left_stick));
     collide(entity, false);
     update_physics_entity(entity, time_step);
 }
@@ -162,6 +154,7 @@ static void reconcile_local_player(uint32_t snapshot_tick, float time_step) {
         }
 
         predict_local_player_input(entity, &input->controller, time_step);
+        network.predicted_tick++;
     }
 
     CoordinateComponent* coord = CoordinateComponent_get(entity);
@@ -317,13 +310,7 @@ static void send_lobby_keepalive() {
 }
 
 
-static void mark_server_packet_received() {
-    if (network.mode != NET_MODE_CLIENT) {
-        return;
-    }
 
-    network.last_server_recv_time = SDL_GetTicks() / 1000.0f;
-}
 
 
 static bool client_check_server_timeout() {
@@ -636,6 +623,8 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
     const SnapshotPacket* pkt = (const SnapshotPacket*)buf;
     if (pkt->header.type != PACKET_SNAPSHOT) return;
 
+    network.predicted_tick = pkt->header.tick;
+
     if (game_data->game_mode == MODE_SURVIVAL) {
         game_data->wave = pkt->wave;
         game_data->wave_delay = pkt->wave_delay;
@@ -774,7 +763,10 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
             SoundComponent* sc = SoundComponent_get(entity);
             if (sc) {
                 float volume = (float)vol / 255.0f;
-                add_sound(entity, resources.sound_names[sidx], volume, 1.0f);
+                if (pkt->header.tick > sc->last_predicted_event_tick + NET_PREDICTED_EVENT_TICK_THRESHOLD) {
+                    LOG_INFO("Tick=%d, predicted_tick=%d", pkt->header.tick, sc->last_predicted_event_tick);
+                    add_sound(entity, resources.sound_names[sidx], volume, 1.0f);
+                }
             }
         }
     }
@@ -805,7 +797,9 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
                 part->origin.x = origin_x;
                 part->origin.y = origin_y;
                 part->max_time = max_time;
-                add_particles(entity, (int)count);
+                if (pkt->header.tick > part->last_predicted_event_tick + NET_PREDICTED_EVENT_TICK_THRESHOLD) {
+                    add_particles(entity, (int)count);
+                }
             }
         }
     }

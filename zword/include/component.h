@@ -293,6 +293,7 @@ typedef struct {
     float stretch;
     float wind_factor;
     int pending_burst;
+    uint32_t last_predicted_event_tick;
 } ParticleComponent;
 
 typedef struct {
@@ -439,6 +440,7 @@ typedef struct {
     SoundEvent* events[4];
     Filename hit_sound;
     Filename loop_sound;
+    uint32_t last_predicted_event_tick;
 } SoundComponent;
 
 typedef struct {
