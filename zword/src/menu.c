@@ -937,7 +937,8 @@ void create_host_lobby_menu() {
 
     Entity mode_label = create_label("Mode", zeros());
     lan_mode_dropdown = create_dropdown(zeros(), GAME_MODES, 4);
-    WidgetComponent_get(lan_mode_dropdown)->on_change = update_maps;
+    WidgetComponent* mode_widget = WidgetComponent_get(lan_mode_dropdown);
+    mode_widget->on_change = update_maps;
     add_row_to_container(container, mode_label, lan_mode_dropdown);
 
     Entity map_label = create_label("Map", zeros());
@@ -947,6 +948,9 @@ void create_host_lobby_menu() {
     set_map_data(lan_map_dropdown, 0);
     WidgetComponent_get(lan_map_dropdown)->on_change = set_map_data;
     add_row_to_container(container, map_label, lan_map_dropdown);
+
+    mode_widget->value = MODE_DEATHMATCH;
+    update_maps(lan_mode_dropdown, MODE_DEATHMATCH);
 
     Entity friendly_fire_label = create_label("Friendly Fire", zeros());
     Entity friendly_fire_checkbox = create_checkbox(zeros(), game_data->friendly_fire, set_friendly_fire);
