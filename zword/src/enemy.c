@@ -484,8 +484,7 @@ void enemy_die(int entity) {
     if (health->health < -health->max_health) {
         ImageComponent_remove(entity);
         if (particle) {
-            particle->origin = zeros();
-            add_particles(entity, 100);
+            add_burst(entity, zeros(), 0.0f, 100, 0.0f);
         }
     }
 

@@ -119,11 +119,17 @@ static void predict_local_player_input(Entity entity, const Controller* controll
     }
 
     player->controller = *controller;
-    input_player(entity);
-    update_player_movement(entity);
-    if (player->state == PLAYER_SHOOT) {
-        player_shoot(entity, time_step);
+    if (player->state == PLAYER_ON_FOOT) {
+        if (player->controller.buttons_pressed[BUTTON_RT]) {
+            player->state = PLAYER_SHOOT;
+            player_shoot(entity, time_step);
+        }
     }
+    // input_player(entity);
+    update_player_movement(entity);
+    // if (player->state == PLAYER_SHOOT) {
+    //     player_shoot(entity, time_step);
+    // }
     collide(entity, false);
     update_physics_entity(entity, time_step);
 }
@@ -579,20 +585,25 @@ int netgame_build_snapshot(uint8_t* buf, int buf_size, uint32_t tick) {
 
         for (int i = 0; i < game_data->components->entities; i++) {
             ParticleComponent* part = ParticleComponent_get(i);
-            if (!part || part->pending_burst <= 0) continue;
-            if (remaining < 16) break;
+            if (!part || part->bursts_size <= 0) continue;
 
-            uint16_t eid = (uint16_t)i;
-            uint16_t count = (uint16_t)part->pending_burst;
-            memcpy(data, &eid, 2);
-            memcpy(data + 2, &count, 2);
-            memcpy(data + 4, &part->origin.x, 4);
-            memcpy(data + 8, &part->origin.y, 4);
-            memcpy(data + 12, &part->max_time, 4);
-            data += 16;
-            remaining -= 16;
-            part->pending_burst = 0;
-            particle_count++;
+            for (int j = 0; j < part->bursts_size; j++) {
+                if (remaining < 20) break;
+                Burst burst = part->bursts[j];
+
+                uint16_t eid = (uint16_t)i;
+                uint16_t count = (uint16_t)burst.count;
+                memcpy(data, &eid, 2);
+                memcpy(data + 2, &count, 2);
+                memcpy(data + 4, &burst.origin.x, 4);
+                memcpy(data + 8, &burst.origin.y, 4);
+                memcpy(data + 12, &burst.angle, 4);
+                memcpy(data + 16, &burst.max_time, 4);
+                data += 20;
+                remaining -= 20;
+                particle_count++;
+            }
+            part->bursts_size = 0;
         }
 
         *count_ptr = particle_count;
@@ -778,27 +789,26 @@ void netgame_apply_snapshot(const uint8_t* buf, int size) {
         remaining -= 1;
 
         for (int i = 0; i < particle_count; i++) {
-            if (remaining < 16) break;
+            if (remaining < 20) break;
 
             uint16_t host_eid;
             uint16_t count;
-            float origin_x, origin_y, max_time;
+            float origin_x, origin_y, angle, max_time;
             memcpy(&host_eid, data, 2);
             memcpy(&count, data + 2, 2);
             memcpy(&origin_x, data + 4, 4);
             memcpy(&origin_y, data + 8, 4);
-            memcpy(&max_time, data + 12, 4);
-            data += 16;
-            remaining -= 16;
+            memcpy(&angle, data + 12, 4);
+            memcpy(&max_time, data + 16, 4);
+            data += 20;
+            remaining -= 20;
 
             Entity entity = (int)host_eid;
             ParticleComponent* part = ParticleComponent_get(entity);
             if (part) {
-                part->origin.x = origin_x;
-                part->origin.y = origin_y;
-                part->max_time = max_time;
                 if (pkt->header.tick > part->last_predicted_event_tick + NET_PREDICTED_EVENT_TICK_THRESHOLD) {
-                    add_particles(entity, (int)count);
+                    LOG_INFO("Adding burst: angle=%f, count=%d", angle, count);
+                    add_burst(entity, vec(origin_x, origin_y), angle, count, max_time);
                 }
             }
         }
@@ -1140,7 +1150,7 @@ void update_client(float time_step) {
 
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
-    update_particles(game_data->camera, time_step);
+    update_particles(game_data->camera, time_step, true);
 
     network.tick++;
 }
@@ -1161,7 +1171,7 @@ void update_client_pause(float time_step) {
 
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
-    update_particles(game_data->camera, time_step);
+    update_particles(game_data->camera, time_step, true);
 
     CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
     cam_coord->previous.position = cam_coord->position;

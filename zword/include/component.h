@@ -7,6 +7,8 @@
 #include "list.h"
 
 #define MAX_ENTITIES 4000
+#define MAX_SOUND_EVENTS 4
+#define MAX_BURSTS 10
 
 
 typedef int Entity;
@@ -267,6 +269,13 @@ typedef enum ParticleType {
 } ParticleType;
 
 typedef struct {
+    Vector2f origin;
+    float angle;
+    int count;
+    float max_time;
+} Burst;
+
+typedef struct {
     ParticleType type;
     bool enabled;
     bool loop;
@@ -292,8 +301,9 @@ typedef struct {
     float height;
     float stretch;
     float wind_factor;
-    int pending_burst;
     uint32_t last_predicted_event_tick;
+    Burst bursts[MAX_BURSTS];
+    int bursts_size;
 } ParticleComponent;
 
 typedef struct {
@@ -437,7 +447,7 @@ typedef struct {
 
 typedef struct {
     int size;
-    SoundEvent* events[4];
+    SoundEvent* events[MAX_SOUND_EVENTS];
     Filename hit_sound;
     Filename loop_sound;
     uint32_t last_predicted_event_tick;

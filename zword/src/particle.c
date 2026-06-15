@@ -201,21 +201,32 @@ ParticleComponent* ParticleComponent_add_type(int entity, ParticleType type, flo
     return particle;
 }
 
-
-void add_particles(int entity, int n) {
-    Vector2f scale = get_scale(entity);
+void add_burst(Entity entity, Vector2f origin, float angle, int count, float max_time) {
     ParticleComponent* part = ParticleComponent_get(entity);
 
     if (network.mode == NET_MODE_CLIENT) {
         if (network.predicted_tick <= part->last_predicted_event_tick) {
             return;
         }
-        part->last_predicted_event_tick = network.predicted_tick;
     }
 
-    if (!part->loop) {
-        part->pending_burst += n;
+    if (part->bursts_size >= MAX_BURSTS) {
+        return;
     }
+
+    Burst burst = {
+        .origin = origin,
+        .angle = angle,
+        .count = count,
+        .max_time = max_time ? max_time : part->max_time
+    };
+    part->bursts[part->bursts_size++] = burst;
+}
+
+
+void add_particles(int entity, int n) {
+    Vector2f scale = get_scale(entity);
+    ParticleComponent* part = ParticleComponent_get(entity);
 
     for (int i = 0; i < n; i++) {
         int next = (part->first + part->particles) % part->max_particles;
@@ -275,6 +286,24 @@ void update_particles(int camera, float time_step) {
         bool visible = on_screen(camera, get_position(i), bounds.x, bounds.y);
         if (part->loop && !visible) {
             continue;
+        }
+
+        for (int j = 0; j < part->bursts_size; j++) {
+            Burst burst = part->bursts[j];
+            LOG_INFO("burst entity=%d count=%d, angle=%f", i, burst.count, burst.angle);
+            part->origin = burst.origin;
+            part->angle = burst.angle;
+            part->max_time = burst.max_time;
+            add_particles(i, burst.count);
+
+            if (network.mode == NET_MODE_CLIENT) {
+                part->last_predicted_event_tick = network.predicted_tick;
+            }
+        }
+
+        // Host clears bursts after building the snapshot
+        if (network.mode != NET_MODE_HOST) {
+            part->bursts_size = 0;
         }
 
         if (part->enabled) {

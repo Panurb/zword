@@ -258,7 +258,7 @@ void update_energy() {
             
             if (phys->collision.entities->size > 0) {
                 light->brightness = 0.5f;
-                add_particles(i, 10);
+                add_burst(i, zeros(), 0.0f, 10, 0.0f);
                 clear_grid(i);
                 ColliderComponent_get(i)->enabled = false;
                 ImageComponent_remove(i);
@@ -508,7 +508,7 @@ void attack(int entity) {
                 }
                 Vector2f dir = polar_to_cartesian(1.0, get_angle(parent) + angle);
 
-                HitInfo info;
+                HitInfo info = { .entity = NULL_ENTITY };
                 Vector2f start = pos;
                 float range = weapon->range;
                 for (int p = 0; p <= weapon->penetration; p++) {
@@ -528,15 +528,15 @@ void attack(int entity) {
                     }
                 }
 
-                particle->angle = angle;
-                if (info.entity != -1) {
-                    particle->max_time = dist(info.position, pos) / particle->speed;
+                float max_time;
+                if (info.entity != NULL_ENTITY) {
+                    max_time = dist(info.position, pos) / particle->speed;
                     // Prevent from going inside walls
-                    particle->max_time -= fmodf(particle->max_time, particle->start_size * particle->stretch);
+                    max_time -= fmodf(max_time, particle->start_size * particle->stretch);
                 } else {
-                    particle->max_time = weapon->range / particle->speed;
+                    max_time = weapon->range / particle->speed;
                 }
-                add_particles(entity, 1);
+                add_burst(entity, zeros(), angle, 1, max_time);
             }
 
             weapon->recoil = fminf(weapon->max_recoil, weapon->recoil + weapon->recoil_up);

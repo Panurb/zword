@@ -409,8 +409,8 @@ ParticleComponent* ParticleComponent_add(int entity, float angle, float spread,
     particle->height = 0.0f;
     particle->stretch = 0.1f;
     particle->wind_factor = 1.0f;
-    particle->pending_burst = 0;
     particle->last_predicted_event_tick = 0;
+    particle->bursts_size = 0;
 
     game_data->components->particle[entity] = particle;
 
@@ -705,7 +705,7 @@ void PathComponent_remove(int entity) {
 
 SoundComponent* SoundComponent_add(int entity, Filename hit_sound) {
     SoundComponent* sound = malloc(sizeof(SoundComponent));
-    sound->size = 4;
+    sound->size = MAX_SOUND_EVENTS;
     for (int i = 0; i < sound->size; i++) {
         sound->events[i] = NULL;
     }

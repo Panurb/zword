@@ -172,8 +172,9 @@ void damage(Entity entity, Vector2f pos, Vector2f dir, int dmg, Entity dealer, D
 
     ParticleComponent* particle = ParticleComponent_get(entity);
     if (particle) {
-        particle->origin = rotate(diff(pos, get_position(entity)), -get_angle(entity));
-        add_particles(entity, maxi(particle->rate / 50.0f * dmg, 1));
+        Vector2f origin = rotate(diff(pos, get_position(entity)), -get_angle(entity));
+        int count = maxi(particle->rate / 50.0f * dmg, 1);
+        add_burst(entity, origin, 0.0f, count, 0.0f);
     }
 
     SoundComponent* scomp = SoundComponent_get(entity);
