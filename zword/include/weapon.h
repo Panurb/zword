@@ -19,7 +19,7 @@ void reload(int i);
 
 void update_energy();
 
-void attack(int i);
+void attack(Entity entity, bool apply_damage);
 
 void update_weapons(float time_step);
 

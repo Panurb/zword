@@ -50,7 +50,6 @@ bool network_init() {
     network.num_clients = 0;
     network.tick = 0;
     network.predicted_tick = 0;
-    network.game_started = false;
     network.own_ip[0] = '\0';
     network.host_ip[0] = '\0';
 

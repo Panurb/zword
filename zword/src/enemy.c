@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <stdio.h>
 
 #include "component.h"
 #include "raycast.h"
@@ -328,7 +329,7 @@ void update_enemies(float time_step) {
                 break;
             } case ENEMY_ATTACK: {
                 if (enemy->attack_timer <= 0.0f) {
-                    attack(enemy->weapon);
+                    attack(enemy->weapon, true);
                     enemy->state = ENEMY_CHASE;
                 } else {
                     enemy->attack_timer -= time_step;

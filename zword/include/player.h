@@ -11,7 +11,7 @@ int get_attachment(int i);
 
 void update_player_movement(Entity entity);
 
-void player_shoot(Entity entity, float time_step);
+void player_shoot(Entity entity, float time_step, bool apply_damage);
 
 void update_players(float time_step);
 

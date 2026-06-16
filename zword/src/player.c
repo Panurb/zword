@@ -6,6 +6,8 @@
 
 #include "util.h"
 #include "player.h"
+
+#include "app.h"
 #include "component.h"
 #include "camera.h"
 #include "weapon.h"
@@ -145,14 +147,14 @@ void update_player_movement(Entity entity) {
 }
 
 
-void player_shoot(Entity entity, float time_step) {
+void player_shoot(Entity entity, float time_step, bool apply_damage) {
     PlayerComponent* player = PlayerComponent_get(entity);
     Entity item = player->inventory[player->item];
     ItemComponent* itco = ItemComponent_get(item);
     WeaponComponent* weapon = WeaponComponent_get(item);
 
     if (weapon) {
-        attack(item);
+        attack(item, apply_damage);
 
         if (weapon->reloading) {
             player->state = PLAYER_RELOAD;
@@ -255,7 +257,7 @@ void update_player(Entity entity, float time_step) {
             player->state = PLAYER_ON_FOOT;
             break;
         case PLAYER_SHOOT:
-            player_shoot(entity, time_step);
+            player_shoot(entity, time_step, true);
             break;
         case PLAYER_RELOAD:
             if (weapon) {

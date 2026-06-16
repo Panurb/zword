@@ -377,7 +377,7 @@ int create_freeze(Vector2f position, Vector2f velocity) {
 }
 
 
-void attack(int entity) {
+void attack(Entity entity, bool apply_damage) {
     WeaponComponent* weapon = WeaponComponent_get(entity);
     int parent = CoordinateComponent_get(entity)->parent;
 
@@ -448,18 +448,22 @@ void attack(int entity) {
                     dmg *= 2;
                 }
                 Vector2f dir = normalized(diff(min_info[i].position, pos));
-                damage(min_info[i].entity, min_info[i].position, dir, dmg, parent, DAMAGE_BULLET);
+                if (apply_damage) {
+                    damage(min_info[i].entity, min_info[i].position, dir, dmg, parent, DAMAGE_BULLET);
+                }
                 shake_camera(0.0125f * weapon->damage);
             }
             break;
         } case AMMO_ENERGY: {
-            for (int i = 0; i < weapon->shots; i++) {
-                float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
-                if (weapon->spread > 0.0f) {
-                    angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+            if (apply_damage) {
+                for (int i = 0; i < weapon->shots; i++) {
+                    float angle = randf(-0.5f * weapon->recoil, 0.5f * weapon->recoil);
+                    if (weapon->spread > 0.0f) {
+                        angle = i * weapon->spread / (weapon->shots - 1) - 0.5f * weapon->spread + randf(-0.1f, 0.1f);
+                    }
+                    Vector2f vel = polar_to_cartesian(7.0f, get_angle(parent) + angle);
+                    create_energy(sum(get_position(entity), mult(1.0f / 14.0f, vel)), vel);
                 }
-                Vector2f vel = polar_to_cartesian(7.0f, get_angle(parent) + angle);
-                create_energy(sum(get_position(entity), mult(1.0f / 14.0f, vel)), vel);
             }
             break;
         } case AMMO_ROPE: {
@@ -476,25 +480,33 @@ void attack(int entity) {
             // coord->
             // PhysicsComponent_remove(j);
 
-            damage(info.entity, info.position, dir, weapon->damage, parent, DAMAGE_BULLET);
+            if (apply_damage) {
+                damage(info.entity, info.position, dir, weapon->damage, parent, DAMAGE_BULLET);
+            }
 
             break;
         } case AMMO_FLAME: {
-            create_flame(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)), parent);
-            if (PlayerComponent_get(parent)) {
-                alert_enemies(parent, weapon->sound_range);
+            if (apply_damage) {
+                create_flame(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)), parent);
+                if (PlayerComponent_get(parent)) {
+                    alert_enemies(parent, weapon->sound_range);
+                }
             }
             break;
         } case AMMO_WATER: {
-            create_splash(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
-            if (PlayerComponent_get(parent)) {
-                alert_enemies(parent, weapon->sound_range);
+            if (apply_damage) {
+                create_splash(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+                if (PlayerComponent_get(parent)) {
+                    alert_enemies(parent, weapon->sound_range);
+                }
             }
             break;
         } case AMMO_FREEZE: {
-            create_freeze(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
-            if (PlayerComponent_get(parent)) {
-                alert_enemies(parent, weapon->sound_range);
+            if (apply_damage) {
+                create_freeze(get_position(entity), polar_to_cartesian(20.0f, get_angle(parent)));
+                if (PlayerComponent_get(parent)) {
+                    alert_enemies(parent, weapon->sound_range);
+                }
             }
             break;
         } default: {
@@ -518,7 +530,9 @@ void attack(int entity) {
                     if (dot(info.normal, dir) < -0.99f) {
                         dmg *= 2;
                     }
-                    damage(info.entity, info.position, dir, dmg, parent, DAMAGE_BULLET);
+                    if (apply_damage) {
+                        damage(info.entity, info.position, dir, dmg, parent, DAMAGE_BULLET);
+                    }
 
                     start = sum(info.position, mult(0.1f, dir));
                     range -= dist(pos, info.position);

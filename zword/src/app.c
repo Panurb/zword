@@ -391,7 +391,6 @@ void update(float time_step) {
                 network_shutdown();
                 network_init();
             }
-            network.game_started = false;
             game_state = STATE_MENU;
             break;
         case STATE_RESET:

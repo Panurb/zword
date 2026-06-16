@@ -34,7 +34,7 @@ int discovered_servers_count = 0;
 
 
 #define NET_PREDICTION_HISTORY_SIZE 128
-#define NET_BUFFERED_SNAPSHOT_COUNT 10
+#define NET_BUFFERED_SNAPSHOT_COUNT 10  // Simulate lag
 #define NET_BUFFERED_SNAPSHOT_STORAGE_SIZE ((NET_BUFFERED_SNAPSHOT_COUNT) > 0 ? (NET_BUFFERED_SNAPSHOT_COUNT) : 1)
 #define NET_PREDICTED_EVENT_TICK_THRESHOLD 10
 
@@ -119,18 +119,28 @@ static void predict_local_player_input(Entity entity, const Controller* controll
     }
 
     player->controller = *controller;
+    coord->previous.position = get_position(entity);
+    coord->previous.angle = get_angle(entity);
+    coord->previous.scale = get_scale(entity);
+    update_player_movement(entity);
+
+    // TODO: update grid?
+
     if (player->state == PLAYER_ON_FOOT) {
         if (player->controller.buttons_pressed[BUTTON_RT]) {
             player->state = PLAYER_SHOOT;
-            player_shoot(entity, time_step);
+            player_shoot(entity, time_step, false);
         }
     }
-    // input_player(entity);
-    update_player_movement(entity);
-    // if (player->state == PLAYER_SHOOT) {
-    //     player_shoot(entity, time_step);
-    // }
+
+    for (int i = 0; i < game_data->components->entities; i++) {
+        ColliderComponent* collider = ColliderComponent_get(i);
+        if (!collider) continue;
+
+        collider->last_collision = -1;
+    }
     collide(entity, false);
+
     update_physics_entity(entity, time_step);
 }
 
@@ -440,7 +450,6 @@ static bool has_dynamic_components(int entity) {
 void return_to_lobby() {
     end_match();
     clear_all_sounds();
-    network.game_started = false;
     lobby_info_broadcast_timer = 0.0f;
     lobby_keepalive_timer = 0.0f;
     clear_local_prediction_history();
@@ -1015,7 +1024,6 @@ void update_client_lobby(float time_step) {
             for (int i = 0; i < (int)start->num_players; i++) {
                 app.player_controllers[i] = CONTROLLER_MKB;
             }
-            network.game_started = true;
             lobby_info_broadcast_timer = 0.0f;
             game_state = STATE_CLIENT_START;
             break;
@@ -1053,7 +1061,6 @@ void host_start(void) {
     start_pkt.num_players = (uint8_t)num_players;
     start_pkt.point_limit = (uint8_t)game_data->point_limit;
     network_broadcast(&start_pkt, sizeof(start_pkt));
-    network.game_started = true;
     lobby_info_broadcast_timer = 0.0f;
 
     memset(net_entity_seen, 0, sizeof(net_entity_seen));
