@@ -1018,12 +1018,6 @@ void update_client_lobby(float time_step) {
             game_data->game_mode = (GameMode)start->game_mode;
             game_data->point_limit = start->point_limit;
 
-            for (int i = 0; i < 4; i++) {
-                app.player_controllers[i] = CONTROLLER_NONE;
-            }
-            for (int i = 0; i < (int)start->num_players; i++) {
-                app.player_controllers[i] = CONTROLLER_MKB;
-            }
             lobby_info_broadcast_timer = 0.0f;
             game_state = STATE_CLIENT_START;
             break;
