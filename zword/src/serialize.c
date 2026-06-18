@@ -130,6 +130,8 @@ void deserialize_string(cJSON* json, char* name, char* value) {
     cJSON* val = cJSON_GetObjectItem(json, name);
     if (val) {
         strcpy(value, val->valuestring);
+    } else {
+        value[0] = '\0';
     }
 }
 
@@ -1097,6 +1099,8 @@ void deserialize_game(cJSON* json, bool preserve_id) {
     LOG_DEBUG("Ambient light: %f", game_data->ambient_light);
     game_data->weather = deserialize_int(json, "weather", game_data->weather);
     LOG_DEBUG("Weather: %d", game_data->weather);
+    deserialize_string(json, "next_map", game_data->next_map);
+    LOG_DEBUG("Next_map: %s", game_data->next_map);
     deserialize_map(json, preserve_id);
 }
 

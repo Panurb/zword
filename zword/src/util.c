@@ -400,6 +400,78 @@ int list_files_alphabetically(String path, String* files, bool (*condition)(File
     return files_size;
 }
 
+bool find_newest_file(String path, String* newest_file) {
+    #ifndef __EMSCRIPTEN__
+        WIN32_FIND_DATA file;
+        HANDLE handle = FindFirstFile(path, &file);
+
+        if (handle == INVALID_HANDLE_VALUE) {
+            LOG_WARNING("Path not found: %s", path);
+            return false;
+        }
+
+        String newest = "";
+        FILETIME newest_time = { 0 };
+
+        do {
+            if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0) {
+                continue;
+            }
+            if (CompareFileTime(&file.ftLastWriteTime, &newest_time) > 0) {
+                strcpy(newest, file.cFileName);
+                newest_time = file.ftLastWriteTime;
+            }
+        } while (FindNextFile(handle, &file));
+
+        if (strlen(newest) == 0) {
+            LOG_WARNING("No files found in path: %s", path);
+            return false;
+        }
+
+        strcpy(*newest_file, newest);
+        return true;
+    #else
+        char* last_slash = strrchr(path, '/');
+        if (last_slash) {
+            *last_slash = '\0';
+        }
+        DIR* dir = opendir(path);
+        if (dir == NULL) {
+            LOG_WARNING("Path not found: %s", path);
+            return false;
+        }
+        String newest = "";
+        time_t newest_time = 0;
+
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != NULL) {
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+                continue;
+            }
+            String full_path;
+            snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+            struct stat st;
+            if (stat(full_path, &st) != 0) {
+                LOG_WARNING("Failed to stat file: %s", full_path);
+                continue;
+            }
+            if (st.st_mtime > newest_time) {
+                strcpy(newest, entry->d_name);
+                newest_time = st.st_mtime;
+            }
+        }
+        closedir(dir);
+
+        if (strlen(newest) == 0) {
+            LOG_WARNING("No files found in path: %s", path);
+            return false;
+        }
+
+        strcpy(*newest_file, newest);
+        return true;
+    #endif
+}
+
 void create_directory(String path) {
     // Create directory if it doesn't exist
 

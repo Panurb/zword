@@ -205,11 +205,6 @@ int get_texture_index(Filename filename) {
 }
 
 
-void set_texture(ImageComponent* image) {
-    image->texture_index = get_texture_index(image->filename);
-}
-
-
 void draw_image(int entity, int camera) {
     ImageComponent* image = ImageComponent_get(entity);
     if (image->alpha == 0.0f) {
@@ -293,6 +288,7 @@ void draw_roofs(int camera) {
 
 
 void change_texture(int entity, Filename filename, float width, float height) {
+    LOG_INFO("Changing texture: %d, %s", entity, filename);
     ImageComponent* image = ImageComponent_get(entity);
     strcpy(image->filename, filename);
     image->width = width;

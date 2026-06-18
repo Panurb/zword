@@ -545,10 +545,7 @@ void draw_spline(Entity camera, int texture_index, Vector2f p0, Vector2f p1, Vec
 }
 
 
-void update_camera(int camera, float time_step, bool follow_players) {
-    CoordinateComponent* coord = CoordinateComponent_get(camera);
-    CameraComponent* cam = CameraComponent_get(camera);
-
+Vector2f get_camera_target_position(bool follow_players) {
     Vector2f pos = zeros();
 
     if (follow_players) {
@@ -574,9 +571,19 @@ void update_camera(int camera, float time_step, bool follow_players) {
         }
         if (n != 0) {
             pos = mult(1.0 / n, pos);
-            coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
         }
     }
+
+    return pos;
+}
+
+
+void update_camera(int camera, float time_step, bool follow_players) {
+    CoordinateComponent* coord = CoordinateComponent_get(camera);
+    CameraComponent* cam = CameraComponent_get(camera);
+
+    Vector2f pos = get_camera_target_position(follow_players);
+    coord->position = sum(coord->position, mult(10.0 * time_step, diff(pos, coord->position)));
 
     cam->zoom += 10.0 * time_step * (cam->zoom_target * cam->resolution.h / 720.0 - cam->zoom);
     cam->shake.velocity = diff(cam->shake.velocity, lin_comb(5.0f, cam->shake.position, 0.1f, cam->shake.velocity));

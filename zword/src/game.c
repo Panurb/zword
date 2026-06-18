@@ -362,6 +362,9 @@ void init_game() {
     }
 
     init_weather();
+
+    CoordinateComponent* coord = CoordinateComponent_get(game_data->camera);
+    coord->position = get_camera_target_position(true);
 }
 
 

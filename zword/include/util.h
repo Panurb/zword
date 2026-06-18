@@ -232,6 +232,8 @@ float smoothstep(float x, float mu, float nu);
 
 int list_files_alphabetically(String path, String* files, bool (*condition)(Filename));
 
+bool find_newest_file(String path, String* newest_file);
+
 void create_directory(String directory);
 
 int binary_search_filename(String filename, String* array, int size);

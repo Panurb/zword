@@ -103,6 +103,7 @@ typedef struct {
     int wave;
     float wave_delay;
     bool friendly_fire;
+    String next_map;
 } GameData;
 
 

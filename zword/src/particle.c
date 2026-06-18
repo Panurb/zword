@@ -290,7 +290,6 @@ void update_particles(int camera, float time_step) {
 
         for (int j = 0; j < part->bursts_size; j++) {
             Burst burst = part->bursts[j];
-            LOG_INFO("burst entity=%d count=%d, angle=%f", i, burst.count, burst.angle);
             part->origin = burst.origin;
             part->angle = burst.angle;
             part->max_time = burst.max_time;

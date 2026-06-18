@@ -743,7 +743,19 @@ void start_campaign(int entity) {
 
 
 void load_campaign(int entity) {
-    strcpy(game_data->map_name, "Campaign");
+    LOG_INFO("Looking for save files...");
+    String filename;
+    if (find_newest_file("save/*.json", &filename)) {
+        char* dot = strchr(filename, '.');
+        if (dot) {
+            *dot = '\0';
+        }
+        LOG_INFO("Found save file: %s", filename);
+        strcpy(game_data->map_name, filename);
+    } else {
+        LOG_ERROR("No save file found");
+        return;
+    }
     change_state_load(entity);
     reset_ids();
 }
@@ -759,7 +771,18 @@ bool save_exists(String map_name) {
     // Make static to prevent stack overflow in Emscripten
     static String files[128];
     int files_count = list_files_alphabetically("save/*.json", files, NULL);
-    return files_count > 0 && strcmp(files[0], map_name) == 0;
+
+    // Any save exists
+    if (map_name[0] == '\0') {
+        return files_count;
+    }
+
+    for (int i = 0; i < files_count; i++) {
+        if (strcmp(map_name, files[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -768,15 +791,15 @@ bool save_exists(String map_name) {
     EMSCRIPTEN_KEEPALIVE
 #endif
 void create_menu() {
-    int height = 8;
+    int height = 9;
 
     if (game_settings.debug) {
-        height += 2;
+        height += 1;
     }
     int container = create_container(vec(-18.0f, -2.0f), 1, height);
     WidgetComponent_get(container)->enabled = false;
 
-    if (save_exists("Campaign")) {
+    if (save_exists("")) {
         add_button_to_container(container, "CONTINUE", load_campaign);
     }
 
@@ -786,9 +809,7 @@ void create_menu() {
     #ifndef __EMSCRIPTEN__
         add_button_to_container(container, "LAN", toggle_lan);
     #endif
-    if (game_settings.debug) {
-        add_button_to_container(container, "EDITOR", toggle_editor);
-    }
+    add_button_to_container(container, "EDITOR", toggle_editor);
     add_button_to_container(container, "SETTINGS", toggle_settings);
     add_button_to_container(container, "CONTROLS", toggle_controls);
     add_button_to_container(container, "CREDITS", toggle_credits);
@@ -890,7 +911,12 @@ void create_win_menu() {
             create_button("QUIT", vec(0.0f, y), change_state_end);
             break;
         default:
-            create_button("CONTINUE", vec(0.0f, y), change_state_end);
+            if (game_data->next_map[0] != '\0') {
+                strcpy(game_data->map_name, game_data->next_map);
+                create_button("CONTINUE", vec(0.0f, y), change_state_start);
+            } else {
+                create_button("CONTINUE", vec(0.0f, y), change_state_end);
+            }
     }
 }
 

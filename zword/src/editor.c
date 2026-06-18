@@ -625,7 +625,7 @@ void update_editor(float time_step) {
     // collide(data.data.grid);
     update_waypoints();
 
-    update_particles(game_data->camera, time_step, true);
+    update_particles(game_data->camera, time_step);
     update_lights(time_step);
     update_camera(game_data->camera, time_step, false);
     CoordinateComponent* coord = CoordinateComponent_get(game_data->camera);

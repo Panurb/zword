@@ -328,6 +328,7 @@ void update_player(Entity entity, float time_step) {
             int new_item = player->inventory[player->item];
 
             if (new_item != item) {
+                // TODO: change arms texture here
                 if (item != -1) {
                     ImageComponent_get(item)->alpha = 0.0f;
                 }

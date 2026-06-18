@@ -2,6 +2,7 @@
 	"game_mode":	1,
 	"ambient_light":	0.5,
 	"weather":	1,
+	"next_map": "Bunker",
 	"entities":	[{
 			"id":	0,
 			"Coordinate":	{
