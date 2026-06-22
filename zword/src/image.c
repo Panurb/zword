@@ -288,7 +288,7 @@ void draw_roofs(int camera) {
 
 
 void change_texture(int entity, Filename filename, float width, float height) {
-    LOG_INFO("Changing texture: %d, %s", entity, filename);
+    LOG_DEBUG("Changing texture: %d, %s", entity, filename);
     ImageComponent* image = ImageComponent_get(entity);
     strcpy(image->filename, filename);
     image->width = width;

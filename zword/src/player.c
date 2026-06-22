@@ -170,26 +170,12 @@ void player_shoot(Entity entity, float time_step, bool apply_damage) {
 }
 
 
-void update_player(Entity entity, float time_step) {
+void update_arms_texture(Entity entity) {
     PlayerComponent* player = PlayerComponent_get(entity);
-    if (!player) return;
-
-    PhysicsComponent* phys = PhysicsComponent_get(entity);
-    Vector2f left_stick = player->controller.left_stick;
-
-    int slot = get_slot(entity, player->inventory_size);
-    int atch = get_attachment(entity);
-
     int item = player->inventory[player->item];
+    ImageComponent* image = ImageComponent_get(item);
     ItemComponent* itco = ItemComponent_get(item);
     WeaponComponent* weapon = WeaponComponent_get(item);
-    LightComponent* light = LightComponent_get(item);
-    ImageComponent* image = ImageComponent_get(item);
-
-    update_player_movement(entity);
-    if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
-        player->money_timer = fmaxf(player->money_timer - time_step, 0.0f);
-    }
 
     if (weapon) {
         char buffer[256];
@@ -205,6 +191,28 @@ void update_player(Entity entity, float time_step) {
         } else {
             change_texture(player->arms, "", 0.0f, 0.0f);
         }
+    }
+}
+
+
+void update_player(Entity entity, float time_step) {
+    PlayerComponent* player = PlayerComponent_get(entity);
+    if (!player) return;
+
+    PhysicsComponent* phys = PhysicsComponent_get(entity);
+    Vector2f left_stick = player->controller.left_stick;
+
+    int slot = get_slot(entity, player->inventory_size);
+    int atch = get_attachment(entity);
+
+    int item = player->inventory[player->item];
+    ItemComponent* itco = ItemComponent_get(item);
+    WeaponComponent* weapon = WeaponComponent_get(item);
+    LightComponent* light = LightComponent_get(item);
+
+    update_player_movement(entity);
+    if (player->state != PLAYER_DEAD && player->state != PLAYER_DRIVE) {
+        player->money_timer = fmaxf(player->money_timer - time_step, 0.0f);
     }
 
     switch (player->state) {
@@ -250,6 +258,7 @@ void update_player(Entity entity, float time_step) {
                     game_state = STATE_SAVE;
                 } else {
                     pick_up_item(entity);
+                    update_arms_texture(entity);
                 }
             } else if (DoorComponent_get(player->target)) {
                 unlock_door(entity);
@@ -328,7 +337,8 @@ void update_player(Entity entity, float time_step) {
             int new_item = player->inventory[player->item];
 
             if (new_item != item) {
-                // TODO: change arms texture here
+                update_arms_texture(entity);
+
                 if (item != -1) {
                     ImageComponent_get(item)->alpha = 0.0f;
                 }

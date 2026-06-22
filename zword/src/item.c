@@ -334,6 +334,7 @@ void drop_item(int entity) {
         change_layer(i, LAYER_ITEMS);
         ImageComponent_get(i)->alpha = 1.0f;
         ColliderComponent_get(i)->enabled = true;
+        update_arms_texture(entity);
     }
 }
 
