@@ -1151,7 +1151,7 @@ void update_client(float time_step) {
 
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
-    update_particles(game_data->camera, time_step, true);
+    update_particles(game_data->camera, time_step);
 
     network.tick++;
 }
@@ -1172,7 +1172,7 @@ void update_client_pause(float time_step) {
 
     update_camera(game_data->camera, time_step, true);
     update_lights(time_step);
-    update_particles(game_data->camera, time_step, true);
+    update_particles(game_data->camera, time_step);
 
     CoordinateComponent* cam_coord = CoordinateComponent_get(game_data->camera);
     cam_coord->previous.position = cam_coord->position;

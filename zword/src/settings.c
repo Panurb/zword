@@ -35,6 +35,7 @@ Settings game_settings = {
     },
     .player_name = "player",
     .last_ip = "127.0.0.1",
+    .show_fps = false,
 };
 
 
@@ -85,6 +86,8 @@ void load_settings() {
             strcpy(game_settings.player_name, line.value);
         } else if (strcmp(line.key, "LAST_IP") == 0) {
             strcpy(game_settings.last_ip, line.value);
+        } else if (strcmp(line.key, "SHOW_FPS") == 0) {
+            game_settings.show_fps = strtol(line.value, NULL, 10);
         } else {
             for (int i = 0; i < ACTIONS_SIZE; i++) {
                 if (strcmp(line.key, ACTIONS[i]) == 0) {

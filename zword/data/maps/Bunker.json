@@ -125,7 +125,7 @@
 			"Coordinate":	{
 				"x":	-3.5,
 				"y":	-6.5,
-				"angle":	0.43704086542129517,
+				"angle":	-1.966395378112793,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -651,7 +651,7 @@
 			"Coordinate":	{
 				"x":	-27,
 				"y":	-19,
-				"angle":	2.8827629089355469,
+				"angle":	-0.971289873123169,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -1246,7 +1246,7 @@
 			"Coordinate":	{
 				"x":	28,
 				"y":	-62,
-				"angle":	-3.0949513912200928,
+				"angle":	-0.66581892967224121,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -1325,7 +1325,7 @@
 			"Coordinate":	{
 				"x":	29.5,
 				"y":	-61.5,
-				"angle":	-0.31589210033416748,
+				"angle":	-2.7193284034729,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -1333,20 +1333,20 @@
 			"Coordinate":	{
 				"x":	27,
 				"y":	-59,
-				"angle":	0.469505101442337,
+				"angle":	-1.9339311122894287,
 				"prefab":	"objects/blood",
-				"scale_x":	1.3309922218322754,
-				"scale_y":	1.3309922218322754
+				"scale_x":	1.3309919834136963,
+				"scale_y":	1.3309919834136963
 			}
 		}, {
 			"id":	141,
 			"Coordinate":	{
 				"x":	28.5,
 				"y":	-57.5,
-				"angle":	-1.1013144254684448,
+				"angle":	2.77843451499939,
 				"prefab":	"objects/blood",
-				"scale_x":	1.6104997396469116,
-				"scale_y":	1.6104997396469116
+				"scale_x":	1.6104995012283325,
+				"scale_y":	1.6104995012283325
 			}
 		}, {
 			"id":	142,
@@ -1362,7 +1362,7 @@
 			"Coordinate":	{
 				"x":	19,
 				"y":	-29,
-				"angle":	-0.56279361248016357,
+				"angle":	-0.31293874979019165,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -2195,15 +2195,15 @@
 			"Coordinate":	{
 				"x":	1,
 				"y":	-34,
-				"angle":	0.78539806604385376,
-				"prefab":	"weapons/ammo rifle"
+				"angle":	-3.01666522026062,
+				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
 			"id":	232,
 			"Coordinate":	{
 				"x":	1,
 				"y":	-35,
-				"angle":	-0.913213074207306,
+				"angle":	1.5159193277359009,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -2271,7 +2271,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-43,
-				"angle":	2.4398152828216553,
+				"angle":	0.66724598407745361,
 				"prefab":	"objects/gas"
 			}
 		}, {
@@ -2386,7 +2386,7 @@
 			"Coordinate":	{
 				"x":	-47.5,
 				"y":	-64.5,
-				"angle":	-0.39908438920974731,
+				"angle":	-0.14922960102558136,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -2394,7 +2394,7 @@
 			"Coordinate":	{
 				"x":	-46.5,
 				"y":	-64.5,
-				"angle":	0.386313647031784,
+				"angle":	0.63616847991943359,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -2463,7 +2463,7 @@
 			"Coordinate":	{
 				"x":	-2.25,
 				"y":	-33.75,
-				"angle":	3.0914888381958008,
+				"angle":	-3.0216109752655029,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2643,7 +2643,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-76,
-				"angle":	2.7463257312774658,
+				"angle":	2.9164113998413086,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2651,7 +2651,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-88,
-				"angle":	2.7463257312774658,
+				"angle":	2.9164113998413086,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2659,7 +2659,7 @@
 			"Coordinate":	{
 				"x":	-14,
 				"y":	-92,
-				"angle":	2.7463257312774658,
+				"angle":	2.9164113998413086,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -2735,7 +2735,7 @@
 			"Coordinate":	{
 				"x":	-10,
 				"y":	-84,
-				"angle":	-2.6514372825622559,
+				"angle":	1.2283117771148682,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2743,7 +2743,7 @@
 			"Coordinate":	{
 				"x":	-8,
 				"y":	-81,
-				"angle":	-1.0806422233581543,
+				"angle":	2.79910683631897,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2909,7 +2909,7 @@
 			"Coordinate":	{
 				"x":	5,
 				"y":	-108,
-				"angle":	2.0225660800933838,
+				"angle":	-0.38087019324302673,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2917,7 +2917,7 @@
 			"Coordinate":	{
 				"x":	11.5,
 				"y":	-100.5,
-				"angle":	1.2371677160263062,
+				"angle":	-1.1662685871124268,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2925,7 +2925,7 @@
 			"Coordinate":	{
 				"x":	9,
 				"y":	-110,
-				"angle":	0.45176944136619568,
+				"angle":	-1.9516668319702148,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -2941,7 +2941,7 @@
 			"Coordinate":	{
 				"x":	-4.5,
 				"y":	-68.5,
-				"angle":	-2.7134711742401123,
+				"angle":	1.86636757850647,
 				"prefab":	"objects/table"
 			}
 		}, {
@@ -2965,7 +2965,7 @@
 			"Coordinate":	{
 				"x":	-1.5,
 				"y":	-65.5,
-				"angle":	2.3611373901367188,
+				"angle":	2.5312230587005615,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -3924,7 +3924,7 @@
 			"Coordinate":	{
 				"x":	58.5,
 				"y":	-51,
-				"angle":	1.3021224737167358,
+				"angle":	-1.1013138294219971,
 				"prefab":	"objects/blood"
 			}
 		}, {
@@ -4096,7 +4096,7 @@
 			"Coordinate":	{
 				"x":	72.5,
 				"y":	-61.5,
-				"angle":	3.0791277885437012,
+				"angle":	1.3757812976837158,
 				"prefab":	"objects/table"
 			}
 		}, {
@@ -4112,7 +4112,7 @@
 			"Coordinate":	{
 				"x":	66,
 				"y":	-49,
-				"angle":	0.53022122383117676,
+				"angle":	0.70030689239501953,
 				"prefab":	"objects/lamp"
 			}
 		}, {
@@ -4120,7 +4120,7 @@
 			"Coordinate":	{
 				"x":	3,
 				"y":	-39,
-				"angle":	1.1238725185394287,
+				"angle":	-1.3648954629898071,
 				"prefab":	"weapons/ammo shotgun"
 			}
 		}, {
@@ -4128,7 +4128,7 @@
 			"Coordinate":	{
 				"x":	2,
 				"y":	-41,
-				"angle":	2.1566526889801025,
+				"angle":	2.40650749206543,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -4373,7 +4373,7 @@
 			"Coordinate":	{
 				"x":	-34,
 				"y":	-77.5,
-				"angle":	-0.18177703022956848,
+				"angle":	-2.6705448627471924,
 				"prefab":	"weapons/ammo shotgun"
 			}
 		}, {
@@ -7239,7 +7239,7 @@
 			"Coordinate":	{
 				"x":	63,
 				"y":	-36,
-				"angle":	1.7505118846893311,
+				"angle":	-2.1035408973693848,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -7319,7 +7319,7 @@
 			"Coordinate":	{
 				"x":	8,
 				"y":	-103,
-				"angle":	0.3731498122215271,
+				"angle":	2.8022823333740234,
 				"prefab":	"objects/bandage"
 			}
 		}, {
@@ -7371,7 +7371,7 @@
 			"Coordinate":	{
 				"x":	63,
 				"y":	-29,
-				"angle":	2.0346717834472656,
+				"angle":	2.2845265865325928,
 				"prefab":	"weapons/ammo pistol"
 			}
 		}, {
@@ -7387,7 +7387,7 @@
 			"Coordinate":	{
 				"x":	62,
 				"y":	-30,
-				"angle":	2.61129879951477,
+				"angle":	0.12253092974424362,
 				"prefab":	"weapons/ammo shotgun"
 			}
 		}, {
@@ -7413,8 +7413,41 @@
 			"Coordinate":	{
 				"x":	-12,
 				"y":	-84,
-				"angle":	-2.231266975402832,
+				"angle":	-1.9814122915267944,
 				"prefab":	"weapons/ammo pistol"
+			}
+		}, {
+			"id":	799,
+			"Coordinate":	{
+				"x":	14,
+				"y":	-94,
+				"angle":	-2.3561944961547852,
+				"prefab":	"objects/save_point"
+			}
+		}, {
+			"id":	800,
+			"Coordinate":	{
+				"x":	-40,
+				"y":	-55.5,
+				"prefab":	"tiles/field",
+				"scale_x":	16,
+				"scale_y":	15
+			}
+		}, {
+			"id":	801,
+			"Coordinate":	{
+				"x":	-40,
+				"y":	-55.5,
+				"prefab":	"tiles/snow",
+				"scale_x":	2,
+				"scale_y":	1.875
+			}
+		}, {
+			"id":	802,
+			"Coordinate":	{
+				"x":	-36,
+				"y":	-76,
+				"prefab":	"weapons/ammo rifle"
 			}
 		}]
 }

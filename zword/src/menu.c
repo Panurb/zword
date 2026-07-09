@@ -235,6 +235,15 @@ void change_state_start(int entity) {
 }
 
 
+void change_state_next_map(int entity) {
+    UNUSED(entity);
+    LOG_INFO("Next map: %s", game_data->next_map);
+    strcpy(game_data->map_name, game_data->next_map);
+    game_state = STATE_START;
+    reset_ids();
+}
+
+
 void change_state_reset(int entity) {
     UNUSED(entity);
     game_state = STATE_RESET;
@@ -835,10 +844,10 @@ void destroy_menu() {
 
 
 void create_pause_menu() {
-    int height = game_data->game_mode == MODE_CAMPAIGN ? 5 : 3;
+    int height = game_settings.debug ? 5 : 3;
     int container = create_container(vec(-20.0f, 0.0f), 1, height);
     add_button_to_container(container, "RESUME", change_state_game);
-    if (game_data->game_mode == MODE_CAMPAIGN) {
+    if (game_settings.debug) {
         add_button_to_container(container, "SAVE", change_state_save);
         add_button_to_container(container, "LOAD", change_state_load);
     }
@@ -912,8 +921,7 @@ void create_win_menu() {
             break;
         default:
             if (game_data->next_map[0] != '\0') {
-                strcpy(game_data->map_name, game_data->next_map);
-                create_button("CONTINUE", vec(0.0f, y), change_state_start);
+                create_button("CONTINUE", vec(0.0f, y), change_state_next_map);
             } else {
                 create_button("CONTINUE", vec(0.0f, y), change_state_end);
             }

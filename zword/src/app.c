@@ -25,7 +25,7 @@ App app;
 
 static GameState previous_state = STATE_MENU;
 
-static String version = "0.5.0";
+static String version = "0.6.0";
 
 static float title_scale = 2.0f;
 
@@ -562,7 +562,9 @@ void draw() {
         draw_debug(debug_level);
     }
 
-    FPSCounter_draw(app.fps);
+    if (game_settings.show_fps) {
+        FPSCounter_draw(app.fps);
+    }
 
     SDL_RenderPresent(app.renderer);
 }

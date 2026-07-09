@@ -1024,6 +1024,7 @@ cJSON* serialize_game(bool preserve_id) {
     cJSON_AddNumberToObject(json, "game_mode", game_data->game_mode);
     cJSON_AddNumberToObject(json, "ambient_light", game_data->ambient_light);
     serialize_int(json, "weather", game_data->weather, WEATHER_NONE);
+    serialize_string(json, "next_map", game_data->next_map, "");
 
     serialize_map(json, preserve_id);
 

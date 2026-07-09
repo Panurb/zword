@@ -34,6 +34,7 @@ typedef struct {
     Keybind keybinds[16];
     String player_name;
     String last_ip;
+    bool show_fps;
 } Settings;
 
 typedef struct {
