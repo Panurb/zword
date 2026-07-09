@@ -771,8 +771,10 @@ void load_campaign(int entity) {
 
 
 void start_tutorial(int entity) {
+    UNUSED(entity);
     strcpy(game_data->map_name, "Tutorial");
-    change_state_start(entity);
+    game_state = STATE_START;
+    reset_ids();
 }
 
 
